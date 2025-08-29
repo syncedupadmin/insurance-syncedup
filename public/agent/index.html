@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Dashboard - SyncedUp Insurance</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .nav { display: flex; gap: 2rem; padding: 0 2rem; background: white; border-bottom: 1px solid #e2e8f0; }
+        .nav a { padding: 1rem; text-decoration: none; color: #2d3748; font-weight: 500; }
+        .nav a.active { color: #667eea; border-bottom: 2px solid #667eea; }
+        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+        .grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+        .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .stat-value { font-size: 2rem; font-weight: bold; color: #667eea; }
+        .stat-label { color: #718096; margin-top: 0.5rem; }
+        .btn { padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        .btn:hover { background: #5a67d8; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Agent Portal</h1>
+        <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">Logout</button>
+    </div>
+    <nav class="nav">
+        <a href="/agent/" class="active">Dashboard</a>
+        <a href="/agent/quotes.html">Quotes</a>
+        <a href="/agent/sales.html">Sales</a>
+        <a href="/agent/commissions.html">Commissions</a>
+    </nav>
+    <div class="container">
+        <div class="grid">
+            <div class="card">
+                <div class="stat-value">$0</div>
+                <div class="stat-label">Monthly Sales</div>
+            </div>
+            <div class="card">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Policies Sold</div>
+            </div>
+            <div class="card">
+                <div class="stat-value">$0</div>
+                <div class="stat-label">Commissions</div>
+            </div>
+            <div class="card">
+                <div class="stat-value">#1</div>
+                <div class="stat-label">Leaderboard Rank</div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>
