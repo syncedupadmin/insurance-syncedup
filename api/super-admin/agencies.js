@@ -10,45 +10,85 @@ async function agenciesHandler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      const { data, error } = await supabase
-        .from('agencies')
-        .select(`
-          *,
-          users!inner(id, email, name, role)
-        `)
-        .eq('users.role', 'admin')
-        .order('created_at', { ascending: false });
+      const { agency_id } = req.query;
+      
+      if (agency_id) {
+        // Get single agency with detailed info
+        const { data: agency, error } = await supabase
+          .from('agencies')
+          .select(`
+            *,
+            profiles!profiles_agency_id_fkey (
+              id, email, name, role, created_at, last_login, is_active, agent_code
+            )
+          `)
+          .eq('id', agency_id)
+          .single();
 
-      if (error) throw error;
-      return res.status(200).json(data || []);
+        if (error) throw error;
+
+        // Get user stats
+        const adminUser = agency.profiles?.find(p => p.role === 'admin');
+        const userCount = agency.profiles?.length || 0;
+        const activeUsers = agency.profiles?.filter(p => p.is_active).length || 0;
+
+        return res.json({
+          ...agency,
+          admin_user: adminUser,
+          user_count: userCount,
+          active_users: activeUsers
+        });
+      } else {
+        // Get all agencies with summary
+        const { data: agencies, error } = await supabase
+          .from('agencies')
+          .select(`
+            *,
+            profiles!profiles_agency_id_fkey (id, role, is_active)
+          `)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        const processedAgencies = agencies.map(agency => ({
+          ...agency,
+          user_count: agency.profiles?.length || 0,
+          active_users: agency.profiles?.filter(p => p.is_active).length || 0,
+          admin_user: agency.profiles?.find(p => p.role === 'admin')
+        }));
+
+        return res.json({ agencies: processedAgencies });
+      }
     }
 
     if (req.method === 'POST') {
-      const { name, code, admin_email } = req.body;
+      const { name, admin_email, admin_name, phone, address, website, subscription_plan = 'starter' } = req.body;
       
-      // Validate inputs
-      if (!name || !code || !admin_email) {
-        return res.status(400).json({ error: 'Name, code, and admin email are required' });
+      if (!name || !admin_email || !admin_name) {
+        return res.status(400).json({ error: 'Agency name, admin email, and admin name are required' });
       }
       
-      // Check if code already exists
-      const { data: existing } = await supabase
-        .from('agencies')
+      // Check if admin email already exists
+      const { data: existingUser } = await supabase
+        .from('profiles')
         .select('id')
-        .eq('code', code.toUpperCase())
+        .eq('email', admin_email.toLowerCase())
         .single();
       
-      if (existing) {
-        return res.status(400).json({ error: 'Agency code already exists' });
+      if (existingUser) {
+        return res.status(400).json({ error: 'Admin email already exists' });
       }
       
-      // Start transaction
+      // Create agency
       const { data: agency, error: agencyError } = await supabase
         .from('agencies')
         .insert({
           name,
-          code: code.toUpperCase(),
-          admin_email
+          phone,
+          address,
+          website,
+          subscription_plan,
+          is_active: true
         })
         .select()
         .single();
@@ -60,13 +100,13 @@ async function agenciesHandler(req, res) {
                           Math.random().toString(36).slice(-4).toUpperCase() + '!';
       const password_hash = await bcrypt.hash(tempPassword, 10);
 
-      // Create admin user for agency
+      // Create admin user
       const { data: adminUser, error: userError } = await supabase
-        .from('users')
+        .from('profiles')
         .insert({
           email: admin_email.toLowerCase(),
           password_hash,
-          name: `${name} Admin`,
+          name: admin_name,
           role: 'admin',
           agency_id: agency.id,
           must_change_password: true,
@@ -76,12 +116,29 @@ async function agenciesHandler(req, res) {
         .single();
 
       if (userError) {
-        // Rollback agency creation
         await supabase.from('agencies').delete().eq('id', agency.id);
         throw userError;
       }
 
-      // Log action
+      // Send welcome email
+      try {
+        await fetch(`${process.env.APP_URL}/api/email/send`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'welcome',
+            to: admin_email,
+            data: {
+              name: admin_name,
+              temp_password: tempPassword,
+              agency_name: name
+            }
+          })
+        });
+      } catch (emailError) {
+        console.error('Email send failed:', emailError);
+      }
+
       await logAction(supabase, req.user.id, agency.id, 'CREATE', 'agency', agency.id);
 
       return res.status(201).json({ 
@@ -89,26 +146,81 @@ async function agenciesHandler(req, res) {
         agency, 
         admin_user: adminUser,
         temp_password: tempPassword,
-        message: `Agency created. Admin password: ${tempPassword}`
+        message: 'Agency created successfully and welcome email sent'
       });
     }
 
-    if (req.method === 'PATCH') {
-      const { id } = req.query;
+    if (req.method === 'PUT') {
+      const { agency_id } = req.query;
       const updates = req.body;
       
-      const { data, error } = await supabase
+      if (!agency_id) {
+        return res.status(400).json({ error: 'Agency ID required' });
+      }
+      
+      const allowedFields = ['name', 'phone', 'address', 'website', 'subscription_plan', 'is_active'];
+      const updateData = {};
+      
+      Object.keys(updates).forEach(key => {
+        if (allowedFields.includes(key)) {
+          updateData[key] = updates[key];
+        }
+      });
+
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ error: 'No valid fields to update' });
+      }
+
+      const { data: agency, error } = await supabase
         .from('agencies')
-        .update(updates)
-        .eq('id', id)
+        .update(updateData)
+        .eq('id', agency_id)
         .select()
         .single();
 
       if (error) throw error;
       
-      await logAction(supabase, req.user.id, id, 'UPDATE', 'agency', id, updates);
+      await logAction(supabase, req.user.id, agency_id, 'UPDATE', 'agency', agency_id, updateData);
       
-      return res.status(200).json(data);
+      return res.json({ 
+        success: true, 
+        agency,
+        message: 'Agency updated successfully' 
+      });
+    }
+
+    if (req.method === 'DELETE') {
+      const { agency_id } = req.query;
+      
+      if (!agency_id) {
+        return res.status(400).json({ error: 'Agency ID required' });
+      }
+
+      // Check if agency has users
+      const { data: users } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('agency_id', agency_id);
+
+      if (users && users.length > 0) {
+        return res.status(400).json({ 
+          error: 'Cannot delete agency with existing users. Deactivate the agency instead.' 
+        });
+      }
+
+      const { error } = await supabase
+        .from('agencies')
+        .delete()
+        .eq('id', agency_id);
+
+      if (error) throw error;
+
+      await logAction(supabase, req.user.id, agency_id, 'DELETE', 'agency', agency_id);
+      
+      return res.json({ 
+        success: true,
+        message: 'Agency deleted successfully' 
+      });
     }
 
     return res.status(405).json({ error: 'Method not allowed' });

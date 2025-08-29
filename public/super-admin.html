@@ -3,62 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Admin - SyncedUp Platform</title>
+    <title>Super Admin Dashboard - SyncedUp Platform</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
         .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
         .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
-        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #e0e0e0; }
-        th { background: #f8f9fa; }
-        .btn { padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .stats-grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 2rem; }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); text-align: center; }
+        .stat-value { font-size: 2rem; font-weight: bold; color: #667eea; }
+        .stat-label { color: #718096; margin-top: 0.5rem; }
+        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        .btn { padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 0.25rem; }
         .btn:hover { background: #5a67d8; }
+        .btn-success { background: #48bb78; }
+        .btn-warning { background: #ed8936; }
+        .btn-danger { background: #f56565; }
+        .btn-secondary { background: #718096; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
         .form-group { margin-bottom: 1rem; }
-        label { display: block; margin-bottom: 0.5rem; }
-        input, select { width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #4a5568; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .table-container { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        th { background: #f7fafc; padding: 0.75rem; text-align: left; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 0.75rem; border-bottom: 1px solid #e2e8f0; }
+        .status-active { color: #48bb78; font-weight: 500; }
+        .status-inactive { color: #f56565; font-weight: 500; }
+        .actions { display: flex; gap: 0.5rem; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { background: white; margin: 5% auto; padding: 2rem; border-radius: 8px; max-width: 600px; position: relative; max-height: 80vh; overflow-y: auto; }
+        .close { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; cursor: pointer; color: #718096; }
+        .alert { padding: 1rem; margin: 1rem 0; border-radius: 6px; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .search-bar { display: flex; gap: 1rem; margin-bottom: 1rem; align-items: center; }
+        .search-bar input, .search-bar select { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>Super Admin Dashboard</h1>
-        <button class="btn" onclick="logout()">Logout</button>
+        <div>
+            <span style="margin-right: 1rem;">Welcome, Super Admin</span>
+            <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">Logout</button>
+        </div>
     </div>
 
     <div class="container">
-        <div class="card">
-            <h2>Create New Agency</h2>
-            <div class="form-group">
-                <label>Agency Name</label>
-                <input type="text" id="agencyName" placeholder="ABC Insurance">
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalAgencies">0</div>
+                <div class="stat-label">Total Agencies</div>
             </div>
-            <div class="form-group">
-                <label>Agency Code</label>
-                <input type="text" id="agencyCode" placeholder="ABC001">
+            <div class="stat-card">
+                <div class="stat-value" id="activeAgencies">0</div>
+                <div class="stat-label">Active Agencies</div>
             </div>
-            <div class="form-group">
-                <label>Admin Email</label>
-                <input type="email" id="adminEmail" placeholder="admin@abcinsurance.com">
+            <div class="stat-card">
+                <div class="stat-value" id="totalUsers">0</div>
+                <div class="stat-label">Total Users</div>
             </div>
-            <button class="btn" onclick="createAgency()">Create Agency</button>
-            <div id="result" style="margin-top: 1rem;"></div>
+            <div class="stat-card">
+                <div class="stat-value" id="activeUsers">0</div>
+                <div class="stat-label">Active Users</div>
+            </div>
         </div>
 
+        <!-- Create Agency Form -->
         <div class="card">
-            <h2>Existing Agencies</h2>
-            <table id="agenciesTable">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Code</th>
-                        <th>Admin Email</th>
-                        <th>Status</th>
-                        <th>Created</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2>Create New Agency</h2>
+                <button class="btn btn-success" onclick="openCreateModal()">+ Create Agency</button>
+            </div>
+            <p style="color: #718096;">Create and manage insurance agencies with admin accounts and email notifications.</p>
+        </div>
+
+        <!-- Agencies Table -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2>Agency Management</h2>
+                <button class="btn" onclick="loadAgencies()">🔄 Refresh</button>
+            </div>
+            
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search agencies..." onkeyup="filterAgencies()">
+                <select id="statusFilter" onchange="filterAgencies()">
+                    <option value="">All Statuses</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+                <select id="planFilter" onchange="filterAgencies()">
+                    <option value="">All Plans</option>
+                    <option value="starter">Starter</option>
+                    <option value="professional">Professional</option>
+                    <option value="enterprise">Enterprise</option>
+                </select>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Agency Name</th>
+                            <th>Admin</th>
+                            <th>Users</th>
+                            <th>Plan</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="agenciesTableBody">
+                        <tr><td colspan="7" style="text-align: center;">Loading agencies...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Agency Modal -->
+    <div id="agencyModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3 id="modalTitle">Create New Agency</h3>
+            <div id="modalAlert"></div>
+            
+            <form id="agencyForm">
+                <input type="hidden" id="agencyId">
+                
+                <div class="form-group">
+                    <label for="agencyName">Agency Name *</label>
+                    <input type="text" id="agencyName" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="adminName">Admin Name *</label>
+                        <input type="text" id="adminName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminEmail">Admin Email *</label>
+                        <input type="email" id="adminEmail" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="agencyPhone">Phone</label>
+                        <input type="tel" id="agencyPhone">
+                    </div>
+                    <div class="form-group">
+                        <label for="agencyWebsite">Website</label>
+                        <input type="url" id="agencyWebsite" placeholder="https://">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="agencyAddress">Address</label>
+                    <textarea id="agencyAddress" rows="3"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="subscriptionPlan">Subscription Plan</label>
+                        <select id="subscriptionPlan">
+                            <option value="starter">Starter - $29/month</option>
+                            <option value="professional" selected>Professional - $99/month</option>
+                            <option value="enterprise">Enterprise - $299/month</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="agencyStatus">Status</label>
+                        <select id="agencyStatus">
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="submit" class="btn btn-success">Save Agency</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Password Reset Modal -->
+    <div id="resetModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeResetModal()">&times;</span>
+            <h3>Reset Admin Password</h3>
+            <div id="resetAlert"></div>
+            
+            <p style="margin-bottom: 1rem;">This will generate a new temporary password for the agency admin.</p>
+            
+            <div class="form-group">
+                <label>Agency</label>
+                <input type="text" id="resetAgencyName" readonly style="background: #f7fafc;">
+            </div>
+            
+            <div class="form-group">
+                <label>Admin Email</label>
+                <input type="email" id="resetAdminEmail" readonly style="background: #f7fafc;">
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button class="btn btn-warning" onclick="confirmPasswordReset()">Reset Password & Send Email</button>
+                <button class="btn btn-secondary" onclick="closeResetModal()">Cancel</button>
+            </div>
         </div>
     </div>
 
@@ -70,47 +225,312 @@
             window.location.href = '/login.html';
         }
 
+        let agencies = [];
+        let currentEditingAgency = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAgencies();
+        });
+
         async function loadAgencies() {
-            const response = await fetch('/api/super-admin/agencies', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const agencies = await response.json();
-            
-            const tbody = document.querySelector('#agenciesTable tbody');
-            tbody.innerHTML = agencies.map(a => `
-                <tr>
-                    <td>${a.name}</td>
-                    <td>${a.code}</td>
-                    <td>${a.admin_email}</td>
-                    <td>${a.is_active ? 'Active' : 'Inactive'}</td>
-                    <td>${new Date(a.created_at).toLocaleDateString()}</td>
-                </tr>
-            `).join('');
+            try {
+                const response = await fetch('/api/super-admin/agencies', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load agencies');
+                }
+                
+                const data = await response.json();
+                agencies = data.agencies || [];
+                
+                displayAgencies();
+                updateStats();
+                
+            } catch (error) {
+                console.error('Error loading agencies:', error);
+                document.getElementById('agenciesTableBody').innerHTML = 
+                    '<tr><td colspan="7" style="text-align: center; color: #f56565;">Failed to load agencies</td></tr>';
+            }
         }
 
-        async function createAgency() {
-            const result = document.getElementById('result');
-            const data = {
-                name: document.getElementById('agencyName').value,
-                code: document.getElementById('agencyCode').value,
-                admin_email: document.getElementById('adminEmail').value
-            };
+        function displayAgencies(filteredAgencies = null) {
+            const agenciesToShow = filteredAgencies || agencies;
+            const tbody = document.getElementById('agenciesTableBody');
+            
+            if (agenciesToShow.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No agencies found</td></tr>';
+                return;
+            }
 
-            const response = await fetch('/api/super-admin/agencies', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
+            tbody.innerHTML = agenciesToShow.map(agency => {
+                const adminUser = agency.profiles?.find(p => p.role === 'admin') || agency.admin_user;
+                return `
+                    <tr>
+                        <td>
+                            <strong>${agency.name}</strong>
+                            ${agency.website ? `<br><small><a href="${agency.website}" target="_blank">${agency.website}</a></small>` : ''}
+                        </td>
+                        <td>
+                            ${adminUser ? `
+                                <div>${adminUser.name}</div>
+                                <div style="font-size: 0.9rem; color: #718096;">${adminUser.email}</div>
+                            ` : 'No admin'}
+                        </td>
+                        <td>
+                            <span style="font-weight: bold;">${agency.user_count || 0}</span>
+                            ${agency.active_users ? `<span style="color: #48bb78;"> (${agency.active_users} active)</span>` : ''}
+                        </td>
+                        <td>
+                            <span style="text-transform: capitalize; font-weight: 500;">
+                                ${agency.subscription_plan || 'starter'}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-${agency.is_active ? 'active' : 'inactive'}">
+                                ${agency.is_active ? 'Active' : 'Inactive'}
+                            </span>
+                        </td>
+                        <td>${new Date(agency.created_at).toLocaleDateString()}</td>
+                        <td class="actions">
+                            <button class="btn" style="padding: 0.5rem; font-size: 0.8rem;" onclick="editAgency('${agency.id}')">Edit</button>
+                            <button class="btn btn-warning" style="padding: 0.5rem; font-size: 0.8rem;" onclick="resetPassword('${agency.id}')">Reset PW</button>
+                            <button class="btn ${agency.is_active ? 'btn-danger' : 'btn-success'}" style="padding: 0.5rem; font-size: 0.8rem;" onclick="toggleAgencyStatus('${agency.id}', ${!agency.is_active})">
+                                ${agency.is_active ? 'Deactivate' : 'Activate'}
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateStats() {
+            document.getElementById('totalAgencies').textContent = agencies.length;
+            document.getElementById('activeAgencies').textContent = agencies.filter(a => a.is_active).length;
+            
+            const totalUsers = agencies.reduce((sum, agency) => sum + (agency.user_count || 0), 0);
+            const activeUsersCount = agencies.reduce((sum, agency) => sum + (agency.active_users || 0), 0);
+            
+            document.getElementById('totalUsers').textContent = totalUsers;
+            document.getElementById('activeUsers').textContent = activeUsersCount;
+        }
+
+        function filterAgencies() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const planFilter = document.getElementById('planFilter').value;
+            
+            const filtered = agencies.filter(agency => {
+                const matchesSearch = !searchTerm || 
+                    agency.name.toLowerCase().includes(searchTerm) ||
+                    (agency.admin_user && agency.admin_user.email.toLowerCase().includes(searchTerm));
+                
+                const matchesStatus = !statusFilter || 
+                    (statusFilter === 'active' && agency.is_active) ||
+                    (statusFilter === 'inactive' && !agency.is_active);
+                
+                const matchesPlan = !planFilter || agency.subscription_plan === planFilter;
+                
+                return matchesSearch && matchesStatus && matchesPlan;
             });
+            
+            displayAgencies(filtered);
+        }
 
-            const json = await response.json();
-            if (response.ok) {
-                result.innerHTML = `<div style="color: green;">Success! Agency created.<br>Admin password: <strong>${json.temp_password}</strong><br>Save this password!</div>`;
-                loadAgencies();
-            } else {
-                result.innerHTML = `<div style="color: red;">Error: ${json.error}</div>`;
+        function openCreateModal() {
+            document.getElementById('modalTitle').textContent = 'Create New Agency';
+            document.getElementById('agencyForm').reset();
+            document.getElementById('agencyId').value = '';
+            document.getElementById('modalAlert').innerHTML = '';
+            document.getElementById('agencyModal').style.display = 'block';
+            currentEditingAgency = null;
+        }
+
+        async function editAgency(agencyId) {
+            try {
+                const response = await fetch(`/api/super-admin/agencies?agency_id=${agencyId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const agency = await response.json();
+                const adminUser = agency.profiles?.find(p => p.role === 'admin');
+                
+                document.getElementById('modalTitle').textContent = 'Edit Agency';
+                document.getElementById('agencyId').value = agency.id;
+                document.getElementById('agencyName').value = agency.name;
+                document.getElementById('adminName').value = adminUser?.name || '';
+                document.getElementById('adminEmail').value = adminUser?.email || '';
+                document.getElementById('agencyPhone').value = agency.phone || '';
+                document.getElementById('agencyWebsite').value = agency.website || '';
+                document.getElementById('agencyAddress').value = agency.address || '';
+                document.getElementById('subscriptionPlan').value = agency.subscription_plan || 'starter';
+                document.getElementById('agencyStatus').value = agency.is_active.toString();
+                
+                document.getElementById('modalAlert').innerHTML = '';
+                document.getElementById('agencyModal').style.display = 'block';
+                currentEditingAgency = agency;
+                
+            } catch (error) {
+                console.error('Error loading agency details:', error);
+                alert('Failed to load agency details');
+            }
+        }
+
+        async function resetPassword(agencyId) {
+            const agency = agencies.find(a => a.id === agencyId);
+            if (!agency) return;
+            
+            const adminUser = agency.profiles?.find(p => p.role === 'admin') || agency.admin_user;
+            
+            document.getElementById('resetAgencyName').value = agency.name;
+            document.getElementById('resetAdminEmail').value = adminUser?.email || '';
+            document.getElementById('resetAlert').innerHTML = '';
+            document.getElementById('resetModal').style.display = 'block';
+            
+            window.currentResetAgency = agency;
+        }
+
+        async function confirmPasswordReset() {
+            const agency = window.currentResetAgency;
+            if (!agency) return;
+            
+            const adminUser = agency.profiles?.find(p => p.role === 'admin') || agency.admin_user;
+            
+            try {
+                const response = await fetch('/api/super-admin/reset-password', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: adminUser.id,
+                        send_email: true
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('resetAlert').innerHTML = 
+                        '<div class="alert alert-success">Password reset successfully! New credentials sent via email.</div>';
+                    setTimeout(() => closeResetModal(), 2000);
+                } else {
+                    document.getElementById('resetAlert').innerHTML = 
+                        `<div class="alert alert-error">Error: ${result.error}</div>`;
+                }
+                
+            } catch (error) {
+                console.error('Error resetting password:', error);
+                document.getElementById('resetAlert').innerHTML = 
+                    '<div class="alert alert-error">Failed to reset password</div>';
+            }
+        }
+
+        async function toggleAgencyStatus(agencyId, newStatus) {
+            try {
+                const response = await fetch(`/api/super-admin/agencies?agency_id=${agencyId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ is_active: newStatus })
+                });
+                
+                if (response.ok) {
+                    await loadAgencies();
+                } else {
+                    const error = await response.json();
+                    alert(`Error: ${error.error}`);
+                }
+                
+            } catch (error) {
+                console.error('Error updating agency status:', error);
+                alert('Failed to update agency status');
+            }
+        }
+
+        // Form submission
+        document.getElementById('agencyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const isEdit = !!currentEditingAgency;
+            const agencyId = document.getElementById('agencyId').value;
+            
+            const formData = {
+                name: document.getElementById('agencyName').value,
+                admin_name: document.getElementById('adminName').value,
+                admin_email: document.getElementById('adminEmail').value,
+                phone: document.getElementById('agencyPhone').value,
+                website: document.getElementById('agencyWebsite').value,
+                address: document.getElementById('agencyAddress').value,
+                subscription_plan: document.getElementById('subscriptionPlan').value,
+                is_active: document.getElementById('agencyStatus').value === 'true'
+            };
+            
+            try {
+                const url = isEdit ? `/api/super-admin/agencies?agency_id=${agencyId}` : '/api/super-admin/agencies';
+                const method = isEdit ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    const alertType = isEdit ? 'Agency updated successfully!' : `Agency created successfully! Admin password: <strong>${result.temp_password}</strong>`;
+                    document.getElementById('modalAlert').innerHTML = 
+                        `<div class="alert alert-success">${alertType}</div>`;
+                    
+                    await loadAgencies();
+                    
+                    if (!isEdit) {
+                        // Show password for 10 seconds, then close modal
+                        setTimeout(() => closeModal(), 10000);
+                    } else {
+                        setTimeout(() => closeModal(), 2000);
+                    }
+                    
+                } else {
+                    document.getElementById('modalAlert').innerHTML = 
+                        `<div class="alert alert-error">Error: ${result.error}</div>`;
+                }
+                
+            } catch (error) {
+                console.error('Error saving agency:', error);
+                document.getElementById('modalAlert').innerHTML = 
+                    '<div class="alert alert-error">Failed to save agency</div>';
+            }
+        });
+
+        function closeModal() {
+            document.getElementById('agencyModal').style.display = 'none';
+            currentEditingAgency = null;
+        }
+
+        function closeResetModal() {
+            document.getElementById('resetModal').style.display = 'none';
+            window.currentResetAgency = null;
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const agencyModal = document.getElementById('agencyModal');
+            const resetModal = document.getElementById('resetModal');
+            
+            if (event.target === agencyModal) {
+                closeModal();
+            }
+            if (event.target === resetModal) {
+                closeResetModal();
             }
         }
 
@@ -118,8 +538,6 @@
             localStorage.clear();
             window.location.href = '/login.html';
         }
-
-        loadAgencies();
     </script>
 </body>
 </html>
