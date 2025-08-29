@@ -26,10 +26,15 @@ export function requireAuth(allowedRoles = []) {
       );
       
       // Set the user context for RLS policies
-      await supabase.rpc('set_config', {
-        key: 'app.user_id',
-        value: decoded.id
-      }).catch(() => {}); // Ignore if function doesn't exist
+      try {
+        await supabase.rpc('set_config', {
+          key: 'app.user_id',
+          value: decoded.id
+        });
+      } catch (error) {
+        // Ignore RLS setup errors for now
+        console.log('RLS setup skipped:', error.message);
+      }
       
       req.user = decoded;
       req.supabase = supabase;
