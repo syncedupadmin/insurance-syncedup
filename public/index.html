@@ -610,10 +610,32 @@
     </style>
 </head>
 <body>
-<script src="/auth-utils.js"></script>
 <script>
-// Check authentication using cookies
-checkAuth();
+// Check authentication using localStorage (consistent with login)
+(function() {
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    
+    console.log('Dashboard - checking auth:', { hasToken: !!token, user });
+    
+    if (!token) {
+        console.log('No token found, redirecting to login');
+        window.location.href = '/login.html';
+        return;
+    }
+    
+    // Show user info if available
+    if (user.name) {
+        console.log('Welcome:', user.name, 'Role:', user.role);
+        // You can add a welcome message to the UI here if desired
+    }
+})();
+
+// Add logout function
+function logout() {
+    localStorage.clear();
+    window.location.href = '/login.html';
+}
 </script>
     <div class="container">
         <div class="header">
