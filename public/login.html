@@ -48,11 +48,26 @@
         button:hover {
             opacity: 0.9;
         }
-        .error {
-            color: #dc3545;
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .error, .success {
             text-align: center;
             margin-top: 1rem;
+            padding: 0.5rem;
+            border-radius: 4px;
             display: none;
+        }
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        .success {
+            color: #155724;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
         }
         .portal-switch {
             text-align: center;
@@ -63,67 +78,154 @@
             color: #667eea;
             text-decoration: none;
         }
+        .debug {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-family: monospace;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="login-container">
         <h2>Login</h2>
-        <form id="loginForm" autocomplete="on">
-            <input type="email" id="email" name="email" placeholder="Email" required autocomplete="email">
-            <input type="password" id="password" name="password" placeholder="Password" required autocomplete="current-password">
-            <button type="submit">Login</button>
+        <form id="loginForm">
+            <input type="email" id="email" name="email" placeholder="Email" required autocomplete="email" value="admin@syncedup.com">
+            <input type="password" id="password" name="password" placeholder="Password" required autocomplete="current-password" value="admin123">
+            <button type="submit" id="loginBtn">Login</button>
             <div class="error" id="error"></div>
+            <div class="success" id="success"></div>
+            <div class="debug" id="debug"></div>
         </form>
         <div class="portal-switch">
-            <a href="/admin/login.html">Admin Login →</a>
+            <a href="/admin/">Direct Admin Access →</a>
         </div>
     </div>
 
     <script>
-        console.log('Login script loaded');
-        
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        const form = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorDiv = document.getElementById('error');
+        const successDiv = document.getElementById('success');
+        const debugDiv = document.getElementById('debug');
+
+        function showMessage(type, message) {
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            
+            if (type === 'error') {
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+            } else if (type === 'success') {
+                successDiv.textContent = message;
+                successDiv.style.display = 'block';
+            }
+            
+            console.log(type + ':', message);
+        }
+
+        function showDebug(message) {
+            debugDiv.textContent = debugDiv.textContent + '\n' + new Date().toLocaleTimeString() + ': ' + message;
+            debugDiv.style.display = 'block';
+            console.log('DEBUG:', message);
+        }
+
+        // Enable debug mode by adding ?debug=1 to URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const debugMode = urlParams.get('debug') === '1';
+        if (debugMode) {
+            debugDiv.style.display = 'block';
+            showDebug('Debug mode enabled');
+        }
+
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            console.log('Form submitted');
             
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const errorDiv = document.getElementById('error');
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
             
-            console.log('Attempting login with:', email);
-            
+            if (!email || !password) {
+                showMessage('error', 'Please enter both email and password');
+                return;
+            }
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Logging in...';
+            showDebug('Starting login process...');
+            showDebug('Email: ' + email);
+
             try {
+                showDebug('Sending request to /api/auth/login');
+                
                 const response = await fetch('/api/auth/login', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password }),
+                    credentials: 'same-origin'
                 });
                 
-                console.log('Response status:', response.status);
+                showDebug('Response status: ' + response.status);
+                showDebug('Response ok: ' + response.ok);
+                
                 const data = await response.json();
-                console.log('Response data:', data);
+                showDebug('Response data: ' + JSON.stringify(data));
                 
                 if (response.ok && data.success) {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
+                    showMessage('success', 'Login successful! Redirecting...');
+                    showDebug('Storing token in localStorage');
+                    
+                    try {
+                        localStorage.setItem('token', data.token);
+                        localStorage.setItem('user', JSON.stringify(data.user));
+                        showDebug('Token and user data stored');
+                    } catch (storageError) {
+                        showDebug('LocalStorage error: ' + storageError.message);
+                    }
                     
                     // Redirect based on role
-                    if (data.user.role === 'admin') {
-                        console.log('Redirecting to admin portal');
-                        window.location.href = '/admin/';
-                    } else {
-                        console.log('Redirecting to main portal');
-                        window.location.href = '/';
-                    }
+                    const redirectUrl = data.user.role === 'admin' ? '/admin/' : '/';
+                    showDebug('Redirecting to: ' + redirectUrl);
+                    
+                    setTimeout(() => {
+                        window.location.href = redirectUrl;
+                    }, 1000);
+                    
                 } else {
-                    errorDiv.textContent = data.error || 'Login failed';
-                    errorDiv.style.display = 'block';
+                    showMessage('error', data.error || 'Login failed');
+                    showDebug('Login failed: ' + (data.error || 'Unknown error'));
                 }
+                
             } catch (error) {
-                console.error('Login error:', error);
-                errorDiv.textContent = 'Network error: ' + error.message;
-                errorDiv.style.display = 'block';
+                showMessage('error', 'Network error: ' + error.message);
+                showDebug('Fetch error: ' + error.message);
+                console.error('Login error details:', error);
             }
+            
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Login';
+        });
+
+        // Test connectivity on page load
+        showDebug('Page loaded, testing API connectivity...');
+        fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: 'test', password: 'test' })
+        })
+        .then(response => {
+            showDebug('API connectivity test - Status: ' + response.status);
+        })
+        .catch(error => {
+            showDebug('API connectivity test failed: ' + error.message);
         });
     </script>
 </body>
