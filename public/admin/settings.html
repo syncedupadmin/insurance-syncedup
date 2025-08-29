@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - SyncedUp Insurance</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .nav { display: flex; gap: 2rem; padding: 0 2rem; background: white; border-bottom: 1px solid #e2e8f0; overflow-x: auto; }
+        .nav a { padding: 1rem; text-decoration: none; color: #2d3748; font-weight: 500; white-space: nowrap; }
+        .nav a.active { color: #667eea; border-bottom: 2px solid #667eea; }
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+        .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
+        .btn { padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 0.25rem; }
+        .btn:hover { background: #5a67d8; }
+        .btn-success { background: #48bb78; }
+        .btn-warning { background: #ed8936; }
+        .btn-danger { background: #f56565; }
+        .btn-secondary { background: #718096; }
+        
+        /* Tab System */
+        .tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 2rem; }
+        .tab { padding: 1rem 2rem; cursor: pointer; border-bottom: 2px solid transparent; color: #718096; font-weight: 500; }
+        .tab.active { color: #667eea; border-bottom-color: #667eea; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* Form Styles */
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #4a5568; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } }
+        
+        /* API Keys */
+        .api-key-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f7fafc; border-radius: 6px; margin-bottom: 1rem; }
+        .api-key-info { flex: 1; }
+        .api-key-name { font-weight: 600; color: #2d3748; }
+        .api-key-value { font-family: monospace; color: #718096; font-size: 0.9rem; margin-top: 0.25rem; }
+        .api-key-actions { display: flex; gap: 0.5rem; }
+        
+        /* Billing */
+        .plan-card { border: 2px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; position: relative; }
+        .plan-card.current { border-color: #667eea; background: #f0f4ff; }
+        .plan-card.current::before { content: "Current Plan"; position: absolute; top: -10px; right: 20px; background: #667eea; color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem; }
+        .plan-name { font-size: 1.25rem; font-weight: 600; color: #2d3748; }
+        .plan-price { font-size: 2rem; font-weight: bold; color: #667eea; margin: 0.5rem 0; }
+        .plan-features { list-style: none; margin: 1rem 0; }
+        .plan-features li { margin: 0.5rem 0; color: #4a5568; }
+        .plan-features li::before { content: "✓"; color: #48bb78; font-weight: bold; margin-right: 0.5rem; }
+        
+        /* Branding */
+        .brand-preview { border: 1px solid #e2e8f0; border-radius: 6px; padding: 2rem; text-align: center; background: white; margin: 1rem 0; }
+        .logo-upload { border: 2px dashed #e2e8f0; padding: 2rem; text-align: center; border-radius: 6px; cursor: pointer; }
+        .logo-upload:hover { background: #f7fafc; }
+        .color-picker { display: flex; align-items: center; gap: 0.5rem; }
+        .color-preview { width: 30px; height: 30px; border-radius: 4px; border: 1px solid #d1d5db; }
+        
+        /* Status indicators */
+        .status-active { color: #48bb78; }
+        .status-inactive { color: #f56565; }
+        
+        .section-title { font-size: 1.1rem; font-weight: 600; color: #2d3748; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e2e8f0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Settings</h1>
+        <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">Logout</button>
+    </div>
+    <nav class="nav">
+        <a href="/admin/">Dashboard</a>
+        <a href="/admin/agents.html">Agents</a>
+        <a href="/admin/bulk-upload.html">Bulk Upload</a>
+        <a href="/admin/licensing.html">Licensing</a>
+        <a href="/admin/commissions.html">Commissions</a>
+        <a href="/admin/reports.html">Reports</a>
+        <a href="/admin/settings.html" class="active">Settings</a>
+    </nav>
+    
+    <div class="container">
+        <!-- Tabs Navigation -->
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('general')">General Settings</div>
+            <div class="tab" onclick="showTab('api')">API Keys</div>
+            <div class="tab" onclick="showTab('billing')">Billing</div>
+            <div class="tab" onclick="showTab('branding')">Branding</div>
+        </div>
+
+        <!-- General Settings Tab -->
+        <div id="general" class="tab-content active">
+            <div class="card">
+                <h3 class="section-title">Agency Information</h3>
+                <form id="generalForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="agencyName">Agency Name</label>
+                            <input type="text" id="agencyName" value="SyncedUp Insurance" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="agencyEmail">Contact Email</label>
+                            <input type="email" id="agencyEmail" value="admin@syncedup.com" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="agencyPhone">Phone Number</label>
+                            <input type="tel" id="agencyPhone" value="+1 (555) 123-4567">
+                        </div>
+                        <div class="form-group">
+                            <label for="agencyWebsite">Website</label>
+                            <input type="url" id="agencyWebsite" value="https://syncedup.com">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="agencyAddress">Address</label>
+                        <textarea id="agencyAddress" placeholder="Enter your agency address">123 Insurance Ave
+Suite 100
+Anywhere, ST 12345</textarea>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3 class="section-title">System Preferences</h3>
+                <form id="systemForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="timezone">Timezone</label>
+                            <select id="timezone">
+                                <option value="America/New_York">Eastern Time (ET)</option>
+                                <option value="America/Chicago">Central Time (CT)</option>
+                                <option value="America/Denver">Mountain Time (MT)</option>
+                                <option value="America/Los_Angeles" selected>Pacific Time (PT)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="dateFormat">Date Format</label>
+                            <select id="dateFormat">
+                                <option value="MM/DD/YYYY" selected>MM/DD/YYYY</option>
+                                <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                                <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="currency">Currency</label>
+                            <select id="currency">
+                                <option value="USD" selected>USD ($)</option>
+                                <option value="CAD">CAD (C$)</option>
+                                <option value="EUR">EUR (€)</option>
+                                <option value="GBP">GBP (£)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="defaultCommission">Default Commission Rate (%)</label>
+                            <input type="number" id="defaultCommission" value="7.5" min="0" max="100" step="0.1">
+                        </div>
+                    </div>
+                </form>
+                <button class="btn btn-success" onclick="saveGeneralSettings()">Save General Settings</button>
+            </div>
+        </div>
+
+        <!-- API Keys Tab -->
+        <div id="api" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3 class="section-title" style="margin: 0;">API Keys</h3>
+                    <button class="btn btn-success" onclick="createApiKey()">+ Create New Key</button>
+                </div>
+                
+                <div class="api-key-item">
+                    <div class="api-key-info">
+                        <div class="api-key-name">Production API Key</div>
+                        <div class="api-key-value">sk_live_••••••••••••••••••••••••••••••••••••••••</div>
+                        <div style="font-size: 0.8rem; color: #718096; margin-top: 0.25rem;">Last used: 2 hours ago</div>
+                    </div>
+                    <div class="api-key-actions">
+                        <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="copyApiKey('prod')">Copy</button>
+                        <button class="btn" style="padding: 0.5rem;" onclick="regenerateApiKey('prod')">Regenerate</button>
+                        <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteApiKey('prod')">Delete</button>
+                    </div>
+                </div>
+                
+                <div class="api-key-item">
+                    <div class="api-key-info">
+                        <div class="api-key-name">Development API Key</div>
+                        <div class="api-key-value">sk_test_••••••••••••••••••••••••••••••••••••••••</div>
+                        <div style="font-size: 0.8rem; color: #718096; margin-top: 0.25rem;">Last used: Never</div>
+                    </div>
+                    <div class="api-key-actions">
+                        <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="copyApiKey('test')">Copy</button>
+                        <button class="btn" style="padding: 0.5rem;" onclick="regenerateApiKey('test')">Regenerate</button>
+                        <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteApiKey('test')">Delete</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="section-title">Third-Party Integrations</h3>
+                <div class="form-group">
+                    <label for="stripeKey">Stripe Secret Key</label>
+                    <input type="password" id="stripeKey" placeholder="sk_live_...">
+                </div>
+                <div class="form-group">
+                    <label for="mailgunKey">Mailgun API Key</label>
+                    <input type="password" id="mailgunKey" placeholder="key-...">
+                </div>
+                <div class="form-group">
+                    <label for="twilioKey">Twilio Auth Token</label>
+                    <input type="password" id="twilioKey" placeholder="Enter Twilio auth token">
+                </div>
+                <button class="btn btn-success" onclick="saveIntegrations()">Save Integration Settings</button>
+            </div>
+        </div>
+
+        <!-- Billing Tab -->
+        <div id="billing" class="tab-content">
+            <div class="card">
+                <h3 class="section-title">Current Subscription</h3>
+                <div class="plan-card current">
+                    <div class="plan-name">Professional Plan</div>
+                    <div class="plan-price">$99<span style="font-size: 1rem; color: #718096;">/month</span></div>
+                    <ul class="plan-features">
+                        <li>Up to 50 agents</li>
+                        <li>Unlimited policies</li>
+                        <li>Advanced reporting</li>
+                        <li>API access</li>
+                        <li>Priority support</li>
+                    </ul>
+                    <div style="margin-top: 1rem;">
+                        <small style="color: #718096;">Next billing date: February 15, 2024</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="section-title">Available Plans</h3>
+                
+                <div class="plan-card">
+                    <div class="plan-name">Starter Plan</div>
+                    <div class="plan-price">$29<span style="font-size: 1rem; color: #718096;">/month</span></div>
+                    <ul class="plan-features">
+                        <li>Up to 5 agents</li>
+                        <li>500 policies/month</li>
+                        <li>Basic reporting</li>
+                        <li>Email support</li>
+                    </ul>
+                    <button class="btn" onclick="changePlan('starter')">Downgrade to Starter</button>
+                </div>
+
+                <div class="plan-card">
+                    <div class="plan-name">Enterprise Plan</div>
+                    <div class="plan-price">$299<span style="font-size: 1rem; color: #718096;">/month</span></div>
+                    <ul class="plan-features">
+                        <li>Unlimited agents</li>
+                        <li>Unlimited policies</li>
+                        <li>Custom integrations</li>
+                        <li>White-label options</li>
+                        <li>Dedicated support</li>
+                        <li>SLA guarantee</li>
+                    </ul>
+                    <button class="btn btn-success" onclick="changePlan('enterprise')">Upgrade to Enterprise</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="section-title">Billing Information</h3>
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+                    <div>
+                        <div class="form-group">
+                            <label>Payment Method</label>
+                            <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; background: #f7fafc; border-radius: 6px;">
+                                <span>•••• •••• •••• 4242</span>
+                                <span style="color: #718096;">Expires 12/25</span>
+                                <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="updatePaymentMethod()">Update</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Billing Address</label>
+                            <div style="color: #718096;">
+                                123 Business St<br>
+                                Suite 456<br>
+                                Anywhere, ST 12345
+                            </div>
+                            <button class="btn btn-secondary" onclick="updateBillingAddress()" style="margin-top: 0.5rem;">Update Address</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 1rem;">Usage This Month</h4>
+                        <div style="margin-bottom: 0.5rem;">
+                            <strong>Agents:</strong> 12 / 50
+                        </div>
+                        <div style="margin-bottom: 0.5rem;">
+                            <strong>Policies:</strong> 345 / Unlimited
+                        </div>
+                        <div style="margin-bottom: 0.5rem;">
+                            <strong>API Calls:</strong> 1,234 / Unlimited
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Branding Tab -->
+        <div id="branding" class="tab-content">
+            <div class="card">
+                <h3 class="section-title">Logo & Brand Assets</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <div class="form-group">
+                            <label>Company Logo</label>
+                            <div class="logo-upload" onclick="uploadLogo()">
+                                <div style="font-size: 3rem; color: #e2e8f0; margin-bottom: 0.5rem;">📁</div>
+                                <div>Click to upload logo</div>
+                                <div style="font-size: 0.8rem; color: #718096; margin-top: 0.5rem;">PNG, JPG up to 2MB</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Favicon</label>
+                            <div class="logo-upload" onclick="uploadFavicon()">
+                                <div style="font-size: 2rem; color: #e2e8f0; margin-bottom: 0.5rem;">🔖</div>
+                                <div>Click to upload favicon</div>
+                                <div style="font-size: 0.8rem; color: #718096; margin-top: 0.5rem;">ICO, PNG 32x32</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="brand-preview">
+                        <h4>Preview</h4>
+                        <div style="margin: 1rem 0; padding: 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 6px;">
+                            <div style="font-size: 1.25rem; font-weight: bold;">SyncedUp Insurance</div>
+                            <div style="font-size: 0.9rem; opacity: 0.9;">Your trusted insurance partner</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="section-title">Color Scheme</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <div class="form-group">
+                            <label>Primary Color</label>
+                            <div class="color-picker">
+                                <div class="color-preview" style="background: #667eea;"></div>
+                                <input type="color" id="primaryColor" value="#667eea" onchange="updateColorPreview()">
+                                <span>#667eea</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Secondary Color</label>
+                            <div class="color-picker">
+                                <div class="color-preview" style="background: #764ba2;"></div>
+                                <input type="color" id="secondaryColor" value="#764ba2" onchange="updateColorPreview()">
+                                <span>#764ba2</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Accent Color</label>
+                            <div class="color-picker">
+                                <div class="color-preview" style="background: #48bb78;"></div>
+                                <input type="color" id="accentColor" value="#48bb78" onchange="updateColorPreview()">
+                                <span>#48bb78</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="brand-preview">
+                        <h4>Color Preview</h4>
+                        <div style="display: flex; gap: 1rem; margin: 1rem 0;">
+                            <div style="width: 60px; height: 60px; background: #667eea; border-radius: 6px;"></div>
+                            <div style="width: 60px; height: 60px; background: #764ba2; border-radius: 6px;"></div>
+                            <div style="width: 60px; height: 60px; background: #48bb78; border-radius: 6px;"></div>
+                        </div>
+                        <div style="text-align: left;">
+                            <button class="btn">Sample Button</button>
+                            <button class="btn btn-success">Success Action</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="section-title">Custom Domain</h3>
+                <div class="form-group">
+                    <label>Custom Domain (Enterprise Plan)</label>
+                    <input type="text" placeholder="app.yourdomain.com" disabled>
+                    <small style="color: #718096;">Upgrade to Enterprise plan to use your custom domain</small>
+                </div>
+                
+                <button class="btn btn-success" onclick="saveBrandingSettings()">Save Branding Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        // General Settings Functions
+        function saveGeneralSettings() {
+            alert('General settings saved successfully! This functionality will be connected to backend API.');
+        }
+
+        // API Keys Functions
+        function createApiKey() {
+            const keyName = prompt('Enter a name for this API key:');
+            if (keyName) {
+                alert(`Creating API key "${keyName}". This functionality will be connected to backend API.`);
+            }
+        }
+
+        function copyApiKey(keyType) {
+            alert(`API key copied to clipboard. This functionality will be connected to backend API.`);
+        }
+
+        function regenerateApiKey(keyType) {
+            if (confirm('Are you sure you want to regenerate this API key? The old key will stop working immediately.')) {
+                alert(`Regenerating ${keyType} API key. This functionality will be connected to backend API.`);
+            }
+        }
+
+        function deleteApiKey(keyType) {
+            if (confirm('Are you sure you want to delete this API key? This action cannot be undone.')) {
+                alert(`Deleting ${keyType} API key. This functionality will be connected to backend API.`);
+            }
+        }
+
+        function saveIntegrations() {
+            alert('Integration settings saved successfully! This functionality will be connected to backend API.');
+        }
+
+        // Billing Functions
+        function changePlan(planType) {
+            alert(`Switching to ${planType} plan. This functionality will be connected to billing API.`);
+        }
+
+        function updatePaymentMethod() {
+            alert('Payment method update. This functionality will be connected to Stripe API.');
+        }
+
+        function updateBillingAddress() {
+            alert('Billing address update. This functionality will be connected to backend API.');
+        }
+
+        // Branding Functions
+        function uploadLogo() {
+            alert('Logo upload functionality will be connected to file upload API.');
+        }
+
+        function uploadFavicon() {
+            alert('Favicon upload functionality will be connected to file upload API.');
+        }
+
+        function updateColorPreview() {
+            // This would update the color previews in real-time
+            const primary = document.getElementById('primaryColor').value;
+            const secondary = document.getElementById('secondaryColor').value;
+            const accent = document.getElementById('accentColor').value;
+            
+            // Update preview colors (mock implementation)
+            console.log('Updating colors:', { primary, secondary, accent });
+        }
+
+        function saveBrandingSettings() {
+            alert('Branding settings saved successfully! This functionality will be connected to backend API.');
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>
