@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/products/:state",
+      "destination": "/api/products?state=:state"
+    }
+  ]
+}
