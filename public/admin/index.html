@@ -60,10 +60,34 @@
     </style>
 </head>
 <body>
-    <script src="/auth-utils.js"></script>
     <script>
-    // Check authentication with admin role requirement
-    checkAuth('admin');
+    // Check authentication with admin role requirement using localStorage
+    (function() {
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        console.log('Admin page - checking auth:', { hasToken: !!token, user });
+        
+        if (!token) {
+            console.log('No token found, redirecting to login');
+            window.location.href = '/login.html';
+            return;
+        }
+        
+        if (user.role !== 'admin') {
+            console.log('User role not admin:', user.role);
+            alert('Admin access required');
+            window.location.href = '/login.html';
+            return;
+        }
+        
+        console.log('Admin authentication successful');
+    })();
+    
+    function logout() {
+        localStorage.clear();
+        window.location.href = '/login.html';
+    }
     
     function exportPayroll(format) {
         fetch(`/api/payroll/export/${format}`, {
