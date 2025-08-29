@@ -27,8 +27,11 @@ export function requireAuth(allowedRoles = []) {
         return res.status(403).json({ error: 'Insufficient permissions' });
       }
       
-      // Set the user context for RLS
-      await supabase.rpc('set_current_user_email', { user_email: decoded.email });
+      // Set the user context for RLS using the simplified approach
+      await supabase.rpc('set_current_user_context', { 
+        user_id: decoded.id, 
+        user_role: decoded.role 
+      });
       
       req.user = decoded;
       return handler(req, res);

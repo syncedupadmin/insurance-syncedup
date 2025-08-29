@@ -19,7 +19,7 @@ This document outlines the security measures implemented in the SyncedUp Insuran
 - **Implementation**: `express-rate-limit` with custom fingerprinting
 
 ### 3. Row Level Security (RLS) in Supabase
-- **SQL Script**: `supabase-rls-setup.sql` - Run this in Supabase SQL Editor
+- **SQL Script**: `supabase-rls-simple.sql` - Run this in Supabase SQL Editor (simplified approach)
 - **Tables protected**: sales, commissions, chargebacks
 - **Policies implemented**:
   - Agents can only see their own data
