@@ -82,32 +82,23 @@
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const errorDiv = document.getElementById('error');
             
-            try {
-                const response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    // No need to store tokens manually - they're in httpOnly cookies
-                    // Redirect based on role
-                    if (data.user.role === 'admin') {
-                        window.location.href = '/admin/';
-                    } else {
-                        window.location.href = '/';
-                    }
-                } else {
-                    errorDiv.textContent = data.error || 'Login failed';
-                    errorDiv.style.display = 'block';
-                }
-            } catch (error) {
-                errorDiv.textContent = 'Network error';
-                errorDiv.style.display = 'block';
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                window.location.href = data.user.role === 'admin' ? '/admin/' : '/';
+            } else {
+                // Show error
+                document.getElementById('error').textContent = data.error;
+                document.getElementById('error').style.display = 'block';
             }
         });
     </script>
