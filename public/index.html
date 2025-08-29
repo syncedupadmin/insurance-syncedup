@@ -610,21 +610,10 @@
     </style>
 </head>
 <body>
+<script src="/auth-utils.js"></script>
 <script>
-// Check authentication
-(function() {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        window.location.href = '/login.html';
-        return;
-    }
-})();
-
-// Add logout function
-function logout() {
-    localStorage.clear();
-    window.location.href = '/login.html';
-}
+// Check authentication using cookies
+checkAuth();
 </script>
     <div class="container">
         <div class="header">

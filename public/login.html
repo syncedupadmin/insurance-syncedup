@@ -94,9 +94,7 @@
                 const data = await response.json();
                 
                 if (response.ok) {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    
+                    // No need to store tokens manually - they're in httpOnly cookies
                     // Redirect based on role
                     if (data.user.role === 'admin') {
                         window.location.href = '/admin/';
