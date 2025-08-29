@@ -45,6 +45,9 @@
             font-size: 1rem;
             cursor: pointer;
         }
+        button:hover {
+            opacity: 0.9;
+        }
         .error {
             color: #dc3545;
             text-align: center;
@@ -65,9 +68,9 @@
 <body>
     <div class="login-container">
         <h2>Login</h2>
-        <form id="loginForm">
-            <input type="email" id="email" placeholder="Email" required>
-            <input type="password" id="password" placeholder="Password" required>
+        <form id="loginForm" autocomplete="on">
+            <input type="email" id="email" name="email" placeholder="Email" required autocomplete="email">
+            <input type="password" id="password" name="password" placeholder="Password" required autocomplete="current-password">
             <button type="submit">Login</button>
             <div class="error" id="error"></div>
         </form>
@@ -77,28 +80,49 @@
     </div>
 
     <script>
+        console.log('Login script loaded');
+        
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            console.log('Form submitted');
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('error');
             
-            const response = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
+            console.log('Attempting login with:', email);
             
-            const data = await response.json();
-            
-            if (response.ok) {
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
-                window.location.href = data.user.role === 'admin' ? '/admin/' : '/';
-            } else {
-                // Show error
-                document.getElementById('error').textContent = data.error;
-                document.getElementById('error').style.display = 'block';
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (response.ok && data.success) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    // Redirect based on role
+                    if (data.user.role === 'admin') {
+                        console.log('Redirecting to admin portal');
+                        window.location.href = '/admin/';
+                    } else {
+                        console.log('Redirecting to main portal');
+                        window.location.href = '/';
+                    }
+                } else {
+                    errorDiv.textContent = data.error || 'Login failed';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                errorDiv.textContent = 'Network error: ' + error.message;
+                errorDiv.style.display = 'block';
             }
         });
     </script>
