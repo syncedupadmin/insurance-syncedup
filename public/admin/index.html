@@ -6,386 +6,88 @@
     <title>Admin Dashboard - SyncedUp Insurance</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f5;
-        }
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1.5rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-        .card {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-            border: 1px solid rgba(0, 0, 0, 0.04);
-        }
-        .card h2 {
-            color: #374151;
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #374151;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.2s;
-        }
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        textarea {
-            resize: vertical;
-            font-family: inherit;
-        }
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-right: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-        .btn.secondary {
-            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-        }
-        .btn.danger {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        }
-        .logout-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-        .result-box {
-            margin-top: 1rem;
-            padding: 1rem;
-            border-radius: 8px;
-            display: none;
-        }
-        .result-success {
-            background: #ecfdf5;
-            border: 1px solid #a7f3d0;
-            color: #065f46;
-        }
-        .result-error {
-            background: #fef2f2;
-            border: 1px solid #fca5a5;
-            color: #991b1b;
-        }
-        .preview-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-        .preview-table th,
-        .preview-table td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        .preview-table th {
-            background: #f9fafb;
-            font-weight: 600;
-        }
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 8px;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .nav { display: flex; gap: 2rem; padding: 0 2rem; background: white; border-bottom: 1px solid #e2e8f0; overflow-x: auto; }
+        .nav a { padding: 1rem; text-decoration: none; color: #2d3748; font-weight: 500; white-space: nowrap; }
+        .nav a.active { color: #667eea; border-bottom: 2px solid #667eea; }
+        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+        .grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+        .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .stat-value { font-size: 2rem; font-weight: bold; color: #667eea; }
+        .stat-label { color: #718096; margin-top: 0.5rem; }
+        .btn { padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 0.5rem; }
+        .btn:hover { background: #5a67d8; }
+        .btn-success { background: #48bb78; }
+        .btn-warning { background: #ed8936; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th { background: #f7fafc; padding: 0.75rem; text-align: left; font-weight: 600; }
+        td { padding: 0.75rem; border-top: 1px solid #e2e8f0; }
+        .quick-actions { display: flex; gap: 1rem; margin: 2rem 0; flex-wrap: wrap; }
     </style>
 </head>
 <body>
-    <script>
-    // Check authentication with admin role requirement
-    (function() {
-        const token = localStorage.getItem('token');
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        
-        if (!token) {
-            window.location.href = '/login.html';
-            return;
-        }
-        
-        if (user.role !== 'admin' && user.role !== 'super_admin') {
-            alert('Admin access required');
-            window.location.href = '/login.html';
-            return;
-        }
-    })();
-    
-    function logout() {
-        localStorage.clear();
-        window.location.href = '/login.html';
-    }
-    
-    // Process Cancellation Email
-    async function processCancellation() {
-        const emailContent = document.getElementById('cancellationEmail').value;
-        if (!emailContent.trim()) {
-            showResult('cancellationResult', 'Please paste the cancellation email content', 'error');
-            return;
-        }
-        
-        const token = localStorage.getItem('token');
-        const btn = document.querySelector('#processCancellationBtn');
-        const originalText = btn.textContent;
-        
-        try {
-            btn.innerHTML = '<span class="loading"></span>Processing...';
-            btn.disabled = true;
-            
-            const response = await fetch('/api/cancellation', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ emailContent })
-            });
-            
-            const data = await response.json();
-            
-            if (response.ok) {
-                const resultHtml = `
-                    <strong>✅ ${data.processing.type} Processed</strong><br>
-                    <strong>Customer:</strong> ${data.parsedData.customerName}<br>
-                    <strong>Policy:</strong> ${data.parsedData.policyNumber}<br>
-                    <strong>Days in Force:</strong> ${data.processing.daysInForce}<br>
-                    <strong>Financial Impact:</strong> $${data.processing.amount || 0}<br>
-                    <strong>Details:</strong> ${data.processing.reason}
-                `;
-                showResult('cancellationResult', resultHtml, 'success');
-                document.getElementById('cancellationEmail').value = '';
-            } else {
-                showResult('cancellationResult', data.message || 'Error processing cancellation', 'error');
-            }
-        } catch (error) {
-            showResult('cancellationResult', 'Network error: ' + error.message, 'error');
-        } finally {
-            btn.textContent = originalText;
-            btn.disabled = false;
-        }
-    }
-    
-    // Export Payroll
-    async function exportPayroll(format = 'json') {
-        const weekEnding = document.getElementById('payrollWeek').value;
-        const token = localStorage.getItem('token');
-        const btn = document.getElementById(`export${format.toUpperCase()}Btn`);
-        const originalText = btn.textContent;
-        
-        try {
-            btn.innerHTML = '<span class="loading"></span>Generating...';
-            btn.disabled = true;
-            
-            const url = `/api/admin/payroll-export?format=${format}${weekEnding ? '&endDate=' + weekEnding : ''}`;
-            const response = await fetch(url, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            
-            if (format === 'csv') {
-                const blob = await response.blob();
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `payroll_${weekEnding || 'current'}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showResult('payrollResult', '✅ CSV file downloaded successfully', 'success');
-            } else {
-                const data = await response.json();
-                displayPayrollPreview(data);
-                showResult('payrollResult', '✅ Payroll data generated successfully', 'success');
-            }
-        } catch (error) {
-            showResult('payrollResult', 'Error generating payroll: ' + error.message, 'error');
-        } finally {
-            btn.textContent = originalText;
-            btn.disabled = false;
-        }
-    }
-    
-    function displayPayrollPreview(data) {
-        const previewDiv = document.getElementById('payrollPreview');
-        if (!data || data.length === 0) {
-            previewDiv.innerHTML = '<p>No payroll data available for this period.</p>';
-            return;
-        }
-        
-        const html = `
-            <table class="preview-table">
+    <div class="header">
+        <h1>Agency Admin Dashboard</h1>
+        <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">Logout</button>
+    </div>
+    <nav class="nav">
+        <a href="/admin/" class="active">Dashboard</a>
+        <a href="/admin/agents.html">Agents</a>
+        <a href="/admin/bulk-upload.html">Bulk Upload</a>
+        <a href="/admin/licensing.html">Licensing</a>
+        <a href="/admin/commissions.html">Commissions</a>
+        <a href="/admin/reports.html">Reports</a>
+        <a href="/admin/api-keys.html">API Settings</a>
+        <a href="/admin/settings.html">Settings</a>
+        <a href="/admin/billing.html">Billing</a>
+    </nav>
+    <div class="container">
+        <div class="grid">
+            <div class="card">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Active Agents</div>
+            </div>
+            <div class="card">
+                <div class="stat-value">$0</div>
+                <div class="stat-label">MTD Revenue</div>
+            </div>
+            <div class="card">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Policies Sold</div>
+            </div>
+            <div class="card">
+                <div class="stat-value">$0</div>
+                <div class="stat-label">Pending Commissions</div>
+            </div>
+        </div>
+        <div class="quick-actions">
+            <button class="btn" onclick="location.href='/admin/agents.html'">Manage Agents</button>
+            <button class="btn btn-success" onclick="location.href='/admin/bulk-upload.html'">Bulk Upload</button>
+            <button class="btn btn-warning" onclick="location.href='/admin/licensing.html'">Check Licenses</button>
+        </div>
+        <div class="card">
+            <h3>Recent Activity</h3>
+            <table>
                 <thead>
                     <tr>
-                        <th>Agent ID</th>
-                        <th>Total Sales</th>
-                        <th>Commission</th>
+                        <th>Time</th>
+                        <th>Agent</th>
+                        <th>Action</th>
+                        <th>Details</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${data.map(agent => `
-                        <tr>
-                            <td>${agent.agentId}</td>
-                            <td>${agent.totalSales}</td>
-                            <td>$${agent.totalCommission}</td>
-                        </tr>
-                    `).join('')}
+                    <tr><td colspan="4" style="text-align: center;">No recent activity</td></tr>
                 </tbody>
             </table>
-        `;
-        previewDiv.innerHTML = html;
-    }
-    
-    function showResult(elementId, message, type) {
-        const element = document.getElementById(elementId);
-        element.innerHTML = message;
-        element.className = `result-box result-${type}`;
-        element.style.display = 'block';
-        
-        // Auto-hide after 10 seconds for success messages
-        if (type === 'success') {
-            setTimeout(() => {
-                element.style.display = 'none';
-            }, 10000);
-        }
-    }
-    
-    // Set default week ending to this Saturday
-    (function setDefaultWeek() {
-        const today = new Date();
-        const saturday = new Date(today);
-        saturday.setDate(today.getDate() + (6 - today.getDay()));
-        document.getElementById('payrollWeek').value = saturday.toISOString().split('T')[0];
-    })();
-    </script>
-
-    <div class="header">
-        <h1>Admin Dashboard</h1>
-        <button class="btn logout-btn" onclick="logout()">Logout</button>
-    </div>
-
-    <div class="container">
-        <div class="dashboard-grid">
-            <!-- Process Cancellation -->
-            <div class="card">
-                <h2>📧 Process Cancellation</h2>
-                <p style="margin-bottom: 1.5rem; color: #6b7280;">Paste cancellation email content to automatically extract customer details and process chargeback/cancellation.</p>
-                
-                <div class="form-group">
-                    <label for="cancellationEmail">Paste Cancellation Email</label>
-                    <textarea id="cancellationEmail" rows="6" placeholder="Paste the cancellation email content here..."></textarea>
-                </div>
-                
-                <button class="btn" id="processCancellationBtn" onclick="processCancellation()">Process Cancellation</button>
-                
-                <div id="cancellationResult" class="result-box"></div>
-            </div>
-
-            <!-- Export Payroll -->
-            <div class="card">
-                <h2>💰 Export Payroll</h2>
-                <p style="margin-bottom: 1.5rem; color: #6b7280;">Generate weekly payroll reports for agent commission processing.</p>
-                
-                <div class="form-group">
-                    <label for="payrollWeek">Week Ending (Saturday)</label>
-                    <input type="date" id="payrollWeek">
-                </div>
-                
-                <button class="btn" id="exportJSONBtn" onclick="exportPayroll('json')">Preview Payroll</button>
-                <button class="btn secondary" id="exportCSVBtn" onclick="exportPayroll('csv')">Download CSV</button>
-                
-                <div id="payrollResult" class="result-box"></div>
-                <div id="payrollPreview"></div>
-            </div>
-
-            <!-- User Management -->
-            <div class="card">
-                <h2>👥 User Management</h2>
-                <p style="margin-bottom: 1.5rem; color: #6b7280;">Create and manage agents within your agency.</p>
-                
-                <button class="btn" onclick="alert('User management UI coming soon - use API endpoints for now')">Manage Users</button>
-                <button class="btn secondary" onclick="alert('Bulk upload UI coming soon - use API endpoints for now')">Bulk Upload</button>
-            </div>
-
-            <!-- Support Tickets -->
-            <div class="card">
-                <h2>🎫 Support Tickets</h2>
-                <p style="margin-bottom: 1.5rem; color: #6b7280;">View and manage support tickets for your agency.</p>
-                
-                <button class="btn" onclick="alert('Support tickets UI coming soon - use API endpoints for now')">View Tickets</button>
-                <button class="btn secondary" onclick="alert('Create ticket UI coming soon')">Create Ticket</button>
-            </div>
-
-            <!-- Sales Overview -->
-            <div class="card">
-                <h2>📊 Sales Overview</h2>
-                <p style="margin-bottom: 1.5rem; color: #6b7280;">View sales metrics and performance across your agency.</p>
-                
-                <button class="btn" onclick="alert('Sales dashboard coming soon')">View Sales</button>
-                <button class="btn secondary" onclick="alert('Agent performance coming soon')">Agent Performance</button>
-            </div>
-
-            <!-- System Settings -->
-            <div class="card">
-                <h2>⚙️ System Settings</h2>
-                <p style="margin-bottom: 1.5rem; color: #6b7280;">Configure agency settings and preferences.</p>
-                
-                <button class="btn" onclick="alert('Agency settings coming soon')">Agency Settings</button>
-                <button class="btn secondary" onclick="alert('Commission settings coming soon')">Commission Rules</button>
-            </div>
         </div>
     </div>
+    <script>
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/login.html';
+        }
+    </script>
 </body>
 </html>
