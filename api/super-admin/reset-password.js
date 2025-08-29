@@ -20,7 +20,7 @@ async function resetPasswordHandler(req, res) {
 
   try {
     // Find the user
-    let query = supabase.from('profiles').select('*');
+    let query = supabase.from('users').select('*');
     if (user_id) {
       query = query.eq('id', user_id);
     } else {
@@ -40,11 +40,10 @@ async function resetPasswordHandler(req, res) {
 
     // Update user password and force change
     const { error: updateError } = await supabase
-      .from('profiles')
+      .from('users')
       .update({
         password_hash,
-        must_change_password: true,
-        updated_at: new Date().toISOString()
+        must_change_password: true
       })
       .eq('id', user.id);
 
@@ -53,11 +52,6 @@ async function resetPasswordHandler(req, res) {
     // Send reset email if requested
     if (send_email) {
       try {
-        const { data: agency } = await supabase
-          .from('agencies')
-          .select('name')
-          .eq('id', user.agency_id)
-          .single();
 
         await fetch(`${process.env.APP_URL}/api/email/send`, {
           method: 'POST',
@@ -68,7 +62,7 @@ async function resetPasswordHandler(req, res) {
             data: {
               name: user.name,
               temp_password: tempPassword,
-              agency_name: agency?.name || 'Your Agency'
+              agency_name: user.name + ' Agency'
             }
           })
         });
