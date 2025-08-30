@@ -17,12 +17,12 @@ async function resetPasswordHandler(req, res) {
         return res.status(400).json({ error: 'User ID is required' });
       }
 
-      // Get the user
+      // Get the user (only allow password reset for agents)
       const { data: user, error: userError } = await supabase
         .from('users')
         .select('*')
         .eq('id', userId)
-        .eq('agency_id', req.user.agency_id) // Ensure same agency
+        .eq('role', 'agent')
         .single();
 
       if (userError || !user) {
