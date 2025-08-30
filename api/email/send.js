@@ -66,7 +66,7 @@ export default async function handler(req, res) {
         
       case 'bulk-upload-complete':
         emailContent = {
-          from: 'SyncedUp Insurance <admin@syncedupsolutions.com>',
+          from: 'SyncedUp <admin@resend.dev>',  // Use resend.dev for testing
           to: to,
           subject: 'Bulk User Upload Complete',
           html: `
@@ -89,7 +89,7 @@ export default async function handler(req, res) {
         
       case 'individual-welcome':
         emailContent = {
-          from: 'SyncedUp Insurance <welcome@syncedupsolutions.com>',
+          from: 'SyncedUp <welcome@resend.dev>',  // Use resend.dev for testing
           to: to,
           subject: 'Welcome to SyncedUp Insurance - Your Personal Agency is Ready!',
           html: `
