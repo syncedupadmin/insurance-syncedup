@@ -7,7 +7,8 @@
       "Bash(vercel:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "WebFetch(domain:syncedup-insurance-demo-kbno0t75i-nicks-projects-f40381ea.vercel.app)"
     ],
     "deny": [],
     "ask": []

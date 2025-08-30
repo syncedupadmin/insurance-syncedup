@@ -166,6 +166,35 @@ export default async function handler(req, res) {
         };
         break;
         
+      case 'contact-form':
+        emailContent = {
+          from: 'SyncedUp <contact@resend.dev>',
+          to: to,
+          subject: `New Contact Form Submission - ${data.inquiry_type || 'General'}`,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                <h1>New Contact Form Submission</h1>
+              </div>
+              <div style="padding: 30px; background: #f7f7f7;">
+                <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                  <p><strong>Name:</strong> ${data.name}</p>
+                  <p><strong>Email:</strong> ${data.email}</p>
+                  <p><strong>Company:</strong> ${data.company || 'Not provided'}</p>
+                  <p><strong>Agent Count:</strong> ${data.agents || 'Not provided'}</p>
+                  <p><strong>Inquiry Type:</strong> ${data.inquiry_type || 'General'}</p>
+                </div>
+                <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                  <h3>Message:</h3>
+                  <p style="white-space: pre-wrap;">${data.message}</p>
+                </div>
+                <p style="color: #666; font-size: 0.9rem;">Submitted: ${new Date(data.timestamp).toLocaleString()}</p>
+              </div>
+            </div>
+          `
+        };
+        break;
+        
       default:
         return res.status(400).json({ error: 'Invalid email type' });
     }

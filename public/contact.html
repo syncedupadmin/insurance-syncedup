@@ -517,18 +517,48 @@
     </footer>
 
     <script>
-        function submitForm(event) {
+        async function submitForm(event) {
             event.preventDefault();
             
             const formData = new FormData(event.target);
             const data = Object.fromEntries(formData);
             
-            // In a real implementation, you would send this to your backend
-            console.log('Form submitted:', data);
+            // Show loading state
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = 'Sending...';
+            submitButton.disabled = true;
             
-            // Show success message
-            alert('Thank you for your message! We\'ll get back to you within 2 hours.');
-            event.target.reset();
+            try {
+                // Send email using the existing email API
+                const response = await fetch('/api/email/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        type: 'contact-form',
+                        to: 'sales@syncedupsolutions.com', // Your sales email
+                        data: {
+                            ...data,
+                            timestamp: new Date().toISOString()
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Thank you for your message! We\'ll get back to you within 2 hours.');
+                    event.target.reset();
+                } else {
+                    throw new Error('Failed to send message');
+                }
+            } catch (error) {
+                console.error('Form submission error:', error);
+                alert('Sorry, there was an error sending your message. Please try again or contact us directly.');
+            } finally {
+                submitButton.textContent = originalText;
+                submitButton.disabled = false;
+            }
         }
 
         function openChat() {
