@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SyncedUp Insurance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen flex items-center justify-center p-4">
+    <!-- Logo at top -->
+    <div class="absolute top-8 left-8">
+        <img src="/images/syncedup-logo-alt.png" alt="SyncedUp" class="h-12" onerror="this.style.display='none'">
+        <div class="text-white text-2xl font-bold" id="fallbackLogo" style="display:none;">SYNCEDUP</div>
+    </div>
+
+    <!-- Login Container -->
+    <div class="glass-effect rounded-2xl p-8 w-full max-w-md">
+        <!-- Login Form -->
+        <div id="loginForm">
+            <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Welcome Back</h2>
+            
+            <form id="loginFormElement" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        required 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                        placeholder="your@email.com"
+                    >
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        required 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                        placeholder="••••••••"
+                    >
+                </div>
+                
+                <button 
+                    type="submit" 
+                    class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition duration-200 transform hover:scale-[1.02]"
+                >
+                    Sign In
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <button 
+                    onclick="showResetForm()" 
+                    class="text-purple-600 hover:text-purple-700 text-sm font-medium"
+                >
+                    Forgot your password?
+                </button>
+            </div>
+
+            <!-- Error message -->
+            <div id="errorMessage" class="mt-4 p-3 bg-red-100 text-red-700 rounded-lg hidden"></div>
+        </div>
+
+        <!-- Password Reset Form -->
+        <div id="resetForm" class="hidden">
+            <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">Reset Password</h2>
+            
+            <form id="resetFormElement" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="resetEmail" 
+                        required 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                        placeholder="your@email.com"
+                    >
+                </div>
+                
+                <button 
+                    type="submit" 
+                    class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition duration-200"
+                >
+                    Send Reset Link
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <button 
+                    onclick="showLoginForm()" 
+                    class="text-purple-600 hover:text-purple-700 text-sm font-medium"
+                >
+                    Back to Login
+                </button>
+            </div>
+
+            <!-- Success/Error message -->
+            <div id="resetMessage" class="mt-4 p-3 rounded-lg hidden"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="absolute bottom-4 text-center text-white text-sm">
+        <p>&copy; 2025 SyncedUp Solutions. All rights reserved.</p>
+    </div>
+
+    <script>
+        // Check for logo and show fallback if needed
+        document.querySelector('img').onerror = function() {
+            this.style.display = 'none';
+            document.getElementById('fallbackLogo').style.display = 'block';
+        };
+
+        // Form switching
+        function showResetForm() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('resetForm').classList.remove('hidden');
+        }
+
+        function showLoginForm() {
+            document.getElementById('resetForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('resetMessage').classList.add('hidden');
+        }
+
+        // Login form handler
+        document.getElementById('loginFormElement').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('errorMessage');
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    // Redirect based on role
+                    if (data.user.must_change_password) {
+                        window.location.href = '/change-password.html';
+                    } else if (data.user.role === 'admin' || data.user.role === 'super_admin') {
+                        window.location.href = '/admin.html';
+                    } else {
+                        window.location.href = '/dashboard.html';
+                    }
+                } else {
+                    errorDiv.textContent = data.error || 'Invalid credentials';
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Connection error. Please try again.';
+                errorDiv.classList.remove('hidden');
+            }
+        });
+
+        // Reset form handler
+        document.getElementById('resetFormElement').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('resetEmail').value;
+            const messageDiv = document.getElementById('resetMessage');
+            
+            try {
+                const response = await fetch('/api/auth/request-reset', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    messageDiv.textContent = 'Reset instructions sent to your email!';
+                    messageDiv.className = 'mt-4 p-3 bg-green-100 text-green-700 rounded-lg';
+                    document.getElementById('resetFormElement').reset();
+                } else {
+                    messageDiv.textContent = data.error || 'Email not found';
+                    messageDiv.className = 'mt-4 p-3 bg-red-100 text-red-700 rounded-lg';
+                }
+                messageDiv.classList.remove('hidden');
+            } catch (error) {
+                messageDiv.textContent = 'Connection error. Please try again.';
+                messageDiv.className = 'mt-4 p-3 bg-red-100 text-red-700 rounded-lg';
+                messageDiv.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
