@@ -6,7 +6,7 @@ export default async function handler(req, res) {
     
     const result = await resend.emails.send({
       from: 'SyncedUp <onboarding@resend.dev>',
-      to: 'nromanoff1@gmail.com', // Your actual email
+      to: 'admin@syncedupsolutions.com', // Your domain email
       subject: 'Test Email from SyncedUp',
       html: '<h1>Email Service Working!</h1><p>Your Resend integration is active.</p>'
     });
