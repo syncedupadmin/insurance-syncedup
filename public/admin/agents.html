@@ -43,20 +43,21 @@
     <nav class="nav">
         <a href="/admin/">Dashboard</a>
         <a href="/admin/agents.html" class="active">Agents</a>
-        <a href="/admin/bulk-upload.html">Bulk Upload</a>
         <a href="/admin/licensing.html">Licensing</a>
         <a href="/admin/commissions.html">Commissions</a>
+        <a href="/admin/commission-settings.html">Commission Settings</a>
         <a href="/admin/reports.html">Reports</a>
-        <a href="/admin/api-keys.html">API Settings</a>
         <a href="/admin/settings.html">Settings</a>
-        <a href="/admin/billing.html">Billing</a>
     </nav>
     
     <div class="container">
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <h2>Agent Directory</h2>
-                <button class="btn btn-success" onclick="openCreateModal()">+ Add New Agent</button>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-secondary" onclick="openBulkUploadModal()">📤 Bulk Upload</button>
+                    <button class="btn btn-success" onclick="openCreateModal()">+ Add New Agent</button>
+                </div>
             </div>
             
             <div class="search-bar">
@@ -125,6 +126,36 @@
         </div>
     </div>
 
+    <!-- Bulk Upload Modal -->
+    <div id="bulkUploadModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close" onclick="closeBulkUploadModal()">&times;</span>
+            <h3>Bulk Upload Agents</h3>
+            
+            <div style="margin: 2rem 0; padding: 1rem; background: #f7fafc; border-radius: 8px;">
+                <h4>Step 1: Download Template</h4>
+                <p style="margin: 0.5rem 0;">Use our CSV template to ensure proper formatting</p>
+                <button class="btn btn-secondary" onclick="downloadTemplate()">Download CSV Template</button>
+            </div>
+            
+            <div id="uploadZone" style="border: 2px dashed #cbd5e0; padding: 2rem; text-align: center; border-radius: 8px; margin: 2rem 0;">
+                <h4>Step 2: Upload Your CSV</h4>
+                <p style="margin: 1rem 0;">Drag and drop your CSV file here or click to browse</p>
+                <input type="file" id="bulkFileInput" accept=".csv" style="display: none;">
+                <button class="btn" onclick="document.getElementById('bulkFileInput').click()">Choose File</button>
+            </div>
+            
+            <div id="bulkPreview" style="display: none; margin-top: 1rem;">
+                <h4>Preview</h4>
+                <p id="bulkFileInfo" style="margin: 0.5rem 0;"></p>
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button class="btn btn-success" onclick="uploadBulkUsers()">Upload Agents</button>
+                    <button class="btn btn-secondary" onclick="closeBulkUploadModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         let agents = [];
 
@@ -165,12 +196,12 @@
                     <td>${agent.agent_code || 'N/A'}</td>
                     <td>${agent.name}</td>
                     <td>${agent.email}</td>
-                    <td><span class="status-${agent.status || 'active'}">${(agent.status || 'active').toUpperCase()}</span></td>
+                    <td><span class="status-${agent.is_active === false ? 'inactive' : 'active'}">${agent.is_active === false ? 'INACTIVE' : 'ACTIVE'}</span></td>
                     <td>${agent.license_count || 0} states</td>
                     <td>${new Date(agent.created_at).toLocaleDateString()}</td>
                     <td class="actions">
                         <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="editAgent('${agent.id}')">Edit</button>
-                        <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteAgent('${agent.id}', '${agent.name}')">Delete</button>
+                        <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteAgent('${agent.id}', '${agent.name}')">${(agent.status === 'inactive' || agent.is_active === false) ? 'Activate' : 'Deactivate'}</button>
                     </td>
                 </tr>
             `).join('');
@@ -186,7 +217,8 @@
                     agent.email.toLowerCase().includes(searchTerm) ||
                     (agent.agent_code && agent.agent_code.toLowerCase().includes(searchTerm));
                 
-                const matchesStatus = !statusFilter || agent.status === statusFilter;
+                const agentStatus = agent.is_active === false ? 'inactive' : 'active';
+                const matchesStatus = !statusFilter || agentStatus === statusFilter;
                 
                 return matchesSearch && matchesStatus;
             });
@@ -198,7 +230,16 @@
             document.getElementById('modalTitle').textContent = 'Add New Agent';
             document.getElementById('agentForm').reset();
             document.getElementById('agentId').value = '';
+            // Auto-generate agent code
+            document.getElementById('agent_code').value = generateAgentCode();
             document.getElementById('agentModal').style.display = 'block';
+        }
+
+        function generateAgentCode() {
+            // Generate agent code in format: AG + current year + 4 random digits
+            const year = new Date().getFullYear();
+            const randomNum = Math.floor(Math.random() * 9000) + 1000;
+            return `AG${year}${randomNum}`;
         }
 
         function editAgent(id) {
@@ -210,7 +251,7 @@
             document.getElementById('name').value = agent.name;
             document.getElementById('email').value = agent.email;
             document.getElementById('agent_code').value = agent.agent_code || '';
-            document.getElementById('status').value = agent.status || 'active';
+            document.getElementById('status').value = agent.is_active === false ? 'inactive' : 'active';
             document.getElementById('agentModal').style.display = 'block';
         }
 
@@ -219,25 +260,57 @@
         }
 
         async function deleteAgent(id, name) {
-            if (!confirm(`Are you sure you want to delete agent "${name}"? This action cannot be undone.`)) {
+            const agent = agents.find(a => a.id === id);
+            const isActive = agent && agent.is_active !== false;
+            const action = isActive ? 'deactivate' : 'activate';
+            const message = isActive ? 
+                `Are you sure you want to deactivate agent "${name}"? This will disable their access but preserve their data for reporting.` :
+                `Are you sure you want to activate agent "${name}"? This will restore their access to the system.`;
+            
+            if (!confirm(message)) {
                 return;
             }
             
             const token = localStorage.getItem('token');
             try {
-                const response = await fetch(`/api/admin/agents?id=${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                
-                if (response.ok) {
-                    loadAgents(); // Reload the table
+                if (isActive) {
+                    // Deactivate agent
+                    const response = await fetch(`/api/admin/agents?id=${id}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        alert(result.message || 'Agent deactivated successfully');
+                        loadAgents();
+                    } else {
+                        const error = await response.json();
+                        alert(error.error || 'Failed to deactivate agent');
+                    }
                 } else {
-                    alert('Failed to delete agent');
+                    // Activate agent
+                    const response = await fetch(`/api/admin/agents?id=${id}`, {
+                        method: 'PUT',
+                        headers: { 
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ status: 'active' })
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        alert(result.message || 'Agent activated successfully');
+                        loadAgents();
+                    } else {
+                        const error = await response.json();
+                        alert(error.error || 'Failed to activate agent');
+                    }
                 }
             } catch (error) {
-                console.error('Error deleting agent:', error);
-                alert('Error deleting agent');
+                console.error(`Error ${action}ing agent:`, error);
+                alert(`Error ${action}ing agent`);
             }
         }
 
@@ -275,7 +348,9 @@
                     loadAgents();
                     
                     if (!isEdit && result.password) {
-                        alert(`Agent created successfully!\n\nLogin credentials:\nEmail: ${formData.email}\nPassword: ${result.password}\n\nPlease save this password - it won't be shown again!`);
+                        alert(`Agent created successfully!\n\nLogin credentials:\nEmail: ${formData.email}\nPassword: ${result.password}\n\nA welcome email has been sent to the agent.\nPlease save this password - it won't be shown again!`);
+                    } else if (!isEdit) {
+                        alert('Agent updated successfully!');
                     }
                 } else {
                     const error = await response.json();
@@ -292,6 +367,126 @@
             const modal = document.getElementById('agentModal');
             if (event.target === modal) {
                 closeModal();
+            }
+        }
+
+        // Bulk Upload Functions
+        function openBulkUploadModal() {
+            document.getElementById('bulkUploadModal').style.display = 'block';
+            setupBulkUpload();
+        }
+
+        function closeBulkUploadModal() {
+            document.getElementById('bulkUploadModal').style.display = 'none';
+            resetBulkUpload();
+        }
+
+        function setupBulkUpload() {
+            const uploadZone = document.getElementById('uploadZone');
+            const fileInput = document.getElementById('bulkFileInput');
+            
+            // Remove existing event listeners
+            uploadZone.replaceWith(uploadZone.cloneNode(true));
+            const newUploadZone = document.getElementById('uploadZone');
+            
+            newUploadZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                newUploadZone.style.borderColor = '#667eea';
+                newUploadZone.style.background = '#f0f4ff';
+            });
+            
+            newUploadZone.addEventListener('dragleave', () => {
+                newUploadZone.style.borderColor = '#cbd5e0';
+                newUploadZone.style.background = 'transparent';
+            });
+            
+            newUploadZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                newUploadZone.style.borderColor = '#cbd5e0';
+                newUploadZone.style.background = 'transparent';
+                handleBulkFile(e.dataTransfer.files[0]);
+            });
+            
+            document.getElementById('bulkFileInput').addEventListener('change', (e) => {
+                handleBulkFile(e.target.files[0]);
+            });
+        }
+
+        function handleBulkFile(file) {
+            if (file && file.type === 'text/csv') {
+                document.getElementById('bulkFileInfo').textContent = `Selected: ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
+                document.getElementById('bulkPreview').style.display = 'block';
+            } else {
+                alert('Please select a valid CSV file');
+            }
+        }
+
+        function downloadTemplate() {
+            const template = 'name,email,agent_code,status\n"John Doe",john@example.com,AG12345,active\n"Jane Smith",jane@example.com,AG67890,active';
+            const blob = new Blob([template], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'agent_upload_template.csv';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        }
+
+        async function uploadBulkUsers() {
+            const fileInput = document.getElementById('bulkFileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a CSV file');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const token = localStorage.getItem('token');
+            
+            try {
+                const response = await fetch('/api/admin/bulk-upload', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(`Bulk upload completed!\n\nSuccess: ${result.success_count} agents\nFailed: ${result.error_count} agents`);
+                    closeBulkUploadModal();
+                    loadAgents(); // Refresh the agents list
+                } else {
+                    const error = await response.json();
+                    alert(`Upload failed: ${error.error}`);
+                }
+            } catch (error) {
+                console.error('Bulk upload error:', error);
+                alert('Error during bulk upload');
+            }
+        }
+
+        function resetBulkUpload() {
+            document.getElementById('bulkFileInput').value = '';
+            document.getElementById('bulkPreview').style.display = 'none';
+            document.getElementById('bulkFileInfo').textContent = '';
+        }
+
+        // Update window click handler to handle both modals
+        window.onclick = function(event) {
+            const agentModal = document.getElementById('agentModal');
+            const bulkModal = document.getElementById('bulkUploadModal');
+            
+            if (event.target === agentModal) {
+                closeModal();
+            } else if (event.target === bulkModal) {
+                closeBulkUploadModal();
             }
         }
 
