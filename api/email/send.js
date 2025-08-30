@@ -9,14 +9,28 @@ export default async function handler(req, res) {
 
   const { type, to, data } = req.body;
 
+  // Enhanced logging
+  console.log('📧 Email API called:', {
+    type,
+    to,
+    hasApiKey: !!process.env.RESEND_API_KEY,
+    apiKeyStart: process.env.RESEND_API_KEY?.substring(0, 8) + '...'
+  });
+
+  // For testing: Use verified admin email address due to Resend restrictions
+  const testEmail = 'admin@syncedupsolutions.com';
+  if (to !== testEmail) {
+    console.log(`📧 Redirecting email from ${to} to verified address ${testEmail} for testing`);
+  }
+
   try {
     let emailContent;
     
     switch(type) {
       case 'welcome':
         emailContent = {
-          from: 'SyncedUp <onboarding@resend.dev>',  // Use resend.dev for testing
-          to: to,
+          from: 'admin@syncedupsolutions.com',
+          to: testEmail, // Use verified email for testing
           subject: `Welcome to SyncedUp - Your Login Credentials`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -43,8 +57,8 @@ export default async function handler(req, res) {
         
       case 'password-reset':
         emailContent = {
-          from: 'SyncedUp <security@resend.dev>',
-          to: to,
+          from: 'admin@syncedupsolutions.com',
+          to: testEmail, // Use verified email for testing
           subject: 'Password Reset Request',
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -66,8 +80,8 @@ export default async function handler(req, res) {
         
       case 'bulk-upload-complete':
         emailContent = {
-          from: 'SyncedUp <admin@resend.dev>',  // Use resend.dev for testing
-          to: to,
+          from: 'admin@syncedupsolutions.com',
+          to: testEmail, // Use verified email for testing
           subject: 'Bulk User Upload Complete',
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -89,8 +103,8 @@ export default async function handler(req, res) {
         
       case 'individual-welcome':
         emailContent = {
-          from: 'SyncedUp <welcome@resend.dev>',  // Use resend.dev for testing
-          to: to,
+          from: 'admin@syncedupsolutions.com',
+          to: testEmail, // Use verified email for testing
           subject: 'Welcome to SyncedUp Insurance - Your Personal Agency is Ready!',
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -137,8 +151,8 @@ export default async function handler(req, res) {
 
       case 'password-reset-admin':
         emailContent = {
-          from: 'SyncedUp <security@resend.dev>',
-          to: to,
+          from: 'admin@syncedupsolutions.com',
+          to: testEmail, // Use verified email for testing
           subject: 'Password Reset - SyncedUp Insurance',
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -168,8 +182,8 @@ export default async function handler(req, res) {
         
       case 'contact-form':
         emailContent = {
-          from: 'SyncedUp <contact@resend.dev>',
-          to: to,
+          from: 'admin@syncedupsolutions.com',
+          to: testEmail, // Use verified email for testing
           subject: `New Contact Form Submission - ${data.inquiry_type || 'General'}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -199,11 +213,32 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Invalid email type' });
     }
 
+    console.log('📧 Sending email with content:', {
+      from: emailContent.from,
+      to: emailContent.to,
+      subject: emailContent.subject
+    });
+
     const result = await resend.emails.send(emailContent);
-    return res.status(200).json({ success: true, id: result.id });
+    
+    console.log('📧 Resend result:', result);
+    
+    return res.status(200).json({ 
+      success: true, 
+      id: result.id,
+      message: 'Email sent successfully'
+    });
     
   } catch (error) {
-    console.error('Email send error:', error);
-    return res.status(500).json({ error: error.message });
+    console.error('📧 Email send error:', error);
+    console.error('📧 Error details:', {
+      message: error.message,
+      stack: error.stack,
+      cause: error.cause
+    });
+    return res.status(500).json({ 
+      error: error.message,
+      details: error.cause || 'Unknown error'
+    });
   }
 }
