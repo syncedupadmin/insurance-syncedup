@@ -288,16 +288,22 @@
         }
 
         async function toggleAgentStatus(id, name, isActive) {
+            console.log('🔧 toggleAgentStatus called:', { id, name, isActive });
+            
             const action = isActive ? 'deactivate' : 'activate';
             const message = isActive ? 
                 `Are you sure you want to deactivate agent "${name}"?\n\nThis will:\n• Disable their login access\n• Preserve all their data for reporting\n• Allow reactivation at any time` :
                 `Are you sure you want to activate agent "${name}"?\n\nThis will:\n• Restore their login access\n• Enable them to use the system again`;
             
             if (!confirm(message)) {
+                console.log('❌ User cancelled status toggle');
                 return;
             }
             
             const token = localStorage.getItem('token');
+            console.log('🔐 Token available:', !!token, token ? 'Length: ' + token.length : 'No token');
+            console.log('📤 Sending status toggle request:', action);
+            
             try {
                 if (isActive) {
                     // Deactivate agent
@@ -306,11 +312,14 @@
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     
+                    console.log('📥 Deactivate response status:', response.status);
                     if (response.ok) {
                         const result = await response.json();
+                        console.log('✅ Deactivate success:', result);
                         loadAgents(); // Reload to show updated status
                     } else {
                         const error = await response.json();
+                        console.error('❌ Deactivate error:', error);
                         alert(error.error || 'Failed to deactivate agent');
                     }
                 } else {
@@ -324,11 +333,14 @@
                         body: JSON.stringify({ status: 'active' })
                     });
                     
+                    console.log('📥 Activate response status:', response.status);
                     if (response.ok) {
                         const result = await response.json();
+                        console.log('✅ Activate success:', result);
                         loadAgents(); // Reload to show updated status
                     } else {
                         const error = await response.json();
+                        console.error('❌ Activate error:', error);
                         alert(error.error || 'Failed to activate agent');
                     }
                 }
@@ -339,26 +351,40 @@
         }
 
         async function resetPassword(id, name) {
+            console.log('🔧 resetPassword called:', { id, name });
+            
             if (!confirm(`Reset password for agent "${name}"?\n\nThis will:\n• Generate a new temporary password\n• Send reset email to the agent\n• Require them to change password on next login`)) {
+                console.log('❌ User cancelled password reset');
                 return;
             }
             
             const token = localStorage.getItem('token');
+            console.log('🔐 Token available:', !!token, token ? 'Length: ' + token.length : 'No token');
+            
+            console.log('📤 Sending password reset request...');
             try {
+                const requestData = { 
+                    userId: id,
+                    sendEmail: true 
+                };
+                console.log('📋 Request data:', requestData);
+                
                 const response = await fetch('/api/admin/reset-password', {
                     method: 'POST',
                     headers: { 
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ 
-                        userId: id,
-                        sendEmail: true 
-                    })
+                    body: JSON.stringify(requestData)
                 });
+                
+                console.log('📥 Response status:', response.status);
+                console.log('📥 Response headers:', Object.fromEntries(response.headers.entries()));
                 
                 if (response.ok) {
                     const result = await response.json();
+                    console.log('✅ Success result:', result);
+                    
                     if (result.email_sent) {
                         alert(`Password reset successfully!\n\nA new temporary password has been sent to ${name}'s email address.\nThey will be required to change it on next login.`);
                     } else {
@@ -366,11 +392,12 @@
                     }
                 } else {
                     const error = await response.json();
+                    console.error('❌ API Error:', error);
                     alert(error.error || 'Failed to reset password');
                 }
             } catch (error) {
-                console.error('Error resetting password:', error);
-                alert('Error resetting password');
+                console.error('💥 JavaScript Error:', error);
+                alert('Error resetting password: ' + error.message);
             }
         }
 
