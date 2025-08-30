@@ -29,8 +29,36 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
         .modal-content { background: white; margin: 5% auto; padding: 2rem; border-radius: 8px; max-width: 500px; position: relative; }
         .close { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; cursor: pointer; }
-        .status-active { color: #48bb78; font-weight: 500; }
-        .status-inactive { color: #f56565; font-weight: 500; }
+        .status-active { 
+            background: #48bb78; 
+            color: white; 
+            padding: 0.25rem 0.75rem; 
+            border-radius: 20px; 
+            font-size: 0.85rem; 
+            font-weight: 500; 
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        .status-inactive { 
+            background: #f56565; 
+            color: white; 
+            padding: 0.25rem 0.75rem; 
+            border-radius: 20px; 
+            font-size: 0.85rem; 
+            font-weight: 500; 
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        .status-active:hover {
+            background: #38a169;
+            transform: translateY(-1px);
+        }
+        .status-inactive:hover {
+            background: #e53e3e;
+            transform: translateY(-1px);
+        }
         .search-bar { display: flex; gap: 1rem; margin-bottom: 1rem; align-items: center; }
         .search-bar input { flex: 1; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; }
     </style>
@@ -196,12 +224,12 @@
                     <td>${agent.agent_code || 'N/A'}</td>
                     <td>${agent.name}</td>
                     <td>${agent.email}</td>
-                    <td><span class="status-${agent.is_active === false ? 'inactive' : 'active'}">${agent.is_active === false ? 'INACTIVE' : 'ACTIVE'}</span></td>
+                    <td><span class="status-${agent.is_active === false ? 'inactive' : 'active'}" onclick="toggleAgentStatus('${agent.id}', '${agent.name}', ${agent.is_active !== false})" title="Click to ${agent.is_active === false ? 'activate' : 'deactivate'} agent">${agent.is_active === false ? 'INACTIVE' : 'ACTIVE'}</span></td>
                     <td>${agent.license_count || 0} states</td>
                     <td>${new Date(agent.created_at).toLocaleDateString()}</td>
                     <td class="actions">
                         <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="editAgent('${agent.id}')">Edit</button>
-                        <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteAgent('${agent.id}', '${agent.name}')">${(agent.status === 'inactive' || agent.is_active === false) ? 'Activate' : 'Deactivate'}</button>
+                        <button class="btn" style="padding: 0.5rem; background: #ffa500; color: white;" onclick="resetPassword('${agent.id}', '${agent.name}')">Reset Password</button>
                     </td>
                 </tr>
             `).join('');
@@ -259,13 +287,11 @@
             document.getElementById('agentModal').style.display = 'none';
         }
 
-        async function deleteAgent(id, name) {
-            const agent = agents.find(a => a.id === id);
-            const isActive = agent && agent.is_active !== false;
+        async function toggleAgentStatus(id, name, isActive) {
             const action = isActive ? 'deactivate' : 'activate';
             const message = isActive ? 
-                `Are you sure you want to deactivate agent "${name}"? This will disable their access but preserve their data for reporting.` :
-                `Are you sure you want to activate agent "${name}"? This will restore their access to the system.`;
+                `Are you sure you want to deactivate agent "${name}"?\n\nThis will:\n• Disable their login access\n• Preserve all their data for reporting\n• Allow reactivation at any time` :
+                `Are you sure you want to activate agent "${name}"?\n\nThis will:\n• Restore their login access\n• Enable them to use the system again`;
             
             if (!confirm(message)) {
                 return;
@@ -282,8 +308,7 @@
                     
                     if (response.ok) {
                         const result = await response.json();
-                        alert(result.message || 'Agent deactivated successfully');
-                        loadAgents();
+                        loadAgents(); // Reload to show updated status
                     } else {
                         const error = await response.json();
                         alert(error.error || 'Failed to deactivate agent');
@@ -301,8 +326,7 @@
                     
                     if (response.ok) {
                         const result = await response.json();
-                        alert(result.message || 'Agent activated successfully');
-                        loadAgents();
+                        loadAgents(); // Reload to show updated status
                     } else {
                         const error = await response.json();
                         alert(error.error || 'Failed to activate agent');
@@ -311,6 +335,42 @@
             } catch (error) {
                 console.error(`Error ${action}ing agent:`, error);
                 alert(`Error ${action}ing agent`);
+            }
+        }
+
+        async function resetPassword(id, name) {
+            if (!confirm(`Reset password for agent "${name}"?\n\nThis will:\n• Generate a new temporary password\n• Send reset email to the agent\n• Require them to change password on next login`)) {
+                return;
+            }
+            
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch('/api/admin/reset-password', {
+                    method: 'POST',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        userId: id,
+                        sendEmail: true 
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.email_sent) {
+                        alert(`Password reset successfully!\n\nA new temporary password has been sent to ${name}'s email address.\nThey will be required to change it on next login.`);
+                    } else {
+                        alert(`Password reset successfully!\n\nNew temporary password: ${result.temp_password}\n\nPlease share this with the agent securely.\nThey will be required to change it on next login.`);
+                    }
+                } else {
+                    const error = await response.json();
+                    alert(error.error || 'Failed to reset password');
+                }
+            } catch (error) {
+                console.error('Error resetting password:', error);
+                alert('Error resetting password');
             }
         }
 
