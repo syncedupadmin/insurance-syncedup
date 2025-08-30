@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commission Settings - SyncedUp Insurance</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .nav { display: flex; gap: 2rem; padding: 0 2rem; background: white; border-bottom: 1px solid #e2e8f0; overflow-x: auto; }
+        .nav a { padding: 1rem; text-decoration: none; color: #2d3748; font-weight: 500; white-space: nowrap; }
+        .nav a.active { color: #667eea; border-bottom: 2px solid #667eea; }
+        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        .btn { padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 0.25rem; font-size: 0.9rem; }
+        .btn:hover { background: #5a67d8; }
+        .btn-success { background: #48bb78; }
+        .btn-danger { background: #f56565; }
+        .btn-secondary { background: #718096; }
+        .btn-warning { background: #ed8936; }
+        
+        .commission-structure { border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; position: relative; }
+        .commission-structure.active { border-color: #48bb78; background: #f0fff4; }
+        .commission-structure h3 { color: #2d3748; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .commission-structure .description { color: #718096; margin-bottom: 1rem; }
+        .commission-structure .status-badge { position: absolute; top: 1rem; right: 1rem; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 500; }
+        .status-badge.active { background: #c6f6d5; color: #22543d; }
+        .status-badge.inactive { background: #fed7d7; color: #742a2a; }
+        
+        .structure-details { margin-top: 1rem; }
+        .rate-display { font-size: 1.25rem; font-weight: bold; color: #667eea; margin: 0.5rem 0; }
+        .tier-list { margin-top: 0.5rem; }
+        .tier-item { background: #f7fafc; padding: 0.75rem; margin: 0.25rem 0; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .product-rates { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem; margin-top: 0.5rem; }
+        .product-rate { background: #f7fafc; padding: 0.5rem; border-radius: 4px; text-align: center; }
+        .product-rate .name { font-weight: 500; text-transform: capitalize; }
+        .product-rate .rate { color: #667eea; font-weight: bold; }
+        
+        .structure-actions { margin-top: 1rem; display: flex; gap: 0.5rem; }
+        .calculator-section { background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-top: 2rem; }
+        .calculator-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+        .calculator-inputs input, .calculator-inputs select { padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; width: 100%; }
+        .calculator-result { background: white; padding: 1rem; border-radius: 6px; border-left: 4px solid #667eea; margin-top: 1rem; }
+        .result-amount { font-size: 1.5rem; font-weight: bold; color: #667eea; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { background: white; margin: 5% auto; padding: 2rem; border-radius: 8px; max-width: 600px; max-height: 80vh; overflow-y: auto; position: relative; }
+        .close { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; cursor: pointer; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #4a5568; }
+        .form-group input, .form-group select, .form-group textarea { padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; width: 100%; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .tier-builder { border: 1px solid #e2e8f0; border-radius: 6px; padding: 1rem; margin-top: 1rem; }
+        .tier-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 0.5rem; align-items: end; margin-bottom: 0.5rem; }
+        .tier-row:last-child { margin-bottom: 0; }
+        
+        .loading { text-align: center; color: #718096; padding: 2rem; }
+        .error { background: #fed7d7; color: #742a2a; padding: 1rem; border-radius: 6px; margin-bottom: 1rem; }
+        .success { background: #c6f6d5; color: #22543d; padding: 1rem; border-radius: 6px; margin-bottom: 1rem; }
+        
+        @media (max-width: 768px) {
+            .container { padding: 0 1rem; }
+            .structure-actions { flex-direction: column; }
+            .calculator-inputs { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .tier-row { grid-template-columns: 1fr; gap: 0.25rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Commission Settings</h1>
+        <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">Logout</button>
+    </div>
+    
+    <nav class="nav">
+        <a href="/admin/">Dashboard</a>
+        <a href="/admin/agents.html">Agents</a>
+        <a href="/admin/licensing.html">Licensing</a>
+        <a href="/admin/commissions.html">Commissions</a>
+        <a href="/admin/commission-settings.html" class="active">Commission Settings</a>
+        <a href="/admin/reports.html">Reports</a>
+        <a href="/admin/settings.html">Settings</a>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <div>
+                    <h2>Commission Structures</h2>
+                    <p style="color: #718096; margin-top: 0.5rem;">Manage how agent commissions are calculated</p>
+                </div>
+                <button class="btn btn-success" onclick="openCreateModal()">+ Add Structure</button>
+            </div>
+
+            <div id="loadingState" class="loading">Loading commission structures...</div>
+            <div id="errorState" class="error" style="display: none;"></div>
+            <div id="successState" class="success" style="display: none;"></div>
+            
+            <div id="structuresContainer"></div>
+        </div>
+
+        <!-- Commission Calculator -->
+        <div class="card">
+            <h3 style="margin-bottom: 1rem;">Commission Calculator</h3>
+            <div class="calculator-section">
+                <div class="calculator-inputs">
+                    <div>
+                        <label for="calcAmount">Sale Amount ($)</label>
+                        <input type="number" id="calcAmount" placeholder="Enter sale amount" value="10000">
+                    </div>
+                    <div>
+                        <label for="calcProduct">Product Type</label>
+                        <select id="calcProduct">
+                            <option value="auto">Auto Insurance</option>
+                            <option value="home">Home Insurance</option>
+                            <option value="life">Life Insurance</option>
+                            <option value="business">Business Insurance</option>
+                            <option value="health">Health Insurance</option>
+                            <option value="dental">Dental Insurance</option>
+                            <option value="vision">Vision Insurance</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="calcAgentSales">Agent YTD Sales ($)</label>
+                        <input type="number" id="calcAgentSales" placeholder="Year-to-date sales" value="15000">
+                    </div>
+                    <div>
+                        <label for="calcStructure">Commission Structure</label>
+                        <select id="calcStructure"></select>
+                    </div>
+                </div>
+                <button class="btn" onclick="calculateCommission()">Calculate Commission</button>
+                <div id="calculatorResult" class="calculator-result" style="display: none;">
+                    <div>Commission Amount: <span class="result-amount" id="resultAmount">$0</span></div>
+                    <div style="margin-top: 0.5rem; color: #718096;" id="resultDetails"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Structure Modal -->
+    <div id="structureModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3 id="modalTitle">Add Commission Structure</h3>
+            <form id="structureForm">
+                <input type="hidden" id="structureKey">
+                
+                <div class="form-group">
+                    <label for="structureName">Structure Name *</label>
+                    <input type="text" id="structureName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="structureDescription">Description</label>
+                    <textarea id="structureDescription" rows="2"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="structureType">Commission Type *</label>
+                    <select id="structureType" required onchange="toggleStructureFields()">
+                        <option value="">Select Type</option>
+                        <option value="percentage">Flat Percentage</option>
+                        <option value="tiered">Tiered Commission</option>
+                        <option value="product">Product-Based</option>
+                        <option value="hybrid">Hybrid Commission</option>
+                    </select>
+                </div>
+
+                <!-- Percentage Fields -->
+                <div id="percentageFields" class="form-group" style="display: none;">
+                    <label for="flatRate">Commission Rate (%)</label>
+                    <input type="number" id="flatRate" min="0" max="100" step="0.1">
+                </div>
+
+                <!-- Tiered Fields -->
+                <div id="tieredFields" style="display: none;">
+                    <label>Commission Tiers</label>
+                    <div class="tier-builder">
+                        <div id="tiersList"></div>
+                        <button type="button" class="btn btn-secondary" onclick="addTier()">+ Add Tier</button>
+                    </div>
+                </div>
+
+                <!-- Product Fields -->
+                <div id="productFields" style="display: none;">
+                    <label>Product Commission Rates (%)</label>
+                    <div style="margin-top: 0.5rem;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="autoRate">Auto Insurance</label>
+                                <input type="number" id="autoRate" min="0" max="100" step="0.1" value="75">
+                            </div>
+                            <div class="form-group">
+                                <label for="homeRate">Home Insurance</label>
+                                <input type="number" id="homeRate" min="0" max="100" step="0.1" value="80">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="lifeRate">Life Insurance</label>
+                                <input type="number" id="lifeRate" min="0" max="100" step="0.1" value="85">
+                            </div>
+                            <div class="form-group">
+                                <label for="businessRate">Business Insurance</label>
+                                <input type="number" id="businessRate" min="0" max="100" step="0.1" value="70">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="healthRate">Health Insurance</label>
+                                <input type="number" id="healthRate" min="0" max="100" step="0.1" value="75">
+                            </div>
+                            <div class="form-group">
+                                <label for="dentalRate">Dental Insurance</label>
+                                <input type="number" id="dentalRate" min="0" max="100" step="0.1" value="70">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hybrid Fields -->
+                <div id="hybridFields" style="display: none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="baseRate">Base Rate (%)</label>
+                            <input type="number" id="baseRate" min="0" max="100" step="0.1" value="60">
+                        </div>
+                        <div class="form-group">
+                            <label for="bonusThreshold">Bonus Threshold ($)</label>
+                            <input type="number" id="bonusThreshold" min="0" step="1000" value="20000">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="bonusRate">Bonus Rate (%)</label>
+                        <input type="number" id="bonusRate" min="0" max="100" step="0.1" value="85">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-success">Save Structure</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let commissionStructures = {};
+        let activeStructure = '';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadCommissionStructures();
+        });
+
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+        }
+
+        async function loadCommissionStructures() {
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch('/api/admin/commission-settings', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    commissionStructures = data.commission_structures || {};
+                    activeStructure = data.active_structure || 'flat_percentage';
+                    displayStructures();
+                    populateCalculatorStructures();
+                    document.getElementById('loadingState').style.display = 'none';
+                } else {
+                    throw new Error('Failed to load commission structures');
+                }
+            } catch (error) {
+                console.error('Error loading structures:', error);
+                showError('Failed to load commission structures');
+                document.getElementById('loadingState').style.display = 'none';
+            }
+        }
+
+        function displayStructures() {
+            const container = document.getElementById('structuresContainer');
+            if (Object.keys(commissionStructures).length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #718096; padding: 2rem;">No commission structures configured</p>';
+                return;
+            }
+
+            container.innerHTML = Object.entries(commissionStructures).map(([key, structure]) => {
+                const isActive = key === activeStructure;
+                return `
+                    <div class="commission-structure ${isActive ? 'active' : ''}">
+                        <div class="status-badge ${isActive ? 'active' : 'inactive'}">
+                            ${isActive ? 'Active' : 'Inactive'}
+                        </div>
+                        <h3>
+                            ${structure.name || key}
+                            ${isActive ? '<span style="color: #48bb78;">★</span>' : ''}
+                        </h3>
+                        <div class="description">${structure.description || 'No description'}</div>
+                        
+                        <div class="structure-details">
+                            ${renderStructureDetails(structure)}
+                        </div>
+                        
+                        <div class="structure-actions">
+                            ${!isActive ? `<button class="btn btn-success" onclick="activateStructure('${key}')">Activate</button>` : ''}
+                            <button class="btn btn-secondary" onclick="editStructure('${key}')">Edit</button>
+                            ${!isActive ? `<button class="btn btn-danger" onclick="deleteStructure('${key}', '${structure.name || key}')">Delete</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderStructureDetails(structure) {
+            switch (structure.type) {
+                case 'percentage':
+                    return `<div class="rate-display">${structure.rate}% commission</div>`;
+                    
+                case 'tiered':
+                    return `
+                        <div class="tier-list">
+                            ${structure.tiers.map(tier => `
+                                <div class="tier-item">
+                                    <span>${tier.description || `$${tier.min.toLocaleString()} - ${tier.max ? '$' + tier.max.toLocaleString() : 'No limit'}`}</span>
+                                    <span class="rate-display">${tier.rate}%</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    
+                case 'product':
+                    return `
+                        <div class="product-rates">
+                            ${Object.entries(structure.rates).map(([product, rate]) => `
+                                <div class="product-rate">
+                                    <div class="name">${product}</div>
+                                    <div class="rate">${rate}%</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    
+                case 'hybrid':
+                    return `
+                        <div>
+                            <div class="rate-display">Base: ${structure.base_rate}% | Bonus: ${structure.bonus_rate}%</div>
+                            <div style="color: #718096;">Bonus threshold: $${structure.bonus_threshold.toLocaleString()}</div>
+                        </div>
+                    `;
+                    
+                default:
+                    return '<div style="color: #718096;">Unknown structure type</div>';
+            }
+        }
+
+        function populateCalculatorStructures() {
+            const select = document.getElementById('calcStructure');
+            select.innerHTML = Object.entries(commissionStructures).map(([key, structure]) => 
+                `<option value="${key}">${structure.name || key} ${key === activeStructure ? '(Active)' : ''}</option>`
+            ).join('');
+            select.value = activeStructure;
+        }
+
+        async function activateStructure(structureKey) {
+            if (confirm(`Activate "${commissionStructures[structureKey].name || structureKey}" as the active commission structure?`)) {
+                const token = localStorage.getItem('token');
+                try {
+                    const response = await fetch('/api/admin/commission-settings', {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            commission_structures: commissionStructures,
+                            active_structure: structureKey
+                        })
+                    });
+
+                    if (response.ok) {
+                        showSuccess('Commission structure activated successfully');
+                        activeStructure = structureKey;
+                        displayStructures();
+                        populateCalculatorStructures();
+                    } else {
+                        throw new Error('Failed to activate structure');
+                    }
+                } catch (error) {
+                    console.error('Error activating structure:', error);
+                    showError('Failed to activate commission structure');
+                }
+            }
+        }
+
+        async function deleteStructure(structureKey, structureName) {
+            if (confirm(`Delete commission structure "${structureName}"? This action cannot be undone.`)) {
+                const token = localStorage.getItem('token');
+                try {
+                    const response = await fetch(`/api/admin/commission-settings?structure_type=${structureKey}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+
+                    if (response.ok) {
+                        showSuccess('Commission structure deleted successfully');
+                        delete commissionStructures[structureKey];
+                        displayStructures();
+                        populateCalculatorStructures();
+                    } else {
+                        throw new Error('Failed to delete structure');
+                    }
+                } catch (error) {
+                    console.error('Error deleting structure:', error);
+                    showError('Failed to delete commission structure');
+                }
+            }
+        }
+
+        function calculateCommission() {
+            const amount = parseFloat(document.getElementById('calcAmount').value) || 0;
+            const product = document.getElementById('calcProduct').value;
+            const agentSales = parseFloat(document.getElementById('calcAgentSales').value) || 0;
+            const structureKey = document.getElementById('calcStructure').value;
+
+            if (!structureKey || !commissionStructures[structureKey]) {
+                showError('Please select a valid commission structure');
+                return;
+            }
+
+            const structure = commissionStructures[structureKey];
+            let commission = 0;
+            let details = '';
+
+            switch (structure.type) {
+                case 'percentage':
+                    commission = (amount * structure.rate) / 100;
+                    details = `${structure.rate}% of $${amount.toLocaleString()}`;
+                    break;
+
+                case 'tiered':
+                    for (const tier of structure.tiers) {
+                        if (agentSales >= tier.min && (tier.max === null || agentSales <= tier.max)) {
+                            commission = (amount * tier.rate) / 100;
+                            details = `${tier.rate}% rate (YTD sales: $${agentSales.toLocaleString()})`;
+                            break;
+                        }
+                    }
+                    break;
+
+                case 'product':
+                    const rate = structure.rates[product] || 0;
+                    commission = (amount * rate) / 100;
+                    details = `${rate}% rate for ${product} insurance`;
+                    break;
+
+                case 'hybrid':
+                    if (agentSales >= structure.bonus_threshold) {
+                        commission = (amount * structure.bonus_rate) / 100;
+                        details = `${structure.bonus_rate}% bonus rate (exceeded threshold)`;
+                    } else {
+                        commission = (amount * structure.base_rate) / 100;
+                        details = `${structure.base_rate}% base rate`;
+                    }
+                    break;
+            }
+
+            document.getElementById('resultAmount').textContent = `$${commission.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('resultDetails').textContent = details;
+            document.getElementById('calculatorResult').style.display = 'block';
+        }
+
+        function openCreateModal() {
+            document.getElementById('modalTitle').textContent = 'Add Commission Structure';
+            document.getElementById('structureForm').reset();
+            document.getElementById('structureKey').value = '';
+            toggleStructureFields();
+            document.getElementById('structureModal').style.display = 'block';
+        }
+
+        function editStructure(structureKey) {
+            const structure = commissionStructures[structureKey];
+            document.getElementById('modalTitle').textContent = 'Edit Commission Structure';
+            document.getElementById('structureKey').value = structureKey;
+            document.getElementById('structureName').value = structure.name || '';
+            document.getElementById('structureDescription').value = structure.description || '';
+            document.getElementById('structureType').value = structure.type;
+            
+            toggleStructureFields();
+            
+            // Populate fields based on type
+            switch (structure.type) {
+                case 'percentage':
+                    document.getElementById('flatRate').value = structure.rate;
+                    break;
+                case 'product':
+                    Object.entries(structure.rates).forEach(([product, rate]) => {
+                        const input = document.getElementById(product + 'Rate');
+                        if (input) input.value = rate;
+                    });
+                    break;
+                case 'hybrid':
+                    document.getElementById('baseRate').value = structure.base_rate;
+                    document.getElementById('bonusThreshold').value = structure.bonus_threshold;
+                    document.getElementById('bonusRate').value = structure.bonus_rate;
+                    break;
+                case 'tiered':
+                    renderTiers(structure.tiers);
+                    break;
+            }
+            
+            document.getElementById('structureModal').style.display = 'block';
+        }
+
+        function toggleStructureFields() {
+            const type = document.getElementById('structureType').value;
+            ['percentageFields', 'tieredFields', 'productFields', 'hybridFields'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+            
+            switch (type) {
+                case 'percentage':
+                    document.getElementById('percentageFields').style.display = 'block';
+                    break;
+                case 'tiered':
+                    document.getElementById('tieredFields').style.display = 'block';
+                    if (!document.getElementById('tiersList').children.length) {
+                        addTier();
+                    }
+                    break;
+                case 'product':
+                    document.getElementById('productFields').style.display = 'block';
+                    break;
+                case 'hybrid':
+                    document.getElementById('hybridFields').style.display = 'block';
+                    break;
+            }
+        }
+
+        function addTier() {
+            const tiersList = document.getElementById('tiersList');
+            const tierCount = tiersList.children.length;
+            const tierDiv = document.createElement('div');
+            tierDiv.className = 'tier-row';
+            tierDiv.innerHTML = `
+                <div class="form-group">
+                    <label>Min Amount ($)</label>
+                    <input type="number" name="tierMin" min="0" step="1000" value="${tierCount * 10000}">
+                </div>
+                <div class="form-group">
+                    <label>Max Amount ($)</label>
+                    <input type="number" name="tierMax" min="0" step="1000" placeholder="Leave empty for no limit">
+                </div>
+                <div class="form-group">
+                    <label>Rate (%)</label>
+                    <input type="number" name="tierRate" min="0" max="100" step="0.1" value="${70 + tierCount * 5}">
+                </div>
+                <div>
+                    <button type="button" class="btn btn-danger" onclick="removeTier(this)" style="margin-top: 1.5rem;">Remove</button>
+                </div>
+            `;
+            tiersList.appendChild(tierDiv);
+        }
+
+        function removeTier(button) {
+            button.parentElement.parentElement.remove();
+        }
+
+        function renderTiers(tiers) {
+            const tiersList = document.getElementById('tiersList');
+            tiersList.innerHTML = '';
+            tiers.forEach((tier, index) => {
+                const tierDiv = document.createElement('div');
+                tierDiv.className = 'tier-row';
+                tierDiv.innerHTML = `
+                    <div class="form-group">
+                        <label>Min Amount ($)</label>
+                        <input type="number" name="tierMin" min="0" step="1000" value="${tier.min}">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Amount ($)</label>
+                        <input type="number" name="tierMax" min="0" step="1000" value="${tier.max || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>Rate (%)</label>
+                        <input type="number" name="tierRate" min="0" max="100" step="0.1" value="${tier.rate}">
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-danger" onclick="removeTier(this)" style="margin-top: 1.5rem;">Remove</button>
+                    </div>
+                `;
+                tiersList.appendChild(tierDiv);
+            });
+        }
+
+        document.getElementById('structureForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const structureKey = document.getElementById('structureKey').value || generateStructureKey();
+            const type = document.getElementById('structureType').value;
+            
+            let structure = {
+                type: type,
+                name: document.getElementById('structureName').value,
+                description: document.getElementById('structureDescription').value,
+                active: false
+            };
+
+            // Build structure based on type
+            switch (type) {
+                case 'percentage':
+                    structure.rate = parseFloat(document.getElementById('flatRate').value);
+                    break;
+                    
+                case 'product':
+                    structure.rates = {
+                        auto: parseFloat(document.getElementById('autoRate').value),
+                        home: parseFloat(document.getElementById('homeRate').value),
+                        life: parseFloat(document.getElementById('lifeRate').value),
+                        business: parseFloat(document.getElementById('businessRate').value),
+                        health: parseFloat(document.getElementById('healthRate').value),
+                        dental: parseFloat(document.getElementById('dentalRate').value)
+                    };
+                    break;
+                    
+                case 'hybrid':
+                    structure.base_rate = parseFloat(document.getElementById('baseRate').value);
+                    structure.bonus_threshold = parseFloat(document.getElementById('bonusThreshold').value);
+                    structure.bonus_rate = parseFloat(document.getElementById('bonusRate').value);
+                    break;
+                    
+                case 'tiered':
+                    const tierRows = document.querySelectorAll('.tier-row');
+                    structure.tiers = Array.from(tierRows).map(row => {
+                        const inputs = row.querySelectorAll('input');
+                        const min = parseFloat(inputs[0].value);
+                        const max = inputs[1].value ? parseFloat(inputs[1].value) : null;
+                        const rate = parseFloat(inputs[2].value);
+                        return {
+                            min,
+                            max,
+                            rate,
+                            description: `$${min.toLocaleString()} - ${max ? '$' + max.toLocaleString() : 'No limit'}`
+                        };
+                    });
+                    break;
+            }
+
+            commissionStructures[structureKey] = structure;
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/admin/commission-settings', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        commission_structures: commissionStructures,
+                        active_structure: activeStructure
+                    })
+                });
+
+                if (response.ok) {
+                    showSuccess('Commission structure saved successfully');
+                    closeModal();
+                    displayStructures();
+                    populateCalculatorStructures();
+                } else {
+                    throw new Error('Failed to save structure');
+                }
+            } catch (error) {
+                console.error('Error saving structure:', error);
+                showError('Failed to save commission structure');
+            }
+        });
+
+        function generateStructureKey() {
+            return 'custom_' + Date.now();
+        }
+
+        function closeModal() {
+            document.getElementById('structureModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('structureModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorState');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => errorDiv.style.display = 'none', 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successState');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => successDiv.style.display = 'none', 3000);
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

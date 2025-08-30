@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Leaderboard - SyncedUp Insurance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #667eea;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-section h1 {
+            font-size: 3rem;
+            color: #333;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-section p {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .control-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .control-group select {
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1rem;
+            background: white;
+        }
+
+        .leaderboard-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .leaderboard-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .leaderboard-header h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .leaderboard-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .leaderboard-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .rank-cell {
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            width: 80px;
+        }
+
+        .rank-1 { color: #ffd700; }
+        .rank-2 { color: #c0c0c0; }
+        .rank-3 { color: #cd7f32; }
+
+        .performance-tier {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .tier-diamond {
+            background: linear-gradient(135deg, #b794f6, #9f7aea);
+            color: white;
+        }
+
+        .tier-platinum {
+            background: linear-gradient(135deg, #e2e8f0, #cbd5e0);
+            color: #2d3748;
+        }
+
+        .tier-gold {
+            background: linear-gradient(135deg, #ffd700, #ffed4a);
+            color: #2d3748;
+        }
+
+        .tier-silver {
+            background: linear-gradient(135deg, #e2e8f0, #cbd5e0);
+            color: #4a5568;
+        }
+
+        .tier-bronze {
+            background: linear-gradient(135deg, #cd7f32, #a0522d);
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .error {
+            text-align: center;
+            padding: 2rem;
+            background: #fed7d7;
+            color: #742a2a;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+
+        .privacy-notice {
+            background: #e6fffa;
+            border-left: 4px solid #38b2ac;
+            padding: 1rem;
+            margin-top: 2rem;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .privacy-notice h4 {
+            color: #234e52;
+            margin-bottom: 0.5rem;
+        }
+
+        .privacy-notice p {
+            color: #2c7a7b;
+            font-size: 0.9rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+                margin: 1rem auto;
+            }
+
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+
+            .control-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .leaderboard-table {
+                font-size: 0.9rem;
+            }
+
+            .leaderboard-table th,
+            .leaderboard-table td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">SyncedUp Insurance</div>
+            <nav class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/leaderboard.html" class="nav-link" style="color: #667eea;">Leaderboard</a>
+                <a href="/login-select.html" class="nav-link">Login</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="hero-section">
+            <h1>🏆 Global Leaderboard</h1>
+            <p>Celebrating top-performing insurance agents worldwide</p>
+        </section>
+
+        <div class="controls">
+            <div class="control-row">
+                <div class="control-group">
+                    <label for="periodSelect">Time Period</label>
+                    <select id="periodSelect" onchange="loadLeaderboard()">
+                        <option value="monthly">This Month</option>
+                        <option value="quarterly">This Quarter</option>
+                        <option value="yearly">This Year</option>
+                        <option value="weekly">This Week</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label for="categorySelect">Category</label>
+                    <select id="categorySelect" onchange="loadLeaderboard()">
+                        <option value="total_sales">Sales Volume</option>
+                        <option value="policies_count">Policy Count</option>
+                        <option value="customer_satisfaction">Customer Satisfaction</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label for="limitSelect">Show Top</label>
+                    <select id="limitSelect" onchange="loadLeaderboard()">
+                        <option value="25">25 Agents</option>
+                        <option value="50" selected>50 Agents</option>
+                        <option value="100">100 Agents</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="leaderboard-container">
+            <div class="leaderboard-header">
+                <h2 id="leaderboardTitle">Loading...</h2>
+                <div class="stats-row" id="statsRow">
+                    <!-- Stats will be populated here -->
+                </div>
+            </div>
+
+            <div id="loadingState" class="loading">
+                <p>🔄 Loading leaderboard data...</p>
+            </div>
+
+            <div id="errorState" class="error" style="display: none;">
+                <p>❌ Failed to load leaderboard data. Please try again later.</p>
+            </div>
+
+            <table class="leaderboard-table" id="leaderboardTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Agent</th>
+                        <th>Agency</th>
+                        <th>Performance</th>
+                        <th id="metricHeader">Sales Volume</th>
+                        <th>Tier</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardBody">
+                    <!-- Leaderboard entries will be populated here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="privacy-notice">
+            <h4>🔒 Privacy & Anonymization</h4>
+            <p>
+                Names and agency information are anonymized based on participant privacy preferences. 
+                Data is updated every 15 minutes during business hours and reflects verified sales performance.
+            </p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2024 SyncedUp Insurance. Global leaderboard data refreshed every 15 minutes.</p>
+    </footer>
+
+    <script>
+        let currentLeaderboardData = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLeaderboard();
+            
+            // Auto-refresh every 5 minutes
+            setInterval(loadLeaderboard, 5 * 60 * 1000);
+        });
+
+        async function loadLeaderboard() {
+            const period = document.getElementById('periodSelect').value;
+            const category = document.getElementById('categorySelect').value;
+            const limit = document.getElementById('limitSelect').value;
+
+            // Show loading state
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('errorState').style.display = 'none';
+            document.getElementById('leaderboardTable').style.display = 'none';
+
+            try {
+                const response = await fetch(`/api/public/global-leaderboard?period=${period}&category=${category}&limit=${limit}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                currentLeaderboardData = data;
+                displayLeaderboard(data);
+
+            } catch (error) {
+                console.error('Failed to load leaderboard:', error);
+                showError();
+            }
+        }
+
+        function displayLeaderboard(data) {
+            const { leaderboard, category, stats } = data;
+
+            // Update title and stats
+            document.getElementById('leaderboardTitle').textContent = `${stats.period_display} Leaders`;
+            updateStats(stats);
+            updateMetricHeader(category);
+
+            // Populate leaderboard table
+            const tbody = document.getElementById('leaderboardBody');
+            tbody.innerHTML = '';
+
+            if (!leaderboard || leaderboard.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem;">No leaderboard data available</td></tr>';
+            } else {
+                leaderboard.forEach(entry => {
+                    const row = document.createElement('tr');
+                    
+                    const rankClass = entry.rank <= 3 ? `rank-${entry.rank}` : '';
+                    const metricValue = formatMetricValue(entry[category], category);
+                    
+                    row.innerHTML = `
+                        <td class="rank-cell ${rankClass}">
+                            ${entry.rank <= 3 ? getRankEmoji(entry.rank) : ''} ${entry.rank}
+                        </td>
+                        <td><strong>${entry.display_name}</strong></td>
+                        <td>${entry.agency_name}</td>
+                        <td><span class="performance-tier tier-${entry.performance_tier.toLowerCase()}">${entry.performance_tier}</span></td>
+                        <td><strong>${metricValue}</strong></td>
+                        <td><span class="performance-tier tier-${entry.performance_tier.toLowerCase()}">${entry.performance_tier}</span></td>
+                    `;
+                    
+                    tbody.appendChild(row);
+                });
+            }
+
+            // Show table and hide loading
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('leaderboardTable').style.display = 'table';
+        }
+
+        function updateStats(stats) {
+            const statsRow = document.getElementById('statsRow');
+            statsRow.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-number">${stats.total_participants}</div>
+                    <div class="stat-label">Participants</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">$${(stats.average_sales || 0).toLocaleString()}</div>
+                    <div class="stat-label">Avg Sales</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${(stats.total_policies || 0).toLocaleString()}</div>
+                    <div class="stat-label">Total Policies</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${stats.top_performer ? stats.top_performer.display_name : 'N/A'}</div>
+                    <div class="stat-label">Top Performer</div>
+                </div>
+            `;
+        }
+
+        function updateMetricHeader(category) {
+            const header = document.getElementById('metricHeader');
+            switch (category) {
+                case 'total_sales':
+                    header.textContent = 'Sales Volume';
+                    break;
+                case 'policies_count':
+                    header.textContent = 'Policies Sold';
+                    break;
+                case 'customer_satisfaction':
+                    header.textContent = 'Satisfaction';
+                    break;
+                default:
+                    header.textContent = 'Performance';
+            }
+        }
+
+        function formatMetricValue(value, category) {
+            if (value === null || value === undefined) return 'N/A';
+            
+            switch (category) {
+                case 'total_sales':
+                    return `$${Math.round(value).toLocaleString()}`;
+                case 'policies_count':
+                    return Math.round(value).toLocaleString();
+                case 'customer_satisfaction':
+                    return `${value.toFixed(1)}/5.0 ⭐`;
+                default:
+                    return value.toString();
+            }
+        }
+
+        function getRankEmoji(rank) {
+            switch (rank) {
+                case 1: return '🥇';
+                case 2: return '🥈';
+                case 3: return '🥉';
+                default: return '';
+            }
+        }
+
+        function showError() {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'block';
+            document.getElementById('leaderboardTable').style.display = 'none';
+        }
+
+        // Add some visual flair to top performers
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add animation to top 3 ranks
+            const style = document.createElement('style');
+            style.textContent = `
+                .rank-1 {
+                    animation: goldGlow 2s ease-in-out infinite alternate;
+                }
+                .rank-2 {
+                    animation: silverGlow 2s ease-in-out infinite alternate;
+                }
+                .rank-3 {
+                    animation: bronzeGlow 2s ease-in-out infinite alternate;
+                }
+                
+                @keyframes goldGlow {
+                    from { text-shadow: 0 0 5px #ffd700; }
+                    to { text-shadow: 0 0 10px #ffd700, 0 0 15px #ffd700; }
+                }
+                
+                @keyframes silverGlow {
+                    from { text-shadow: 0 0 5px #c0c0c0; }
+                    to { text-shadow: 0 0 10px #c0c0c0, 0 0 15px #c0c0c0; }
+                }
+                
+                @keyframes bronzeGlow {
+                    from { text-shadow: 0 0 5px #cd7f32; }
+                    to { text-shadow: 0 0 10px #cd7f32, 0 0 15px #cd7f32; }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>

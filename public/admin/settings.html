@@ -64,6 +64,19 @@
         .status-inactive { color: #f56565; }
         
         .section-title { font-size: 1.1rem; font-weight: 600; color: #2d3748; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e2e8f0; }
+        
+        /* Commission and Settings Styles */
+        .commission-settings { margin-top: 1rem; }
+        .tier-builder { border: 1px solid #e2e8f0; border-radius: 6px; padding: 1rem; margin-top: 1rem; background: #f9fafb; }
+        .tier-item { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 0.5rem; align-items: end; margin-bottom: 0.5rem; padding: 0.75rem; background: #f7fafc; border-radius: 4px; }
+        .tier-item:last-of-type { margin-bottom: 0; }
+        .help-text { color: #718096; font-size: 0.9rem; margin-top: 0.5rem; }
+        
+        @media (max-width: 768px) { 
+            .form-row { grid-template-columns: 1fr; }
+            .tier-item { grid-template-columns: 1fr; gap: 0.25rem; }
+            .tier-item button { margin-top: 0.5rem; }
+        }
     </style>
 </head>
 <body>
@@ -74,9 +87,9 @@
     <nav class="nav">
         <a href="/admin/">Dashboard</a>
         <a href="/admin/agents.html">Agents</a>
-        <a href="/admin/bulk-upload.html">Bulk Upload</a>
         <a href="/admin/licensing.html">Licensing</a>
         <a href="/admin/commissions.html">Commissions</a>
+        <a href="/admin/commission-settings.html">Commission Settings</a>
         <a href="/admin/reports.html">Reports</a>
         <a href="/admin/settings.html" class="active">Settings</a>
     </nav>
@@ -199,6 +212,161 @@ Anywhere, ST 12345</textarea>
                         <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteApiKey('test')">Delete</button>
                     </div>
                 </div>
+            </div>
+
+            <div class="card">
+                <h3 class="section-title">Commission Structure</h3>
+                <div class="form-group">
+                    <label for="commissionType">Commission Type</label>
+                    <select id="commissionType" onchange="toggleCommissionFields()">
+                        <option value="flat">Flat Percentage</option>
+                        <option value="tiered">Tiered</option>
+                        <option value="product">Product-Based</option>
+                        <option value="hybrid">Hybrid</option>
+                    </select>
+                </div>
+                
+                <div id="flatSettings" class="commission-settings">
+                    <div class="form-group">
+                        <label for="flatRate">Commission Rate (%)</label>
+                        <input type="number" id="flatRate" min="0" max="100" step="0.1" value="80">
+                    </div>
+                </div>
+                
+                <div id="tieredSettings" class="commission-settings" style="display:none;">
+                    <div class="tier-builder">
+                        <label>Commission Tiers</label>
+                        <div id="tiersList" style="margin-top: 0.5rem;"></div>
+                        <button type="button" class="btn btn-secondary" onclick="addCommissionTier()">+ Add Tier</button>
+                    </div>
+                </div>
+                
+                <div id="productSettings" class="commission-settings" style="display:none;">
+                    <label>Product Commission Rates (%)</label>
+                    <div class="form-row" style="margin-top: 0.5rem;">
+                        <div class="form-group">
+                            <label for="autoCommission">Auto Insurance</label>
+                            <input type="number" id="autoCommission" min="0" max="100" step="0.1" value="75">
+                        </div>
+                        <div class="form-group">
+                            <label for="homeCommission">Home Insurance</label>
+                            <input type="number" id="homeCommission" min="0" max="100" step="0.1" value="80">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="lifeCommission">Life Insurance</label>
+                            <input type="number" id="lifeCommission" min="0" max="100" step="0.1" value="85">
+                        </div>
+                        <div class="form-group">
+                            <label for="businessCommission">Business Insurance</label>
+                            <input type="number" id="businessCommission" min="0" max="100" step="0.1" value="70">
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="hybridSettings" class="commission-settings" style="display:none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="baseRate">Base Rate (%)</label>
+                            <input type="number" id="baseRate" min="0" max="100" step="0.1" value="60">
+                        </div>
+                        <div class="form-group">
+                            <label for="bonusThreshold">Bonus Threshold ($)</label>
+                            <input type="number" id="bonusThreshold" min="0" step="1000" value="20000">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="bonusRate">Bonus Rate (%)</label>
+                        <input type="number" id="bonusRate" min="0" max="100" step="0.1" value="85">
+                    </div>
+                </div>
+                
+                <button class="btn btn-success" onclick="saveCommissionSettings()">Save Commission Settings</button>
+            </div>
+
+            <div class="card">
+                <h3 class="section-title">Pay Period Settings</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="payPeriod">Pay Period</label>
+                        <select id="payPeriod">
+                            <option value="weekly">Weekly</option>
+                            <option value="biweekly">Bi-Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="payDay">Pay Day (Day of Month/Week)</label>
+                        <input type="number" id="payDay" min="1" max="31" value="1">
+                        <small style="color: #718096; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                            For weekly: 1-7 (1=Monday), For monthly: 1-31
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="paymentMethod">Default Payment Method</label>
+                    <select id="paymentMethod">
+                        <option value="direct_deposit">Direct Deposit</option>
+                        <option value="check">Physical Check</option>
+                        <option value="paypal">PayPal</option>
+                        <option value="stripe">Stripe Connect</option>
+                    </select>
+                </div>
+                <button class="btn btn-success" onclick="savePaySettings()">Save Pay Settings</button>
+            </div>
+
+            <div class="card">
+                <h3 class="section-title">Global Leaderboard</h3>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="globalLeaderboard" onchange="toggleLeaderboardSettings()">
+                        <span>Participate in Global Leaderboard</span>
+                    </label>
+                    <p style="color: #718096; font-size: 0.9rem; margin-top: 0.5rem;">
+                        Allow your agents to compete globally (names can be anonymized)
+                    </p>
+                </div>
+                
+                <div id="leaderboardSettings" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e2e8f0;">
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="anonymizeNames" checked>
+                            <span>Anonymize Agent Names</span>
+                        </label>
+                        <small style="color: #718096;">Show as "Agent #123" instead of real names</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="leaderboardCategories">Leaderboard Categories</label>
+                        <div style="margin-top: 0.5rem;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-bottom: 0.5rem;">
+                                <input type="checkbox" id="salesVolume" checked>
+                                <span>Sales Volume</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-bottom: 0.5rem;">
+                                <input type="checkbox" id="policyCount" checked>
+                                <span>Policy Count</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-bottom: 0.5rem;">
+                                <input type="checkbox" id="customerSatisfaction">
+                                <span>Customer Satisfaction</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="leaderboardPeriod">Leaderboard Period</label>
+                        <select id="leaderboardPeriod">
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button class="btn btn-success" onclick="saveLeaderboardSettings()">Save Leaderboard Settings</button>
             </div>
 
             <div class="card">
@@ -489,6 +657,153 @@ Anywhere, ST 12345</textarea>
         function saveBrandingSettings() {
             alert('Branding settings saved successfully! This functionality will be connected to backend API.');
         }
+
+        // Commission Settings Functions
+        function toggleCommissionFields() {
+            const type = document.getElementById('commissionType').value;
+            const settings = document.querySelectorAll('.commission-settings');
+            settings.forEach(setting => setting.style.display = 'none');
+            
+            switch(type) {
+                case 'flat':
+                    document.getElementById('flatSettings').style.display = 'block';
+                    break;
+                case 'tiered':
+                    document.getElementById('tieredSettings').style.display = 'block';
+                    if (!document.getElementById('tiersList').children.length) {
+                        addCommissionTier();
+                    }
+                    break;
+                case 'product':
+                    document.getElementById('productSettings').style.display = 'block';
+                    break;
+                case 'hybrid':
+                    document.getElementById('hybridSettings').style.display = 'block';
+                    break;
+            }
+        }
+
+        function addCommissionTier() {
+            const tiersList = document.getElementById('tiersList');
+            const tierCount = tiersList.children.length;
+            const tierDiv = document.createElement('div');
+            tierDiv.className = 'tier-item';
+            tierDiv.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 0.5rem; align-items: end; margin-bottom: 0.5rem; padding: 0.75rem; background: #f7fafc; border-radius: 4px;';
+            
+            tierDiv.innerHTML = `
+                <div>
+                    <label style="font-size: 0.85rem; margin-bottom: 0.25rem; display: block;">Min Amount ($)</label>
+                    <input type="number" min="0" step="1000" value="${tierCount * 10000}" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px; width: 100%;">
+                </div>
+                <div>
+                    <label style="font-size: 0.85rem; margin-bottom: 0.25rem; display: block;">Max Amount ($)</label>
+                    <input type="number" min="0" step="1000" placeholder="No limit" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px; width: 100%;">
+                </div>
+                <div>
+                    <label style="font-size: 0.85rem; margin-bottom: 0.25rem; display: block;">Rate (%)</label>
+                    <input type="number" min="0" max="100" step="0.1" value="${70 + tierCount * 5}" style="padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 4px; width: 100%;">
+                </div>
+                <div>
+                    <button type="button" class="btn btn-danger" onclick="removeCommissionTier(this)" style="padding: 0.5rem; margin-top: 1rem;">Remove</button>
+                </div>
+            `;
+            tiersList.appendChild(tierDiv);
+        }
+
+        function removeCommissionTier(button) {
+            button.closest('.tier-item').remove();
+        }
+
+        async function saveCommissionSettings() {
+            const type = document.getElementById('commissionType').value;
+            const settings = { type };
+
+            switch(type) {
+                case 'flat':
+                    settings.rate = parseFloat(document.getElementById('flatRate').value);
+                    break;
+                case 'tiered':
+                    const tierItems = document.querySelectorAll('#tiersList .tier-item');
+                    settings.tiers = Array.from(tierItems).map(item => {
+                        const inputs = item.querySelectorAll('input');
+                        return {
+                            min: parseFloat(inputs[0].value),
+                            max: inputs[1].value ? parseFloat(inputs[1].value) : null,
+                            rate: parseFloat(inputs[2].value)
+                        };
+                    });
+                    break;
+                case 'product':
+                    settings.rates = {
+                        auto: parseFloat(document.getElementById('autoCommission').value),
+                        home: parseFloat(document.getElementById('homeCommission').value),
+                        life: parseFloat(document.getElementById('lifeCommission').value),
+                        business: parseFloat(document.getElementById('businessCommission').value)
+                    };
+                    break;
+                case 'hybrid':
+                    settings.base_rate = parseFloat(document.getElementById('baseRate').value);
+                    settings.bonus_threshold = parseFloat(document.getElementById('bonusThreshold').value);
+                    settings.bonus_rate = parseFloat(document.getElementById('bonusRate').value);
+                    break;
+            }
+
+            try {
+                // This would connect to the commission settings API
+                console.log('Saving commission settings:', settings);
+                alert('Commission settings saved successfully!');
+            } catch (error) {
+                console.error('Error saving commission settings:', error);
+                alert('Failed to save commission settings');
+            }
+        }
+
+        // Pay Period Settings Functions
+        function savePaySettings() {
+            const paySettings = {
+                period: document.getElementById('payPeriod').value,
+                day: parseInt(document.getElementById('payDay').value),
+                method: document.getElementById('paymentMethod').value
+            };
+            
+            console.log('Saving pay settings:', paySettings);
+            alert('Pay period settings saved successfully!');
+        }
+
+        // Global Leaderboard Functions
+        function toggleLeaderboardSettings() {
+            const checkbox = document.getElementById('globalLeaderboard');
+            const settings = document.getElementById('leaderboardSettings');
+            settings.style.display = checkbox.checked ? 'block' : 'none';
+        }
+
+        function saveLeaderboardSettings() {
+            if (!document.getElementById('globalLeaderboard').checked) {
+                console.log('Global leaderboard disabled');
+                alert('Leaderboard settings saved - participation disabled');
+                return;
+            }
+
+            const leaderboardSettings = {
+                enabled: true,
+                anonymize: document.getElementById('anonymizeNames').checked,
+                categories: {
+                    salesVolume: document.getElementById('salesVolume').checked,
+                    policyCount: document.getElementById('policyCount').checked,
+                    customerSatisfaction: document.getElementById('customerSatisfaction').checked
+                },
+                period: document.getElementById('leaderboardPeriod').value
+            };
+            
+            console.log('Saving leaderboard settings:', leaderboardSettings);
+            alert('Global leaderboard settings saved successfully!');
+        }
+
+        // Initialize settings on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleCommissionFields();
+            toggleLeaderboardSettings();
+        });
 
         function logout() {
             localStorage.clear();
