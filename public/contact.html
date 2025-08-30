@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - SyncedUp Insurance Platform</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --obsidian: #0A0A0A;
+            --charcoal: #1A1A1A;
+            --smoke: #2A2A2A;
+            --pearl: #F8F8F8;
+            --platinum: #E5E4E2;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: var(--pearl);
+            background: var(--obsidian);
+        }
+
+        .luxury-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse at top, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+                linear-gradient(180deg, #0A0A0A 0%, #1A1A1A 100%);
+        }
+
+        .header {
+            background: linear-gradient(180deg, rgba(10, 10, 10, 0.98) 0%, rgba(10, 10, 10, 0.9) 100%);
+            backdrop-filter: blur(40px);
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 3rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--platinum);
+            font-weight: 400;
+            font-size: 0.95rem;
+            letter-spacing: 0.05em;
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--primary);
+        }
+
+        .cta-button-nav {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            text-decoration: none;
+            font-weight: 500;
+            border-radius: 50px;
+            transition: all 0.4s;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 3rem;
+        }
+
+        .hero-section {
+            padding: 6rem 0 4rem;
+            text-align: center;
+        }
+
+        .hero-section h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 200;
+            margin-bottom: 1.5rem;
+            color: var(--pearl);
+        }
+
+        .hero-section h1 span {
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-section p {
+            font-size: 1.25rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto 3rem;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 6rem;
+        }
+
+        .contact-info {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8), rgba(42, 42, 42, 0.4));
+            padding: 3rem;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+        }
+
+        .contact-form {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8), rgba(42, 42, 42, 0.4));
+            padding: 3rem;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+        }
+
+        .contact-method {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .contact-method:last-child {
+            border-bottom: none;
+        }
+
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: var(--pearl);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.2rem 3rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.4s;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .quick-contact {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 6rem;
+        }
+
+        .quick-contact-card {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8), rgba(42, 42, 42, 0.4));
+            padding: 2rem;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .quick-contact-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .office-hours {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            padding: 3rem;
+            border-radius: 12px;
+            margin-bottom: 4rem;
+        }
+
+        .hours-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .hours-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .demo-section {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(42, 42, 42, 0.5));
+            padding: 4rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            margin-bottom: 6rem;
+        }
+
+        .demo-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .demo-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .demo-feature::before {
+            content: '✓';
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .contact-grid { grid-template-columns: 1fr; gap: 2rem; }
+            .quick-contact { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="luxury-bg"></div>
+
+    <header class="header">
+        <nav class="nav">
+            <a href="/" class="logo">SyncedUp</a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/#features">Features</a></li>
+                <li><a href="/pricing.html">Pricing</a></li>
+                <li><a href="/contact.html" class="active">Contact</a></li>
+            </ul>
+            <a href="/login.html" class="cta-button-nav">Login</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero-section">
+            <div class="container">
+                <h1>Get in <span>Touch</span></h1>
+                <p>Ready to transform your insurance agency? Our team is here to help you get started.</p>
+            </div>
+        </section>
+
+        <section class="quick-contact">
+            <div class="container">
+                <div class="quick-contact-card">
+                    <div class="contact-icon" style="margin: 0 auto 1rem;">📞</div>
+                    <h3>Sales Inquiries</h3>
+                    <p>Ready to get started?</p>
+                    <a href="tel:+1-800-SYNCEDUP" style="color: var(--primary); text-decoration: none; font-weight: 600;">+1 (800) SYNC-EDP</a>
+                </div>
+                
+                <div class="quick-contact-card">
+                    <div class="contact-icon" style="margin: 0 auto 1rem;">💬</div>
+                    <h3>Live Chat</h3>
+                    <p>Get instant answers</p>
+                    <button onclick="openChat()" style="background: var(--primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer;">Start Chat</button>
+                </div>
+                
+                <div class="quick-contact-card">
+                    <div class="contact-icon" style="margin: 0 auto 1rem;">🎯</div>
+                    <h3>Book a Demo</h3>
+                    <p>See it in action</p>
+                    <a href="#demo-form" style="color: var(--primary); text-decoration: none; font-weight: 600;">Schedule Now</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="contact-section">
+            <div class="container">
+                <div class="contact-grid">
+                    <div class="contact-info">
+                        <h2 style="margin-bottom: 2rem;">Contact Information</h2>
+                        
+                        <div class="contact-method">
+                            <div class="contact-icon">📍</div>
+                            <div>
+                                <strong>Headquarters</strong><br>
+                                123 Insurance Way<br>
+                                Austin, TX 78701
+                            </div>
+                        </div>
+                        
+                        <div class="contact-method">
+                            <div class="contact-icon">📞</div>
+                            <div>
+                                <strong>Phone</strong><br>
+                                Sales: +1 (800) SYNC-EDP<br>
+                                Support: +1 (800) 796-2387
+                            </div>
+                        </div>
+                        
+                        <div class="contact-method">
+                            <div class="contact-icon">✉️</div>
+                            <div>
+                                <strong>Email</strong><br>
+                                Sales: sales@syncedup.com<br>
+                                Support: support@syncedup.com
+                            </div>
+                        </div>
+                        
+                        <div class="contact-method">
+                            <div class="contact-icon">🌐</div>
+                            <div>
+                                <strong>Response Time</strong><br>
+                                Sales: Within 2 hours<br>
+                                Support: Within 4 hours
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="contact-form">
+                        <h2 style="margin-bottom: 2rem;">Send us a Message</h2>
+                        <form id="contactForm" onsubmit="submitForm(event)">
+                            <div class="form-group">
+                                <label for="name">Full Name *</label>
+                                <input type="text" id="name" name="name" class="form-control" placeholder="Enter your full name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">Email Address *</label>
+                                <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="company">Company/Agency Name</label>
+                                <input type="text" id="company" name="company" class="form-control" placeholder="Enter your agency name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="agents">Number of Agents</label>
+                                <select id="agents" name="agents" class="form-control">
+                                    <option value="">Select range</option>
+                                    <option value="1-10">1-10 agents</option>
+                                    <option value="11-25">11-25 agents</option>
+                                    <option value="26-50">26-50 agents</option>
+                                    <option value="51-100">51-100 agents</option>
+                                    <option value="101-500">101-500 agents</option>
+                                    <option value="500+">500+ agents</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="inquiry">Inquiry Type</label>
+                                <select id="inquiry" name="inquiry" class="form-control">
+                                    <option value="general">General Information</option>
+                                    <option value="demo">Request Demo</option>
+                                    <option value="pricing">Pricing Question</option>
+                                    <option value="support">Technical Support</option>
+                                    <option value="integration">Integration Question</option>
+                                    <option value="enterprise">Enterprise Sales</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="message">Message *</label>
+                                <textarea id="message" name="message" class="form-control" placeholder="Tell us about your needs..." required></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn-primary">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="office-hours">
+            <div class="container">
+                <h2 style="text-align: center; margin-bottom: 2rem;">Office Hours</h2>
+                <div class="hours-grid">
+                    <div>
+                        <h3 style="margin-bottom: 1rem; color: var(--primary);">Sales Team</h3>
+                        <div class="hours-item">
+                            <span>Monday - Friday</span>
+                            <span>8:00 AM - 8:00 PM CST</span>
+                        </div>
+                        <div class="hours-item">
+                            <span>Saturday</span>
+                            <span>10:00 AM - 4:00 PM CST</span>
+                        </div>
+                        <div class="hours-item">
+                            <span>Sunday</span>
+                            <span>Closed</span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 style="margin-bottom: 1rem; color: var(--primary);">Support Team</h3>
+                        <div class="hours-item">
+                            <span>Monday - Friday</span>
+                            <span>24/7 Online Support</span>
+                        </div>
+                        <div class="hours-item">
+                            <span>Phone Support</span>
+                            <span>7:00 AM - 9:00 PM CST</span>
+                        </div>
+                        <div class="hours-item">
+                            <span>Emergency</span>
+                            <span>24/7 Available</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="demo-section" id="demo-form">
+            <div class="container">
+                <h2>Schedule a Personal Demo</h2>
+                <p>See how SyncedUp can transform your agency in a 30-minute personalized demonstration.</p>
+                
+                <div class="demo-features">
+                    <div class="demo-feature">Live dashboard walkthrough</div>
+                    <div class="demo-feature">Custom setup consultation</div>
+                    <div class="demo-feature">Migration planning</div>
+                    <div class="demo-feature">ROI calculation</div>
+                    <div class="demo-feature">Implementation timeline</div>
+                    <div class="demo-feature">Pricing discussion</div>
+                </div>
+                
+                <a href="/login.html" class="btn-primary" style="width: auto; display: inline-block; margin-top: 2rem;">Schedule Demo</a>
+            </div>
+        </section>
+    </main>
+
+    <footer style="background: var(--obsidian); padding: 3rem; text-align: center; border-top: 1px solid rgba(102, 126, 234, 0.2); opacity: 0.7;">
+        <p>© 2024 SyncedUp Insurance Platform. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function submitForm(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData);
+            
+            // In a real implementation, you would send this to your backend
+            console.log('Form submitted:', data);
+            
+            // Show success message
+            alert('Thank you for your message! We\'ll get back to you within 2 hours.');
+            event.target.reset();
+        }
+
+        function openChat() {
+            // In a real implementation, this would open your chat widget
+            alert('Chat feature coming soon! Please use the contact form or call us directly.');
+        }
+
+        // Add smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
