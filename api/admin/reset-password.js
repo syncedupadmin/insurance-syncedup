@@ -39,8 +39,7 @@ async function resetPasswordHandler(req, res) {
         .from('users')
         .update({ 
           password_hash,
-          must_change_password: true,
-          updated_at: new Date().toISOString()
+          must_change_password: true
         })
         .eq('id', userId)
         .select()
