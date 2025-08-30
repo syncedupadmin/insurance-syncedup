@@ -9,7 +9,8 @@
       "Bash(git commit:*)",
       "Bash(mkdir:*)",
       "WebFetch(domain:syncedup-insurance-demo-kbno0t75i-nicks-projects-f40381ea.vercel.app)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

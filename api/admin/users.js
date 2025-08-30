@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcryptjs';
 import { Resend } from 'resend';
+import { EMAIL_CONFIG } from '../email/config.js';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -8,7 +9,6 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
-  // Check admin auth
   const token = req.headers.authorization?.replace('Bearer ', '');
   if (!token) {
     return res.status(401).json({ error: 'No authorization token' });
@@ -19,7 +19,6 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Invalid token' });
   }
 
-  // Get user details
   const { data: currentUser } = await supabase
     .from('users')
     .select('role, agency_id')
@@ -35,11 +34,9 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     const { email, name, role = 'agent', agent_code } = req.body;
     
-    // Generate password
     const tempPassword = Math.random().toString(36).slice(-8) + 'A1!';
     const password_hash = await bcrypt.hash(tempPassword, 10);
     
-    // Create user
     const { data: newUser, error } = await supabase
       .from('users')
       .insert({
@@ -57,63 +54,26 @@ export default async function handler(req, res) {
     
     if (error) return res.status(400).json({ error: error.message });
     
-    // Send welcome email
     try {
       await resend.emails.send({
-        from: 'SyncedUp <onboarding@resend.dev>',
+        from: EMAIL_CONFIG.from,
         to: email,
         subject: 'Welcome to SyncedUp - Your Login Credentials',
         html: `
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <style>
-              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-              .header { background: #4F46E5; color: white; padding: 20px; text-align: center; }
-              .content { background: #f9f9f9; padding: 20px; margin-top: 20px; }
-              .credentials { background: white; padding: 15px; border-left: 4px solid #4F46E5; margin: 20px 0; }
-              .button { display: inline-block; padding: 12px 24px; background: #4F46E5; color: white; text-decoration: none; border-radius: 5px; }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <div class="header">
-                <h1>Welcome to SyncedUp!</h1>
-              </div>
-              <div class="content">
-                <h2>Hello ${name},</h2>
-                <p>Your SyncedUp account has been successfully created. Below are your login credentials:</p>
-                
-                <div class="credentials">
-                  <p><strong>Email:</strong> ${email}</p>
-                  <p><strong>Temporary Password:</strong> ${tempPassword}</p>
-                </div>
-                
-                <p><strong>Important:</strong> You will be required to change your password upon first login.</p>
-                
-                <p style="text-align: center; margin-top: 30px;">
-                  <a href="https://syncedup-insurance-demo.vercel.app/login.html" class="button">Login to SyncedUp</a>
-                </p>
-                
-                <p style="margin-top: 30px; font-size: 14px; color: #666;">
-                  If you have any questions, please contact your administrator at admin@syncedupsolutions.com
-                </p>
-              </div>
-            </div>
-          </body>
-          </html>
+          <h2>Welcome ${name}!</h2>
+          <p>Your SyncedUp account has been created.</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Temporary Password:</strong> ${tempPassword}</p>
+          <p>Login at: https://insurance.syncedupsolutions.com/login.html</p>
         `
       });
       
       return res.status(201).json({ 
         success: true,
         user: newUser,
-        message: 'User created and email sent successfully!'
+        message: 'User created and email sent!'
       });
     } catch (emailError) {
-      // User created but email failed
-      console.error('Email error:', emailError);
       return res.status(201).json({ 
         success: true,
         user: newUser,
