@@ -175,6 +175,8 @@
             grid-template-columns: 2fr 1fr;
             gap: 2rem;
             margin-bottom: 2rem;
+            max-width: 100%;
+            overflow: hidden;
         }
 
         .chart-container {
@@ -182,6 +184,8 @@
             border-radius: 8px;
             padding: 1rem;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            min-width: 0;
+            overflow: hidden;
         }
 
         .chart-container h3 {
@@ -549,13 +553,13 @@
                 <div class="charts-grid">
                     <div class="chart-container">
                         <h3>Sales Performance (Last 6 Months)</h3>
-                        <div style="position: relative; height: 300px;">
+                        <div style="position: relative; height: 300px; width: 100%; max-width: 100%;">
                             <canvas id="salesChart"></canvas>
                         </div>
                     </div>
                     <div class="chart-container">
                         <h3>Product Mix</h3>
-                        <div style="position: relative; height: 300px;">
+                        <div style="position: relative; height: 300px; width: 100%; max-width: 100%;">
                             <canvas id="productChart"></canvas>
                         </div>
                     </div>
