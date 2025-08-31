@@ -4,84 +4,181 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - SyncedUp Insurance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
-        .login-container {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
+        
+        .animated-gradient {
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
         }
-        h2 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 1.5rem;
+        
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
         }
-        input {
-            width: 100%;
-            padding: 0.75rem;
-            margin-bottom: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-sizing: border-box;
+        
+        .neon-text {
+            text-shadow: 0 0 10px rgba(255,255,255,0.8),
+                         0 0 20px rgba(255,255,255,0.8),
+                         0 0 30px rgba(255,255,255,0.8);
         }
-        button {
-            width: 100%;
-            padding: 0.75rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            cursor: pointer;
-        }
-        .error {
-            color: #dc3545;
-            text-align: center;
-            margin-top: 1rem;
-            display: none;
-        }
-        .success {
-            color: #28a745;
-            text-align: center;
-            margin-top: 1rem;
-            display: none;
+        
+        .input-glow:focus {
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1),
+                        0 0 20px rgba(102, 126, 234, 0.3);
         }
     </style>
 </head>
-<body>
-    <div class="login-container">
-        <h2>Login</h2>
-        <form id="loginForm" autocomplete="on">
-            <input type="email" id="email" name="email" placeholder="Email" required autocomplete="email">
-            <input type="password" id="password" name="password" placeholder="Password" required autocomplete="current-password">
-            <button type="submit">Login</button>
-            <div class="error" id="error"></div>
-            <div class="success" id="success"></div>
-        </form>
+<body class="animated-gradient min-h-screen flex flex-col items-center justify-center p-4">
+    <!-- Floating particles effect -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-10 -left-10 w-40 h-40 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce"></div>
+        <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce animation-delay-2000"></div>
+        <div class="absolute top-1/2 left-1/2 w-40 h-40 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce animation-delay-4000"></div>
+    </div>
+
+    <!-- Logo Section -->
+    <div class="mb-8 text-center z-10">
+        <h1 class="text-5xl font-bold text-white neon-text mb-2">SYNCEDUP</h1>
+        <p class="text-white/80 text-lg">Insurance Intelligence Platform</p>
+    </div>
+
+    <!-- Main Login Container -->
+    <div class="glass-morphism rounded-3xl p-8 w-full max-w-md z-10 transform hover:scale-[1.02] transition-transform duration-300">
+        <!-- Login Form -->
+        <div id="loginForm">
+            <h2 class="text-3xl font-bold text-center mb-2 text-white">Welcome Back</h2>
+            <p class="text-center text-white/70 mb-8">Sign in to continue to your dashboard</p>
+            
+            <form id="loginFormElement" class="space-y-6">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-envelope text-white/50"></i>
+                    </div>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        required 
+                        class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:bg-white/20 focus:border-white/40 input-glow outline-none transition-all duration-300"
+                        placeholder="Email address"
+                    >
+                </div>
+                
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-lock text-white/50"></i>
+                    </div>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        required 
+                        class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:bg-white/20 focus:border-white/40 input-glow outline-none transition-all duration-300"
+                        placeholder="Password"
+                    >
+                </div>
+                
+                <button 
+                    type="submit" 
+                    class="w-full bg-white/90 text-purple-700 py-3 rounded-xl font-bold hover:bg-white transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+                >
+                    Sign In
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </form>
+            
+            <div class="mt-6 flex justify-between items-center">
+                <button 
+                    onclick="showResetForm()" 
+                    class="text-white/70 hover:text-white text-sm font-medium transition-colors"
+                >
+                    Forgot Password?
+                </button>
+                <a href="/" class="text-white/70 hover:text-white text-sm font-medium transition-colors">
+                    Back to Home
+                </a>
+            </div>
+
+            <!-- Error message -->
+            <div id="errorMessage" class="mt-4 p-3 bg-red-500/20 border border-red-500/50 text-white rounded-xl hidden"></div>
+        </div>
+
+        <!-- Password Reset Form -->
+        <div id="resetForm" class="hidden">
+            <h2 class="text-3xl font-bold text-center mb-2 text-white">Reset Password</h2>
+            <p class="text-center text-white/70 mb-8">We'll send you reset instructions</p>
+            
+            <form id="resetFormElement" class="space-y-6">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-envelope text-white/50"></i>
+                    </div>
+                    <input 
+                        type="email" 
+                        id="resetEmail" 
+                        required 
+                        class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:bg-white/20 focus:border-white/40 input-glow outline-none transition-all duration-300"
+                        placeholder="Your email address"
+                    >
+                </div>
+                
+                <button 
+                    type="submit" 
+                    class="w-full bg-white/90 text-purple-700 py-3 rounded-xl font-bold hover:bg-white transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+                >
+                    Send Reset Link
+                    <i class="fas fa-paper-plane ml-2"></i>
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <button 
+                    onclick="showLoginForm()" 
+                    class="text-white/70 hover:text-white text-sm font-medium transition-colors"
+                >
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Login
+                </button>
+            </div>
+
+            <!-- Success/Error message -->
+            <div id="resetMessage" class="mt-4 p-3 rounded-xl hidden"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-8 text-center text-white/60 text-sm z-10">
+        <p>&copy; 2025 SyncedUp Solutions. Empowering Insurance Excellence.</p>
     </div>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        // Form switching with smooth transitions
+        function showResetForm() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('resetForm').classList.remove('hidden');
+        }
+
+        function showLoginForm() {
+            document.getElementById('resetForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('resetMessage').classList.add('hidden');
+        }
+
+        // Login form handler
+        document.getElementById('loginFormElement').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const errorDiv = document.getElementById('error');
-            const successDiv = document.getElementById('success');
-            
-            errorDiv.style.display = 'none';
-            successDiv.style.display = 'none';
+            const errorDiv = document.getElementById('errorMessage');
             
             try {
                 const response = await fetch('/api/auth/login', {
@@ -92,38 +189,66 @@
                 
                 const data = await response.json();
                 
-                if (response.ok && data.success) {
-                    localStorage.setItem('token', data.token);
+                if (response.ok) {
+                    localStorage.setItem('authToken', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
                     
-                    successDiv.textContent = 'Login successful! Redirecting...';
-                    successDiv.style.display = 'block';
+                    // After successful login, store the email
+                    localStorage.setItem('userEmail', email);
                     
-                    // Redirect based on role - FIX HERE
-                    setTimeout(() => {
-                        switch(data.user.role) {
-                            case 'super_admin':
-                                window.location.href = '/super-admin.html';
-                                break;
-                            case 'admin':
-                                window.location.href = '/admin/';
-                                break;
-                            case 'manager':
-                                window.location.href = '/manager.html';
-                                break;
-                            case 'agent':
-                            default:
-                                window.location.href = '/agent/';
-                                break;
-                        }
-                    }, 500);
+                    // Redirect based on role
+                    if (data.user.must_change_password) {
+                        // Store email for password change page
+                        localStorage.setItem('pendingPasswordChange', JSON.stringify({
+                            email: data.user.email,
+                            timestamp: Date.now()
+                        }));
+                        window.location.href = `/change-password.html?email=${encodeURIComponent(email)}`;
+                    } else if (data.user.role === 'admin' || data.user.role === 'super-admin') {
+                        window.location.href = '/admin.html';
+                    } else {
+                        window.location.href = '/agent/';
+                    }
                 } else {
-                    errorDiv.textContent = data.error || 'Login failed';
-                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = data.error || 'Invalid credentials';
+                    errorDiv.classList.remove('hidden');
+                    setTimeout(() => errorDiv.classList.add('hidden'), 5000);
                 }
             } catch (error) {
-                errorDiv.textContent = 'Network error: ' + error.message;
-                errorDiv.style.display = 'block';
+                errorDiv.textContent = 'Connection error. Please try again.';
+                errorDiv.classList.remove('hidden');
+            }
+        });
+
+        // Reset form handler
+        document.getElementById('resetFormElement').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('resetEmail').value;
+            const messageDiv = document.getElementById('resetMessage');
+            
+            try {
+                const response = await fetch('/api/auth/request-reset', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    messageDiv.textContent = 'Reset instructions sent to your email!';
+                    messageDiv.className = 'mt-4 p-3 bg-green-500/20 border border-green-500/50 text-white rounded-xl';
+                    document.getElementById('resetFormElement').reset();
+                } else {
+                    messageDiv.textContent = data.error || 'Email not found';
+                    messageDiv.className = 'mt-4 p-3 bg-red-500/20 border border-red-500/50 text-white rounded-xl';
+                }
+                messageDiv.classList.remove('hidden');
+            } catch (error) {
+                messageDiv.textContent = 'Connection error. Please try again.';
+                messageDiv.className = 'mt-4 p-3 bg-red-500/20 border border-red-500/50 text-white rounded-xl';
+                messageDiv.classList.remove('hidden');
             }
         });
     </script>

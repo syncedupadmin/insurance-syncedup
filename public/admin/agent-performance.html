@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Performance - SyncedUp Insurance</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .nav { display: flex; gap: 2rem; padding: 0 2rem; background: white; border-bottom: 1px solid #e2e8f0; overflow-x: auto; }
+        .nav a { padding: 1rem; text-decoration: none; color: #2d3748; font-weight: 500; white-space: nowrap; }
+        .nav a.active { color: #667eea; border-bottom: 2px solid #667eea; }
+        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+        .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
+        .btn { padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 0.25rem; }
+        .btn:hover { background: #5a67d8; }
+        .btn-success { background: #48bb78; }
+        .btn-warning { background: #ed8936; }
+        .btn-danger { background: #f56565; }
+        
+        .form-row { display: flex; gap: 1rem; margin-bottom: 1rem; align-items: end; }
+        .form-group { flex: 1; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #4a5568; }
+        .form-group select { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); padding: 1.5rem; border-radius: 8px; text-align: center; }
+        .stat-number { font-size: 2rem; font-weight: bold; color: #667eea; margin-bottom: 0.5rem; }
+        .stat-label { color: #718096; font-weight: 500; }
+        
+        .agent-selector { background: rgba(102, 126, 234, 0.05); border: 2px solid #667eea; border-radius: 8px; padding: 1rem; margin-bottom: 2rem; }
+        .agent-selector h3 { color: #667eea; margin-bottom: 1rem; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th { background: #f7fafc; padding: 0.75rem; text-align: left; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 0.75rem; border-bottom: 1px solid #e2e8f0; }
+        
+        .commission-amount { color: #059669; font-weight: 600; }
+        .premium-amount { color: #667eea; font-weight: 600; }
+        
+        .export-section { display: flex; gap: 1rem; margin-top: 2rem; }
+        
+        #performanceData { display: none; }
+        
+        .no-data { text-align: center; color: #718096; padding: 2rem; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Agent Performance Analytics</h1>
+        <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">Logout</button>
+    </div>
+    <nav class="nav">
+        <a href="/admin/">Dashboard</a>
+        <a href="/admin/agents.html">Agents</a>
+        <a href="/admin/agent-performance.html" class="active">Agent Performance</a>
+        <a href="/admin/licensing.html">Licensing</a>
+        <a href="/admin/commissions.html">Commissions</a>
+        <a href="/admin/commission-settings.html">Commission Settings</a>
+        <a href="/admin/reports.html">Reports</a>
+        <a href="/admin/settings.html">Settings</a>
+    </nav>
+    
+    <div class="container">
+        <div class="card agent-selector">
+            <h3>👑 Agent Performance Viewer</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="agentSelect">Select Agent</label>
+                    <select id="agentSelect">
+                        <option value="">Choose an agent...</option>
+                        <option value="ALL">🌟 All Agents Combined</option>
+                        <!-- Will be populated dynamically -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="timeframe">Time Period</label>
+                    <select id="timeframe">
+                        <option value="thisweek">This Week</option>
+                        <option value="lastweek">Last Week</option>
+                        <option value="thismonth">This Month</option>
+                        <option value="lastmonth">Last Month</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button class="btn" onclick="loadAgentPerformance()">Load Performance Data</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="performanceData">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalSales">0</div>
+                    <div class="stat-label">Total Sales</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalPremium">$0</div>
+                    <div class="stat-label">Premium Volume</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalCommission">$0</div>
+                    <div class="stat-label">Commission Earned</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avgSale">$0</div>
+                    <div class="stat-label">Average Sale</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>📊 Recent Sales Activity</h3>
+                <div id="salesTableContainer">
+                    <table id="salesTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Agent</th>
+                                <th>Customer</th>
+                                <th>Product</th>
+                                <th>Premium</th>
+                                <th>Commission</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="salesTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="export-section">
+                <button class="btn btn-success" onclick="exportData('csv')">📊 Export to CSV</button>
+                <button class="btn btn-warning" onclick="exportData('pdf')">📄 Export to PDF</button>
+                <button class="btn" onclick="refreshData()">🔄 Refresh Data</button>
+            </div>
+        </div>
+        
+        <div id="noDataMessage" class="card no-data">
+            Select an agent and time period to view performance analytics.
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let selectedAgent = null;
+        let currentTimeframe = 'thismonth';
+        
+        // Mock agent data - in production this would come from API
+        const agents = [
+            { id: 'AGENT001', name: 'John Smith', email: 'john@example.com', active: true },
+            { id: 'AGENT002', name: 'Jane Doe', email: 'jane@example.com', active: true },
+            { id: 'AGENT003', name: 'Mike Johnson', email: 'mike@example.com', active: true },
+            { id: 'AGENT004', name: 'Sarah Wilson', email: 'sarah@example.com', active: false },
+            { id: 'AGENT005', name: 'David Brown', email: 'david@example.com', active: true }
+        ];
+        
+        // Mock sales data - in production this would come from API
+        const mockSalesData = [
+            {
+                date: '2025-08-30',
+                agentId: 'AGENT001',
+                agentName: 'John Smith',
+                customer: 'John Doe',
+                product: 'Good Health Distribution Partner',
+                premium: 339.00,
+                commission: 101.70,
+                status: 'Active'
+            },
+            {
+                date: '2025-08-29',
+                agentId: 'AGENT002',
+                agentName: 'Jane Doe',
+                customer: 'Mary Johnson',
+                product: 'Summit Plan 100',
+                premium: 232.00,
+                commission: 69.60,
+                status: 'Active'
+            },
+            {
+                date: '2025-08-28',
+                agentId: 'AGENT001',
+                agentName: 'John Smith',
+                customer: 'Bob Wilson',
+                product: 'Sigma Care PLUS 100',
+                premium: 214.00,
+                commission: 64.20,
+                status: 'Pending'
+            }
+        ];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            const userData = localStorage.getItem('user');
+            if (userData) {
+                currentUser = JSON.parse(userData);
+                
+                // Only admin and super-admin can access this page
+                if (currentUser.role !== 'admin' && currentUser.role !== 'super-admin') {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                
+                populateAgentSelect();
+            } else {
+                window.location.href = '/login.html';
+            }
+        });
+        
+        function populateAgentSelect() {
+            const agentSelect = document.getElementById('agentSelect');
+            
+            // Clear existing options (except first two)
+            agentSelect.innerHTML = '<option value="">Choose an agent...</option><option value="ALL">🌟 All Agents Combined</option>';
+            
+            // Add agents
+            agents.filter(agent => agent.active).forEach(agent => {
+                const option = document.createElement('option');
+                option.value = agent.id;
+                option.textContent = `${agent.name} (${agent.id})`;
+                agentSelect.appendChild(option);
+            });
+        }
+        
+        async function loadAgentPerformance() {
+            const agentId = document.getElementById('agentSelect').value;
+            const timeframe = document.getElementById('timeframe').value;
+            
+            if (!agentId) {
+                alert('Please select an agent first');
+                return;
+            }
+            
+            selectedAgent = agentId;
+            currentTimeframe = timeframe;
+            
+            try {
+                // Call the same API that agents use, but as admin we can view any agent
+                let apiUrl = `/api/dashboard?agentId=${agentId}&timeframe=${timeframe}`;
+                
+                const response = await fetch(apiUrl);
+                const performanceData = await response.json();
+                
+                // Load commission data
+                const commissionResponse = await fetch(`/api/commissions?agentId=${agentId}`);
+                const commissionData = await commissionResponse.json();
+                
+                displayPerformanceData(performanceData, agentId);
+                displaySalesTable(agentId);
+                
+            } catch (error) {
+                console.error('Failed to load performance data:', error);
+                displayMockData(agentId);
+            }
+        }
+        
+        function displayPerformanceData(data, agentId) {
+            // Adjust data if viewing all agents
+            let multiplier = 1;
+            if (agentId === 'ALL') {
+                multiplier = agents.filter(a => a.active).length;
+            }
+            
+            document.getElementById('totalSales').textContent = (data.totalSales || 12) * multiplier;
+            document.getElementById('totalPremium').textContent = `$${((data.totalPremium || 28500) * multiplier).toLocaleString()}`;
+            document.getElementById('totalCommission').textContent = `$${((data.totalCommission || 8550) * multiplier).toLocaleString()}`;
+            document.getElementById('avgSale').textContent = `$${(data.averageSale || 2375).toLocaleString()}`;
+            
+            document.getElementById('performanceData').style.display = 'block';
+            document.getElementById('noDataMessage').style.display = 'none';
+        }
+        
+        function displayMockData(agentId) {
+            // Use mock data when API fails
+            let totalSales = 12;
+            let totalPremium = 28500;
+            let totalCommission = 8550;
+            let avgSale = 2375;
+            
+            if (agentId === 'ALL') {
+                const activeAgents = agents.filter(a => a.active).length;
+                totalSales *= activeAgents;
+                totalPremium *= activeAgents;
+                totalCommission *= activeAgents;
+            }
+            
+            document.getElementById('totalSales').textContent = totalSales;
+            document.getElementById('totalPremium').textContent = `$${totalPremium.toLocaleString()}`;
+            document.getElementById('totalCommission').textContent = `$${totalCommission.toLocaleString()}`;
+            document.getElementById('avgSale').textContent = `$${avgSale.toLocaleString()}`;
+            
+            document.getElementById('performanceData').style.display = 'block';
+            document.getElementById('noDataMessage').style.display = 'none';
+            
+            displaySalesTable(agentId);
+        }
+        
+        function displaySalesTable(agentId) {
+            const tableBody = document.getElementById('salesTableBody');
+            tableBody.innerHTML = '';
+            
+            // Filter sales data based on selected agent
+            let salesToShow = mockSalesData;
+            if (agentId !== 'ALL') {
+                salesToShow = mockSalesData.filter(sale => sale.agentId === agentId);
+            }
+            
+            if (salesToShow.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="7" class="no-data">No sales data available for selected agent and time period.</td></tr>';
+                return;
+            }
+            
+            salesToShow.forEach(sale => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(sale.date).toLocaleDateString()}</td>
+                    <td><strong>${sale.agentName}</strong><br><small>${sale.agentId}</small></td>
+                    <td>${sale.customer}</td>
+                    <td>${sale.product}</td>
+                    <td class="premium-amount">$${sale.premium.toFixed(2)}</td>
+                    <td class="commission-amount">$${sale.commission.toFixed(2)}</td>
+                    <td><span class="status-${sale.status.toLowerCase()}">${sale.status}</span></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function exportData(format) {
+            if (!selectedAgent) {
+                alert('Please load performance data first');
+                return;
+            }
+            
+            const agentName = selectedAgent === 'ALL' ? 'All-Agents' : 
+                agents.find(a => a.id === selectedAgent)?.name.replace(' ', '-') || 'Agent';
+            
+            if (format === 'csv') {
+                exportToCSV(agentName);
+            } else if (format === 'pdf') {
+                exportToPDF(agentName);
+            }
+        }
+        
+        function exportToCSV(agentName) {
+            let csvContent = 'Date,Agent ID,Agent Name,Customer,Product,Premium,Commission,Status\\n';
+            
+            const salesToExport = selectedAgent === 'ALL' ? mockSalesData : 
+                mockSalesData.filter(sale => sale.agentId === selectedAgent);
+            
+            salesToExport.forEach(sale => {
+                csvContent += `${sale.date},${sale.agentId},${sale.agentName},${sale.customer},${sale.product},${sale.premium},${sale.commission},${sale.status}\\n`;
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${agentName}-performance-${currentTimeframe}-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+        
+        function exportToPDF(agentName) {
+            // Mock PDF export - in production this would generate actual PDF
+            alert(`PDF export for ${agentName} would be generated here. This feature requires a PDF library like jsPDF or a backend service.`);
+        }
+        
+        function refreshData() {
+            if (selectedAgent) {
+                loadAgentPerformance();
+            }
+        }
+        
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

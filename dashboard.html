@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script>
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user.role === 'admin' || user.role === 'super-admin') {
+            window.location.href = '/admin/index.html';
+        } else {
+            window.location.href = '/agent/index.html';
+        }
+    </script>
+</head>
+<body>
+    <p>Loading dashboard...</p>
+</body>
+</html>

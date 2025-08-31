@@ -46,6 +46,11 @@ export default async function handler(req, res) {
       return { data: { session: { access_token: jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'your-secret-key') } } };
     });
 
+    // Debug logging
+    console.log('Login successful for:', email);
+    console.log('User must_change_password flag:', user.must_change_password);
+    console.log('User last_password_change:', user.last_password_change);
+
     return res.status(200).json({
       success: true,
       user: {
@@ -56,7 +61,14 @@ export default async function handler(req, res) {
         agency_id: user.agency_id,
         must_change_password: user.must_change_password
       },
-      token: authData?.session?.access_token || jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'your-secret-key')
+      token: authData?.session?.access_token || jwt.sign({ 
+        userId: user.id, 
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        name: user.name,
+        sub: user.id
+      }, process.env.JWT_SECRET || 'your-secret-key')
     });
 
   } catch (error) {

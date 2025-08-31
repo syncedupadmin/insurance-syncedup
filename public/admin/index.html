@@ -34,6 +34,7 @@
     <nav class="nav">
         <a href="/admin/" class="active">Dashboard</a>
         <a href="/admin/agents.html">Agents</a>
+        <a href="/admin/agent-performance.html">Agent Performance</a>
         <a href="/admin/licensing.html">Licensing</a>
         <a href="/admin/commissions.html">Commissions</a>
         <a href="/admin/commission-settings.html">Commission Settings</a>
@@ -43,26 +44,47 @@
     <div class="container">
         <div class="grid">
             <div class="card">
-                <div class="stat-value">0</div>
+                <div class="stat-value" id="activeAgents">0</div>
                 <div class="stat-label">Active Agents</div>
             </div>
             <div class="card">
-                <div class="stat-value">$0</div>
+                <div class="stat-value" id="mtdRevenue">$0</div>
                 <div class="stat-label">MTD Revenue</div>
             </div>
             <div class="card">
-                <div class="stat-value">0</div>
+                <div class="stat-value" id="policiesSold">0</div>
                 <div class="stat-label">Policies Sold</div>
             </div>
             <div class="card">
-                <div class="stat-value">$0</div>
+                <div class="stat-value" id="pendingCommissions">$0</div>
                 <div class="stat-label">Pending Commissions</div>
             </div>
         </div>
         <div class="quick-actions">
-            <button class="btn" onclick="location.href='/admin/agents.html'">Manage Agents</button>
-            <button class="btn btn-success" onclick="location.href='/admin/bulk-upload.html'">Bulk Upload</button>
-            <button class="btn btn-warning" onclick="location.href='/admin/licensing.html'">Check Licenses</button>
+            <button class="btn" onclick="location.href='/admin/agents.html'">👥 Manage Agents</button>
+            <button class="btn" onclick="location.href='/admin/agent-performance.html'">📊 View Agent Performance</button>
+            <button class="btn btn-success" onclick="location.href='/admin/bulk-upload.html'">📤 Bulk Upload</button>
+            <button class="btn btn-warning" onclick="location.href='/admin/licensing.html'">📋 Check Licenses</button>
+        </div>
+        
+        <!-- Agent Quick Stats -->
+        <div class="card">
+            <h3>👑 Agent Overview (This Month)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Agent</th>
+                        <th>Sales</th>
+                        <th>Premium Volume</th>
+                        <th>Commission</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="agentOverviewTable">
+                    <tr><td colspan="6" style="text-align: center;">Loading agent data...</td></tr>
+                </tbody>
+            </table>
         </div>
         <div class="card">
             <h3>Recent Activity</h3>
@@ -82,10 +104,132 @@
         </div>
     </div>
     <script>
+        let currentUser = null;
+        
+        // Mock agent data
+        const agentData = [
+            { id: 'AGENT001', name: 'John Smith', sales: 8, premium: 2712, commission: 813.60, status: 'Active' },
+            { id: 'AGENT002', name: 'Jane Doe', sales: 12, premium: 3845, commission: 1153.50, status: 'Active' },
+            { id: 'AGENT003', name: 'Mike Johnson', sales: 5, premium: 1680, commission: 504.00, status: 'Active' },
+            { id: 'AGENT004', name: 'Sarah Wilson', sales: 0, premium: 0, commission: 0, status: 'Inactive' },
+            { id: 'AGENT005', name: 'David Brown', sales: 15, premium: 4950, commission: 1485.00, status: 'Active' }
+        ];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            const userData = localStorage.getItem('user');
+            if (userData) {
+                currentUser = JSON.parse(userData);
+                
+                // Only admin and super-admin can access admin portal
+                if (currentUser.role !== 'admin' && currentUser.role !== 'super-admin') {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                
+                loadDashboardData();
+            } else {
+                window.location.href = '/login.html';
+            }
+        });
+        
+        async function loadDashboardData() {
+            try {
+                // Load overall stats
+                const activeAgents = agentData.filter(agent => agent.status === 'Active').length;
+                const totalRevenue = agentData.reduce((sum, agent) => sum + agent.premium, 0);
+                const totalSales = agentData.reduce((sum, agent) => sum + agent.sales, 0);
+                const totalCommissions = agentData.reduce((sum, agent) => sum + agent.commission, 0);
+                
+                document.getElementById('activeAgents').textContent = activeAgents;
+                document.getElementById('mtdRevenue').textContent = `$${totalRevenue.toLocaleString()}`;
+                document.getElementById('policiesSold').textContent = totalSales;
+                document.getElementById('pendingCommissions').textContent = `$${totalCommissions.toLocaleString()}`;
+                
+                // Load agent overview table
+                loadAgentOverviewTable();
+                
+            } catch (error) {
+                console.error('Failed to load dashboard data:', error);
+                // Use mock data on error
+                document.getElementById('activeAgents').textContent = '4';
+                document.getElementById('mtdRevenue').textContent = '$38,500';
+                document.getElementById('policiesSold').textContent = '40';
+                document.getElementById('pendingCommissions').textContent = '$11,550';
+                
+                loadAgentOverviewTable();
+            }
+        }
+        
+        function loadAgentOverviewTable() {
+            const tableBody = document.getElementById('agentOverviewTable');
+            tableBody.innerHTML = '';
+            
+            agentData.forEach(agent => {
+                const row = document.createElement('tr');
+                const statusClass = agent.status === 'Active' ? 'status-active' : 'status-inactive';
+                
+                row.innerHTML = `
+                    <td><strong>${agent.name}</strong><br><small>${agent.id}</small></td>
+                    <td><strong>${agent.sales}</strong></td>
+                    <td class="premium-amount">$${agent.premium.toLocaleString()}</td>
+                    <td class="commission-amount">$${agent.commission.toLocaleString()}</td>
+                    <td><span class="${statusClass}">${agent.status}</span></td>
+                    <td>
+                        <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 
+                                onclick="viewAgentPerformance('${agent.id}')">📊 View</button>
+                        <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 
+                                onclick="toggleAgentStatus('${agent.id}')">${agent.status === 'Active' ? '⏸️' : '▶️'}</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function viewAgentPerformance(agentId) {
+            window.location.href = `/admin/agent-performance.html?agent=${agentId}&timeframe=thismonth`;
+        }
+        
+        function toggleAgentStatus(agentId) {
+            const agent = agentData.find(a => a.id === agentId);
+            if (agent) {
+                agent.status = agent.status === 'Active' ? 'Inactive' : 'Active';
+                loadAgentOverviewTable(); // Refresh table
+                
+                // In production, this would make an API call to update the status
+                console.log(`Agent ${agent.name} status changed to ${agent.status}`);
+            }
+        }
+        
         function logout() {
             localStorage.clear();
             window.location.href = '/login.html';
         }
+        
+        // Add some additional styling for the new elements
+        const style = document.createElement('style');
+        style.textContent = `
+            .premium-amount { color: #667eea; font-weight: 600; }
+            .commission-amount { color: #059669; font-weight: 600; }
+            .status-active { 
+                background: #48bb78; 
+                color: white; 
+                padding: 0.25rem 0.75rem; 
+                border-radius: 20px; 
+                font-size: 0.85rem; 
+                font-weight: 500; 
+            }
+            .status-inactive { 
+                background: #f56565; 
+                color: white; 
+                padding: 0.25rem 0.75rem; 
+                border-radius: 20px; 
+                font-size: 0.85rem; 
+                font-weight: 500; 
+            }
+            h3 { margin-bottom: 1rem; color: #2d3748; font-size: 1.25rem; }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
