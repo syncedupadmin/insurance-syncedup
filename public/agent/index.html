@@ -549,11 +549,15 @@
                 <div class="charts-grid">
                     <div class="chart-container">
                         <h3>Sales Performance (Last 6 Months)</h3>
-                        <canvas id="salesChart" width="400" height="200"></canvas>
+                        <div style="position: relative; height: 300px;">
+                            <canvas id="salesChart"></canvas>
+                        </div>
                     </div>
                     <div class="chart-container">
                         <h3>Product Mix</h3>
-                        <canvas id="productChart" width="200" height="200"></canvas>
+                        <div style="position: relative; height: 300px;">
+                            <canvas id="productChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -804,6 +808,7 @@
 
             initializeCharts();
             loadRecentSales();
+            loadAgentPerformance();
         });
 
         function logout() {
@@ -848,6 +853,9 @@
                                 display: false
                             }
                         }
+                    },
+                    layout: {
+                        padding: 10
                     }
                 }
             });
@@ -875,6 +883,9 @@
                                 usePointStyle: true
                             }
                         }
+                    },
+                    layout: {
+                        padding: 10
                     }
                 }
             });
@@ -884,6 +895,90 @@
             // This would typically fetch from your API
             // For now, using sample data
             console.log('Recent sales loaded');
+        }
+
+        // Get Agent Performance function
+        async function getAgentPerformance(agentId, timeframe = 'thismonth') {
+            try {
+                const dashboardResponse = await fetch(`/api/dashboard?agentId=${agentId}&timeframe=${timeframe}`);
+                const commissionsResponse = await fetch(`/api/commissions?agentId=${agentId}`);
+                
+                if (!dashboardResponse.ok || !commissionsResponse.ok) {
+                    throw new Error('Failed to fetch agent performance data');
+                }
+                
+                const dashboardData = await dashboardResponse.json();
+                const commissionsData = await commissionsResponse.json();
+                
+                // Update the dashboard with real data
+                updateDashboardStats(dashboardData);
+                updateCommissionsTable(commissionsData);
+                
+                return {
+                    dashboard: dashboardData,
+                    commissions: commissionsData
+                };
+            } catch (error) {
+                console.error('Error fetching agent performance:', error);
+                // Show error message to user
+                alert('Failed to load performance data. Please try again.');
+                return null;
+            }
+        }
+
+        // Update dashboard statistics
+        function updateDashboardStats(data) {
+            // Update sidebar stats
+            document.getElementById('monthlyPolicies').textContent = data.totalSales || '0';
+            document.getElementById('monthlyRevenue').textContent = '$' + (data.totalPremium || '0');
+            
+            // Update conversion rate if available
+            if (data.totalSales > 0) {
+                const conversionRate = Math.round((data.totalSales / (data.totalSales * 1.5)) * 100);
+                document.getElementById('conversionRate').textContent = conversionRate + '%';
+            }
+        }
+
+        // Update commissions table
+        function updateCommissionsTable(commissions) {
+            const tableBody = document.getElementById('recentSalesTable');
+            if (!tableBody || !commissions || commissions.length === 0) return;
+            
+            // Clear existing data
+            tableBody.innerHTML = '';
+            
+            // Add new data
+            commissions.slice(0, 5).forEach(commission => {
+                const row = document.createElement('tr');
+                const saleDate = new Date(commission.saleDate).toLocaleDateString();
+                const status = commission.status === 'paid' ? 'completed' : 'pending';
+                
+                row.innerHTML = `
+                    <td>${saleDate}</td>
+                    <td>${commission.customerName}</td>
+                    <td>${commission.productName}</td>
+                    <td>$${commission.premium}</td>
+                    <td><span class="status ${status}">${commission.status}</span></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Load agent performance on page load
+        function loadAgentPerformance() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (token) {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    const agentId = payload.sub || payload.id;
+                    
+                    if (agentId) {
+                        getAgentPerformance(agentId, 'thismonth');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading agent performance:', error);
+            }
         }
 
         // Modal functions
