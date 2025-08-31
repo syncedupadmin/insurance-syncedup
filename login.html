@@ -6,26 +6,8 @@
     <title>Login - SyncedUp Insurance</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/global-styles.css">
     <style>
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        
-        .animated-gradient {
-            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
-        }
-        
-        .glass-morphism {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        }
-        
         .neon-text {
             text-shadow: 0 0 10px rgba(255,255,255,0.8),
                          0 0 20px rgba(255,255,255,0.8),
@@ -38,13 +20,14 @@
         }
     </style>
 </head>
-<body class="animated-gradient min-h-screen flex flex-col items-center justify-center p-4">
-    <!-- Floating particles effect -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute -top-10 -left-10 w-40 h-40 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce"></div>
-        <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce animation-delay-2000"></div>
-        <div class="absolute top-1/2 left-1/2 w-40 h-40 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce animation-delay-4000"></div>
-    </div>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+    <!-- Luxury overlay pattern -->
+    <div class="luxury-overlay"></div>
+
+    <!-- Floating orbs -->
+    <div class="floating-orb w-96 h-96 bg-purple-500 -top-48 -left-48"></div>
+    <div class="floating-orb w-64 h-64 bg-pink-500 top-1/2 -right-32" style="animation-delay: 5s;"></div>
+    <div class="floating-orb w-80 h-80 bg-blue-500 -bottom-40 left-1/4" style="animation-delay: 10s;"></div>
 
     <!-- Logo Section -->
     <div class="mb-8 text-center z-10">
@@ -53,7 +36,7 @@
     </div>
 
     <!-- Main Login Container -->
-    <div class="glass-morphism rounded-3xl p-8 w-full max-w-md z-10 transform hover:scale-[1.02] transition-transform duration-300">
+    <div class="glass-card rounded-3xl p-8 w-full max-w-md z-10 transform hover:scale-[1.02] transition-transform duration-300">
         <!-- Login Form -->
         <div id="loginForm">
             <h2 class="text-3xl font-bold text-center mb-2 text-white">Welcome Back</h2>

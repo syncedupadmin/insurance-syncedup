@@ -4,30 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Admin Dashboard - SyncedUp Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/global-styles.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
-        .stats-grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 2rem; }
-        .stat-card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); text-align: center; }
-        .stat-value { font-size: 2rem; font-weight: bold; color: #667eea; }
-        .stat-label { color: #718096; margin-top: 0.5rem; }
-        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem; }
-        .btn { padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 0.25rem; }
-        .btn:hover { background: #5a67d8; }
-        .btn-success { background: #48bb78; }
-        .btn-warning { background: #ed8936; }
-        .btn-danger { background: #f56565; }
-        .btn-secondary { background: #718096; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
         .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #4a5568; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        .table-container { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        th { background: #f7fafc; padding: 0.75rem; text-align: left; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
-        td { padding: 0.75rem; border-bottom: 1px solid #e2e8f0; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #ffffff; }
+        .form-group input, .form-group select, .form-group textarea { 
+            width: 100%; 
+            padding: 0.75rem; 
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px; 
+            color: white;
+        }
+        .form-group input::placeholder { color: rgba(255, 255, 255, 0.7); }
         .status-active { color: #48bb78; font-weight: 500; }
         .status-inactive { color: #f56565; font-weight: 500; }
         .actions { display: flex; gap: 0.5rem; }
@@ -42,49 +35,65 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Super Admin Dashboard</h1>
-        <div>
-            <span style="margin-right: 1rem;">Welcome, Super Admin</span>
-            <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">Logout</button>
+    <!-- Luxury overlay pattern -->
+    <div class="luxury-overlay"></div>
+
+    <!-- Floating orbs -->
+    <div class="floating-orb w-96 h-96 bg-purple-500 -top-48 -left-48"></div>
+    <div class="floating-orb w-64 h-64 bg-pink-500 top-1/2 -right-32" style="animation-delay: 5s;"></div>
+    <div class="floating-orb w-80 h-80 bg-blue-500 -bottom-40 left-1/4" style="animation-delay: 10s;"></div>
+
+    <div class="glass-card-dark p-6 mb-6">
+        <div class="flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-white glow-text">Super Admin Dashboard</h1>
+            <div class="flex items-center gap-4">
+                <span class="text-white/80">Welcome, Super Admin</span>
+                <button class="btn-glass px-4 py-2 rounded-lg" onclick="logout()">
+                    <i class="fas fa-sign-out-alt mr-2"></i>
+                    Logout
+                </button>
+            </div>
         </div>
     </div>
 
-    <div class="container">
+    <div class="max-w-7xl mx-auto px-6">
         <!-- Statistics -->
-        <div class="stats-grid">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="stat-card">
-                <div class="stat-value" id="totalAgencies">0</div>
-                <div class="stat-label">Total Agencies</div>
+                <div class="stat-number" id="totalAgencies">0</div>
+                <div class="text-sm opacity-70 uppercase tracking-wider">Total Agencies</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" id="activeAgencies">0</div>
-                <div class="stat-label">Active Agencies</div>
+                <div class="stat-number" id="activeAgencies">0</div>
+                <div class="text-sm opacity-70 uppercase tracking-wider">Active Agencies</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" id="totalUsers">0</div>
-                <div class="stat-label">Total Users</div>
+                <div class="stat-number" id="totalUsers">0</div>
+                <div class="text-sm opacity-70 uppercase tracking-wider">Total Users</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" id="activeUsers">0</div>
-                <div class="stat-label">Active Users</div>
+                <div class="stat-number" id="activeUsers">0</div>
+                <div class="text-sm opacity-70 uppercase tracking-wider">Active Users</div>
             </div>
         </div>
 
         <!-- Create Agency Form -->
-        <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2>Create New Agency</h2>
-                <button class="btn btn-success" onclick="openCreateModal()">+ Create Agency</button>
+        <div class="glass-card rounded-2xl p-6 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-white">Create New Agency</h2>
+                <button class="btn-luxury px-6 py-3 rounded-lg" onclick="openCreateModal()">
+                    <i class="fas fa-plus mr-2"></i>
+                    Create Agency
+                </button>
             </div>
             <p style="color: #718096;">Create and manage insurance agencies with admin accounts and email notifications.</p>
         </div>
 
         <!-- Agencies Table -->
-        <div class="card">
+        <div class="glass-card rounded-2xl p-6 mb-8">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <h2>Agency Management</h2>
-                <button class="btn" onclick="loadAgencies()">🔄 Refresh</button>
+                <button class="btn-glass px-4 py-2 rounded-lg" onclick="loadAgencies()">🔄 Refresh</button>
             </div>
             
             <div class="search-bar">
@@ -102,7 +111,7 @@
                 </select>
             </div>
 
-            <div class="table-container">
+            <div class="glass-table rounded-2xl overflow-hidden">
                 <table>
                     <thead>
                         <tr>
@@ -294,7 +303,7 @@
                         </td>
                         <td>${new Date(agency.created_at).toLocaleDateString()}</td>
                         <td class="actions">
-                            <button class="btn" style="padding: 0.5rem; font-size: 0.8rem;" onclick="editAgency('${agency.id}')">Edit</button>
+                            <button class="btn-glass px-4 py-2 rounded-lg" style="padding: 0.5rem; font-size: 0.8rem;" onclick="editAgency('${agency.id}')">Edit</button>
                             <button class="btn btn-warning" style="padding: 0.5rem; font-size: 0.8rem;" onclick="resetPassword('${agency.id}')">Reset PW</button>
                             <button class="btn ${agency.is_active ? 'btn-danger' : 'btn-success'}" style="padding: 0.5rem; font-size: 0.8rem;" onclick="toggleAgencyStatus('${agency.id}', ${!agency.is_active})">
                                 ${agency.is_active ? 'Deactivate' : 'Activate'}

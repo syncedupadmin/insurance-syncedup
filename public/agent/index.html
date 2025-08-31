@@ -5,24 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agent Dashboard - SyncedUp Insurance</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/assets/global-styles.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-        }
-
         .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
@@ -30,12 +18,13 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            color: white;
         }
 
         .logo {
             font-size: 1.5rem;
             font-weight: bold;
-            color: #667eea;
+            color: #FFD700;
         }
 
         .user-info {
@@ -500,6 +489,10 @@
     </style>
 </head>
 <body>
+    <div class="luxury-overlay"></div>
+    <div class="floating-orb w-96 h-96 bg-purple-500 -top-48 -left-48" style="width: 24rem; height: 24rem; background: #8B5CF6; top: -12rem; left: -12rem;"></div>
+    <div class="floating-orb w-64 h-64 bg-pink-500 top-1/2 -right-32" style="width: 16rem; height: 16rem; background: #EC4899; top: 50%; right: -8rem; animation-delay: 5s;"></div>
+    <div class="floating-orb w-80 h-80 bg-blue-500 -bottom-40 left-1/4" style="width: 20rem; height: 20rem; background: #3B82F6; bottom: -10rem; left: 25%; animation-delay: 10s;"></div>
     <header class="header">
         <div class="logo">SyncedUp Insurance</div>
         <div class="user-info">
