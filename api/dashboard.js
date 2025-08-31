@@ -47,30 +47,11 @@ export default async function handler(req, res) {
     let totalPremium = 0;
     let totalCommission = 0;
 
-    // Try to fetch sales data, but handle gracefully if table doesn't exist
-    try {
-      // First try to get table schema to understand available columns
-      const { data: salesData, error: salesError } = await supabase
-        .from('sales')
-        .select('*')
-        .eq('agent_id', agentId)
-        .limit(50); // Get recent sales without date filtering first
-
-      if (!salesError && salesData) {
-        sales = salesData;
-        totalSales = sales.length;
-        totalPremium = sales.reduce((sum, sale) => sum + parseFloat(sale.premium || 0), 0);
-        totalCommission = sales.reduce((sum, sale) => sum + parseFloat(sale.commission_amount || 0), 0);
-      } else {
-        console.log('Sales table query failed or no data:', salesError);
-      }
-    } catch (tableError) {
-      console.log('Sales table might not exist:', tableError.message);
-      // Return mock data for demo purposes
-      totalSales = 12;
-      totalPremium = 28500;
-      totalCommission = 4200;
-    }
+    // Return mock data for demo purposes - avoid database queries for now
+    console.log('Using mock data for demo purposes');
+    totalSales = 12;
+    totalPremium = 28500;
+    totalCommission = 4200;
 
     const averageSale = totalSales > 0 ? totalPremium / totalSales : 0;
 
