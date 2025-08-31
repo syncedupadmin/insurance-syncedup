@@ -17,28 +17,20 @@ export default async function handler(req, res) {
     try {
       const { data: commissions, error: commissionsError } = await supabase
         .from('commissions')
-        .select(`
-          *,
-          sales (
-            product_name,
-            premium,
-            customer_name,
-            sale_date
-          )
-        `)
+        .select('*')
         .eq('agent_id', agentId)
-        .order('created_at', { ascending: false });
+        .limit(50);
 
       if (!commissionsError && commissions) {
-        // Format the response
+        // Format the response with available fields
         formattedCommissions = commissions.map(commission => ({
-          saleId: commission.sale_id,
-          amount: commission.amount,
-          status: commission.status,
-          productName: commission.sales?.product_name || 'Unknown Product',
-          premium: commission.sales?.premium || 0,
-          customerName: commission.sales?.customer_name || 'Unknown',
-          saleDate: commission.sales?.sale_date || commission.created_at,
+          saleId: commission.sale_id || commission.id,
+          amount: commission.amount || 0,
+          status: commission.status || 'pending',
+          productName: commission.product_name || 'Unknown Product',
+          premium: commission.premium || 0,
+          customerName: commission.customer_name || 'Unknown',
+          saleDate: commission.sale_date || commission.created_at,
           paymentDate: commission.payment_date
         }));
       } else {

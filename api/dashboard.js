@@ -49,12 +49,12 @@ export default async function handler(req, res) {
 
     // Try to fetch sales data, but handle gracefully if table doesn't exist
     try {
+      // First try to get table schema to understand available columns
       const { data: salesData, error: salesError } = await supabase
         .from('sales')
         .select('*')
         .eq('agent_id', agentId)
-        .gte('sale_date', startDate.toISOString())
-        .lte('sale_date', endDate.toISOString());
+        .limit(50); // Get recent sales without date filtering first
 
       if (!salesError && salesData) {
         sales = salesData;
