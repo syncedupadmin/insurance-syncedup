@@ -8,7 +8,7 @@ const supabase = createClient(
 export default async function handler(req, res) {
   // Activate the admin account
   const { data, error } = await supabase
-    .from('users')
+    .from('portal_users')
     .update({ 
       is_active: true,
       must_change_password: false 

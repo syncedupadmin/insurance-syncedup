@@ -17,7 +17,7 @@ export default async function handler(req, res) {
   const { email } = req.body;
 
   const { data: user } = await supabase
-    .from('users')
+    .from('portal_users')
     .select('*')
     .eq('email', email.toLowerCase())
     .single();
@@ -32,7 +32,7 @@ export default async function handler(req, res) {
 
   // Update password
   await supabase
-    .from('users')
+    .from('portal_users')
     .update({ 
       password_hash,
       must_change_password: true 

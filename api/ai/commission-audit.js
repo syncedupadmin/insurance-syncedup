@@ -10,7 +10,7 @@ async function commissionAuditHandler(req, res) {
 
     // Get expected commissions from sales records
     const { data: expectedCommissions, error: salesError } = await req.supabase
-      .from('sales')
+      .from('portal_sales')
       .select('*')
       .eq('agency_id', req.user.agency_id)
       .gte('sale_date', new Date(Date.now() - timeframe * 24 * 60 * 60 * 1000).toISOString())

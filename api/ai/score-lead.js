@@ -14,7 +14,7 @@ async function leadScorerHandler(req, res) {
   try {
     // Get agent's conversion history
     const { data: history } = await req.supabase
-      .from('sales')
+      .from('portal_sales')
       .select('client_age, client_income, commission_amount, product_type, created_at')
       .eq('agent_id', req.user.id)
       .not('commission_amount', 'is', null)

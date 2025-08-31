@@ -19,7 +19,7 @@ export default async function handler(req, res) {
   try {
     // Verify admin has permission
     const { data: admin } = await supabase
-      .from('users')
+      .from('portal_users')
       .select('role, agency_id')
       .eq('id', adminId)
       .single();
@@ -30,7 +30,7 @@ export default async function handler(req, res) {
 
     // Get user details
     const { data: user } = await supabase
-      .from('users')
+      .from('portal_users')
       .select('email, name, agency_id')
       .eq('id', userId)
       .single();
@@ -50,7 +50,7 @@ export default async function handler(req, res) {
 
     // Update user password
     const { error: updateError } = await supabase
-      .from('users')
+      .from('portal_users')
       .update({ 
         password_hash,
         must_change_password: true,

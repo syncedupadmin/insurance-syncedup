@@ -10,7 +10,7 @@ async function leaderboardSettingsHandler(req, res) {
   try {
     // Get agency_id for the requesting admin
     const { data: adminUser, error: adminError } = await supabase
-      .from('users')
+      .from('portal_users')
       .select('agency_id, role')
       .eq('id', req.user.id)
       .single();
@@ -188,7 +188,7 @@ async function syncAgencyToLeaderboard(supabase, agencyId) {
   
   // Get agency's active agents
   const { data: agents, error: agentsError } = await supabase
-    .from('users')
+    .from('portal_users')
     .select(`
       id,
       name,

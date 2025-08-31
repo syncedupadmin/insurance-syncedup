@@ -19,7 +19,7 @@ async function resetPasswordHandler(req, res) {
 
       // Get the user (only allow password reset for agents)
       const { data: user, error: userError } = await supabase
-        .from('users')
+        .from('portal_users')
         .select('*')
         .eq('id', userId)
         .eq('role', 'agent')
@@ -36,7 +36,7 @@ async function resetPasswordHandler(req, res) {
 
       // Update user with new password and force change
       const { data: updatedUser, error: updateError } = await supabase
-        .from('users')
+        .from('portal_users')
         .update({ 
           password_hash,
           must_change_password: true

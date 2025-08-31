@@ -1,17 +1,21 @@
 import { requireAuth } from '../_middleware/authCheck.js';
+import { getUserContext } from '../utils/auth-helper.js';
 
 async function dashboardHandler(req, res) {
   const supabase = req.supabase;
   
   try {
+    const { agencyId, agentId, role } = getUserContext(req);
+    
     // Get current month start date
     const currentMonthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
     
     // Get real sales data for the current agent
     const { data: sales, error: salesError } = await supabase
-      .from('sales')
+      .from('portal_sales')
       .select('*')
-      .eq('agent_id', req.user.id) // Use user ID instead of agent_code
+      .eq('agent_id', agentId)
+      .eq('agency_id', agencyId)
       .gte('sale_date', currentMonthStart);
     
     if (salesError) {
@@ -25,8 +29,9 @@ async function dashboardHandler(req, res) {
     
     // Get all agents' sales for ranking (simplified)
     const { data: allAgentsSales } = await supabase
-      .from('sales')
+      .from('portal_sales')
       .select('agent_id, commission_amount')
+      .eq('agency_id', agencyId)
       .gte('sale_date', currentMonthStart);
     
     // Calculate agent rankings
@@ -44,13 +49,14 @@ async function dashboardHandler(req, res) {
       .sort(([,a], [,b]) => b - a)
       .map(([agentId]) => agentId);
     
-    const currentAgentRank = sortedAgents.indexOf(req.user.id.toString()) + 1;
+    const currentAgentRank = sortedAgents.indexOf(agentId.toString()) + 1;
     
     // Get recent sales for activity feed
     const { data: recentSales } = await supabase
-      .from('sales')
+      .from('portal_sales')
       .select('*')
-      .eq('agent_id', req.user.id)
+      .eq('agent_id', agentId)
+      .eq('agency_id', agencyId)
       .order('sale_date', { ascending: false })
       .limit(5);
     
@@ -86,7 +92,7 @@ async function dashboardHandler(req, res) {
           }
         ],
         leaderboard: [
-          { rank: 1, name: req.user.name, commissions: 2100, isCurrentUser: true },
+          { rank: 1, name: 'Current Agent', commissions: 2100, isCurrentUser: true },
           { rank: 2, name: 'Agent Martinez', commissions: 1950 },
           { rank: 3, name: 'Agent Thompson', commissions: 1800 }
         ],
@@ -117,11 +123,11 @@ async function dashboardHandler(req, res) {
         commission: parseFloat(sale.commission_amount) || 0,
         date: sale.sale_date
       })),
-      leaderboard: sortedAgents.slice(0, 5).map((agentId, index) => ({
+      leaderboard: sortedAgents.slice(0, 5).map((agentIdStr, index) => ({
         rank: index + 1,
-        name: agentId === req.user.id.toString() ? req.user.name : `Agent ${index + 1}`,
-        commissions: agentCommissions[agentId],
-        isCurrentUser: agentId === req.user.id.toString()
+        name: agentIdStr === agentId.toString() ? 'Current Agent' : `Agent ${index + 1}`,
+        commissions: agentCommissions[agentIdStr],
+        isCurrentUser: agentIdStr === agentId.toString()
       })),
       trends: {
         lastMonth: commissions * 0.9, // Simulate 10% growth
@@ -148,7 +154,7 @@ async function dashboardHandler(req, res) {
       leaderboard: [
         { rank: 1, name: 'Top Agent', commissions: 2500 },
         { rank: 2, name: 'Agent Smith', commissions: 2100 },
-        { rank: 3, name: req.user?.name || 'Current Agent', commissions: 1275, isCurrentUser: true }
+        { rank: 3, name: 'Current Agent', commissions: 1275, isCurrentUser: true }
       ],
       trends: {
         lastMonth: 1150,

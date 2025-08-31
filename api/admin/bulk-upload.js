@@ -32,7 +32,7 @@ async function bulkUploadHandler(req, res) {
 
       // Check for existing user
       const { data: existing } = await supabase
-        .from('users')
+        .from('portal_users')
         .select('id')
         .eq('email', email.toLowerCase())
         .single();
@@ -48,7 +48,7 @@ async function bulkUploadHandler(req, res) {
       // Check agent code uniqueness
       if (agent_code) {
         const { data: existingCode } = await supabase
-          .from('users')
+          .from('portal_users')
           .select('id')
           .eq('agent_code', agent_code)
           .single();
@@ -69,7 +69,7 @@ async function bulkUploadHandler(req, res) {
 
       // Create user
       const { data: newUser, error } = await supabase
-        .from('users')
+        .from('portal_users')
         .insert({
           email: email.toLowerCase(),
           password_hash,

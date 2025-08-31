@@ -35,7 +35,7 @@ async function payrollExportHandler(req, res) {
 
     // Get sales data for the specified period
     let query = supabase
-      .from('sales')
+      .from('portal_sales')
       .select('agent_id, premium, monthly_recurring, created_at')
       .gte('created_at', window.startISO)
       .lte('created_at', window.endISO);

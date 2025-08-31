@@ -9,7 +9,7 @@ async function churnPredictorHandler(req, res) {
     // Get all clients with their policy and interaction data
     // Note: This is a simplified version since we don't have a full client/policy schema yet
     const { data: salesData, error: salesError } = await req.supabase
-      .from('sales')
+      .from('portal_sales')
       .select('*')
       .eq('agency_id', req.user.agency_id)
       .order('sale_date', { ascending: false });

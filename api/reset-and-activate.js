@@ -11,7 +11,7 @@ export default async function handler(req, res) {
   const hashedPassword = await bcrypt.hash(newPassword, 10);
   
   const { data, error } = await supabase
-    .from('users')
+    .from('portal_users')
     .update({ 
       is_active: true,
       password_hash: hashedPassword,

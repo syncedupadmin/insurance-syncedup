@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     
     // Test users table
     const { data: users, error: usersError } = await supabase
-      .from('users')
+      .from('portal_users')
       .select('id, email, name, role')
       .limit(5)
 

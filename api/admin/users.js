@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   }
 
   const { data: currentUser } = await supabase
-    .from('users')
+    .from('portal_users')
     .select('role, agency_id')
     .eq('id', user.id)
     .single();
@@ -38,7 +38,7 @@ export default async function handler(req, res) {
     const password_hash = await bcrypt.hash(tempPassword, 10);
     
     const { data: newUser, error } = await supabase
-      .from('users')
+      .from('portal_users')
       .insert({
         email: email.toLowerCase(),
         password_hash,
@@ -85,7 +85,7 @@ export default async function handler(req, res) {
   
   if (req.method === 'GET') {
     const { data, error } = await supabase
-      .from('users')
+      .from('portal_users')
       .select('*')
       .eq('agency_id', currentUser.agency_id)
       .order('created_at', { ascending: false });

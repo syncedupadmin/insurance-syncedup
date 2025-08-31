@@ -20,7 +20,7 @@ async function resetPasswordHandler(req, res) {
 
   try {
     // Find the user
-    let query = supabase.from('users').select('*');
+    let query = supabase.from('portal_users').select('*');
     if (user_id) {
       query = query.eq('id', user_id);
     } else {
@@ -40,7 +40,7 @@ async function resetPasswordHandler(req, res) {
 
     // Update user password and force change
     const { error: updateError } = await supabase
-      .from('users')
+      .from('portal_users')
       .update({
         password_hash,
         must_change_password: true

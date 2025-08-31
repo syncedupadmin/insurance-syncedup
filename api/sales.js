@@ -1,4 +1,5 @@
 const { createClient } = require('@supabase/supabase-js');
+const { getUserContext } = require('./utils/auth-helper');
 
 const supabase = createClient(
  process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -17,20 +18,23 @@ module.exports = async function handler(req, res) {
  
  if (req.method === 'POST') {
    try {
+     const { agencyId, agentId, role } = getUserContext(req);
      console.log('Received sale data:', req.body);
      
      const saleData = {
        customer_name: req.body.customerName,
-       agent_id: req.body.agentId,
+       agent_id: req.body.agentId || agentId,
+       agency_id: agencyId,
        product_id: req.body.productId,
        premium: parseFloat(req.body.premium),
        monthly_recurring: parseFloat(req.body.monthlyRecurring),
        enrollment_fee: parseFloat(req.body.enrollmentFee || 0),
-       first_month_total: parseFloat(req.body.premium)
+       first_month_total: parseFloat(req.body.premium),
+       sale_date: new Date().toISOString().split('T')[0]
      };
      
      const { data: sale, error } = await supabase
-       .from('sales')
+       .from('portal_sales')
        .insert([saleData])
        .select()
        .single();
@@ -48,8 +52,18 @@ module.exports = async function handler(req, res) {
  } 
  else if (req.method === 'GET') {
    try {
-     const { data: sales, error } = await supabase
-       .from('sales')
+     const { agencyId, agentId, role } = getUserContext(req);
+     
+     let query = supabase.from('portal_sales');
+     
+     if (role === 'agent') {
+       query = query.eq('agent_id', agentId);
+     } else if (['manager', 'admin'].includes(role)) {
+       query = query.eq('agency_id', agencyId);
+     }
+     // super_admin sees all
+     
+     const { data: sales, error } = await query
        .select('*')
        .order('created_at', { ascending: false });
        

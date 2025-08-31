@@ -39,7 +39,7 @@ export default async function handler(req, res) {
       try {
         // Check if account already exists
         const { data: existingUser } = await supabase
-          .from('users')
+          .from('portal_users')
           .select('email')
           .eq('email', account.email)
           .single();
@@ -49,7 +49,7 @@ export default async function handler(req, res) {
           const hashedPassword = await bcrypt.hash(account.password, 10);
           
           const { data, error } = await supabase
-            .from('users')
+            .from('portal_users')
             .update({
               password_hash: hashedPassword,
               name: account.name,
@@ -72,7 +72,7 @@ export default async function handler(req, res) {
           const hashedPassword = await bcrypt.hash(account.password, 10);
           
           const { data, error } = await supabase
-            .from('users')
+            .from('portal_users')
             .insert({
               email: account.email,
               password_hash: hashedPassword,

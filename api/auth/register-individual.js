@@ -38,7 +38,7 @@ export default async function handler(req, res) {
 
     // Create user account
     const { data: user, error: userError } = await supabase
-      .from('users')
+      .from('portal_users')
       .insert({
         email: email.toLowerCase(),
         name,

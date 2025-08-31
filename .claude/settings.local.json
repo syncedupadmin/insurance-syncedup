@@ -27,7 +27,8 @@
       "Bash(notepad:*)",
       "Bash(dir api)",
       "Bash(dir public)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []

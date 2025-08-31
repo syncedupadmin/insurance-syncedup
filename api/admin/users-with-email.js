@@ -14,7 +14,7 @@ async function usersHandler(req, res) {
     
     // Create user
     const { data: newUser, error } = await supabase
-      .from('users')
+      .from('portal_users')
       .insert({
         email: email.toLowerCase(),
         password_hash,

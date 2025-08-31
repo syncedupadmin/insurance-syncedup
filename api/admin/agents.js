@@ -12,7 +12,7 @@ async function agentsHandler(req, res) {
     if (req.method === 'GET') {
       // Get all agent users
       const { data: agents, error } = await supabase
-        .from('users')
+        .from('portal_users')
         .select('*')
         .eq('role', 'agent')
         .order('created_at', { ascending: false });
@@ -31,7 +31,7 @@ async function agentsHandler(req, res) {
       
       // Check if email already exists
       const { data: existingUser } = await supabase
-        .from('users')
+        .from('portal_users')
         .select('id')
         .eq('email', email.toLowerCase())
         .single();
@@ -50,7 +50,7 @@ async function agentsHandler(req, res) {
 
       // Create agent user
       const { data: agent, error: userError } = await supabase
-        .from('users')
+        .from('portal_users')
         .insert({
           email: email.toLowerCase(),
           password_hash,
@@ -129,7 +129,7 @@ async function agentsHandler(req, res) {
       }
 
       const { data: agent, error } = await supabase
-        .from('users')
+        .from('portal_users')
         .update(updateData)
         .eq('id', id)
         .eq('role', 'agent')
@@ -160,7 +160,7 @@ async function agentsHandler(req, res) {
 
       // Check if agent exists
       const { data: agent } = await supabase
-        .from('users')
+        .from('portal_users')
         .select('*')
         .eq('id', id)
         .eq('role', 'agent')
@@ -172,7 +172,7 @@ async function agentsHandler(req, res) {
 
       // For safety, deactivate instead of delete
       const { data: updatedAgent, error } = await supabase
-        .from('users')
+        .from('portal_users')
         .update({ is_active: false })
         .eq('id', id)
         .eq('role', 'agent')

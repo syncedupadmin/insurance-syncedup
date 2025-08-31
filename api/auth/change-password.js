@@ -25,9 +25,9 @@ export default async function handler(req, res) {
     console.log('Changing password for email:', email);
     console.log('Hashed password length:', hashedPassword.length);
 
-    // Update the password in your users table
+    // Update the password in your portal_users table
     const { data, error } = await supabase
-      .from('users')
+      .from('portal_users')
       .update({ 
         password_hash: hashedPassword,
         must_change_password: false,
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
 
     // Clear any password reset tokens if you have them
     await supabase
-      .from('users')
+      .from('portal_users')
       .update({ reset_token: null, reset_token_expires: null })
       .eq('email', email);
 

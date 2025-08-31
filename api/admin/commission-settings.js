@@ -71,7 +71,7 @@ async function commissionSettingsHandler(req, res) {
 
       // Also get active agents for commission calculation preview
       const { data: agents, error: agentsError } = await supabase
-        .from('users')
+        .from('portal_users')
         .select('id, name, email')
         .eq('role', 'agent')
         .eq('is_active', true);
