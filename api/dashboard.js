@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { getUserContext } from './utils/auth-helper';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -6,10 +7,12 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
-  const { agentId, timeframe } = req.query;
+  const { timeframe } = req.query;
   
   try {
-    console.log('Dashboard API called for agent:', agentId, 'timeframe:', timeframe);
+    // Get user context from JWT/session
+    const { agencyId, agentId, role } = getUserContext(req);
+    console.log('Dashboard API called for role:', role, 'agencyId:', agencyId, 'agentId:', agentId, 'timeframe:', timeframe);
 
     // Calculate date range based on timeframe
     let startDate, endDate;
@@ -42,17 +45,32 @@ export default async function handler(req, res) {
       endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
     }
 
-    let sales = null;
-    let totalSales = 0;
-    let totalPremium = 0;
-    let totalCommission = 0;
+    // Build query with role-based filtering
+    let query = supabase.from('portal_sales');
 
-    // Return mock data for demo purposes - avoid database queries for now
-    console.log('Using mock data for demo purposes');
-    totalSales = 12;
-    totalPremium = 28500;
-    totalCommission = 4200;
+    if (role === 'agent') {
+      query = query.eq('agent_id', agentId);
+    } else if (role === 'manager' || role === 'admin') {
+      query = query.eq('agency_id', agencyId);
+    }
+    // Super admin sees all data (no additional filtering)
 
+    // Add date filtering
+    query = query
+      .gte('sale_date', startDate.toISOString())
+      .lte('sale_date', endDate.toISOString());
+
+    const { data: sales, error } = await query.select('*');
+
+    if (error) {
+      console.error('Query error:', error);
+      throw error;
+    }
+
+    // Calculate totals from actual data
+    const totalSales = sales?.length || 0;
+    const totalPremium = sales?.reduce((sum, sale) => sum + (sale.premium || 0), 0) || 0;
+    const totalCommission = sales?.reduce((sum, sale) => sum + (sale.commission || 0), 0) || 0;
     const averageSale = totalSales > 0 ? totalPremium / totalSales : 0;
 
     const dashboardData = {
@@ -60,6 +78,8 @@ export default async function handler(req, res) {
       totalPremium: totalPremium.toFixed(2),
       totalCommission: totalCommission.toFixed(2),
       averageSale: averageSale.toFixed(2),
+      role,
+      agencyId,
       agentId,
       timeframe,
       period: `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`

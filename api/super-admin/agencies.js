@@ -1,5 +1,6 @@
 import { requireAuth, logAction } from '../_middleware/authCheck.js';
 import { createClient } from '@supabase/supabase-js';
+import { getUserContext } from '../utils/auth-helper.js';
 import bcrypt from 'bcryptjs';
 
 async function agenciesHandler(req, res) {
@@ -9,20 +10,27 @@ async function agenciesHandler(req, res) {
   );
 
   try {
+    const { role } = getUserContext(req);
+    
     if (req.method === 'GET') {
-      // For now, we'll work with the existing users table structure
-      // and treat admin users as "agencies" until proper schema is created
-      
-      const { data: users, error } = await supabase
-        .from('users')
+      // Get agencies from portal_users table
+      const { data: agencies, error: agenciesError } = await supabase
+        .from('portal_agencies')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (agenciesError) {
+        // Fallback to portal_users for backward compatibility
+        const { data: users, error } = await supabase
+          .from('portal_users')
+          .select('*')
+          .order('created_at', { ascending: false });
 
-      // Group users by role and create agency-like structure
-      const adminUsers = users.filter(u => u.role === 'admin');
-      const agentUsers = users.filter(u => u.role === 'agent');
+        if (error) throw error;
+
+        // Group users by role and create agency-like structure
+        const adminUsers = users.filter(u => u.role === 'admin');
+        const agentUsers = users.filter(u => u.role === 'agent');
       
       const processedAgencies = adminUsers.map(admin => {
         // Count agents for this admin (simplified - would need proper agency_id in real schema)
@@ -61,7 +69,7 @@ async function agenciesHandler(req, res) {
       
       // Check if admin email already exists
       const { data: existingUser } = await supabase
-        .from('users')
+        .from('portal_users')
         .select('id')
         .eq('email', admin_email.toLowerCase())
         .single();
@@ -75,9 +83,9 @@ async function agenciesHandler(req, res) {
                           Math.random().toString(36).slice(-4).toUpperCase() + '!';
       const password_hash = await bcrypt.hash(tempPassword, 10);
 
-      // Create admin user in users table
+      // Create admin user in portal_users table
       const { data: adminUser, error: userError } = await supabase
-        .from('users')
+        .from('portal_users')
         .insert({
           email: admin_email.toLowerCase(),
           password_hash,
@@ -164,7 +172,7 @@ async function agenciesHandler(req, res) {
       }
 
       const { data: user, error } = await supabase
-        .from('users')
+        .from('portal_users')
         .update(updateData)
         .eq('id', agency_id)
         .eq('role', 'admin') // Only update admin users
@@ -203,7 +211,7 @@ async function agenciesHandler(req, res) {
 
       // Check if this admin user exists
       const { data: adminUser } = await supabase
-        .from('users')
+        .from('portal_users')
         .select('*')
         .eq('id', agency_id)
         .eq('role', 'admin')
@@ -215,7 +223,7 @@ async function agenciesHandler(req, res) {
 
       // For safety, we'll deactivate instead of delete
       const { data: updatedUser, error } = await supabase
-        .from('users')
+        .from('portal_users')
         .update({ is_active: false })
         .eq('id', agency_id)
         .eq('role', 'admin')
