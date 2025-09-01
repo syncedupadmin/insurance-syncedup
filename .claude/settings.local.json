@@ -28,9 +28,14 @@
       "Bash(dir api)",
       "Bash(dir public)",
       "Bash(dir:*)",
+<<<<<<< Updated upstream
       "Bash(git push:*)",
       "Bash(git rm:*)",
       "Bash(node:*)"
+=======
+      "Bash(git pull:*)",
+      "Bash(git stash:*)"
+>>>>>>> Stashed changes
     ],
     "deny": [],
     "ask": []
