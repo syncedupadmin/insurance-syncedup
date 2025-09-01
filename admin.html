@@ -5,21 +5,235 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - SyncedUp Insurance</title>
     <link rel="stylesheet" href="/assets/global-styles.css">
-    <meta http-equiv="refresh" content="0; url=/public/admin/index.html">
+    <style>
+        .nav { display: flex; gap: 2rem; padding: 0 2rem; background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); overflow-x: auto; }
+        .nav a { padding: 1rem; text-decoration: none; color: rgba(255, 255, 255, 0.8); font-weight: 500; white-space: nowrap; transition: all 0.3s ease; }
+        .nav a.active, .nav a:hover { color: white; background: rgba(255, 255, 255, 0.1); }
+        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; position: relative; z-index: 10; }
+        .grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+        .header { background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(20px); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .btn { padding: 0.75rem 1.5rem; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); color: white; border-radius: 6px; cursor: pointer; margin: 0.5rem; transition: all 0.3s ease; }
+        .btn:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(-2px); }
+        .btn-success { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); }
+        .btn-warning { background: rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.5); }
+        .quick-actions { display: flex; gap: 1rem; margin: 2rem 0; flex-wrap: wrap; }
+    </style>
 </head>
 <body>
-    <!-- Luxury overlay pattern -->
     <div class="luxury-overlay"></div>
-
-    <!-- Floating orbs -->
-    <div class="floating-orb w-96 h-96 bg-purple-500 -top-48 -left-48"></div>
-    <div class="floating-orb w-64 h-64 bg-pink-500 top-1/2 -right-32" style="animation-delay: 5s;"></div>
-
-    <div class="min-h-screen flex items-center justify-center">
-        <div class="glass-card rounded-2xl p-8 text-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-            <p class="text-white text-lg">Redirecting to admin dashboard...</p>
+    <div class="floating-orb w-96 h-96 bg-purple-500 -top-48 -left-48" style="width: 24rem; height: 24rem; background: #8B5CF6; top: -12rem; left: -12rem;"></div>
+    <div class="floating-orb w-64 h-64 bg-pink-500 top-1/2 -right-32" style="width: 16rem; height: 16rem; background: #EC4899; top: 50%; right: -8rem; animation-delay: 5s;"></div>
+    <div class="floating-orb w-80 h-80 bg-blue-500 -bottom-40 left-1/4" style="width: 20rem; height: 20rem; background: #3B82F6; bottom: -10rem; left: 25%; animation-delay: 10s;"></div>
+    <div class="header">
+        <h1>Agency Admin Dashboard</h1>
+        <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">Logout</button>
+    </div>
+    <nav class="nav">
+        <a href="/admin/" class="active">Dashboard</a>
+        <a href="/admin/agents.html">Agents</a>
+        <a href="/admin/agent-performance.html">Agent Performance</a>
+        <a href="/admin/licensing.html">Licensing</a>
+        <a href="/admin/commissions.html">Commissions</a>
+        <a href="/admin/commission-settings.html">Commission Settings</a>
+        <a href="/admin/reports.html">Reports</a>
+        <a href="/admin/settings.html">Settings</a>
+    </nav>
+    <div class="container">
+        <div class="grid">
+            <div class="stat-card">
+                <div class="stat-number" id="activeAgents">0</div>
+                <div class="stat-label">Active Agents</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="mtdRevenue">$0</div>
+                <div class="stat-label">MTD Revenue</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="policiesSold">0</div>
+                <div class="stat-label">Policies Sold</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pendingCommissions">$0</div>
+                <div class="stat-label">Pending Commissions</div>
+            </div>
+        </div>
+        <div class="quick-actions">
+            <button class="btn" onclick="location.href='/admin/agents.html'">👥 Manage Agents</button>
+            <button class="btn" onclick="location.href='/admin/agent-performance.html'">📊 View Agent Performance</button>
+            <button class="btn btn-success" onclick="location.href='/admin/bulk-upload.html'">📤 Bulk Upload</button>
+            <button class="btn btn-warning" onclick="location.href='/admin/licensing.html'">📋 Check Licenses</button>
+        </div>
+        
+        <!-- Agent Quick Stats -->
+        <div class="glass-card" style="padding: 2rem; border-radius: 1rem; margin: 2rem 0;">
+            <h3 style="color: white; margin-bottom: 1rem;">👑 Agent Overview (This Month)</h3>
+            <div class="glass-table">
+                <table style="width: 100%; color: white;">
+                    <thead>
+                        <tr>
+                            <th>Agent</th>
+                            <th>Sales</th>
+                            <th>Premium Volume</th>
+                            <th>Commission</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="agentOverviewTable">
+                        <tr><td colspan="6" style="text-align: center;">Loading agent data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="glass-card" style="padding: 2rem; border-radius: 1rem; margin: 2rem 0;">
+            <h3 style="color: white; margin-bottom: 1rem;">Recent Activity</h3>
+            <div class="glass-table">
+                <table style="width: 100%; color: white;">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Agent</th>
+                            <th>Action</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="4" style="text-align: center;">No recent activity</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
+    <script>
+        let currentUser = null;
+        
+        // Mock agent data
+        const agentData = [
+            { id: 'AGENT001', name: 'John Smith', sales: 8, premium: 2712, commission: 813.60, status: 'Active' },
+            { id: 'AGENT002', name: 'Jane Doe', sales: 12, premium: 3845, commission: 1153.50, status: 'Active' },
+            { id: 'AGENT003', name: 'Mike Johnson', sales: 5, premium: 1680, commission: 504.00, status: 'Active' },
+            { id: 'AGENT004', name: 'Sarah Wilson', sales: 0, premium: 0, commission: 0, status: 'Inactive' },
+            { id: 'AGENT005', name: 'David Brown', sales: 15, premium: 4950, commission: 1485.00, status: 'Active' }
+        ];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            const userData = localStorage.getItem('user');
+            if (userData) {
+                currentUser = JSON.parse(userData);
+                
+                // Only admin and super-admin can access admin portal
+                if (currentUser.role !== 'admin' && currentUser.role !== 'super-admin') {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                
+                loadDashboardData();
+            } else {
+                window.location.href = '/login.html';
+            }
+        });
+        
+        async function loadDashboardData() {
+            try {
+                // Load overall stats
+                const activeAgents = agentData.filter(agent => agent.status === 'Active').length;
+                const totalRevenue = agentData.reduce((sum, agent) => sum + agent.premium, 0);
+                const totalSales = agentData.reduce((sum, agent) => sum + agent.sales, 0);
+                const totalCommissions = agentData.reduce((sum, agent) => sum + agent.commission, 0);
+                
+                document.getElementById('activeAgents').textContent = activeAgents;
+                document.getElementById('mtdRevenue').textContent = `$${totalRevenue.toLocaleString()}`;
+                document.getElementById('policiesSold').textContent = totalSales;
+                document.getElementById('pendingCommissions').textContent = `$${totalCommissions.toLocaleString()}`;
+                
+                // Load agent overview table
+                loadAgentOverviewTable();
+                
+            } catch (error) {
+                console.error('Failed to load dashboard data:', error);
+                // Use mock data on error
+                document.getElementById('activeAgents').textContent = '4';
+                document.getElementById('mtdRevenue').textContent = '$38,500';
+                document.getElementById('policiesSold').textContent = '40';
+                document.getElementById('pendingCommissions').textContent = '$11,550';
+                
+                loadAgentOverviewTable();
+            }
+        }
+        
+        function loadAgentOverviewTable() {
+            const tableBody = document.getElementById('agentOverviewTable');
+            tableBody.innerHTML = '';
+            
+            agentData.forEach(agent => {
+                const row = document.createElement('tr');
+                const statusClass = agent.status === 'Active' ? 'status-active' : 'status-inactive';
+                
+                row.innerHTML = `
+                    <td><strong>${agent.name}</strong><br><small>${agent.id}</small></td>
+                    <td><strong>${agent.sales}</strong></td>
+                    <td class="premium-amount">$${agent.premium.toLocaleString()}</td>
+                    <td class="commission-amount">$${agent.commission.toLocaleString()}</td>
+                    <td><span class="${statusClass}">${agent.status}</span></td>
+                    <td>
+                        <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 
+                                onclick="viewAgentPerformance('${agent.id}')">📊 View</button>
+                        <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 
+                                onclick="toggleAgentStatus('${agent.id}')">${agent.status === 'Active' ? '⏸️' : '▶️'}</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function viewAgentPerformance(agentId) {
+            window.location.href = `/admin/agent-performance.html?agent=${agentId}&timeframe=thismonth`;
+        }
+        
+        function toggleAgentStatus(agentId) {
+            const agent = agentData.find(a => a.id === agentId);
+            if (agent) {
+                agent.status = agent.status === 'Active' ? 'Inactive' : 'Active';
+                loadAgentOverviewTable(); // Refresh table
+                
+                // In production, this would make an API call to update the status
+                console.log(`Agent ${agent.name} status changed to ${agent.status}`);
+            }
+        }
+        
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/login.html';
+        }
+        
+        // Add some additional styling for the new elements
+        const style = document.createElement('style');
+        style.textContent = `
+            .premium-amount { color: #FFD700; font-weight: 600; }
+            .commission-amount { color: #48bb78; font-weight: 600; }
+            .status-active { 
+                background: rgba(34, 197, 94, 0.2); 
+                color: #48bb78; 
+                padding: 0.25rem 0.75rem; 
+                border-radius: 20px; 
+                font-size: 0.85rem; 
+                font-weight: 500; 
+                border: 1px solid rgba(34, 197, 94, 0.3);
+            }
+            .status-inactive { 
+                background: rgba(239, 68, 68, 0.2); 
+                color: #f56565; 
+                padding: 0.25rem 0.75rem; 
+                border-radius: 20px; 
+                font-size: 0.85rem; 
+                font-weight: 500; 
+                border: 1px solid rgba(239, 68, 68, 0.3);
+            }
+            .stat-label { color: rgba(255, 255, 255, 0.8); margin-top: 0.5rem; }
+            h3 { margin-bottom: 1rem; color: white; font-size: 1.25rem; }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 </html>
