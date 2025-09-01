@@ -4,26 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manager Dashboard - SyncedUp Insurance</title>
-    <link rel="stylesheet" href="/assets/global-styles.css">
     <style>
-        .header { background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(20px); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-        .nav { display: flex; gap: 2rem; padding: 0 2rem; background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); overflow-x: auto; }
-        .nav a { padding: 1rem; text-decoration: none; color: rgba(255, 255, 255, 0.8); font-weight: 500; white-space: nowrap; transition: all 0.3s ease; }
-        .nav a.active, .nav a:hover { color: white; background: rgba(255, 255, 255, 0.1); }
-        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; position: relative; z-index: 10; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .header { background: linear-gradient(135deg, #4299e1 0%, #667eea 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .nav { display: flex; gap: 2rem; padding: 0 2rem; background: white; border-bottom: 1px solid #e2e8f0; overflow-x: auto; }
+        .nav a { padding: 1rem; text-decoration: none; color: #2d3748; font-weight: 500; white-space: nowrap; }
+        .nav a.active { color: #4299e1; border-bottom: 2px solid #4299e1; }
+        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
         .grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+        .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
+        .stat-value { font-size: 2rem; font-weight: bold; color: #4299e1; }
+        .stat-label { color: #718096; margin-top: 0.5rem; }
+        .btn { padding: 0.75rem 1.5rem; background: #4299e1; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 0.5rem; }
+        .btn:hover { background: #3182ce; }
+        .btn-success { background: #48bb78; }
+        .btn-warning { background: #ed8936; }
+        .btn-secondary { background: #718096; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th { background: #f7fafc; padding: 0.75rem; text-align: left; font-weight: 600; }
+        td { padding: 0.75rem; border-top: 1px solid #e2e8f0; }
         .quick-actions { display: flex; gap: 1rem; margin: 2rem 0; flex-wrap: wrap; }
-        .stat-label { color: rgba(255, 255, 255, 0.8); margin-top: 0.5rem; }
         
         .manager-notice { 
-            background: rgba(255, 255, 255, 0.1); 
-            backdrop-filter: blur(10px); 
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            border-radius: 1rem; 
+            background: linear-gradient(135deg, rgba(66, 153, 225, 0.1) 0%, rgba(102, 126, 234, 0.1) 100%); 
+            border: 2px solid #4299e1; 
+            border-radius: 8px; 
             padding: 1rem; 
             margin-bottom: 2rem; 
             text-align: center;
-            color: white;
         }
         
         .premium-amount { color: #4299e1; font-weight: 600; }
@@ -57,10 +66,6 @@
     </style>
 </head>
 <body>
-    <div class="luxury-overlay"></div>
-    <div class="floating-orb w-96 h-96 bg-purple-500 -top-48 -left-48" style="width: 24rem; height: 24rem; background: #8B5CF6; top: -12rem; left: -12rem;"></div>
-    <div class="floating-orb w-64 h-64 bg-pink-500 top-1/2 -right-32" style="width: 16rem; height: 16rem; background: #EC4899; top: 50%; right: -8rem; animation-delay: 5s;"></div>
-    <div class="floating-orb w-80 h-80 bg-blue-500 -bottom-40 left-1/4" style="width: 20rem; height: 20rem; background: #3B82F6; bottom: -10rem; left: 25%; animation-delay: 10s;"></div>
     <div class="header">
         <h1>Manager Dashboard</h1>
         <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">Logout</button>
@@ -79,22 +84,22 @@
         </div>
         
         <div class="grid">
-            <div class="stat-card">
-                <div class="stat-number" id="activeAgents">0</div>
+            <div class="card">
+                <div class="stat-value" id="activeAgents">0</div>
                 <div class="stat-label">Active Agents</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="mtdRevenue">$0</div>
+            <div class="card">
+                <div class="stat-value" id="mtdRevenue">$0</div>
                 <div class="stat-label">MTD Premium Volume</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="policiesSold">0</div>
+            <div class="card">
+                <div class="stat-value" id="policiesSold">0</div>
                 <div class="stat-label">Policies Sold</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number">⛔</div>
+            <div class="card">
+                <div class="stat-value">⛔</div>
                 <div class="stat-label">Commission Data</div>
-                <div class="restricted-notice" style="color: rgba(255, 255, 255, 0.7); font-size: 0.8rem; margin-top: 0.5rem;">Restricted - Admin Only</div>
+                <div class="restricted-notice">Restricted - Admin Only</div>
             </div>
         </div>
         
