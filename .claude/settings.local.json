@@ -28,7 +28,9 @@
       "Bash(dir api)",
       "Bash(dir public)",
       "Bash(dir:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(git rm:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []
