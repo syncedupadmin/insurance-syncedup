@@ -8,6 +8,11 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
+  console.log('ENV CHECK:', {
+    url: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'SET' : 'MISSING',
+    key: process.env.SUPABASE_SERVICE_KEY ? 'SET' : 'MISSING'
+  });
+  
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
