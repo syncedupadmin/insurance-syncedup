@@ -118,11 +118,15 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication
             const userData = localStorage.getItem('user');
+            console.log('DEBUG: userData from localStorage:', userData);
             if (userData) {
                 currentUser = JSON.parse(userData);
+                console.log('DEBUG: currentUser parsed:', currentUser);
+                console.log('DEBUG: currentUser.role:', currentUser.role);
                 
                 // Only admin and super-admin can access admin portal
                 if (currentUser.role !== 'admin' && currentUser.role !== 'super-admin') {
+                    console.log('DEBUG: Role check failed. Redirecting to login.');
                     window.location.href = '/login.html';
                     return;
                 }
