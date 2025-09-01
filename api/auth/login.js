@@ -37,6 +37,8 @@ export default async function handler(req, res) {
       .eq('email', email.toLowerCase())
       .single();
 
+    console.log('Query result:', { user, error });
+
     if (error || !user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
@@ -48,6 +50,11 @@ export default async function handler(req, res) {
 
     // Verify password
     const validPassword = await bcrypt.compare(password, user.password_hash);
+    console.log('Password check:', { 
+      provided: password, 
+      stored: user?.password_hash?.substring(0, 10) + '...', 
+      valid: validPassword 
+    });
     if (!validPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
