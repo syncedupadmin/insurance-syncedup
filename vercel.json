@@ -1,8 +1,10 @@
 {
-  "rewrites": [
-    {
-      "source": "/api/products/:state",
-      "destination": "/api/products?state=:state"
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "@vercel/node@latest"
     }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" }
   ]
 }
