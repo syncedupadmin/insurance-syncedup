@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     // Get user by email from portal_users table
     const { data: user, error } = await supabase
       .from('portal_users')
-      .select('id, email, role, agency_id, agent_id, password_hash, is_active, must_change_password, last_password_change, name')
+      .select('*')
       .eq('email', email.toLowerCase())
       .single();
 
@@ -43,8 +43,8 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Check if user is active
-    if (!user.is_active) {
+    // Check if user is active (if column exists)
+    if (user.is_active === false) {
       return res.status(403).json({ error: 'Account is deactivated' });
     }
 
@@ -78,11 +78,11 @@ export default async function handler(req, res) {
       user: {
         id: user.id,
         email: user.email,
-        name: user.name,
+        name: user.full_name || user.name,
         role: user.role,
         agency_id: user.agency_id,
         agent_id: user.agent_id,
-        must_change_password: user.must_change_password
+        must_change_password: user.must_change_password || false
       },
       token: authData?.session?.access_token || jwt.sign({ 
         userId: user.id, 
@@ -91,7 +91,7 @@ export default async function handler(req, res) {
         role: user.role,
         agency_id: user.agency_id,
         agent_id: user.agent_id,
-        name: user.name,
+        name: user.full_name || user.name,
         sub: user.id
       }, process.env.JWT_SECRET || 'your-secret-key')
     });
