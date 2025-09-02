@@ -72,6 +72,99 @@
         .tier-item:last-of-type { margin-bottom: 0; }
         .help-text { color: #718096; font-size: 0.9rem; margin-top: 0.5rem; }
         
+        /* Classic Mode Styles - Windows 95 Theme */
+        html.theme-classic body { 
+            background: #c0c0c0 !important; 
+            color: #000 !important; 
+            font-family: 'MS Sans Serif', sans-serif !important; 
+            font-size: 11px !important; 
+        }
+        
+        .theme-classic .header {
+            background: #c0c0c0 !important;
+            color: #000 !important;
+            border-bottom: 2px solid !important;
+            border-color: #808080 #fff #fff #808080 !important;
+        }
+        
+        .theme-classic .nav {
+            background: #c0c0c0 !important;
+            border-bottom: 2px solid !important;
+            border-color: #808080 #fff #fff #808080 !important;
+        }
+        
+        .theme-classic .nav a {
+            color: #000 !important;
+            font-family: 'MS Sans Serif', sans-serif !important;
+            font-size: 11px !important;
+        }
+        
+        .theme-classic .nav a:hover {
+            background: #808080 !important;
+            color: #fff !important;
+        }
+        
+        .theme-classic .nav a.active {
+            background: #fff !important;
+            color: #000 !important;
+            border: 2px inset !important;
+            border-color: #808080 #fff #fff #808080 !important;
+        }
+        
+        .theme-classic .card {
+            background: #c0c0c0 !important;
+            border: 2px outset !important;
+            border-color: #fff #808080 #808080 #fff !important;
+            border-radius: 0 !important;
+        }
+        
+        .theme-classic .btn {
+            background: #c0c0c0 !important;
+            color: #000 !important;
+            border: 2px outset !important;
+            border-color: #fff #808080 #808080 #fff !important;
+            font-family: 'MS Sans Serif', sans-serif !important;
+            font-size: 11px !important;
+            border-radius: 0 !important;
+        }
+        
+        .theme-classic .btn:hover {
+            background: #e0e0e0 !important;
+        }
+        
+        .theme-classic .btn:active {
+            border: 2px inset !important;
+            border-color: #808080 #fff #fff #808080 !important;
+        }
+        
+        .theme-classic input,
+        .theme-classic select,
+        .theme-classic textarea {
+            background: #fff !important;
+            color: #000 !important;
+            border: 2px inset !important;
+            border-color: #808080 #fff #fff #808080 !important;
+            font-family: 'MS Sans Serif', sans-serif !important;
+            font-size: 11px !important;
+            border-radius: 0 !important;
+        }
+        
+        .theme-classic .tab {
+            background: #c0c0c0 !important;
+            color: #000 !important;
+            border: 2px outset !important;
+            border-color: #fff #808080 #808080 #fff !important;
+            border-radius: 0 !important;
+            font-family: 'MS Sans Serif', sans-serif !important;
+            font-size: 11px !important;
+        }
+        
+        .theme-classic .tab.active {
+            background: #fff !important;
+            border: 2px inset !important;
+            border-color: #808080 #fff #fff #808080 !important;
+        }
+
         @media (max-width: 768px) { 
             .form-row { grid-template-columns: 1fr; }
             .tier-item { grid-template-columns: 1fr; gap: 0.25rem; }
@@ -135,6 +228,17 @@ Suite 100
 Anywhere, ST 12345</textarea>
                     </div>
                 </form>
+            </div>
+
+            <div class="card">
+                <h3 class="section-title">Theme Settings</h3>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="classicModeToggle" onchange="toggleClassicMode()">
+                        <span>Classic Mode (Windows 95 Style)</span>
+                    </label>
+                    <span id="toggleStatus" class="help-text">Switch to retro Windows 95 interface</span>
+                </div>
             </div>
 
             <div class="card">
@@ -803,7 +907,52 @@ Anywhere, ST 12345</textarea>
         document.addEventListener('DOMContentLoaded', function() {
             toggleCommissionFields();
             toggleLeaderboardSettings();
+            initializeClassicMode();
         });
+
+        // Classic Mode Toggle Functions
+        function toggleClassicMode() {
+            const toggle = document.getElementById('classicModeToggle');
+            const status = document.getElementById('toggleStatus');
+            
+            if (toggle.checked) {
+                localStorage.setItem('classic_mode', 'true');
+                document.documentElement.classList.add('theme-classic');
+                document.body.classList.add('theme-classic');
+                status.textContent = 'Classic mode enabled - page will reload';
+                
+                // Reload page to apply theme fully
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
+            } else {
+                localStorage.setItem('classic_mode', 'false');
+                document.documentElement.classList.remove('theme-classic');
+                document.body.classList.remove('theme-classic');
+                status.textContent = 'Classic mode disabled - page will reload';
+                
+                // Reload page to remove theme fully
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
+            }
+        }
+
+        // Initialize classic mode on page load
+        function initializeClassicMode() {
+            const isClassicMode = localStorage.getItem('classic_mode') === 'true';
+            const toggle = document.getElementById('classicModeToggle');
+            const status = document.getElementById('toggleStatus');
+            
+            if (isClassicMode) {
+                toggle.checked = true;
+                document.documentElement.classList.add('theme-classic');
+                document.body.classList.add('theme-classic');
+                status.textContent = 'Classic mode enabled';
+            } else {
+                status.textContent = 'Switch to retro Windows 95 interface';
+            }
+        }
 
         function logout() {
             localStorage.clear();
