@@ -30,6 +30,12 @@ export default async function handler(req, res) {
         password: 'admin123', 
         name: 'Test Admin',
         role: 'admin'
+      },
+      {
+        email: 'customerservice@test.com',
+        password: 'password123',
+        name: 'Test Customer Service',
+        role: 'customer-service'
       }
     ];
 
@@ -103,7 +109,8 @@ export default async function handler(req, res) {
       testCredentials: {
         agent: { email: 'agent@test.com', password: 'agent123' },
         manager: { email: 'manager@test.com', password: 'manager123' },
-        admin: { email: 'admin@test.com', password: 'admin123' }
+        admin: { email: 'admin@test.com', password: 'admin123' },
+        customerService: { email: 'customerservice@test.com', password: 'password123' }
       }
     });
 
