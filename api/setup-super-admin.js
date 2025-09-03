@@ -13,7 +13,7 @@ export default async function handler(req, res) {
 
   try {
     const superAdminAccount = {
-      email: 'superadmin@syncedup.com',
+      email: 'admin@syncedupsolutions.com',
       password: 'superadmin123',
       name: 'Super Admin',
       role: 'admin' // Using admin role until database constraint is updated
