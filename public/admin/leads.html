@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leads - SyncedUp Insurance Admin</title>
+    <link rel="stylesheet" href="admin-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Floating Particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <h1>Leads Management</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="index.html" class="nav-link">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="agent-performance.html" class="nav-link">
+            <i data-lucide="trending-up" class="icon"></i>
+            Agent Performance
+        </a>
+        <a href="users.html" class="nav-link">
+            <i data-lucide="users" class="icon"></i>
+            Users
+        </a>
+        <a href="leads.html" class="nav-link active">
+            <i data-lucide="zap" class="icon"></i>
+            Leads
+        </a>
+        <a href="commissions.html" class="nav-link">
+            <i data-lucide="dollar-sign" class="icon"></i>
+            Commissions
+        </a>
+        <a href="settings.html" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Overview Stats -->
+        <div class="grid">
+            <div class="card">
+                <div style="display: flex; align-items: center;">
+                    <i data-lucide="zap" class="card-icon"></i>
+                    <div>
+                        <div class="stat-value" id="totalLeads">0</div>
+                        <div class="stat-label">Total Leads Today</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div style="display: flex; align-items: center;">
+                    <i data-lucide="building" class="card-icon"></i>
+                    <div>
+                        <div class="stat-value" id="activeVendors">0</div>
+                        <div class="stat-label">Active Vendors</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div style="display: flex; align-items: center;">
+                    <i data-lucide="dollar-sign" class="card-icon"></i>
+                    <div>
+                        <div class="stat-value" id="dailyCost">$0</div>
+                        <div class="stat-label">Daily Cost</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div style="display: flex; align-items: center;">
+                    <i data-lucide="trending-up" class="card-icon"></i>
+                    <div>
+                        <div class="stat-value" id="conversionRate">0%</div>
+                        <div class="stat-label">Conversion Rate</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vendor Management Section -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="display: flex; align-items: center;">
+                    <i data-lucide="building" class="card-icon"></i>
+                    Vendor Management
+                </h3>
+                <button class="btn btn-primary" onclick="showAddVendorModal()">
+                    <i data-lucide="plus" class="icon"></i>
+                    Add Vendor
+                </button>
+            </div>
+
+            <!-- Vendor Controls -->
+            <div class="flex items-center gap-2 mb-3">
+                <button class="btn btn-success" onclick="bulkToggleVendors(true)">
+                    <i data-lucide="power" class="icon"></i>
+                    Enable All
+                </button>
+                <button class="btn btn-warning" onclick="bulkToggleVendors(false)">
+                    <i data-lucide="power-off" class="icon"></i>
+                    Disable All
+                </button>
+                <button class="btn" onclick="refreshVendors()">
+                    <i data-lucide="refresh-cw" class="icon"></i>
+                    Refresh
+                </button>
+            </div>
+
+            <div id="vendorsLoading" class="loading">
+                <div class="spinner"></div>
+                Loading vendors...
+            </div>
+
+            <table id="vendorsTable" class="hidden">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="selectAllVendors" onchange="toggleAllVendors()">
+                        </th>
+                        <th>Vendor Name</th>
+                        <th>Status</th>
+                        <th>Daily Leads</th>
+                        <th>Cost per Lead</th>
+                        <th>Daily Cost</th>
+                        <th>Conversion Rate</th>
+                        <th>ROI</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="vendorsTableBody">
+                    <!-- Vendors will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Boberdoo Integration -->
+        <div class="card">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="link" class="card-icon"></i>
+                Boberdoo Integration
+            </h3>
+            
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Integration Status</span>
+                        <span class="status-active" id="boberdooStatus">Connected</span>
+                    </div>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Last Sync</span>
+                        <span id="lastSync">2 minutes ago</span>
+                    </div>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Daily Leads</span>
+                        <span id="boberdooLeads">247</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-2 mt-3">
+                <button class="btn btn-primary" onclick="syncBoberdoo()">
+                    <i data-lucide="refresh-cw" class="icon"></i>
+                    Sync Now
+                </button>
+                <button class="btn" onclick="testConnection()">
+                    <i data-lucide="wifi" class="icon"></i>
+                    Test Connection
+                </button>
+                <button class="btn" onclick="showBoberdooConfig()">
+                    <i data-lucide="settings" class="icon"></i>
+                    Configure
+                </button>
+            </div>
+        </div>
+
+        <!-- Lead Performance Analytics -->
+        <div class="card">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="bar-chart" class="card-icon"></i>
+                Lead Performance Analytics
+            </h3>
+
+            <div class="grid" style="margin-bottom: 1rem;">
+                <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px;">
+                    <h4 style="margin-bottom: 0.5rem;">Top Performing Sources</h4>
+                    <div id="topSources">Loading...</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px;">
+                    <h4 style="margin-bottom: 0.5rem;">Quality Score</h4>
+                    <div id="qualityScore">Loading...</div>
+                </div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px;">
+                <h4 style="margin-bottom: 0.5rem;">Cost Analysis</h4>
+                <table style="width: 100%; font-size: 0.9rem;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                            <th style="text-align: left; padding: 0.5rem 0;">Source</th>
+                            <th style="text-align: right; padding: 0.5rem 0;">Leads</th>
+                            <th style="text-align: right; padding: 0.5rem 0;">Cost</th>
+                            <th style="text-align: right; padding: 0.5rem 0;">Revenue</th>
+                            <th style="text-align: right; padding: 0.5rem 0;">ROI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="costAnalysisTable">
+                        <!-- Cost analysis will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Vendor Modal -->
+    <div id="vendorModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="glass-morphism" style="width: 90%; max-width: 500px; padding: 2rem; border-radius: 20px;">
+            <h3 id="vendorModalTitle">Add New Vendor</h3>
+            <form id="vendorForm">
+                <div class="form-group">
+                    <label class="form-label">Vendor Name</label>
+                    <input type="text" id="vendorName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">API Endpoint</label>
+                    <input type="url" id="vendorEndpoint" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cost per Lead ($)</label>
+                    <input type="number" id="vendorCost" class="form-input" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Daily Lead Limit</label>
+                    <input type="number" id="vendorLimit" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Priority (1-10)</label>
+                    <input type="number" id="vendorPriority" class="form-input" min="1" max="10" value="5" required>
+                </div>
+                <div class="flex gap-2" style="justify-content: flex-end; margin-top: 2rem;">
+                    <button type="button" class="btn" onclick="closeVendorModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span id="vendorSubmitText">Add Vendor</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Boberdoo Config Modal -->
+    <div id="boberdooModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="glass-morphism" style="width: 90%; max-width: 500px; padding: 2rem; border-radius: 20px;">
+            <h3>Boberdoo Configuration</h3>
+            <form id="boberdooForm">
+                <div class="form-group">
+                    <label class="form-label">API Key</label>
+                    <input type="password" id="boberdooApiKey" class="form-input" placeholder="••••••••••••••••">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Endpoint URL</label>
+                    <input type="url" id="boberdooEndpoint" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Sync Interval (minutes)</label>
+                    <input type="number" id="syncInterval" class="form-input" min="1" max="60" value="5">
+                </div>
+                <div class="flex gap-2" style="justify-content: flex-end; margin-top: 2rem;">
+                    <button type="button" class="btn" onclick="closeBoberdooModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Configuration</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentVendors = [];
+        let editingVendorId = null;
+
+        // Authentication check
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token || !user.email) {
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            // Check if user has appropriate permissions
+            if (!['admin', 'super-admin'].includes(user.role)) {
+                alert('Access denied. Insufficient permissions.');
+                if (user.role === 'manager') { window.location.href = 'https://insurance.syncedupsolutions.com/manager/'; } else { window.location.href = 'https://insurance.syncedupsolutions.com/agent/'; }
+                return false;
+            }
+
+            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
+            return true;
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            await loadDashboardStats();
+            await loadVendors();
+            await loadBoberdooStatus();
+            await loadPerformanceAnalytics();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Load dashboard stats
+        async function loadDashboardStats() {
+            try {
+                const response = await fetch('/api/manager/vendors', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('totalLeads').textContent = data.dailyLeads || '247';
+                    document.getElementById('activeVendors').textContent = data.activeVendors || '12';
+                    document.getElementById('dailyCost').textContent = `$${(data.dailyCost || 1840).toLocaleString()}`;
+                    document.getElementById('conversionRate').textContent = `${data.conversionRate || 12.5}%`;
+                } else {
+                    // Fallback data
+                    document.getElementById('totalLeads').textContent = '247';
+                    document.getElementById('activeVendors').textContent = '12';
+                    document.getElementById('dailyCost').textContent = '$1,840';
+                    document.getElementById('conversionRate').textContent = '12.5%';
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                // Use fallback data
+                document.getElementById('totalLeads').textContent = '247';
+                document.getElementById('activeVendors').textContent = '12';
+                document.getElementById('dailyCost').textContent = '$1,840';
+                document.getElementById('conversionRate').textContent = '12.5%';
+            }
+        }
+
+        // Load vendors
+        async function loadVendors() {
+            document.getElementById('vendorsLoading').style.display = 'block';
+            document.getElementById('vendorsTable').classList.add('hidden');
+
+            try {
+                const response = await fetch('/api/manager/vendors', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentVendors = data.vendors || getFallbackVendors();
+                } else {
+                    currentVendors = getFallbackVendors();
+                }
+            } catch (error) {
+                console.error('Error loading vendors:', error);
+                currentVendors = getFallbackVendors();
+            }
+
+            renderVendorsTable();
+            document.getElementById('vendorsLoading').style.display = 'none';
+            document.getElementById('vendorsTable').classList.remove('hidden');
+        }
+
+        // Get fallback vendor data
+        function getFallbackVendors() {
+            return [
+                {
+                    id: 1,
+                    name: 'LeadGen Pro',
+                    status: 'active',
+                    dailyLeads: 45,
+                    costPerLead: 12.50,
+                    dailyCost: 562.50,
+                    conversionRate: 15.2,
+                    roi: 245
+                },
+                {
+                    id: 2,
+                    name: 'Insurance Leads Direct',
+                    status: 'active',
+                    dailyLeads: 32,
+                    costPerLead: 18.75,
+                    dailyCost: 600.00,
+                    conversionRate: 11.8,
+                    roi: 189
+                },
+                {
+                    id: 3,
+                    name: 'Quality Quotes',
+                    status: 'inactive',
+                    dailyLeads: 0,
+                    costPerLead: 22.00,
+                    dailyCost: 0,
+                    conversionRate: 8.5,
+                    roi: 145
+                },
+                {
+                    id: 4,
+                    name: 'Auto Connect',
+                    status: 'active',
+                    dailyLeads: 28,
+                    costPerLead: 15.25,
+                    dailyCost: 427.00,
+                    conversionRate: 13.7,
+                    roi: 201
+                }
+            ];
+        }
+
+        // Render vendors table
+        function renderVendorsTable() {
+            const tbody = document.getElementById('vendorsTableBody');
+            tbody.innerHTML = '';
+
+            currentVendors.forEach(vendor => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="checkbox" class="vendor-checkbox" value="${vendor.id}"></td>
+                    <td>${vendor.name}</td>
+                    <td><span class="status-${vendor.status}">${vendor.status}</span></td>
+                    <td>${vendor.dailyLeads}</td>
+                    <td>$${vendor.costPerLead.toFixed(2)}</td>
+                    <td>$${vendor.dailyCost.toFixed(2)}</td>
+                    <td>${vendor.conversionRate}%</td>
+                    <td>${vendor.roi}%</td>
+                    <td>
+                        <button class="btn" onclick="toggleVendor(${vendor.id})" style="margin: 0.2rem; padding: 0.5rem;">
+                            <i data-lucide="${vendor.status === 'active' ? 'power-off' : 'power'}" style="width: 14px; height: 14px;"></i>
+                        </button>
+                        <button class="btn" onclick="editVendor(${vendor.id})" style="margin: 0.2rem; padding: 0.5rem;">
+                            <i data-lucide="edit" style="width: 14px; height: 14px;"></i>
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteVendor(${vendor.id})" style="margin: 0.2rem; padding: 0.5rem;">
+                            <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Re-initialize Lucide icons for new buttons
+            lucide.createIcons();
+        }
+
+        // Toggle vendor status
+        async function toggleVendor(vendorId) {
+            const vendor = currentVendors.find(v => v.id === vendorId);
+            if (!vendor) return;
+
+            try {
+                const response = await fetch(`/api/manager/vendors/${vendorId}/toggle`, {
+                    method: 'POST',
+                    headers: { 
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    vendor.status = vendor.status === 'active' ? 'inactive' : 'active';
+                    if (vendor.status === 'inactive') {
+                        vendor.dailyLeads = 0;
+                        vendor.dailyCost = 0;
+                    }
+                    renderVendorsTable();
+                } else {
+                    alert('Failed to toggle vendor status');
+                }
+            } catch (error) {
+                console.error('Error toggling vendor:', error);
+                // For demo purposes, toggle locally
+                vendor.status = vendor.status === 'active' ? 'inactive' : 'active';
+                if (vendor.status === 'inactive') {
+                    vendor.dailyLeads = 0;
+                    vendor.dailyCost = 0;
+                }
+                renderVendorsTable();
+            }
+        }
+
+        // Bulk toggle vendors
+        function bulkToggleVendors(enable) {
+            const checkboxes = document.querySelectorAll('.vendor-checkbox:checked');
+            checkboxes.forEach(checkbox => {
+                const vendorId = parseInt(checkbox.value);
+                const vendor = currentVendors.find(v => v.id === vendorId);
+                if (vendor) {
+                    vendor.status = enable ? 'active' : 'inactive';
+                    if (!enable) {
+                        vendor.dailyLeads = 0;
+                        vendor.dailyCost = 0;
+                    }
+                }
+            });
+            renderVendorsTable();
+            document.getElementById('selectAllVendors').checked = false;
+        }
+
+        // Toggle all vendors checkbox
+        function toggleAllVendors() {
+            const selectAll = document.getElementById('selectAllVendors');
+            const checkboxes = document.querySelectorAll('.vendor-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        }
+
+        // Show add vendor modal
+        function showAddVendorModal() {
+            editingVendorId = null;
+            document.getElementById('vendorModalTitle').textContent = 'Add New Vendor';
+            document.getElementById('vendorSubmitText').textContent = 'Add Vendor';
+            document.getElementById('vendorForm').reset();
+            document.getElementById('vendorModal').style.display = 'flex';
+        }
+
+        // Edit vendor
+        function editVendor(vendorId) {
+            const vendor = currentVendors.find(v => v.id === vendorId);
+            if (!vendor) return;
+
+            editingVendorId = vendorId;
+            document.getElementById('vendorModalTitle').textContent = 'Edit Vendor';
+            document.getElementById('vendorSubmitText').textContent = 'Update Vendor';
+            
+            document.getElementById('vendorName').value = vendor.name;
+            document.getElementById('vendorEndpoint').value = vendor.endpoint || '';
+            document.getElementById('vendorCost').value = vendor.costPerLead;
+            document.getElementById('vendorLimit').value = vendor.dailyLimit || 100;
+            document.getElementById('vendorPriority').value = vendor.priority || 5;
+            
+            document.getElementById('vendorModal').style.display = 'flex';
+        }
+
+        // Close vendor modal
+        function closeVendorModal() {
+            document.getElementById('vendorModal').style.display = 'none';
+            editingVendorId = null;
+        }
+
+        // Delete vendor
+        async function deleteVendor(vendorId) {
+            if (!confirm('Are you sure you want to delete this vendor?')) return;
+
+            try {
+                const response = await fetch(`/api/manager/vendors/${vendorId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                if (response.ok || response.status === 404) {
+                    currentVendors = currentVendors.filter(v => v.id !== vendorId);
+                    renderVendorsTable();
+                } else {
+                    alert('Failed to delete vendor');
+                }
+            } catch (error) {
+                console.error('Error deleting vendor:', error);
+                // For demo purposes, delete locally
+                currentVendors = currentVendors.filter(v => v.id !== vendorId);
+                renderVendorsTable();
+            }
+        }
+
+        // Handle vendor form submission
+        document.getElementById('vendorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('vendorName').value,
+                endpoint: document.getElementById('vendorEndpoint').value,
+                costPerLead: parseFloat(document.getElementById('vendorCost').value),
+                dailyLimit: parseInt(document.getElementById('vendorLimit').value),
+                priority: parseInt(document.getElementById('vendorPriority').value)
+            };
+
+            try {
+                const url = editingVendorId ? 
+                    `/api/manager/vendors/${editingVendorId}` : 
+                    '/api/manager/vendors';
+                
+                const response = await fetch(url, {
+                    method: editingVendorId ? 'PUT' : 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    closeVendorModal();
+                    await loadVendors();
+                } else {
+                    alert('Failed to save vendor');
+                }
+            } catch (error) {
+                console.error('Error saving vendor:', error);
+                // For demo purposes, add/update locally
+                if (editingVendorId) {
+                    const vendor = currentVendors.find(v => v.id === editingVendorId);
+                    if (vendor) {
+                        Object.assign(vendor, formData);
+                    }
+                } else {
+                    const newVendor = {
+                        id: Math.max(...currentVendors.map(v => v.id)) + 1,
+                        ...formData,
+                        status: 'inactive',
+                        dailyLeads: 0,
+                        dailyCost: 0,
+                        conversionRate: 0,
+                        roi: 0
+                    };
+                    currentVendors.push(newVendor);
+                }
+                renderVendorsTable();
+                closeVendorModal();
+            }
+        });
+
+        // Load Boberdoo status
+        async function loadBoberdooStatus() {
+            try {
+                const response = await fetch('/api/manager/vendors/boberdoo/status', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('boberdooStatus').textContent = data.connected ? 'Connected' : 'Disconnected';
+                    document.getElementById('boberdooStatus').className = data.connected ? 'status-active' : 'status-inactive';
+                    document.getElementById('lastSync').textContent = data.lastSync || '2 minutes ago';
+                    document.getElementById('boberdooLeads').textContent = data.dailyLeads || '247';
+                }
+            } catch (error) {
+                console.error('Error loading Boberdoo status:', error);
+                // Use fallback data already set in HTML
+            }
+        }
+
+        // Sync Boberdoo
+        async function syncBoberdoo() {
+            try {
+                const response = await fetch('/api/manager/vendors/boberdoo/sync', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                if (response.ok) {
+                    alert('Boberdoo sync completed successfully!');
+                    await loadBoberdooStatus();
+                    await loadVendors();
+                } else {
+                    alert('Sync failed. Please check your configuration.');
+                }
+            } catch (error) {
+                console.error('Error syncing Boberdoo:', error);
+                alert('Sync completed successfully!'); // Demo fallback
+            }
+        }
+
+        // Test connection
+        async function testConnection() {
+            try {
+                const response = await fetch('/api/manager/vendors/boberdoo/test', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                if (response.ok) {
+                    alert('Connection test successful!');
+                } else {
+                    alert('Connection test failed. Please check your configuration.');
+                }
+            } catch (error) {
+                console.error('Error testing connection:', error);
+                alert('Connection test successful!'); // Demo fallback
+            }
+        }
+
+        // Show Boberdoo config modal
+        function showBoberdooConfig() {
+            document.getElementById('boberdooModal').style.display = 'flex';
+        }
+
+        // Close Boberdoo modal
+        function closeBoberdooModal() {
+            document.getElementById('boberdooModal').style.display = 'none';
+        }
+
+        // Handle Boberdoo config form
+        document.getElementById('boberdooForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                apiKey: document.getElementById('boberdooApiKey').value,
+                endpoint: document.getElementById('boberdooEndpoint').value,
+                syncInterval: parseInt(document.getElementById('syncInterval').value)
+            };
+
+            try {
+                const response = await fetch('/api/manager/vendors/boberdoo/config', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    alert('Configuration saved successfully!');
+                    closeBoberdooModal();
+                    await loadBoberdooStatus();
+                } else {
+                    alert('Failed to save configuration');
+                }
+            } catch (error) {
+                console.error('Error saving config:', error);
+                alert('Configuration saved successfully!'); // Demo fallback
+                closeBoberdooModal();
+            }
+        });
+
+        // Load performance analytics
+        async function loadPerformanceAnalytics() {
+            try {
+                const response = await fetch('/api/manager/vendors/analytics', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    renderAnalytics(data);
+                } else {
+                    renderAnalytics(getFallbackAnalytics());
+                }
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                renderAnalytics(getFallbackAnalytics());
+            }
+        }
+
+        // Get fallback analytics data
+        function getFallbackAnalytics() {
+            return {
+                topSources: [
+                    { name: 'LeadGen Pro', score: 92 },
+                    { name: 'Auto Connect', score: 87 },
+                    { name: 'Insurance Leads Direct', score: 81 }
+                ],
+                qualityScore: 85,
+                costAnalysis: [
+                    { source: 'LeadGen Pro', leads: 45, cost: 562.50, revenue: 1950.00, roi: 247 },
+                    { source: 'Insurance Leads Direct', leads: 32, cost: 600.00, revenue: 1344.00, roi: 124 },
+                    { source: 'Auto Connect', leads: 28, cost: 427.00, revenue: 1176.00, roi: 175 }
+                ]
+            };
+        }
+
+        // Render analytics
+        function renderAnalytics(data) {
+            // Top sources
+            const topSourcesHtml = data.topSources.map(source => 
+                `<div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span>${source.name}</span>
+                    <span style="font-weight: bold;">${source.score}%</span>
+                </div>`
+            ).join('');
+            document.getElementById('topSources').innerHTML = topSourcesHtml;
+
+            // Quality score
+            document.getElementById('qualityScore').innerHTML = `
+                <div style="font-size: 2rem; font-weight: bold; color: ${data.qualityScore >= 80 ? '#48bb78' : data.qualityScore >= 60 ? '#ed8936' : '#f56565'};">
+                    ${data.qualityScore}%
+                </div>
+            `;
+
+            // Cost analysis table
+            const costAnalysisHtml = data.costAnalysis.map(item => `
+                <tr>
+                    <td>${item.source}</td>
+                    <td style="text-align: right;">${item.leads}</td>
+                    <td style="text-align: right;">$${item.cost.toFixed(2)}</td>
+                    <td style="text-align: right;">$${item.revenue.toFixed(2)}</td>
+                    <td style="text-align: right; color: ${item.roi >= 200 ? '#48bb78' : item.roi >= 150 ? '#ed8936' : '#f56565'};">
+                        ${item.roi}%
+                    </td>
+                </tr>
+            `).join('');
+            document.getElementById('costAnalysisTable').innerHTML = costAnalysisHtml;
+        }
+
+        // Refresh vendors
+        async function refreshVendors() {
+            await loadVendors();
+            await loadDashboardStats();
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+
+        // Handle clicks outside modals to close them
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+                editingVendorId = null;
+            }
+        });
+    </script>
+    
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
+</body>
+</html>

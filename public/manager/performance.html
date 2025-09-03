@@ -4,76 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Performance - Manager Dashboard</title>
-    <link rel="stylesheet" href="/assets/global-styles.css">
-    <style>
-        .header { background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(20px); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-        .nav { display: flex; gap: 2rem; padding: 0 2rem; background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); overflow-x: auto; }
-        .nav a { padding: 1rem; text-decoration: none; color: rgba(255, 255, 255, 0.8); font-weight: 500; white-space: nowrap; transition: all 0.3s ease; }
-        .nav a.active, .nav a:hover { color: white; background: rgba(255, 255, 255, 0.1); }
-        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; position: relative; z-index: 10; }
-        .btn { padding: 0.75rem 1.5rem; background: #4299e1; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 0.25rem; }
-        .btn:hover { background: #3182ce; }
-        .btn-success { background: #48bb78; }
-        .btn-warning { background: #ed8936; }
-        
-        .form-row { display: flex; gap: 1rem; margin-bottom: 1rem; align-items: end; }
-        .form-group { flex: 1; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: white; }
-        .form-group select { width: 100%; padding: 0.75rem; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 6px; color: white; }
-        
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .stat-number { font-size: 2rem; font-weight: bold; color: #FFD700; margin-bottom: 0.5rem; }
-        .stat-label { color: rgba(255, 255, 255, 0.8); font-weight: 500; }
-        
-        .agent-selector { background: rgba(66, 153, 225, 0.05); border: 2px solid #4299e1; border-radius: 8px; padding: 1rem; margin-bottom: 2rem; }
-        .agent-selector h3 { color: #4299e1; margin-bottom: 1rem; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        th { background: #f7fafc; padding: 0.75rem; text-align: left; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
-        td { padding: 0.75rem; border-bottom: 1px solid #e2e8f0; }
-        
-        .premium-amount { color: #4299e1; font-weight: 600; }
-        .commission-restricted { color: #ed8936; font-style: italic; }
-        
-        .export-section { display: flex; gap: 1rem; margin-top: 2rem; }
-        
-        #performanceData { display: none; }
-        
-        .no-data { text-align: center; color: #718096; padding: 2rem; font-style: italic; }
-        
-        .restricted-notice {
-            background: rgba(237, 137, 54, 0.1);
-            border: 1px solid #ed8936;
-            color: #dd6b20;
-            padding: 0.75rem;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            margin: 1rem 0;
-            text-align: center;
-        }
-    </style>
+    <link rel="stylesheet" href="manager-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
-    <div class="luxury-overlay"></div>
-    <div class="floating-orb w-96 h-96 bg-purple-500 -top-48 -left-48" style="width: 24rem; height: 24rem; background: #8B5CF6; top: -12rem; left: -12rem;"></div>
-    <div class="floating-orb w-64 h-64 bg-pink-500 top-1/2 -right-32" style="width: 16rem; height: 16rem; background: #EC4899; top: 50%; right: -8rem; animation-delay: 5s;"></div>
-    <div class="floating-orb w-80 h-80 bg-blue-500 -bottom-40 left-1/4" style="width: 20rem; height: 20rem; background: #3B82F6; bottom: -10rem; left: 25%; animation-delay: 10s;"></div>
+    <!-- Header -->
     <div class="header">
         <h1>Team Performance Analytics</h1>
-        <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">Logout</button>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
     </div>
-    <nav class="nav">
-        <a href="/manager/">Dashboard</a>
-        <a href="/manager/agents.html">Team Management</a>
-        <a href="/manager/performance.html" class="active">Team Performance</a>
-        <a href="/manager/reports.html">Reports</a>
-    </nav>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="index.html" class="nav-link">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="team-management.html" class="nav-link">
+            <i data-lucide="users" class="icon"></i>
+            Team Management
+        </a>
+        <a href="performance.html" class="nav-link active">
+            <i data-lucide="trending-up" class="icon"></i>
+            Team Performance
+        </a>
+        <a href="reports.html" class="nav-link">
+            <i data-lucide="file-text" class="icon"></i>
+            Reports
+        </a>
+        <a href="goals.html" class="nav-link">
+            <i data-lucide="target" class="icon"></i>
+            Goals
+        </a>
+        <a href="vendors.html" class="nav-link">
+            <i data-lucide="building-2" class="icon"></i>
+            Vendors
+        </a>
+        <a href="settings.html" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+    </div>
     
     <div class="container">
-        <div class="card agent-selector">
-            <h3>👨‍💼 Team Performance Viewer</h3>
+        <div class="card">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="trending-up" class="card-icon"></i>
+                Team Performance Viewer
+            </h3>
             <div class="restricted-notice">
-                ⚠️ Commission data is restricted to admin level. You can view sales counts and premium volumes.
+                <i data-lucide="info" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
+                Commission data is restricted to admin level. You can view sales counts and premium volumes.
             </div>
             <div class="form-row">
                 <div class="form-group">
@@ -197,26 +184,39 @@
             }
         ];
         
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check authentication
-            const userData = localStorage.getItem('user');
-            if (userData) {
-                currentUser = JSON.parse(userData);
-                
-                // Only managers can access this page
-                if (currentUser.role !== 'manager') {
-                    if (currentUser.role === 'admin' || currentUser.role === 'super-admin') {
-                        window.location.href = '/admin/agent-performance.html';
-                    } else {
-                        window.location.href = '/login.html';
-                    }
-                    return;
-                }
-                
-                populateAgentSelect();
-            } else {
-                window.location.href = '/login.html';
+        // Authentication check
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token || !user.email) {
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
             }
+
+            // Check if user has manager permissions
+            if (!['manager', 'admin', 'super-admin'].includes(user.role)) {
+                alert('Access denied. Manager permissions required.');
+                if (user.role === 'agent') {
+                    window.location.href = 'https://insurance.syncedupsolutions.com/agent/';
+                } else {
+                    window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                }
+                return false;
+            }
+
+            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
+            currentUser = user;
+            return true;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!checkAuth()) return;
+            
+            populateAgentSelect();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
         });
         
         function populateAgentSelect() {
@@ -247,8 +247,11 @@
             currentTimeframe = timeframe;
             
             try {
-                // For managers, we use the same API but don't show commission data
-                let apiUrl = `/api/dashboard?agentId=${agentId}&timeframe=${timeframe}`;
+                // Use the manager-specific team performance API
+                let apiUrl = `/api/manager/team-performance?timeframe=${timeframe}`;
+                if (agentId !== 'ALL') {
+                    apiUrl += `&agent_id=${agentId}`;
+                }
                 
                 const response = await fetch(apiUrl);
                 const performanceData = await response.json();
@@ -263,16 +266,21 @@
         }
         
         function displayPerformanceData(data, agentId) {
-            // Adjust data if viewing all agents
-            let multiplier = 1;
-            if (agentId === 'ALL') {
-                multiplier = agents.filter(a => a.active).length;
-            }
+            // Use the new API response structure
+            const teamSummary = data.team_summary || {};
+            const agentDetail = data.agent_detail;
             
-            document.getElementById('totalSales').textContent = (data.totalSales || 12) * multiplier;
-            document.getElementById('totalPremium').textContent = `$${((data.totalPremium || 28500) * multiplier).toLocaleString()}`;
-            // Note: No commission data for managers
-            document.getElementById('avgSale').textContent = `$${(data.averageSale || 2375).toLocaleString()}`;
+            if (agentDetail) {
+                // Show individual agent performance
+                document.getElementById('totalSales').textContent = agentDetail.metrics.sales_count || 0;
+                document.getElementById('totalPremium').textContent = `$${(agentDetail.metrics.total_sales || 0).toLocaleString()}`;
+                document.getElementById('avgSale').textContent = `$${(agentDetail.metrics.avg_premium || 0).toLocaleString()}`;
+            } else {
+                // Show team totals
+                document.getElementById('totalSales').textContent = teamSummary.total_sales_count || 0;
+                document.getElementById('totalPremium').textContent = `$${(teamSummary.total_sales || 0).toLocaleString()}`;
+                document.getElementById('avgSale').textContent = `$${(teamSummary.avg_sales_per_agent || 0).toLocaleString()}`;
+            }
             
             document.getElementById('performanceData').style.display = 'block';
             document.getElementById('noDataMessage').style.display = 'none';
@@ -382,8 +390,12 @@
         
         function logout() {
             localStorage.clear();
-            window.location.href = '/login.html';
+            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
         }
+        
     </script>
+    
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
 </body>
 </html>

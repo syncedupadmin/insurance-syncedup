@@ -4,82 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manager Dashboard - SyncedUp Insurance</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
-        .header { background: linear-gradient(135deg, #4299e1 0%, #667eea 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .nav { display: flex; gap: 2rem; padding: 0 2rem; background: white; border-bottom: 1px solid #e2e8f0; overflow-x: auto; }
-        .nav a { padding: 1rem; text-decoration: none; color: #2d3748; font-weight: 500; white-space: nowrap; }
-        .nav a.active { color: #4299e1; border-bottom: 2px solid #4299e1; }
-        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
-        .grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
-        .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
-        .stat-value { font-size: 2rem; font-weight: bold; color: #4299e1; }
-        .stat-label { color: #718096; margin-top: 0.5rem; }
-        .btn { padding: 0.75rem 1.5rem; background: #4299e1; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 0.5rem; }
-        .btn:hover { background: #3182ce; }
-        .btn-success { background: #48bb78; }
-        .btn-warning { background: #ed8936; }
-        .btn-secondary { background: #718096; }
-        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        th { background: #f7fafc; padding: 0.75rem; text-align: left; font-weight: 600; }
-        td { padding: 0.75rem; border-top: 1px solid #e2e8f0; }
-        .quick-actions { display: flex; gap: 1rem; margin: 2rem 0; flex-wrap: wrap; }
-        
-        .manager-notice { 
-            background: linear-gradient(135deg, rgba(66, 153, 225, 0.1) 0%, rgba(102, 126, 234, 0.1) 100%); 
-            border: 2px solid #4299e1; 
-            border-radius: 8px; 
-            padding: 1rem; 
-            margin-bottom: 2rem; 
-            text-align: center;
-        }
-        
-        .premium-amount { color: #4299e1; font-weight: 600; }
-        .status-active { 
-            background: #48bb78; 
-            color: white; 
-            padding: 0.25rem 0.75rem; 
-            border-radius: 20px; 
-            font-size: 0.85rem; 
-            font-weight: 500; 
-        }
-        .status-inactive { 
-            background: #f56565; 
-            color: white; 
-            padding: 0.25rem 0.75rem; 
-            border-radius: 20px; 
-            font-size: 0.85rem; 
-            font-weight: 500; 
-        }
-        h3 { margin-bottom: 1rem; color: #2d3748; font-size: 1.25rem; }
-        
-        .restricted-notice {
-            background: rgba(237, 137, 54, 0.1);
-            border: 1px solid #ed8936;
-            color: #dd6b20;
-            padding: 0.5rem;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            font-style: italic;
-        }
-    </style>
+    <link rel="stylesheet" href="/manager/manager-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
+    <!-- Header -->
     <div class="header">
         <h1>Manager Dashboard</h1>
-        <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">Logout</button>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
     </div>
-    <nav class="nav">
-        <a href="/manager/" class="active">Dashboard</a>
-        <a href="/manager/agents.html">Team Management</a>
-        <a href="/manager/performance.html">Team Performance</a>
-        <a href="/manager/reports.html">Reports</a>
-    </nav>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="index.html" class="nav-link active">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="team-management.html" class="nav-link">
+            <i data-lucide="users" class="icon"></i>
+            Team Management
+        </a>
+        <a href="performance.html" class="nav-link">
+            <i data-lucide="trending-up" class="icon"></i>
+            Team Performance
+        </a>
+        <a href="reports.html" class="nav-link">
+            <i data-lucide="file-text" class="icon"></i>
+            Reports
+        </a>
+        <a href="goals.html" class="nav-link">
+            <i data-lucide="target" class="icon"></i>
+            Goals
+        </a>
+        <a href="vendors.html" class="nav-link">
+            <i data-lucide="building-2" class="icon"></i>
+            Vendors
+        </a>
+        <a href="settings.html" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+    </div>
     
     <div class="container">
         <div class="manager-notice">
-            <h3>👨‍💼 Manager Portal</h3>
+            <h3><i data-lucide="shield-check"></i> Manager Portal</h3>
             <p>You have access to agent data and performance metrics. Commission data is restricted to admin level.</p>
         </div>
         
@@ -104,15 +79,27 @@
         </div>
         
         <div class="quick-actions">
-            <button class="btn" onclick="location.href='/manager/agents.html'">👥 Manage Team</button>
-            <button class="btn" onclick="location.href='/manager/performance.html'">📊 Team Performance</button>
-            <button class="btn btn-success" onclick="location.href='/manager/reports.html'">📋 Generate Reports</button>
-            <button class="btn btn-warning" onclick="viewAgentDashboard()">🎯 View as Agent</button>
+            <button class="btn" onclick="location.href='team-management.html'">
+                <i data-lucide="users"></i>
+                Manage Team
+            </button>
+            <button class="btn" onclick="location.href='performance.html'">
+                <i data-lucide="trending-up"></i>
+                Team Performance
+            </button>
+            <button class="btn btn-success" onclick="location.href='reports.html'">
+                <i data-lucide="file-text"></i>
+                Generate Reports
+            </button>
+            <button class="btn btn-warning" onclick="viewAgentDashboard()">
+                <i data-lucide="eye"></i>
+                View as Agent
+            </button>
         </div>
         
         <!-- Team Overview -->
         <div class="card">
-            <h3>👥 Team Overview (This Month)</h3>
+            <h3><i data-lucide="users"></i> Team Overview (This Month)</h3>
             <table>
                 <thead>
                     <tr>
@@ -131,7 +118,7 @@
         </div>
         
         <div class="card">
-            <h3>📊 Recent Team Activity</h3>
+            <h3><i data-lucide="activity"></i> Recent Team Activity</h3>
             <table>
                 <thead>
                     <tr>
@@ -179,22 +166,82 @@
                 if (currentUser.role !== 'manager') {
                     // Redirect based on actual role
                     if (currentUser.role === 'admin' || currentUser.role === 'super-admin') {
-                        window.location.href = '/admin/';
+                        window.location.href = 'https://insurance.syncedupsolutions.com/admin/';
                     } else if (currentUser.role === 'agent') {
-                        window.location.href = '/agent/';
+                        window.location.href = 'https://insurance.syncedupsolutions.com/agent/';
                     } else {
-                        window.location.href = '/login.html';
+                        window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
                     }
                     return;
                 }
                 
-                loadManagerDashboard();
+                initializeDashboard();
             } else {
-                window.location.href = '/login.html';
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
             }
         });
         
-        function loadManagerDashboard() {
+        async function initializeDashboard() {
+            showLoadingState();
+            await loadManagerDashboard();
+            hideLoadingState();
+            
+            // Set up auto-refresh every 5 minutes
+            setInterval(refreshDashboardData, 5 * 60 * 1000);
+        }
+        
+        async function loadManagerDashboard() {
+            try {
+                // Try to fetch real data from manager dashboard API
+                const response = await fetch('/api/manager/dashboard?timeframe=month', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayDashboardData(data);
+                } else {
+                    console.log('API not available, using mock data');
+                    displayMockDashboardData();
+                }
+            } catch (error) {
+                console.error('Dashboard API error:', error);
+                displayMockDashboardData();
+            }
+        }
+        
+        function displayDashboardData(data) {
+            // Display quick stats
+            document.getElementById('activeAgents').textContent = data.quick_stats?.active_agents || 0;
+            document.getElementById('mtdRevenue').textContent = `$${(data.agency_overview?.total_sales || 0).toLocaleString()}`;
+            document.getElementById('policiesSold').textContent = data.quick_stats?.total_sales_mtd || 0;
+            
+            // Update team data with real data
+            if (data.team_performance?.top_performers) {
+                teamData = data.team_performance.top_performers.map(agent => ({
+                    id: agent.agent_id,
+                    name: agent.agent_name,
+                    sales: agent.sales_count,
+                    premium: agent.total_sales,
+                    status: 'Active',
+                    lastActivity: new Date().toISOString().split('T')[0]
+                }));
+            }
+            
+            // Update recent activity with real data
+            if (data.recent_activity) {
+                updateRecentActivityFromAPI(data.recent_activity);
+            }
+            
+            loadTeamOverviewTable();
+            loadRecentActivityTable();
+        }
+        
+        function displayMockDashboardData() {
             // Load overall stats (no commission data for managers)
             const activeAgents = teamData.filter(agent => agent.status === 'Active').length;
             const totalRevenue = teamData.reduce((sum, agent) => sum + agent.premium, 0);
@@ -225,9 +272,13 @@
                     <td>${new Date(agent.lastActivity).toLocaleDateString()}</td>
                     <td>
                         <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 
-                                onclick="viewAgentPerformance('${agent.id}')">📊 View</button>
+                                onclick="viewAgentPerformance('${agent.id}')">
+                                <i data-lucide="trending-up"></i> View
+                        </button>
                         <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 
-                                onclick="contactAgent('${agent.id}')">💬 Contact</button>
+                                onclick="contactAgent('${agent.id}')">
+                                <i data-lucide="message-circle"></i> Contact
+                        </button>
                     </td>
                 `;
                 tableBody.appendChild(row);
@@ -253,7 +304,7 @@
         }
         
         function viewAgentPerformance(agentId) {
-            window.location.href = `/manager/performance.html?agent=${agentId}`;
+            window.location.href = `https://insurance.syncedupsolutions.com/manager/performance.html?agent=${agentId}`;
         }
         
         function contactAgent(agentId) {
@@ -263,13 +314,59 @@
         
         function viewAgentDashboard() {
             // Allow manager to view the agent interface (useful for training/support)
-            window.open('/agent/', '_blank');
+            window.open('https://insurance.syncedupsolutions.com/agent/', '_blank');
+        }
+        
+        function updateRecentActivityFromAPI(apiActivity) {
+            recentActivity.length = 0; // Clear existing data
+            apiActivity.forEach(activity => {
+                recentActivity.push({
+                    time: new Date(activity.date).toLocaleTimeString(),
+                    agent: activity.agent_name,
+                    action: activity.type === 'sale' ? 'Sale Recorded' : 'Activity',
+                    customer: activity.description.split(' to ')[1] || 'Customer',
+                    product: activity.description.split(' sold ')[1]?.split(' to ')[0] || 'Product',
+                    premium: activity.amount || 0
+                });
+            });
+        }
+        
+        function showLoadingState() {
+            const tables = document.querySelectorAll('tbody');
+            tables.forEach(tbody => {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;"><div class="loading"></div> Loading data...</td></tr>';
+            });
+            
+            // Show loading in stats
+            document.getElementById('activeAgents').innerHTML = '<div class="loading"></div>';
+            document.getElementById('mtdRevenue').innerHTML = '<div class="loading"></div>';
+            document.getElementById('policiesSold').innerHTML = '<div class="loading"></div>';
+        }
+        
+        function hideLoadingState() {
+            // Loading states will be replaced by actual data
+        }
+        
+        async function refreshDashboardData() {
+            console.log('Refreshing dashboard data...');
+            await loadManagerDashboard();
         }
         
         function logout() {
             localStorage.clear();
-            window.location.href = '/login.html';
+            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
         }
+        
+        // Initialize Lucide icons
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Lucide icons after page load
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
     </script>
+    
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
 </body>
 </html>

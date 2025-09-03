@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goals Management - Manager Portal</title>
+    <link rel="stylesheet" href="/manager/manager-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Goals Management</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="index.html" class="nav-link">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="team-management.html" class="nav-link">
+            <i data-lucide="users" class="icon"></i>
+            Team Management
+        </a>
+        <a href="performance.html" class="nav-link">
+            <i data-lucide="trending-up" class="icon"></i>
+            Team Performance
+        </a>
+        <a href="reports.html" class="nav-link">
+            <i data-lucide="file-text" class="icon"></i>
+            Reports
+        </a>
+        <a href="goals.html" class="nav-link active">
+            <i data-lucide="target" class="icon"></i>
+            Goals
+        </a>
+        <a href="vendors.html" class="nav-link">
+            <i data-lucide="building-2" class="icon"></i>
+            Vendors
+        </a>
+        <a href="settings.html" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+    </div>
+    
+    <div class="container">
+        <div class="manager-notice">
+            <h3><i data-lucide="target"></i> Goals Management Center</h3>
+            <p>Set and track individual and team goals to drive performance and growth.</p>
+        </div>
+        
+        <div class="grid">
+            <div class="stat-card">
+                <div class="stat-value" id="activeGoals">0</div>
+                <div class="stat-label">Active Goals</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="completedGoals">0</div>
+                <div class="stat-label">Completed This Month</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="onTrackGoals">0</div>
+                <div class="stat-label">On Track</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="overdueGoals">0</div>
+                <div class="stat-label">Overdue</div>
+            </div>
+        </div>
+        
+        <div class="quick-actions">
+            <button class="btn" onclick="createGoal()">
+                <i data-lucide="plus-circle"></i>
+                Create New Goal
+            </button>
+            <button class="btn btn-success" onclick="createTeamGoal()">
+                <i data-lucide="users"></i>
+                Team Goal
+            </button>
+            <button class="btn btn-warning" onclick="reviewGoals()">
+                <i data-lucide="search"></i>
+                Review Goals
+            </button>
+            <button class="btn btn-secondary" onclick="exportGoals()">
+                <i data-lucide="download"></i>
+                Export Report
+            </button>
+        </div>
+        
+        <!-- Goal Categories -->
+        <div class="card">
+            <h3><i data-lucide="layers"></i> Goal Categories</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <select id="goalCategory" onchange="filterGoals()">
+                        <option value="">All Categories</option>
+                        <option value="sales">Sales Targets</option>
+                        <option value="activity">Activity Goals</option>
+                        <option value="training">Training & Development</option>
+                        <option value="quality">Quality Metrics</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select id="agentFilter" onchange="filterGoals()">
+                        <option value="">All Agents</option>
+                        <option value="team">Team Goals</option>
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select id="statusFilter" onchange="filterGoals()">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="overdue">Overdue</option>
+                        <option value="paused">Paused</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Active Goals -->
+        <div class="card">
+            <h3><i data-lucide="target"></i> Current Goals</h3>
+            <table id="goalsTable">
+                <thead>
+                    <tr>
+                        <th>Goal</th>
+                        <th>Agent</th>
+                        <th>Category</th>
+                        <th>Target</th>
+                        <th>Progress</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="goalsTableBody">
+                    <tr><td colspan="8" style="text-align: center;">Loading goals...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Goal Templates -->
+        <div class="card">
+            <h3><i data-lucide="bookmark"></i> Goal Templates</h3>
+            <p style="margin-bottom: 1rem; color: rgba(255,255,255,0.8);">Quick-start templates for common goals</p>
+            <div class="grid">
+                <div class="stat-card" onclick="useTemplate('monthly_sales')">
+                    <div class="stat-value" style="font-size: 1.5rem;"><i data-lucide="dollar-sign"></i></div>
+                    <div class="stat-label">Monthly Sales Target</div>
+                </div>
+                <div class="stat-card" onclick="useTemplate('weekly_calls')">
+                    <div class="stat-value" style="font-size: 1.5rem;"><i data-lucide="phone"></i></div>
+                    <div class="stat-label">Weekly Call Goal</div>
+                </div>
+                <div class="stat-card" onclick="useTemplate('training_completion')">
+                    <div class="stat-value" style="font-size: 1.5rem;"><i data-lucide="graduation-cap"></i></div>
+                    <div class="stat-label">Training Completion</div>
+                </div>
+                <div class="stat-card" onclick="useTemplate('quality_score')">
+                    <div class="stat-value" style="font-size: 1.5rem;"><i data-lucide="star"></i></div>
+                    <div class="stat-label">Quality Score Goal</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Create Goal Modal -->
+    <div id="createGoalModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3><i data-lucide="plus-circle"></i> Create New Goal</h3>
+            <div class="form-group">
+                <label for="goalTitle">Goal Title</label>
+                <input type="text" id="goalTitle" placeholder="e.g., Monthly Sales Target" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="goalAgent">Assign To</label>
+                    <select id="goalAgent" required>
+                        <option value="">Select Agent</option>
+                        <option value="team">Entire Team</option>
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="goalCategorySelect">Category</label>
+                    <select id="goalCategorySelect" required>
+                        <option value="sales">Sales Target</option>
+                        <option value="activity">Activity Goal</option>
+                        <option value="training">Training & Development</option>
+                        <option value="quality">Quality Metric</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="goalTarget">Target Value</label>
+                    <input type="number" id="goalTarget" placeholder="e.g., 15" required>
+                </div>
+                <div class="form-group">
+                    <label for="goalUnit">Unit</label>
+                    <select id="goalUnit">
+                        <option value="sales">Sales</option>
+                        <option value="dollars">Dollars</option>
+                        <option value="calls">Calls</option>
+                        <option value="appointments">Appointments</option>
+                        <option value="percent">Percentage</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="goalStartDate">Start Date</label>
+                    <input type="date" id="goalStartDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="goalDueDate">Due Date</label>
+                    <input type="date" id="goalDueDate" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="goalDescription">Description (Optional)</label>
+                <textarea id="goalDescription" rows="3" placeholder="Additional details about this goal..."></textarea>
+            </div>
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button class="btn btn-success" onclick="saveGoal()">
+                    <i data-lucide="check"></i>
+                    Create Goal
+                </button>
+                <button class="btn btn-secondary" onclick="closeModal()">
+                    <i data-lucide="x"></i>
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentUser = null;
+        let goalsData = [];
+        let agentsData = [];
+        
+        // Mock goals data
+        const mockGoalsData = [
+            {
+                id: 'GOAL001',
+                title: 'Monthly Sales Target',
+                agentId: 'AGENT001',
+                agentName: 'John Smith',
+                category: 'sales',
+                target: 15,
+                current: 8,
+                unit: 'sales',
+                startDate: '2025-08-01',
+                dueDate: '2025-08-31',
+                status: 'active',
+                description: 'Achieve 15 sales this month'
+            },
+            {
+                id: 'GOAL002',
+                title: 'Weekly Call Goal',
+                agentId: 'AGENT002',
+                agentName: 'Jane Doe',
+                category: 'activity',
+                target: 50,
+                current: 45,
+                unit: 'calls',
+                startDate: '2025-08-26',
+                dueDate: '2025-08-31',
+                status: 'active',
+                description: 'Make 50 prospect calls this week'
+            },
+            {
+                id: 'GOAL003',
+                title: 'Product Training Completion',
+                agentId: 'AGENT003',
+                agentName: 'Mike Johnson',
+                category: 'training',
+                target: 100,
+                current: 100,
+                unit: 'percent',
+                startDate: '2025-08-15',
+                dueDate: '2025-08-25',
+                status: 'completed',
+                description: 'Complete all product training modules'
+            },
+            {
+                id: 'GOAL004',
+                title: 'Team Monthly Target',
+                agentId: 'team',
+                agentName: 'Entire Team',
+                category: 'sales',
+                target: 75,
+                current: 40,
+                unit: 'sales',
+                startDate: '2025-08-01',
+                dueDate: '2025-08-31',
+                status: 'active',
+                description: 'Team goal: 75 total sales this month'
+            },
+            {
+                id: 'GOAL005',
+                title: 'Quality Score Improvement',
+                agentId: 'AGENT005',
+                agentName: 'David Brown',
+                category: 'quality',
+                target: 95,
+                current: 88,
+                unit: 'percent',
+                startDate: '2025-08-01',
+                dueDate: '2025-09-01',
+                status: 'overdue',
+                description: 'Achieve 95% quality score average'
+            }
+        ];
+        
+        const mockAgentsData = [
+            { id: 'AGENT001', name: 'John Smith' },
+            { id: 'AGENT002', name: 'Jane Doe' },
+            { id: 'AGENT003', name: 'Mike Johnson' },
+            { id: 'AGENT004', name: 'Sarah Wilson' },
+            { id: 'AGENT005', name: 'David Brown' }
+        ];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            const userData = localStorage.getItem('user');
+            if (userData) {
+                currentUser = JSON.parse(userData);
+                
+                // Only managers can access this page
+                if (currentUser.role !== 'manager') {
+                    if (currentUser.role === 'admin' || currentUser.role === 'super-admin') {
+                        window.location.href = 'https://insurance.syncedupsolutions.com/admin/';
+                    } else {
+                        window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                    }
+                    return;
+                }
+                
+                loadGoalsManagement();
+            } else {
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+            }
+            
+            // Set default dates
+            const today = new Date().toISOString().split('T')[0];
+            const nextMonth = new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0];
+            document.getElementById('goalStartDate').value = today;
+            document.getElementById('goalDueDate').value = nextMonth;
+            
+            // Initialize Lucide icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+        
+        async function loadGoalsManagement() {
+            showLoadingState();
+            try {
+                // Try to fetch real data from API
+                const response = await fetch('/api/manager/goals', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    goalsData = data.goals || mockGoalsData;
+                    agentsData = data.agents || mockAgentsData;
+                    console.log('Goals data loaded from API');
+                } else {
+                    throw new Error('API not available');
+                }
+            } catch (error) {
+                console.log('Using mock data:', error);
+                goalsData = mockGoalsData;
+                agentsData = mockAgentsData;
+            }
+            
+            populateAgentSelects();
+            displayGoalStats();
+            displayGoalsTable();
+            hideLoadingState();
+            
+            // Set up auto-refresh every 3 minutes for goals
+            setInterval(refreshGoalsData, 3 * 60 * 1000);
+        }
+        
+        function populateAgentSelects() {
+            const agentFilter = document.getElementById('agentFilter');
+            const goalAgent = document.getElementById('goalAgent');
+            
+            // Populate filter dropdown
+            agentsData.forEach(agent => {
+                const option = document.createElement('option');
+                option.value = agent.id;
+                option.textContent = agent.name;
+                agentFilter.appendChild(option.cloneNode(true));
+                goalAgent.appendChild(option);
+            });
+        }
+        
+        function displayGoalStats() {
+            const activeGoals = goalsData.filter(g => g.status === 'active').length;
+            const completedGoals = goalsData.filter(g => g.status === 'completed').length;
+            const onTrackGoals = goalsData.filter(g => {
+                if (g.status !== 'active') return false;
+                const progress = (g.current / g.target) * 100;
+                return progress >= 70; // Consider 70%+ as on track
+            }).length;
+            const overdueGoals = goalsData.filter(g => {
+                if (g.status !== 'active') return false;
+                return new Date(g.dueDate) < new Date();
+            }).length;
+            
+            document.getElementById('activeGoals').textContent = activeGoals;
+            document.getElementById('completedGoals').textContent = completedGoals;
+            document.getElementById('onTrackGoals').textContent = onTrackGoals;
+            document.getElementById('overdueGoals').textContent = overdueGoals;
+        }
+        
+        function displayGoalsTable() {
+            const tableBody = document.getElementById('goalsTableBody');
+            tableBody.innerHTML = '';
+            
+            goalsData.forEach(goal => {
+                const row = document.createElement('tr');
+                const progress = Math.round((goal.current / goal.target) * 100);
+                const progressBarWidth = Math.min(progress, 100);
+                
+                let statusClass = 'status-active';
+                if (goal.status === 'completed') statusClass = 'status-active';
+                else if (goal.status === 'overdue') statusClass = 'status-inactive';
+                else if (goal.status === 'paused') statusClass = 'status-pending';
+                
+                const isOverdue = new Date(goal.dueDate) < new Date() && goal.status === 'active';
+                if (isOverdue) statusClass = 'status-inactive';
+                
+                row.innerHTML = `
+                    <td><strong>${goal.title}</strong></td>
+                    <td>${goal.agentName}</td>
+                    <td>${goal.category.charAt(0).toUpperCase() + goal.category.slice(1)}</td>
+                    <td>${goal.target} ${goal.unit}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div class="progress" style="flex: 1;">
+                                <div class="progress-bar" style="width: ${progressBarWidth}%"></div>
+                            </div>
+                            <small>${progress}%</small>
+                        </div>
+                        <small>${goal.current} / ${goal.target} ${goal.unit}</small>
+                    </td>
+                    <td>${new Date(goal.dueDate).toLocaleDateString()}</td>
+                    <td><span class="${statusClass}">${isOverdue ? 'Overdue' : goal.status.charAt(0).toUpperCase() + goal.status.slice(1)}</span></td>
+                    <td>
+                        <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin: 0.1rem;" 
+                                onclick="editGoal('${goal.id}')">
+                                <i data-lucide="edit"></i> Edit
+                        </button>
+                        <button class="btn btn-success" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin: 0.1rem;" 
+                                onclick="updateProgress('${goal.id}')">
+                                <i data-lucide="trending-up"></i> Update
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function filterGoals() {
+            const category = document.getElementById('goalCategory').value;
+            const agent = document.getElementById('agentFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            let filteredData = goalsData;
+            
+            if (category) {
+                filteredData = filteredData.filter(goal => goal.category === category);
+            }
+            
+            if (agent) {
+                filteredData = filteredData.filter(goal => goal.agentId === agent);
+            }
+            
+            if (status) {
+                filteredData = filteredData.filter(goal => {
+                    if (status === 'overdue') {
+                        return new Date(goal.dueDate) < new Date() && goal.status === 'active';
+                    }
+                    return goal.status === status;
+                });
+            }
+            
+            // Temporarily update display
+            const originalData = goalsData;
+            goalsData = filteredData;
+            displayGoalsTable();
+            goalsData = originalData;
+        }
+        
+        function createGoal() {
+            document.getElementById('createGoalModal').style.display = 'block';
+        }
+        
+        function createTeamGoal() {
+            createGoal();
+            document.getElementById('goalAgent').value = 'team';
+        }
+        
+        function closeModal() {
+            document.getElementById('createGoalModal').style.display = 'none';
+            
+            // Reset modal to create mode
+            document.querySelector('.modal-content h3').innerHTML = '<i data-lucide="plus-circle"></i> Create New Goal';
+            document.querySelector('.modal-content .btn-success').innerHTML = '<i data-lucide="check"></i> Create Goal';
+            document.querySelector('.modal-content .btn-success').onclick = saveGoal;
+            
+            // Clear form
+            document.getElementById('goalTitle').value = '';
+            document.getElementById('goalAgent').value = '';
+            document.getElementById('goalTarget').value = '';
+            document.getElementById('goalDescription').value = '';
+            
+            // Re-initialize icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        async function saveGoal() {
+            const title = document.getElementById('goalTitle').value;
+            const agent = document.getElementById('goalAgent').value;
+            const category = document.getElementById('goalCategorySelect').value;
+            const target = document.getElementById('goalTarget').value;
+            const unit = document.getElementById('goalUnit').value;
+            const startDate = document.getElementById('goalStartDate').value;
+            const dueDate = document.getElementById('goalDueDate').value;
+            const description = document.getElementById('goalDescription').value;
+            
+            if (!title || !agent || !target || !startDate || !dueDate) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Show loading state
+            const saveButton = document.querySelector('.modal-content .btn-success');
+            const originalText = saveButton.innerHTML;
+            saveButton.innerHTML = '<div class="loading"></div> Creating...';
+            saveButton.disabled = true;
+            
+            try {
+                const goalData = {
+                    title,
+                    agent_id: agent === 'team' ? null : agent,
+                    is_team_goal: agent === 'team',
+                    category,
+                    target_value: parseFloat(target),
+                    unit,
+                    start_date: startDate,
+                    due_date: dueDate,
+                    description,
+                    status: 'active'
+                };
+                
+                const response = await fetch('/api/manager/goals', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+                    },
+                    body: JSON.stringify(goalData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    // Add the new goal to our local data
+                    const newGoal = {
+                        id: result.id || 'GOAL' + (goalsData.length + 1),
+                        title,
+                        agentId: agent,
+                        agentName: agent === 'team' ? 'Entire Team' : agentsData.find(a => a.id === agent)?.name || 'Unknown',
+                        category,
+                        target: parseFloat(target),
+                        current: 0,
+                        unit,
+                        startDate,
+                        dueDate,
+                        status: 'active',
+                        description
+                    };
+                    
+                    goalsData.unshift(newGoal);
+                    
+                    // Refresh display
+                    displayGoalStats();
+                    displayGoalsTable();
+                    
+                    alert(`Goal "${title}" created successfully!`);
+                    closeModal();
+                } else {
+                    const error = await response.json();
+                    alert(`Error creating goal: ${error.message || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Error saving goal:', error);
+                
+                // Fallback: Add to local mock data for demo
+                const newGoal = {
+                    id: 'GOAL' + (goalsData.length + 1),
+                    title,
+                    agentId: agent,
+                    agentName: agent === 'team' ? 'Entire Team' : agentsData.find(a => a.id === agent)?.name || 'Unknown',
+                    category,
+                    target: parseFloat(target),
+                    current: 0,
+                    unit,
+                    startDate,
+                    dueDate,
+                    status: 'active',
+                    description
+                };
+                
+                goalsData.unshift(newGoal);
+                displayGoalStats();
+                displayGoalsTable();
+                
+                alert(`Goal "${title}" created successfully! (Demo mode - API not available)`);
+                closeModal();
+            }
+            
+            // Reset button
+            saveButton.innerHTML = originalText;
+            saveButton.disabled = false;
+        }
+        
+        function useTemplate(templateType) {
+            createGoal();
+            
+            switch(templateType) {
+                case 'monthly_sales':
+                    document.getElementById('goalTitle').value = 'Monthly Sales Target';
+                    document.getElementById('goalCategorySelect').value = 'sales';
+                    document.getElementById('goalTarget').value = '15';
+                    document.getElementById('goalUnit').value = 'sales';
+                    document.getElementById('goalDescription').value = 'Achieve monthly sales target to drive revenue growth';
+                    break;
+                case 'weekly_calls':
+                    document.getElementById('goalTitle').value = 'Weekly Call Goal';
+                    document.getElementById('goalCategorySelect').value = 'activity';
+                    document.getElementById('goalTarget').value = '50';
+                    document.getElementById('goalUnit').value = 'calls';
+                    document.getElementById('goalDescription').value = 'Make prospect calls to generate leads';
+                    break;
+                case 'training_completion':
+                    document.getElementById('goalTitle').value = 'Training Module Completion';
+                    document.getElementById('goalCategorySelect').value = 'training';
+                    document.getElementById('goalTarget').value = '100';
+                    document.getElementById('goalUnit').value = 'percent';
+                    document.getElementById('goalDescription').value = 'Complete all assigned training modules';
+                    break;
+                case 'quality_score':
+                    document.getElementById('goalTitle').value = 'Quality Score Goal';
+                    document.getElementById('goalCategorySelect').value = 'quality';
+                    document.getElementById('goalTarget').value = '95';
+                    document.getElementById('goalUnit').value = 'percent';
+                    document.getElementById('goalDescription').value = 'Maintain high quality standards';
+                    break;
+            }
+        }
+        
+        function editGoal(goalId) {
+            const goal = goalsData.find(g => g.id === goalId);
+            alert(`Edit interface for "${goal.title}" would open here. This feature will be implemented in Phase 2.`);
+        }
+        
+        async function updateProgress(goalId) {
+            const goal = goalsData.find(g => g.id === goalId);
+            const newProgress = prompt(`Update progress for "${goal.title}". Current: ${goal.current}/${goal.target} ${goal.unit}`, goal.current);
+            
+            if (newProgress !== null && !isNaN(newProgress) && parseFloat(newProgress) >= 0) {
+                const progressValue = parseFloat(newProgress);
+                
+                try {
+                    const response = await fetch(`/api/manager/goals/${goalId}/progress`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+                        },
+                        body: JSON.stringify({ 
+                            current_value: progressValue,
+                            updated_at: new Date().toISOString()
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        // Update local data
+                        goal.current = progressValue;
+                        
+                        // Check if goal is completed
+                        if (progressValue >= goal.target && goal.status === 'active') {
+                            goal.status = 'completed';
+                            alert(`🎉 Goal "${goal.title}" has been completed! Congratulations!`);
+                        }
+                        
+                        // Refresh display
+                        displayGoalStats();
+                        displayGoalsTable();
+                        
+                        alert(`Progress updated successfully! Current: ${progressValue}/${goal.target} ${goal.unit}`);
+                    } else {
+                        throw new Error('API update failed');
+                    }
+                } catch (error) {
+                    console.error('Error updating progress:', error);
+                    
+                    // Fallback: Update local data for demo
+                    goal.current = progressValue;
+                    
+                    if (progressValue >= goal.target && goal.status === 'active') {
+                        goal.status = 'completed';
+                        alert(`🎉 Goal "${goal.title}" has been completed! Congratulations! (Demo mode)`);
+                    } else {
+                        alert(`Progress updated successfully! Current: ${progressValue}/${goal.target} ${goal.unit} (Demo mode)`);
+                    }
+                    
+                    displayGoalStats();
+                    displayGoalsTable();
+                }
+            }
+        }
+        
+        function reviewGoals() {
+            alert('Goal review interface would open here with detailed analytics and recommendations.');
+        }
+        
+        function exportGoals() {
+            // Create CSV content
+            let csvContent = 'Goal,Agent,Category,Target,Current,Progress %,Due Date,Status\\n';
+            
+            goalsData.forEach(goal => {
+                const progress = Math.round((goal.current / goal.target) * 100);
+                csvContent += `"${goal.title}",${goal.agentName},${goal.category},${goal.target},${goal.current},${progress}%,${goal.dueDate},${goal.status}\\n`;
+            });
+            
+            // Create and download file
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `goals-report-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+        
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+        }
+        
+        function showLoadingState() {
+            const tableBody = document.getElementById('goalsTableBody');
+            tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center;"><div class="loading"></div> Loading goals...</td></tr>';
+        }
+        
+        function hideLoadingState() {
+            // Loading state will be replaced by actual data
+        }
+        
+        async function refreshGoalsData() {
+            console.log('Refreshing goals data...');
+            await loadGoalsManagement();
+        }
+        
+        async function editGoal(goalId) {
+            const goal = goalsData.find(g => g.id === goalId);
+            
+            // Pre-fill the modal with existing goal data
+            document.getElementById('goalTitle').value = goal.title;
+            document.getElementById('goalAgent').value = goal.agentId;
+            document.getElementById('goalCategorySelect').value = goal.category;
+            document.getElementById('goalTarget').value = goal.target;
+            document.getElementById('goalUnit').value = goal.unit;
+            document.getElementById('goalStartDate').value = goal.startDate;
+            document.getElementById('goalDueDate').value = goal.dueDate;
+            document.getElementById('goalDescription').value = goal.description || '';
+            
+            // Change modal title and button text
+            document.querySelector('.modal-content h3').innerHTML = '<i data-lucide="edit"></i> Edit Goal';
+            document.querySelector('.modal-content .btn-success').innerHTML = '<i data-lucide="check"></i> Update Goal';
+            document.querySelector('.modal-content .btn-success').onclick = function() { updateGoal(goalId); };
+            
+            document.getElementById('createGoalModal').style.display = 'block';
+            
+            // Re-initialize icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        async function updateGoal(goalId) {
+            const title = document.getElementById('goalTitle').value;
+            const agent = document.getElementById('goalAgent').value;
+            const category = document.getElementById('goalCategorySelect').value;
+            const target = document.getElementById('goalTarget').value;
+            const unit = document.getElementById('goalUnit').value;
+            const startDate = document.getElementById('goalStartDate').value;
+            const dueDate = document.getElementById('goalDueDate').value;
+            const description = document.getElementById('goalDescription').value;
+            
+            if (!title || !agent || !target || !startDate || !dueDate) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/manager/goals/${goalId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+                    },
+                    body: JSON.stringify({
+                        title,
+                        agent_id: agent === 'team' ? null : agent,
+                        is_team_goal: agent === 'team',
+                        category,
+                        target_value: parseFloat(target),
+                        unit,
+                        start_date: startDate,
+                        due_date: dueDate,
+                        description
+                    })
+                });
+                
+                if (response.ok) {
+                    // Update local data
+                    const goal = goalsData.find(g => g.id === goalId);
+                    goal.title = title;
+                    goal.agentId = agent;
+                    goal.agentName = agent === 'team' ? 'Entire Team' : agentsData.find(a => a.id === agent)?.name || 'Unknown';
+                    goal.category = category;
+                    goal.target = parseFloat(target);
+                    goal.unit = unit;
+                    goal.startDate = startDate;
+                    goal.dueDate = dueDate;
+                    goal.description = description;
+                    
+                    displayGoalStats();
+                    displayGoalsTable();
+                    alert('Goal updated successfully!');
+                    closeModal();
+                } else {
+                    throw new Error('API update failed');
+                }
+            } catch (error) {
+                console.error('Error updating goal:', error);
+                
+                // Fallback: Update local data for demo
+                const goal = goalsData.find(g => g.id === goalId);
+                goal.title = title;
+                goal.agentId = agent;
+                goal.agentName = agent === 'team' ? 'Entire Team' : agentsData.find(a => a.id === agent)?.name || 'Unknown';
+                goal.category = category;
+                goal.target = parseFloat(target);
+                goal.unit = unit;
+                goal.startDate = startDate;
+                goal.dueDate = dueDate;
+                goal.description = description;
+                
+                displayGoalStats();
+                displayGoalsTable();
+                alert('Goal updated successfully! (Demo mode)');
+                closeModal();
+            }
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('createGoalModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+    
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
+</body>
+</html>

@@ -103,7 +103,7 @@
                 >
                     Forgot Password?
                 </button>
-                <a href="/" class="text-white/70 hover:text-white text-sm font-medium transition-colors">
+                <a href="https://insurance.syncedupsolutions.com/" class="text-white/70 hover:text-white text-sm font-medium transition-colors">
                     Back to Home
                 </a>
             </div>
@@ -204,11 +204,13 @@
                             email: data.user.email,
                             timestamp: Date.now()
                         }));
-                        window.location.href = `/change-password.html?email=${encodeURIComponent(email)}`;
+                        window.location.href = `https://insurance.syncedupsolutions.com/change-password.html?email=${encodeURIComponent(email)}`;
                     } else if (data.user.role === 'admin' || data.user.role === 'super-admin') {
-                        window.location.href = '/admin.html';
+                        window.location.href = 'https://insurance.syncedupsolutions.com/admin/';
+                    } else if (data.user.role === 'manager') {
+                        window.location.href = 'https://insurance.syncedupsolutions.com/manager/';
                     } else {
-                        window.location.href = '/agent/';
+                        window.location.href = 'https://insurance.syncedupsolutions.com/agent/';
                     }
                 } else {
                     errorDiv.textContent = data.error || 'Invalid credentials';

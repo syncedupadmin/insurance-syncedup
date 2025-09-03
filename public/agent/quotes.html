@@ -3,34 +3,565 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quotes - SyncedUp Insurance</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; }
-        .nav { display: flex; gap: 2rem; padding: 0 2rem; background: white; border-bottom: 1px solid #e2e8f0; }
-        .nav a { padding: 1rem; text-decoration: none; color: #2d3748; }
-        .nav a.active { color: #667eea; border-bottom: 2px solid #667eea; }
-        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
-        .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    </style>
+    <title>Quote Products - SyncedUp Insurance Agent</title>
+    <link rel="stylesheet" href="agent-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
+    <!-- Header -->
     <div class="header">
-        <h1>Quotes</h1>
-    </div>
-    <nav class="nav">
-        <a href="/agent/">Dashboard</a>
-        <a href="/agent/quotes.html" class="active">Quotes</a>
-        <a href="/agent/sales.html" >Sales</a>
-        <a href="/agent/commissions.html" >Commissions</a>
-        <a href="/agent/customers.html" >Customers</a>
-    </nav>
-    <div class="container">
-        <div class="card">
-            <h2>Quotes Management</h2>
-            <p>This feature will be connected to the backend API.</p>
+        <h1>Quote Products</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
         </div>
     </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="index.html" class="nav-link">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="quotes.html" class="nav-link active">
+            <i data-lucide="calculator" class="icon"></i>
+            Quote Products
+        </a>
+        <a href="sales.html" class="nav-link">
+            <i data-lucide="handshake" class="icon"></i>
+            Sales History
+        </a>
+        <a href="commissions.html" class="nav-link">
+            <i data-lucide="dollar-sign" class="icon"></i>
+            My Commissions
+        </a>
+        <a href="customers.html" class="nav-link">
+            <i data-lucide="users" class="icon"></i>
+            Customers
+        </a>
+        <a href="settings.html" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Quote Generator -->
+        <div class="card">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="calculator" class="card-icon"></i>
+                Generate Insurance Quote
+            </h3>
+
+            <form id="quoteForm">
+                <!-- Customer Information -->
+                <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                    <h4 style="margin-bottom: 1rem;">Customer Information</h4>
+                    
+                    <div class="grid" style="margin-bottom: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" id="customerFirstName" class="form-input" placeholder="John" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" id="customerLastName" class="form-input" placeholder="Smith" required>
+                        </div>
+                    </div>
+
+                    <div class="grid" style="margin-bottom: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="customerEmail" class="form-input" placeholder="john@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" id="customerPhone" class="form-input" placeholder="(555) 123-4567" required>
+                        </div>
+                    </div>
+
+                    <div class="grid" style="margin-bottom: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Date of Birth</label>
+                            <input type="date" id="customerDOB" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">State</label>
+                            <select id="customerState" class="form-select" required>
+                                <option value="">Select State</option>
+                                <option value="CA">California</option>
+                                <option value="TX">Texas</option>
+                                <option value="FL">Florida</option>
+                                <option value="NY">New York</option>
+                                <option value="PA">Pennsylvania</option>
+                                <option value="IL">Illinois</option>
+                                <option value="OH">Ohio</option>
+                                <option value="GA">Georgia</option>
+                                <option value="NC">North Carolina</option>
+                                <option value="MI">Michigan</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Selection -->
+                <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                    <h4 style="margin-bottom: 1rem;">Product Selection</h4>
+                    
+                    <div class="grid" id="productGrid">
+                        <!-- Products will be loaded here -->
+                        <div class="loading" style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
+                            Loading available products...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Options -->
+                <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;" id="additionalOptions" style="display: none;">
+                    <h4 style="margin-bottom: 1rem;">Additional Options</h4>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Coverage Amount</label>
+                        <select id="coverageAmount" class="form-select">
+                            <option value="50000">$50,000</option>
+                            <option value="100000" selected>$100,000</option>
+                            <option value="250000">$250,000</option>
+                            <option value="500000">$500,000</option>
+                            <option value="1000000">$1,000,000</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Deductible</label>
+                        <select id="deductible" class="form-select">
+                            <option value="500">$500</option>
+                            <option value="1000" selected>$1,000</option>
+                            <option value="2500">$2,500</option>
+                            <option value="5000">$5,000</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Special Notes</label>
+                        <textarea id="specialNotes" class="form-input" rows="3" placeholder="Any special requirements or notes..."></textarea>
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="calculator" class="icon"></i>
+                        Generate Quote
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="clearForm()">
+                        <i data-lucide="x" class="icon"></i>
+                        Clear Form
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Quote Results -->
+        <div id="quoteResults" class="card" style="display: none;">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="file-text" class="card-icon"></i>
+                Quote Results
+            </h3>
+            
+            <div id="quoteResultsContent">
+                <!-- Quote results will be displayed here -->
+            </div>
+        </div>
+
+        <!-- Recent Quotes -->
+        <div class="card">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="history" class="card-icon"></i>
+                Recent Quotes
+            </h3>
+
+            <div style="margin-bottom: 1rem;">
+                <button class="btn btn-secondary" onclick="loadRecentQuotes()">
+                    <i data-lucide="refresh-cw" class="icon"></i>
+                    Refresh
+                </button>
+                <button class="btn btn-warning" onclick="exportQuotes()">
+                    <i data-lucide="download" class="icon"></i>
+                    Export Quotes
+                </button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th>Premium</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="recentQuotesTable">
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 2rem;">
+                            <div class="loading"></div>
+                            Loading recent quotes...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let availableProducts = [];
+        let selectedProduct = null;
+
+        // Authentication check
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token || !user.email) {
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            if (!['agent', 'manager', 'admin', 'super-admin'].includes(user.role)) {
+                alert('Access denied. Agent permissions required.');
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
+            currentUser = user;
+            return true;
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            await loadProducts();
+            await loadRecentQuotes();
+            setupFormHandlers();
+            
+            lucide.createIcons();
+        }
+
+        // Load available products
+        async function loadProducts() {
+            try {
+                // Mock products - replace with API call
+                availableProducts = [
+                    {
+                        id: 'health_premium',
+                        name: 'Health Plan Premium',
+                        description: 'Comprehensive health coverage with low deductibles',
+                        basePrice: 149.99,
+                        commission: 15.00
+                    },
+                    {
+                        id: 'life_gold',
+                        name: 'Life Insurance Gold',
+                        description: 'Term life insurance with flexible coverage amounts',
+                        basePrice: 87.50,
+                        commission: 8.75
+                    },
+                    {
+                        id: 'auto_plus',
+                        name: 'Auto Coverage Plus',
+                        description: 'Full coverage auto insurance with roadside assistance',
+                        basePrice: 234.00,
+                        commission: 23.40
+                    },
+                    {
+                        id: 'home_protection',
+                        name: 'Home Protection Plan',
+                        description: 'Comprehensive homeowners insurance coverage',
+                        basePrice: 189.99,
+                        commission: 19.00
+                    }
+                ];
+
+                displayProducts();
+            } catch (error) {
+                console.error('Error loading products:', error);
+                document.getElementById('productGrid').innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.7);">Error loading products. Please refresh the page.</p>';
+            }
+        }
+
+        // Display products
+        function displayProducts() {
+            const productGrid = document.getElementById('productGrid');
+            
+            const productsHTML = availableProducts.map(product => `
+                <div class="product-card" onclick="selectProduct('${product.id}')">
+                    <h4 style="margin-bottom: 0.5rem; font-size: 1.1rem;">${product.name}</h4>
+                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 1rem; font-size: 0.9rem;">${product.description}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="premium-amount">$${product.basePrice}/mo</div>
+                        <div style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">Commission: $${product.commission}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            productGrid.innerHTML = productsHTML;
+        }
+
+        // Select product
+        function selectProduct(productId) {
+            // Remove previous selection
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Select new product
+            event.target.closest('.product-card').classList.add('selected');
+            selectedProduct = availableProducts.find(p => p.id === productId);
+            
+            // Show additional options
+            document.getElementById('additionalOptions').style.display = 'block';
+        }
+
+        // Setup form handlers
+        function setupFormHandlers() {
+            document.getElementById('quoteForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await generateQuote();
+            });
+        }
+
+        // Generate quote
+        async function generateQuote() {
+            if (!selectedProduct) {
+                alert('Please select a product first.');
+                return;
+            }
+
+            const quoteData = {
+                customer: {
+                    firstName: document.getElementById('customerFirstName').value,
+                    lastName: document.getElementById('customerLastName').value,
+                    email: document.getElementById('customerEmail').value,
+                    phone: document.getElementById('customerPhone').value,
+                    dob: document.getElementById('customerDOB').value,
+                    state: document.getElementById('customerState').value
+                },
+                product: selectedProduct,
+                options: {
+                    coverageAmount: document.getElementById('coverageAmount').value,
+                    deductible: document.getElementById('deductible').value,
+                    specialNotes: document.getElementById('specialNotes').value
+                }
+            };
+
+            try {
+                // Show loading
+                const submitBtn = document.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<div class="loading"></div> Generating Quote...';
+                submitBtn.disabled = true;
+
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Calculate quote (simple logic - replace with actual API)
+                const basePrice = selectedProduct.basePrice;
+                const coverageMultiplier = parseInt(quoteData.options.coverageAmount) / 100000;
+                const deductibleDiscount = (5000 - parseInt(quoteData.options.deductible)) / 5000 * 0.1;
+                
+                const finalPrice = basePrice * coverageMultiplier * (1 - deductibleDiscount);
+                const commission = finalPrice * 0.10; // 10% commission
+
+                displayQuoteResults({
+                    ...quoteData,
+                    quote: {
+                        monthlyPremium: finalPrice.toFixed(2),
+                        annualPremium: (finalPrice * 12).toFixed(2),
+                        commission: commission.toFixed(2),
+                        quoteId: 'Q' + Date.now(),
+                        validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+                    }
+                });
+
+                // Reset button
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+
+                // Refresh recent quotes
+                loadRecentQuotes();
+
+            } catch (error) {
+                console.error('Error generating quote:', error);
+                alert('Error generating quote. Please try again.');
+                
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Display quote results
+        function displayQuoteResults(data) {
+            const resultsContainer = document.getElementById('quoteResultsContent');
+            
+            resultsContainer.innerHTML = `
+                <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h4>Quote #${data.quote.quoteId}</h4>
+                        <span style="color: rgba(255,255,255,0.8);">Valid until: ${data.quote.validUntil}</span>
+                    </div>
+                    
+                    <div class="grid" style="margin-bottom: 1rem;">
+                        <div>
+                            <strong>Customer:</strong><br>
+                            ${data.customer.firstName} ${data.customer.lastName}<br>
+                            ${data.customer.email}<br>
+                            ${data.customer.phone}
+                        </div>
+                        <div>
+                            <strong>Product:</strong><br>
+                            ${data.product.name}<br>
+                            Coverage: $${parseInt(data.options.coverageAmount).toLocaleString()}<br>
+                            Deductible: $${parseInt(data.options.deductible).toLocaleString()}
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(16, 185, 129, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>Monthly Premium:</span>
+                            <span class="premium-amount">$${data.quote.monthlyPremium}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>Annual Premium:</span>
+                            <span class="premium-amount">$${data.quote.annualPremium}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Your Commission:</span>
+                            <span style="color: #34d399; font-weight: 600;">$${data.quote.commission}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <button class="btn btn-success" onclick="convertToSale('${data.quote.quoteId}')">
+                            <i data-lucide="handshake" class="icon"></i>
+                            Convert to Sale
+                        </button>
+                        <button class="btn btn-warning" onclick="emailQuote('${data.quote.quoteId}')">
+                            <i data-lucide="mail" class="icon"></i>
+                            Email to Customer
+                        </button>
+                        <button class="btn btn-secondary" onclick="printQuote('${data.quote.quoteId}')">
+                            <i data-lucide="printer" class="icon"></i>
+                            Print Quote
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('quoteResults').style.display = 'block';
+            document.getElementById('quoteResults').scrollIntoView({ behavior: 'smooth' });
+            
+            lucide.createIcons();
+        }
+
+        // Load recent quotes
+        async function loadRecentQuotes() {
+            const tableBody = document.getElementById('recentQuotesTable');
+            
+            // Mock data - replace with API call
+            const quotes = [
+                { date: '2025-09-03', customer: 'John Smith', product: 'Health Plan Premium', premium: '$149.99', status: 'Pending' },
+                { date: '2025-09-02', customer: 'Mary Johnson', product: 'Life Insurance Gold', premium: '$87.50', status: 'Accepted' },
+                { date: '2025-09-01', customer: 'Bob Wilson', product: 'Auto Coverage Plus', premium: '$234.00', status: 'Pending' }
+            ];
+
+            const quotesHTML = quotes.map(quote => `
+                <tr>
+                    <td>${quote.date}</td>
+                    <td>${quote.customer}</td>
+                    <td>${quote.product}</td>
+                    <td class="premium-amount">${quote.premium}</td>
+                    <td><span class="status-${quote.status.toLowerCase()}">${quote.status}</span></td>
+                    <td>
+                        <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                            <i data-lucide="eye" style="width: 12px; height: 12px;"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            tableBody.innerHTML = quotesHTML;
+            lucide.createIcons();
+        }
+
+        // Convert to sale
+        function convertToSale(quoteId) {
+            if (confirm('Convert this quote to a sale?')) {
+                alert(`Quote ${quoteId} converted to sale! Redirecting to sales page...`);
+                // In real implementation, would make API call and redirect
+                setTimeout(() => {
+                    window.location.href = 'sales.html';
+                }, 1500);
+            }
+        }
+
+        // Email quote
+        function emailQuote(quoteId) {
+            alert(`Quote ${quoteId} emailed to customer successfully!`);
+            // In real implementation, would make API call to send email
+        }
+
+        // Print quote
+        function printQuote(quoteId) {
+            window.print();
+        }
+
+        // Clear form
+        function clearForm() {
+            document.getElementById('quoteForm').reset();
+            selectedProduct = null;
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.getElementById('additionalOptions').style.display = 'none';
+            document.getElementById('quoteResults').style.display = 'none';
+        }
+
+        // Export quotes
+        function exportQuotes() {
+            const csvContent = `Date,Customer,Product,Premium,Status
+2025-09-03,John Smith,Health Plan Premium,$149.99,Pending
+2025-09-02,Mary Johnson,Life Insurance Gold,$87.50,Accepted
+2025-09-01,Bob Wilson,Auto Coverage Plus,$234.00,Pending`;
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `quotes-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
 </body>
 </html>

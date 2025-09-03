@@ -3,7 +3,7 @@
 <head>
     <script>
         const user = JSON.parse(localStorage.getItem('user') || '{}');
-        if (user.role === 'admin' || user.role === 'super-admin') {
+        if (user.role === 'admin' || user.role === 'super-admin' || user.role === 'manager') {
             window.location.href = '/admin/index.html';
         } else {
             window.location.href = '/agent/index.html';

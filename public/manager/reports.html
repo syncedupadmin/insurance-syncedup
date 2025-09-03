@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Manager Portal</title>
+    <link rel="stylesheet" href="/manager/manager-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Reports & Analytics</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="index.html" class="nav-link">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="team-management.html" class="nav-link">
+            <i data-lucide="users" class="icon"></i>
+            Team Management
+        </a>
+        <a href="performance.html" class="nav-link">
+            <i data-lucide="trending-up" class="icon"></i>
+            Team Performance
+        </a>
+        <a href="reports.html" class="nav-link active">
+            <i data-lucide="file-text" class="icon"></i>
+            Reports
+        </a>
+        <a href="goals.html" class="nav-link">
+            <i data-lucide="target" class="icon"></i>
+            Goals
+        </a>
+        <a href="vendors.html" class="nav-link">
+            <i data-lucide="building-2" class="icon"></i>
+            Vendors
+        </a>
+        <a href="settings.html" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+    </div>
+    
+    <div class="container">
+        <div class="manager-notice">
+            <h3><i data-lucide="file-text"></i> Reports & Analytics Center</h3>
+            <p>Generate comprehensive reports, analyze performance trends, and export data for stakeholders.</p>
+        </div>
+        
+        <div class="grid">
+            <div class="stat-card">
+                <div class="stat-value" id="reportsGenerated">0</div>
+                <div class="stat-label">Reports This Month</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="scheduledReports">0</div>
+                <div class="stat-label">Scheduled Reports</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="dataPoints">0</div>
+                <div class="stat-label">Data Points Tracked</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="lastExport">--</div>
+                <div class="stat-label">Last Export</div>
+            </div>
+        </div>
+        
+        <!-- Quick Report Generation -->
+        <div class="card">
+            <h3><i data-lucide="zap"></i> Quick Report Generation</h3>
+            <div class="grid">
+                <button class="btn" onclick="generateQuickReport('performance')" style="display: flex; flex-direction: column; align-items: center; padding: 1.5rem; height: auto;">
+                    <i data-lucide="trending-up" style="margin-bottom: 0.5rem;"></i>
+                    <strong>Team Performance</strong>
+                    <small style="margin-top: 0.5rem; opacity: 0.8;">Sales, goals, and KPIs</small>
+                </button>
+                <button class="btn btn-success" onclick="generateQuickReport('sales')" style="display: flex; flex-direction: column; align-items: center; padding: 1.5rem; height: auto;">
+                    <i data-lucide="dollar-sign" style="margin-bottom: 0.5rem;"></i>
+                    <strong>Sales Summary</strong>
+                    <small style="margin-top: 0.5rem; opacity: 0.8;">Revenue and conversions</small>
+                </button>
+                <button class="btn btn-warning" onclick="generateQuickReport('vendors')" style="display: flex; flex-direction: column; align-items: center; padding: 1.5rem; height: auto;">
+                    <i data-lucide="briefcase" style="margin-bottom: 0.5rem;"></i>
+                    <strong>Vendor Analysis</strong>
+                    <small style="margin-top: 0.5rem; opacity: 0.8;">Lead costs and ROI</small>
+                </button>
+                <button class="btn btn-secondary" onclick="generateQuickReport('activity')" style="display: flex; flex-direction: column; align-items: center; padding: 1.5rem; height: auto;">
+                    <i data-lucide="activity" style="margin-bottom: 0.5rem;"></i>
+                    <strong>Activity Report</strong>
+                    <small style="margin-top: 0.5rem; opacity: 0.8;">Calls, leads, and engagement</small>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Custom Report Builder -->
+        <div class="card">
+            <h3><i data-lucide="settings"></i> Custom Report Builder</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="reportType">Report Type</label>
+                    <select id="reportType">
+                        <option value="performance">Team Performance</option>
+                        <option value="sales">Sales Analysis</option>
+                        <option value="goals">Goals Progress</option>
+                        <option value="vendors">Vendor Performance</option>
+                        <option value="activity">Activity Summary</option>
+                        <option value="custom">Custom Metrics</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="reportPeriod">Time Period</label>
+                    <select id="reportPeriod">
+                        <option value="week">This Week</option>
+                        <option value="month" selected>This Month</option>
+                        <option value="quarter">This Quarter</option>
+                        <option value="year">This Year</option>
+                        <option value="custom">Custom Range</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="reportFormat">Export Format</label>
+                    <select id="reportFormat">
+                        <option value="pdf">PDF Report</option>
+                        <option value="excel">Excel Spreadsheet</option>
+                        <option value="csv">CSV Data</option>
+                        <option value="powerpoint">PowerPoint</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row" id="customDateRange" style="display: none;">
+                <div class="form-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate">
+                </div>
+                <div class="form-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="includeCharts" checked>
+                    Include Charts and Visualizations
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="includeComparison">
+                    Include Period-over-Period Comparison
+                </label>
+            </div>
+            <div class="quick-actions">
+                <button class="btn btn-success" onclick="enhancedGenerateCustomReport()">
+                    <i data-lucide="file-text"></i>
+                    Generate Report
+                </button>
+                <button class="btn btn-warning" onclick="previewReport()">
+                    <i data-lucide="eye"></i>
+                    Preview
+                </button>
+                <button class="btn btn-secondary" onclick="scheduleReport()">
+                    <i data-lucide="clock"></i>
+                    Schedule
+                </button>
+            </div>
+        </div>
+        
+        <!-- Report Templates -->
+        <div class="card">
+            <h3><i data-lucide="bookmark"></i> Report Templates</h3>
+            <div class="grid">
+                <div class="card" style="cursor: pointer; margin: 0;" onclick="useTemplate('weekly_summary')">
+                    <h4><i data-lucide="calendar"></i> Weekly Summary</h4>
+                    <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7); margin: 0.5rem 0;">
+                        Team performance, sales totals, and goal progress for the week
+                    </p>
+                    <small style="color: #FFD700;">Most Popular</small>
+                </div>
+                <div class="card" style="cursor: pointer; margin: 0;" onclick="useTemplate('monthly_exec')">
+                    <h4><i data-lucide="briefcase"></i> Executive Monthly</h4>
+                    <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7); margin: 0.5rem 0;">
+                        High-level metrics and trends for leadership review
+                    </p>
+                    <small style="color: rgba(255,255,255,0.6);">Executive Level</small>
+                </div>
+                <div class="card" style="cursor: pointer; margin: 0;" onclick="useTemplate('agent_detail')">
+                    <h4><i data-lucide="user"></i> Individual Agent</h4>
+                    <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7); margin: 0.5rem 0;">
+                        Detailed performance report for specific agents
+                    </p>
+                    <small style="color: rgba(255,255,255,0.6);">Agent Specific</small>
+                </div>
+                <div class="card" style="cursor: pointer; margin: 0;" onclick="useTemplate('roi_analysis')">
+                    <h4><i data-lucide="pie-chart"></i> ROI Analysis</h4>
+                    <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7); margin: 0.5rem 0;">
+                        Lead costs, conversion rates, and return on investment
+                    </p>
+                    <small style="color: rgba(255,255,255,0.6);">Financial Focus</small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Reports -->
+        <div class="card">
+            <h3><i data-lucide="history"></i> Recent Reports</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Report Name</th>
+                        <th>Type</th>
+                        <th>Generated</th>
+                        <th>Period</th>
+                        <th>Format</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="recentReportsTable">
+                    <tr><td colspan="6" style="text-align: center;">Loading recent reports...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Scheduled Reports -->
+        <div class="card">
+            <h3><i data-lucide="clock"></i> Scheduled Reports</h3>
+            <div class="quick-actions">
+                <button class="btn" onclick="addScheduledReport()">
+                    <i data-lucide="plus-circle"></i>
+                    Schedule New Report
+                </button>
+                <button class="btn btn-secondary" onclick="manageSchedules()">
+                    <i data-lucide="calendar"></i>
+                    Manage Schedules
+                </button>
+            </div>
+            <table id="scheduledReportsTable">
+                <thead>
+                    <tr>
+                        <th>Report</th>
+                        <th>Frequency</th>
+                        <th>Recipients</th>
+                        <th>Next Run</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Weekly Team Summary</strong></td>
+                        <td>Every Monday</td>
+                        <td>management@agency.com</td>
+                        <td>Sep 2, 2025 9:00 AM</td>
+                        <td><span class="status-active">Active</span></td>
+                        <td>
+                            <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                                <i data-lucide="edit"></i> Edit
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Monthly Executive Report</strong></td>
+                        <td>Monthly (1st)</td>
+                        <td>executives@agency.com</td>
+                        <td>Sep 1, 2025 8:00 AM</td>
+                        <td><span class="status-active">Active</span></td>
+                        <td>
+                            <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                                <i data-lucide="edit"></i> Edit
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        let currentUser = null;
+        
+        // Mock recent reports data
+        const recentReports = [
+            {
+                name: 'Weekly Team Performance',
+                type: 'Performance',
+                generated: '2025-08-30 14:30',
+                period: 'Aug 26-30, 2025',
+                format: 'PDF',
+                id: 'RPT001'
+            },
+            {
+                name: 'Monthly Sales Summary',
+                type: 'Sales',
+                generated: '2025-08-30 09:15',
+                period: 'August 2025',
+                format: 'Excel',
+                id: 'RPT002'
+            },
+            {
+                name: 'Vendor ROI Analysis',
+                type: 'Vendors',
+                generated: '2025-08-29 16:45',
+                period: 'Q3 2025',
+                format: 'PDF',
+                id: 'RPT003'
+            },
+            {
+                name: 'Agent Activity Report',
+                type: 'Activity',
+                generated: '2025-08-28 11:20',
+                period: 'Aug 1-28, 2025',
+                format: 'CSV',
+                id: 'RPT004'
+            }
+        ];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            const userData = localStorage.getItem('user');
+            if (userData) {
+                currentUser = JSON.parse(userData);
+                
+                // Only managers can access this page
+                if (currentUser.role !== 'manager') {
+                    if (currentUser.role === 'admin' || currentUser.role === 'super-admin') {
+                        window.location.href = 'https://insurance.syncedupsolutions.com/admin/';
+                    } else {
+                        window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                    }
+                    return;
+                }
+                
+                loadReportsData();
+            } else {
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+            }
+            
+            // Show/hide custom date range
+            document.getElementById('reportPeriod').addEventListener('change', function() {
+                const customRange = document.getElementById('customDateRange');
+                if (this.value === 'custom') {
+                    customRange.style.display = 'flex';
+                } else {
+                    customRange.style.display = 'none';
+                }
+            });
+            
+            // Set default dates
+            const today = new Date().toISOString().split('T')[0];
+            const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            document.getElementById('startDate').value = weekAgo;
+            document.getElementById('endDate').value = today;
+            
+            // Initialize Lucide icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+        
+        function loadReportsData() {
+            // Display stats
+            document.getElementById('reportsGenerated').textContent = recentReports.length + 8; // Mock total
+            document.getElementById('scheduledReports').textContent = '2';
+            document.getElementById('dataPoints').textContent = '1,247';
+            document.getElementById('lastExport').textContent = 'Today';
+            
+            // Display recent reports
+            displayRecentReports();
+        }
+        
+        function displayRecentReports() {
+            const tableBody = document.getElementById('recentReportsTable');
+            tableBody.innerHTML = '';
+            
+            recentReports.forEach(report => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${report.name}</strong></td>
+                    <td>${report.type}</td>
+                    <td>${new Date(report.generated).toLocaleString()}</td>
+                    <td>${report.period}</td>
+                    <td>${report.format}</td>
+                    <td>
+                        <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin: 0.1rem;" 
+                                onclick="downloadReport('${report.id}')">
+                                <i data-lucide="download"></i> Download
+                        </button>
+                        <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin: 0.1rem;" 
+                                onclick="shareReport('${report.id}')">
+                                <i data-lucide="share"></i> Share
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function generateQuickReport(reportType) {
+            const reportNames = {
+                'performance': 'Team Performance Report',
+                'sales': 'Sales Summary Report',
+                'vendors': 'Vendor Analysis Report',
+                'activity': 'Activity Summary Report'
+            };
+            
+            alert(`Generating ${reportNames[reportType]}... This would create a comprehensive report with current data and export it in your preferred format.`);
+        }
+        
+        function generateCustomReport() {
+            const reportType = document.getElementById('reportType').value;
+            const period = document.getElementById('reportPeriod').value;
+            const format = document.getElementById('reportFormat').value;
+            const includeCharts = document.getElementById('includeCharts').checked;
+            const includeComparison = document.getElementById('includeComparison').checked;
+            
+            let reportDetails = `Report Type: ${reportType}\\nPeriod: ${period}\\nFormat: ${format}`;
+            if (includeCharts) reportDetails += '\\nIncludes: Charts & Visualizations';
+            if (includeComparison) reportDetails += '\\nIncludes: Period Comparison';
+            
+            alert(`Custom report would be generated with the following settings:\\n\\n${reportDetails}\\n\\nThis feature will be implemented in Phase 2.`);
+        }
+        
+        function previewReport() {
+            alert('Report preview would open here showing a sample of the data and layout before final generation.');
+        }
+        
+        function scheduleReport() {
+            const reportType = document.getElementById('reportType').value;
+            alert(`Schedule interface would open for ${reportType} report with options for frequency, recipients, and delivery preferences.`);
+        }
+        
+        function useTemplate(templateType) {
+            const templates = {
+                'weekly_summary': {
+                    type: 'performance',
+                    period: 'week',
+                    format: 'pdf',
+                    charts: true,
+                    comparison: false
+                },
+                'monthly_exec': {
+                    type: 'performance',
+                    period: 'month',
+                    format: 'powerpoint',
+                    charts: true,
+                    comparison: true
+                },
+                'agent_detail': {
+                    type: 'performance',
+                    period: 'month',
+                    format: 'pdf',
+                    charts: true,
+                    comparison: false
+                },
+                'roi_analysis': {
+                    type: 'vendors',
+                    period: 'quarter',
+                    format: 'excel',
+                    charts: true,
+                    comparison: true
+                }
+            };
+            
+            const template = templates[templateType];
+            if (template) {
+                document.getElementById('reportType').value = template.type;
+                document.getElementById('reportPeriod').value = template.period;
+                document.getElementById('reportFormat').value = template.format;
+                document.getElementById('includeCharts').checked = template.charts;
+                document.getElementById('includeComparison').checked = template.comparison;
+                
+                alert(`Template loaded: ${templateType.replace('_', ' ').replace(/\\b\\w/g, l => l.toUpperCase())}. You can modify settings or generate directly.`);
+            }
+        }
+        
+        function downloadReport(reportId) {
+            const report = recentReports.find(r => r.id === reportId);
+            alert(`Downloading ${report.name} (${report.format})... File would be saved to your downloads folder.`);
+        }
+        
+        function shareReport(reportId) {
+            const report = recentReports.find(r => r.id === reportId);
+            alert(`Share interface for ${report.name} would open with options to email, generate shareable links, or send to stakeholders.`);
+        }
+        
+        function addScheduledReport() {
+            alert('Schedule creation interface would open here with options to set up automated report generation and delivery.');
+        }
+        
+        function manageSchedules() {
+            alert('Schedule management interface would open here to edit, pause, or delete existing scheduled reports.');
+        }
+        
+        async function generateMockReport(reportType, format, period, startDate = null, endDate = null) {
+            // Simulate report generation delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            let content = '';
+            const dateRange = period === 'custom' ? `${startDate} to ${endDate}` : period;
+            
+            if (format === 'csv') {
+                content = generateCSVContent(reportType, dateRange);
+            } else if (format === 'excel') {
+                content = generateExcelContent(reportType, dateRange);
+            } else {
+                content = generatePDFContent(reportType, dateRange);
+            }
+            
+            // Create and download file
+            const blob = new Blob([content], { type: getMimeType(format) });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${reportType}_report_${new Date().toISOString().split('T')[0]}.${getFileExtension(format)}`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            
+            // Add to recent reports for demo
+            const newReport = {
+                name: `${reportType.charAt(0).toUpperCase() + reportType.slice(1)} Report`,
+                type: reportType.charAt(0).toUpperCase() + reportType.slice(1),
+                generated: new Date().toISOString(),
+                period: dateRange,
+                format: format.toUpperCase(),
+                id: 'RPT' + (recentReports.length + 1)
+            };
+            
+            recentReports.unshift(newReport);
+            displayRecentReports();
+        }
+        
+        function generateCSVContent(reportType, dateRange) {
+            let content = `${reportType.toUpperCase()} REPORT - ${dateRange}\n\n`;
+            
+            if (reportType === 'performance') {
+                content += 'Agent,Sales Count,Premium Volume,Conversion Rate,Goals Met\n';
+                content += 'John Smith,8,$2712,15.2%,2/3\n';
+                content += 'Jane Doe,12,$3845,18.4%,3/3\n';
+                content += 'Mike Johnson,5,$1680,12.1%,1/3\n';
+                content += 'David Brown,15,$4950,21.3%,3/3\n';
+            } else if (reportType === 'vendors') {
+                content += 'Vendor,Leads,Cost Per Lead,Total Cost,Conversion Rate,ROI\n';
+                content += 'Boberdoo,145,$28.50,$4132.50,15.9%,245%\n';
+                content += 'QuoteWizard,89,$32.00,$2848.00,20.2%,198%\n';
+                content += 'LeadsCon Network,67,$24.75,$1658.25,11.9%,156%\n';
+            } else if (reportType === 'sales') {
+                content += 'Date,Agent,Customer,Product,Premium,Status\n';
+                content += '2025-08-30,John Smith,Jane Doe,Health Plan A,$295,Active\n';
+                content += '2025-08-29,Jane Doe,Bob Wilson,Health Plan B,$425,Active\n';
+                content += '2025-08-28,Mike Johnson,Mary Johnson,Health Plan C,$355,Pending\n';
+            } else if (reportType === 'activity') {
+                content += 'Date,Agent,Activity Type,Description,Duration\n';
+                content += '2025-08-30,John Smith,Call,Customer follow-up call,15 min\n';
+                content += '2025-08-30,Jane Doe,Email,Quote sent to prospect,5 min\n';
+                content += '2025-08-29,Mike Johnson,Meeting,Product presentation,45 min\n';
+            }
+            
+            return content;
+        }
+        
+        function generateExcelContent(reportType, dateRange) {
+            // For demo purposes, return CSV-like content with tab separators
+            // In production, this would generate actual Excel binary format
+            return generateCSVContent(reportType, dateRange).replace(/,/g, '\t');
+        }
+        
+        function generatePDFContent(reportType, dateRange) {
+            return `${reportType.toUpperCase()} REPORT\n${dateRange}\n\n` +
+                   `Generated on: ${new Date().toLocaleDateString()}\n` +
+                   `Generated by: Manager Portal\n\n` +
+                   `EXECUTIVE SUMMARY\n` +
+                   `================\n\n` +
+                   `This comprehensive ${reportType} report provides detailed insights ` +
+                   `into organizational performance for the selected period.\n\n` +
+                   `KEY PERFORMANCE INDICATORS\n` +
+                   `=========================\n` +
+                   `• Total Revenue: $13,187\n` +
+                   `• Active Agents: 4\n` +
+                   `• Conversion Rate: 16.8%\n` +
+                   `• Goals Achievement: 75%\n` +
+                   `• Customer Satisfaction: 92%\n\n` +
+                   `PERFORMANCE HIGHLIGHTS\n` +
+                   `====================\n` +
+                   `• Top performing agent exceeded goals by 25%\n` +
+                   `• Lead quality improved by 18% this month\n` +
+                   `• Customer retention rate at 94%\n` +
+                   `• Average response time: 2.3 hours\n\n` +
+                   `This report was generated automatically by the Manager Portal system.`;
+        }
+        
+        function generateMockReportContent(report) {
+            return `${report.name.toUpperCase()}\n` +
+                   `Generated: ${new Date(report.generated).toLocaleDateString()}\n` +
+                   `Period: ${report.period}\n` +
+                   `Format: ${report.format}\n\n` +
+                   `This is a previously generated report from the Manager Portal.\n\n` +
+                   `In a production environment, this would contain:\n` +
+                   `• Complete data analysis and visualizations\n` +
+                   `• Interactive charts and graphs\n` +
+                   `• Detailed performance metrics\n` +
+                   `• Actionable insights and recommendations\n\n` +
+                   `Report ID: ${report.id}\n` +
+                   `Status: Available for download`;
+        }
+        
+        function getMimeType(format) {
+            const mimeTypes = {
+                'pdf': 'application/pdf',
+                'excel': 'application/vnd.ms-excel',
+                'csv': 'text/csv',
+                'powerpoint': 'application/vnd.ms-powerpoint'
+            };
+            return mimeTypes[format] || 'text/plain';
+        }
+        
+        function getFileExtension(format) {
+            const extensions = {
+                'pdf': 'pdf',
+                'excel': 'xlsx',
+                'csv': 'csv',
+                'powerpoint': 'pptx'
+            };
+            return extensions[format] || 'txt';
+        }
+        
+        // Enhanced report generation with better user feedback
+        async function enhancedGenerateCustomReport() {
+            const reportType = document.getElementById('reportType').value;
+            const period = document.getElementById('reportPeriod').value;
+            const format = document.getElementById('reportFormat').value;
+            const includeCharts = document.getElementById('includeCharts').checked;
+            const includeComparison = document.getElementById('includeComparison').checked;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            // Validate custom date range
+            if (period === 'custom' && (!startDate || !endDate)) {
+                alert('Please select start and end dates for custom range');
+                return;
+            }
+            
+            if (period === 'custom' && new Date(startDate) >= new Date(endDate)) {
+                alert('End date must be after start date');
+                return;
+            }
+            
+            // Generate the report using mock functionality
+            await generateMockReport(reportType, format, period, startDate, endDate);
+            alert('Custom report generated and downloaded successfully!');
+        }
+        
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+        }
+    </script>
+    
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
+</body>
+</html>

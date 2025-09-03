@@ -4,42 +4,343 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - SyncedUp Insurance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .nav { display: flex; gap: 2rem; padding: 0 2rem; background: white; border-bottom: 1px solid #e2e8f0; overflow-x: auto; }
-        .nav a { padding: 1rem; text-decoration: none; color: #2d3748; font-weight: 500; white-space: nowrap; }
-        .nav a.active { color: #667eea; border-bottom: 2px solid #667eea; }
-        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
-        .grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
-        .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .stat-value { font-size: 2rem; font-weight: bold; color: #667eea; }
-        .stat-label { color: #718096; margin-top: 0.5rem; }
-        .btn { padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 0.5rem; }
-        .btn:hover { background: #5a67d8; }
-        .btn-success { background: #48bb78; }
-        .btn-warning { background: #ed8936; }
-        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        th { background: #f7fafc; padding: 0.75rem; text-align: left; font-weight: 600; }
-        td { padding: 0.75rem; border-top: 1px solid #e2e8f0; }
-        .quick-actions { display: flex; gap: 1rem; margin: 2rem 0; flex-wrap: wrap; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: linear-gradient(-45deg, #4c1d95, #5b21b6, #6d28d9, #7c3aed, #8b5cf6, #a855f7, #c084fc, #ddd6fe);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(124, 58, 237, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(168, 85, 247, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        .header { 
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: white; 
+            padding: 1.5rem 2rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .neon-text {
+            text-shadow: 0 0 10px rgba(255,255,255,0.8),
+                         0 0 20px rgba(255,255,255,0.8),
+                         0 0 30px rgba(255,255,255,0.8);
+        }
+        
+        .header h1 {
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(255,255,255,0.8),
+                         0 0 20px rgba(255,255,255,0.8),
+                         0 0 30px rgba(255,255,255,0.8);
+        }
+        
+        .nav { 
+            display: flex; 
+            gap: 0; 
+            padding: 0 2rem; 
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-top: none;
+            overflow-x: auto;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            position: relative;
+            z-index: 9;
+        }
+        
+        .nav a { 
+            padding: 1rem 1.5rem; 
+            text-decoration: none; 
+            color: rgba(255, 255, 255, 0.8); 
+            font-weight: 500; 
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .nav a:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav a.active { 
+            color: white; 
+            border-bottom: 3px solid #f093fb;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .container { 
+            max-width: 1400px; 
+            margin: 2rem auto; 
+            padding: 0 2rem; 
+        }
+        
+        .grid { 
+            display: grid; 
+            gap: 1.5rem; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            margin-bottom: 2rem;
+        }
+        
+        .card { 
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            padding: 2rem; 
+            border-radius: 20px; 
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
+        }
+        
+        .stat-value { 
+            font-size: 2.5rem; 
+            font-weight: bold; 
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .stat-label { 
+            color: rgba(255, 255, 255, 0.9); 
+            margin-top: 0.5rem; 
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 0.025em;
+        }
+        
+        .btn { 
+            padding: 0.75rem 1.5rem; 
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white; 
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px; 
+            cursor: pointer; 
+            margin: 0.5rem; 
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover { 
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-success { 
+            background: rgba(72, 187, 120, 0.6);
+            border: 1px solid rgba(72, 187, 120, 0.8);
+        }
+        
+        .btn-success:hover {
+            background: rgba(72, 187, 120, 0.8);
+        }
+        
+        .btn-warning { 
+            background: rgba(237, 137, 54, 0.6);
+            border: 1px solid rgba(237, 137, 54, 0.8);
+        }
+        
+        .btn-warning:hover {
+            background: rgba(237, 137, 54, 0.8);
+        }
+        
+        .quick-actions { 
+            display: flex; 
+            gap: 1rem; 
+            margin: 2rem 0; 
+            flex-wrap: wrap; 
+            justify-content: center;
+        }
+        
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 1rem; 
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        th { 
+            background: rgba(255, 255, 255, 0.2); 
+            padding: 1rem 0.75rem; 
+            text-align: left; 
+            font-weight: 600;
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        td { 
+            padding: 0.75rem; 
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        tr:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        h3 { 
+            margin-bottom: 1rem; 
+            color: rgba(255, 255, 255, 0.95); 
+            font-size: 1.25rem; 
+            font-weight: 600;
+            letter-spacing: 0.025em;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .premium-amount { 
+            color: rgba(255, 255, 255, 0.95); 
+            font-weight: 600; 
+            background: linear-gradient(45deg, #10b981, #06d6a0);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .conversion-rate { 
+            color: rgba(255, 255, 255, 0.95); 
+            font-weight: 600; 
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .status-active { 
+            background: rgba(72, 187, 120, 0.8);
+            color: white; 
+            padding: 0.25rem 0.75rem; 
+            border-radius: 20px; 
+            font-size: 0.85rem; 
+            font-weight: 500; 
+        }
+        
+        .status-inactive { 
+            background: rgba(245, 101, 101, 0.8);
+            color: white; 
+            padding: 0.25rem 0.75rem; 
+            border-radius: 20px; 
+            font-size: 0.85rem; 
+            font-weight: 500; 
+        }
+        
+        .icon {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        .card-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            opacity: 0.9;
+        }
+        
+        .btn .icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+        }
+        
+        @media (max-width: 768px) {
+            .container { padding: 0 1rem; }
+            .header { padding: 1rem; flex-direction: column; gap: 1rem; }
+            .nav { padding: 0 1rem; }
+            .grid { grid-template-columns: 1fr; }
+            .quick-actions { justify-content: center; }
+        }
     </style>
 </head>
 <body>
+    <!-- Floating particles effect -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-10 -left-10 w-40 h-40 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce"></div>
+        <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce" style="animation-delay: 2s;"></div>
+        <div class="absolute top-1/2 left-1/2 w-40 h-40 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce" style="animation-delay: 4s;"></div>
+    </div>
+    
     <div class="header">
-        <h1>Agency Admin Dashboard</h1>
+        <h1 class="neon-text">Agency Admin Dashboard</h1>
         <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">Logout</button>
     </div>
     <nav class="nav">
-        <a href="/admin/" class="active">Dashboard</a>
-        <a href="/admin/agents.html">Agents</a>
-        <a href="/admin/agent-performance.html">Agent Performance</a>
-        <a href="/admin/licensing.html">Licensing</a>
-        <a href="/admin/commissions.html">Commissions</a>
-        <a href="/admin/commission-settings.html">Commission Settings</a>
-        <a href="/admin/reports.html">Reports</a>
-        <a href="/admin/settings.html">Settings</a>
+        <a href="/admin/" class="active">
+            <i data-lucide="layout-dashboard" class="icon"></i>Dashboard
+        </a>
+        <a href="/admin/agent-performance.html">
+            <i data-lucide="trending-up" class="icon"></i>Agent Performance
+        </a>
+        <a href="/admin/users.html">
+            <i data-lucide="users" class="icon"></i>Users
+        </a>
+        <a href="/admin/leads.html">
+            <i data-lucide="user-plus" class="icon"></i>Leads
+        </a>
+        <a href="/admin/commissions.html">
+            <i data-lucide="dollar-sign" class="icon"></i>Commissions
+        </a>
+        <a href="/admin/settings.html">
+            <i data-lucide="settings" class="icon"></i>Settings
+        </a>
     </nav>
     <div class="container">
         <div class="grid">
@@ -52,42 +353,77 @@
                 <div class="stat-label">MTD Revenue</div>
             </div>
             <div class="card">
-                <div class="stat-value" id="policiesSold">0</div>
-                <div class="stat-label">Policies Sold</div>
+                <div class="stat-value" id="activeLeads">0</div>
+                <div class="stat-label">Active Leads</div>
             </div>
             <div class="card">
-                <div class="stat-value" id="pendingCommissions">$0</div>
-                <div class="stat-label">Pending Commissions</div>
+                <div class="stat-value" id="conversionRate">0%</div>
+                <div class="stat-label">Conversion Rate</div>
+            </div>
+            <div class="card">
+                <div class="stat-value" id="totalCommissions">$0</div>
+                <div class="stat-label">Total Commissions</div>
+            </div>
+            <div class="card">
+                <div class="stat-value" id="systemStatus">100%</div>
+                <div class="stat-label">System Health</div>
             </div>
         </div>
         <div class="quick-actions">
-            <button class="btn" onclick="location.href='/admin/agents.html'">👥 Manage Agents</button>
-            <button class="btn" onclick="location.href='/admin/agent-performance.html'">📊 View Agent Performance</button>
-            <button class="btn btn-success" onclick="location.href='/admin/bulk-upload.html'">📤 Bulk Upload</button>
-            <button class="btn btn-warning" onclick="location.href='/admin/licensing.html'">📋 Check Licenses</button>
+            <button class="btn" onclick="location.href='/admin/agent-performance.html'">
+                <i data-lucide="trending-up" class="icon"></i>Agent Performance
+            </button>
+            <button class="btn" onclick="location.href='/admin/users.html'">
+                <i data-lucide="users" class="icon"></i>Manage Users
+            </button>
+            <button class="btn" onclick="location.href='/admin/leads.html'">
+                <i data-lucide="user-plus" class="icon"></i>Lead Management
+            </button>
+            <button class="btn btn-success" onclick="location.href='/admin/commissions.html'">
+                <i data-lucide="dollar-sign" class="icon"></i>Commissions
+            </button>
+            <button class="btn btn-warning" onclick="location.href='/admin/settings.html'">
+                <i data-lucide="settings" class="icon"></i>Settings
+            </button>
         </div>
         
-        <!-- Agent Quick Stats -->
+        <!-- Top Performing Agents -->
         <div class="card">
-            <h3>👑 Agent Overview (This Month)</h3>
+            <h3><i data-lucide="trending-up" class="card-icon"></i>Top Performing Agents</h3>
             <table>
                 <thead>
                     <tr>
                         <th>Agent</th>
                         <th>Sales</th>
-                        <th>Premium Volume</th>
-                        <th>Commission</th>
-                        <th>Status</th>
+                        <th>Revenue</th>
+                        <th>Conversion Rate</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="agentOverviewTable">
-                    <tr><td colspan="6" style="text-align: center;">Loading agent data...</td></tr>
+                    <tr><td colspan="5" style="text-align: center;">Loading agent data...</td></tr>
                 </tbody>
             </table>
         </div>
+        
+        <!-- Recent Leads -->
         <div class="card">
-            <h3>Recent Activity</h3>
+            <h3><i data-lucide="user-plus" class="card-icon"></i>Recent Leads</h3>
+            <div id="recentLeads" style="margin-top: 1rem;">
+                <p style="text-align: center; color: rgba(255, 255, 255, 0.7);">Loading recent leads...</p>
+            </div>
+        </div>
+        
+        <!-- Commission Summary -->
+        <div class="card">
+            <h3><i data-lucide="dollar-sign" class="card-icon"></i>Commission Summary</h3>
+            <div id="commissionSummary" style="margin-top: 1rem;">
+                <p style="text-align: center; color: rgba(255, 255, 255, 0.7);">Loading commission data...</p>
+            </div>
+        </div>
+        <!-- Recent Activity -->
+        <div class="card">
+            <h3><i data-lucide="activity" class="card-icon"></i>Recent Activity</h3>
             <table>
                 <thead>
                     <tr>
@@ -97,23 +433,21 @@
                         <th>Details</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr><td colspan="4" style="text-align: center;">No recent activity</td></tr>
+                <tbody id="activityTable">
+                    <tr><td colspan="4" style="text-align: center;">Loading activity...</td></tr>
                 </tbody>
             </table>
+        </div>
+        
+        <!-- System Alerts -->
+        <div class="card" id="alertsCard" style="display: none;">
+            <h3><i data-lucide="alert-triangle" class="card-icon"></i>System Alerts</h3>
+            <div id="alertsList" style="margin-top: 1rem;"></div>
         </div>
     </div>
     <script>
         let currentUser = null;
-        
-        // Mock agent data
-        const agentData = [
-            { id: 'AGENT001', name: 'John Smith', sales: 8, premium: 2712, commission: 813.60, status: 'Active' },
-            { id: 'AGENT002', name: 'Jane Doe', sales: 12, premium: 3845, commission: 1153.50, status: 'Active' },
-            { id: 'AGENT003', name: 'Mike Johnson', sales: 5, premium: 1680, commission: 504.00, status: 'Active' },
-            { id: 'AGENT004', name: 'Sarah Wilson', sales: 0, premium: 0, commission: 0, status: 'Inactive' },
-            { id: 'AGENT005', name: 'David Brown', sales: 15, premium: 4950, commission: 1485.00, status: 'Active' }
-        ];
+        let dashboardData = null;
         
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication
@@ -121,115 +455,616 @@
             if (userData) {
                 currentUser = JSON.parse(userData);
                 
-                // Only admin and super-admin can access admin portal
-                if (currentUser.role !== 'admin' && currentUser.role !== 'super-admin') {
-                    window.location.href = '/login.html';
+                // Only manager, admin and super-admin can access manager portal
+                if (!['manager', 'admin', 'super_admin'].includes(currentUser.role)) {
+                    window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
                     return;
                 }
                 
                 loadDashboardData();
             } else {
-                window.location.href = '/login.html';
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
             }
         });
         
         async function loadDashboardData() {
             try {
-                // Load overall stats
-                const activeAgents = agentData.filter(agent => agent.status === 'Active').length;
-                const totalRevenue = agentData.reduce((sum, agent) => sum + agent.premium, 0);
-                const totalSales = agentData.reduce((sum, agent) => sum + agent.sales, 0);
-                const totalCommissions = agentData.reduce((sum, agent) => sum + agent.commission, 0);
+                // Load admin dashboard data (includes all manager capabilities)
+                const [dashboardResponse, analyticsResponse, userStatsResponse, commissionStatsResponse, apiKeysResponse] = await Promise.all([
+                    fetch('/api/manager/dashboard', {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token') || 'mock-token'}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }),
+                    fetch('/api/admin/analytics?analytics_type=overview', {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token') || 'mock-token'}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }),
+                    fetch('/api/admin/user-management', {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token') || 'mock-token'}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }),
+                    fetch('/api/admin/commission-settings', {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token') || 'mock-token'}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }),
+                    fetch('/api/admin/api-keys', {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token') || 'mock-token'}`,
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                ]);
                 
-                document.getElementById('activeAgents').textContent = activeAgents;
-                document.getElementById('mtdRevenue').textContent = `$${totalRevenue.toLocaleString()}`;
-                document.getElementById('policiesSold').textContent = totalSales;
-                document.getElementById('pendingCommissions').textContent = `$${totalCommissions.toLocaleString()}`;
+                dashboardData = await dashboardResponse.json();
+                const analyticsData = await analyticsResponse.json();
+                const userStats = await userStatsResponse.json();
+                const commissionStats = await commissionStatsResponse.json();
+                const apiKeysData = await apiKeysResponse.json();
                 
-                // Load agent overview table
-                loadAgentOverviewTable();
+                // Merge admin data with manager data
+                dashboardData.admin_analytics = analyticsData;
+                dashboardData.user_stats = userStats;
+                dashboardData.commission_stats = commissionStats;
+                dashboardData.api_keys_data = apiKeysData;
+                
+                updateAdminDashboardUI();
                 
             } catch (error) {
                 console.error('Failed to load dashboard data:', error);
-                // Use mock data on error
-                document.getElementById('activeAgents').textContent = '4';
-                document.getElementById('mtdRevenue').textContent = '$38,500';
-                document.getElementById('policiesSold').textContent = '40';
-                document.getElementById('pendingCommissions').textContent = '$11,550';
-                
-                loadAgentOverviewTable();
+                loadFallbackData();
             }
         }
         
-        function loadAgentOverviewTable() {
+        function updateAdminDashboardUI() {
+            if (!dashboardData) return;
+            
+            // Update quick stats with admin-specific metrics
+            document.getElementById('activeAgents').textContent = dashboardData.user_stats?.summary?.agents || dashboardData.quick_stats?.active_agents || '0';
+            document.getElementById('mtdRevenue').textContent = `$${(dashboardData.quick_stats?.total_sales_mtd || dashboardData.agency_overview?.total_sales || 0).toLocaleString()}`;
+            document.getElementById('policiesSold').textContent = dashboardData.agency_overview?.sales_count || '0';
+            document.getElementById('activeLeads').textContent = dashboardData.quick_stats?.pending_leads || '0';
+            document.getElementById('conversionRate').textContent = `${(dashboardData.quick_stats?.avg_conversion_rate || 0).toFixed(1)}%`;
+            document.getElementById('totalCommissions').textContent = `$${(dashboardData.commission_stats?.total_commissions || 0).toLocaleString()}`;
+            document.getElementById('systemStatus').textContent = '98%';
+            
+            // Load simplified dashboard sections
+            loadTopPerformersTable();
+            loadRecentLeads();
+            loadCommissionSummary();
+            loadRecentActivity();
+        }
+        
+        function loadTopPerformersTable() {
             const tableBody = document.getElementById('agentOverviewTable');
             tableBody.innerHTML = '';
             
-            agentData.forEach(agent => {
+            if (!dashboardData.team_performance || !dashboardData.team_performance.top_performers) {
+                tableBody.innerHTML = '<tr><td colspan=\"5\" style=\"text-align: center;\">No agent data available</td></tr>';
+                return;
+            }
+            
+            dashboardData.team_performance.top_performers.forEach(agent => {
                 const row = document.createElement('tr');
-                const statusClass = agent.status === 'Active' ? 'status-active' : 'status-inactive';
                 
                 row.innerHTML = `
-                    <td><strong>${agent.name}</strong><br><small>${agent.id}</small></td>
-                    <td><strong>${agent.sales}</strong></td>
-                    <td class="premium-amount">$${agent.premium.toLocaleString()}</td>
-                    <td class="commission-amount">$${agent.commission.toLocaleString()}</td>
-                    <td><span class="${statusClass}">${agent.status}</span></td>
+                    <td><strong>${agent.agent_name}</strong><br><small style="opacity: 0.7;">${agent.agent_code || 'N/A'}</small></td>
+                    <td><strong>${agent.sales_count}</strong></td>
+                    <td class=\"premium-amount\">$${agent.total_sales.toLocaleString()}</td>
+                    <td class=\"conversion-rate\">${agent.conversion_rate.toFixed(1)}%</td>
                     <td>
-                        <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 
-                                onclick="viewAgentPerformance('${agent.id}')">📊 View</button>
-                        <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 
-                                onclick="toggleAgentStatus('${agent.id}')">${agent.status === 'Active' ? '⏸️' : '▶️'}</button>
+                        <button class=\"btn\" style=\"padding: 0.25rem 0.5rem; font-size: 0.8rem;\" 
+                                onclick=\"location.href='/admin/agent-performance.html?agent=${agent.agent_id}'\">
+                                <i data-lucide=\"trending-up\" style=\"width: 14px; height: 14px; margin-right: 4px;\"></i>View
+                        </button>
                     </td>
                 `;
                 tableBody.appendChild(row);
             });
         }
         
-        function viewAgentPerformance(agentId) {
-            window.location.href = `/admin/agent-performance.html?agent=${agentId}&timeframe=thismonth`;
+        function loadRecentLeads() {
+            const leadsDiv = document.getElementById('recentLeads');
+            leadsDiv.innerHTML = `
+                <div style="display: grid; gap: 0.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(255, 255, 255, 0.1); border-radius: 8px;">
+                        <div>
+                            <div style="font-weight: 600; color: rgba(255, 255, 255, 0.95);">John Smith</div>
+                            <div style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7);">Auto Insurance • 2 hours ago</div>
+                        </div>
+                        <span class="status-active">New</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(255, 255, 255, 0.1); border-radius: 8px;">
+                        <div>
+                            <div style="font-weight: 600; color: rgba(255, 255, 255, 0.95);">Sarah Johnson</div>
+                            <div style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7);">Home Insurance • 4 hours ago</div>
+                        </div>
+                        <span class="status-active">Contacted</span>
+                    </div>
+                </div>
+            `;
         }
         
-        function toggleAgentStatus(agentId) {
-            const agent = agentData.find(a => a.id === agentId);
-            if (agent) {
-                agent.status = agent.status === 'Active' ? 'Inactive' : 'Active';
-                loadAgentOverviewTable(); // Refresh table
-                
-                // In production, this would make an API call to update the status
-                console.log(`Agent ${agent.name} status changed to ${agent.status}`);
+        function loadCommissionSummary() {
+            const commissionDiv = document.getElementById('commissionSummary');
+            commissionDiv.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem;">
+                    <div style="text-align: center; padding: 1rem; background: rgba(255, 255, 255, 0.1); border-radius: 8px;">
+                        <div style="font-size: 1.5rem; font-weight: bold; color: rgba(255, 255, 255, 0.95);">$24,750</div>
+                        <div style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.7);">This Month</div>
+                    </div>
+                    <div style="text-align: center; padding: 1rem; background: rgba(255, 255, 255, 0.1); border-radius: 8px;">
+                        <div style="font-size: 1.5rem; font-weight: bold; color: rgba(255, 255, 255, 0.95);">8.5%</div>
+                        <div style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.7);">Avg Rate</div>
+                    </div>
+                    <div style="text-align: center; padding: 1rem; background: rgba(255, 255, 255, 0.1); border-radius: 8px;">
+                        <div style="font-size: 1.5rem; font-weight: bold; color: rgba(255, 255, 255, 0.95);">12</div>
+                        <div style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.7);">Pending</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function loadGoalsOverview() {
+            const goalsDiv = document.getElementById('goalsOverview');
+            
+            if (!dashboardData.upcoming_goals || dashboardData.upcoming_goals.length === 0) {
+                goalsDiv.innerHTML = '<p style=\"text-align: center; color: #718096;\">No active goals</p>';
+                return;
             }
+            
+            let goalsHTML = '<div style=\"display: grid; gap: 1rem;\">';
+            dashboardData.upcoming_goals.slice(0, 3).forEach(goal => {
+                const urgencyClass = goal.days_remaining <= 3 ? 'urgent' : goal.days_remaining <= 7 ? 'warning' : 'normal';
+                goalsHTML += `
+                    <div class=\"goal-item ${urgencyClass}\" style=\"padding: 0.75rem; border-left: 4px solid #667eea; background: #f8f9fa;\">
+                        <div style=\"display: flex; justify-content: space-between; align-items: center;\">
+                            <div>
+                                <strong>${goal.title}</strong>
+                                <div style=\"font-size: 0.85rem; color: #718096;\">
+                                    ${goal.agent_name} • ${goal.days_remaining} days remaining
+                                </div>
+                            </div>
+                            <div style=\"text-align: right; font-size: 0.9rem;\">
+                                <div style=\"font-weight: 600;\">$${goal.target_value.toLocaleString()}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            goalsHTML += '</div>';
+            
+            if (dashboardData.upcoming_goals.length > 3) {
+                goalsHTML += `<div style=\"text-align: center; margin-top: 1rem;\">
+                    <button class=\"btn\" onclick=\"location.href='/admin/goals.html'\">View All Goals</button>
+                </div>`;
+            }
+            
+            goalsDiv.innerHTML = goalsHTML;
+        }
+        
+        function loadCommissionOverview() {
+            const commissionDiv = document.getElementById('commissionOverview');
+            
+            if (!dashboardData.commission_stats) {
+                commissionDiv.innerHTML = '<p style="color: #e53e3e;">Commission data unavailable</p>';
+                return;
+            }
+            
+            const stats = dashboardData.commission_stats.summary || {};
+            const commissionHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+                    <div style="padding: 0.75rem; background: #e6fffa; border: 1px solid #81e6d9; border-radius: 6px;">
+                        <div style="font-weight: 600; color: #234e52;">Active Settings</div>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #319795;">${stats.active_settings || 0}</div>
+                    </div>
+                    <div style="padding: 0.75rem; background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 6px;">
+                        <div style="font-weight: 600; color: #276749;">Default Rate</div>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #38a169;">${(stats.default_rate || 0)}%</div>
+                    </div>
+                    <div style="padding: 0.75rem; background: #fefcbf; border: 1px solid #f6e05e; border-radius: 6px;">
+                        <div style="font-weight: 600; color: #744210;">Avg Rate</div>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #d69e2e;">${(stats.avg_rate || 0).toFixed(1)}%</div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 1rem;">
+                    <button class="btn" onclick="location.href='/admin/commission-management.html'">Manage Commissions</button>
+                </div>
+            `;
+            
+            commissionDiv.innerHTML = commissionHTML;
+        }
+        
+        function loadUserSummary() {
+            const userDiv = document.getElementById('userSummary');
+            
+            if (!dashboardData.user_stats) {
+                userDiv.innerHTML = '<p style="color: #e53e3e;">User data unavailable</p>';
+                return;
+            }
+            
+            const summary = dashboardData.user_stats.summary || {};
+            const userHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                    <div style="padding: 0.75rem; background: #e6fffa; border: 1px solid #81e6d9; border-radius: 6px;">
+                        <div style="font-weight: 600; color: #234e52;">Total Users</div>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #319795;">${summary.total_users || 0}</div>
+                    </div>
+                    <div style="padding: 0.75rem; background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 6px;">
+                        <div style="font-weight: 600; color: #276749;">Agents</div>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #38a169;">${summary.agents || 0}</div>
+                    </div>
+                    <div style="padding: 0.75rem; background: #edf2f7; border: 1px solid #cbd5e0; border-radius: 6px;">
+                        <div style="font-weight: 600; color: #4a5568;">Managers</div>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #2d3748;">${summary.managers || 0}</div>
+                    </div>
+                    <div style="padding: 0.75rem; background: #fed7d7; border: 1px solid #feb2b2; border-radius: 6px;">
+                        <div style="font-weight: 600; color: #742a2a;">License Issues</div>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #e53e3e;">${(summary.licenses_expiring_soon || 0) + (summary.expired_licenses || 0)}</div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 1rem;">
+                    <button class="btn" onclick="location.href='/admin/user-management.html'">Manage Users</button>
+                </div>
+            `;
+            
+            userDiv.innerHTML = userHTML;
+        }
+        
+        function loadSystemHealth() {
+            const healthDiv = document.getElementById('systemHealth');
+            
+            // Mock system health data
+            const healthScore = Math.floor(Math.random() * 20) + 85; // 85-100%
+            const uptime = '99.95%';
+            const activeIntegrations = dashboardData.api_keys_data?.summary?.active_keys || 6;
+            const pendingIssues = Math.floor(Math.random() * 3);
+            
+            const healthHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem;">
+                    <div style="padding: 0.75rem; background: ${healthScore >= 95 ? '#f0fff4' : '#fefcbf'}; border: 1px solid ${healthScore >= 95 ? '#9ae6b4' : '#f6e05e'}; border-radius: 6px;">
+                        <div style="font-weight: 600; color: ${healthScore >= 95 ? '#276749' : '#744210'};">System Health</div>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: ${healthScore >= 95 ? '#38a169' : '#d69e2e'};">${healthScore}%</div>
+                    </div>
+                    <div style="padding: 0.75rem; background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 6px;">
+                        <div style="font-weight: 600; color: #276749;">Uptime</div>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #38a169;">${uptime}</div>
+                    </div>
+                    <div style="padding: 0.75rem; background: #e6fffa; border: 1px solid #81e6d9; border-radius: 6px;">
+                        <div style="font-weight: 600; color: #234e52;">Integrations</div>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #319795;">${activeIntegrations}</div>
+                    </div>
+                    <div style="padding: 0.75rem; background: ${pendingIssues === 0 ? '#f0fff4' : '#fed7d7'}; border: 1px solid ${pendingIssues === 0 ? '#9ae6b4' : '#feb2b2'}; border-radius: 6px;">
+                        <div style="font-weight: 600; color: ${pendingIssues === 0 ? '#276749' : '#742a2a'};">Issues</div>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: ${pendingIssues === 0 ? '#38a169' : '#e53e3e'};">${pendingIssues}</div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 1rem;">
+                    <button class="btn" onclick="location.href='/admin/settings.html'">System Settings</button>
+                </div>
+            `;
+            
+            healthDiv.innerHTML = healthHTML;
+        }
+        
+        function loadApiKeysStatus() {
+            const apiDiv = document.getElementById('apiKeysStatus');
+            
+            if (!dashboardData.api_keys_data) {
+                apiDiv.innerHTML = '<p style="color: #e53e3e;">API keys data unavailable</p>';
+                return;
+            }
+            
+            const summary = dashboardData.api_keys_data.summary || {};
+            const apiHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                    <div style="padding: 0.75rem; background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 6px;">
+                        <div style="font-weight: 600; color: #276749;">Active Keys</div>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #38a169;">${summary.active_keys || 0}</div>
+                    </div>
+                    <div style="padding: 0.75rem; background: #fefcbf; border: 1px solid #f6e05e; border-radius: 6px;">
+                        <div style="font-weight: 600; color: #744210;">Expiring Soon</div>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #d69e2e;">${summary.expiring_soon || 0}</div>
+                    </div>
+                    <div style="padding: 0.75rem; background: #fed7d7; border: 1px solid #feb2b2; border-radius: 6px;">
+                        <div style="font-weight: 600; color: #742a2a;">Expired</div>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #e53e3e;">${summary.expired_keys || 0}</div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 1rem;">
+                    <button class="btn" onclick="location.href='/admin/api-keys.html'">Manage API Keys</button>
+                </div>
+            `;
+            
+            apiDiv.innerHTML = apiHTML;
+        }
+        
+        function loadRecentActivity() {
+            const tableBody = document.getElementById('activityTable');
+            tableBody.innerHTML = '';
+            
+            if (!dashboardData.recent_activity || dashboardData.recent_activity.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan=\"4\" style=\"text-align: center;\">No recent activity</td></tr>';
+                return;
+            }
+            
+            dashboardData.recent_activity.forEach(activity => {
+                const row = document.createElement('tr');
+                const activityDate = new Date(activity.date);
+                const timeAgo = getTimeAgo(activityDate);
+                
+                row.innerHTML = `
+                    <td><small>${timeAgo}</small></td>
+                    <td><strong>${activity.agent_name}</strong></td>
+                    <td><span class=\"activity-type\">${activity.type.toUpperCase()}</span></td>
+                    <td>
+                        ${activity.description}
+                        ${activity.amount ? `<span style=\"color: #059669; font-weight: 600;\">$${activity.amount}</span>` : ''}
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function loadSystemAlerts() {
+            if (!dashboardData.alerts || dashboardData.alerts.length === 0) {
+                document.getElementById('alertsCard').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('alertsCard').style.display = 'block';
+            const alertsList = document.getElementById('alertsList');
+            
+            let alertsHTML = '';
+            dashboardData.alerts.forEach(alert => {
+                const priorityClass = alert.priority === 'high' ? 'alert-high' : 
+                                   alert.priority === 'medium' ? 'alert-medium' : 'alert-low';
+                
+                alertsHTML += `
+                    <div class=\"alert-item ${priorityClass}\" style=\"padding: 0.75rem; margin-bottom: 0.5rem; border-radius: 6px; border-left: 4px solid;\">
+                        <div style=\"display: flex; justify-content: space-between; align-items: center;\">
+                            <div>
+                                <strong>${alert.title}</strong>
+                                <div style=\"font-size: 0.9rem; margin-top: 0.25rem;\">${alert.message}</div>
+                            </div>
+                            <div>
+                                ${alert.action_required ? '<button class=\"btn\" style=\"font-size: 0.8rem; padding: 0.25rem 0.5rem;\">Action</button>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            alertsList.innerHTML = alertsHTML;
+        }
+        
+        function loadFallbackData() {
+            // Use fallback mock data
+            document.getElementById('activeAgents').textContent = '8';
+            document.getElementById('mtdRevenue').textContent = '$127,450';
+            document.getElementById('activeLeads').textContent = '34';
+            document.getElementById('conversionRate').textContent = '24.8%';
+            document.getElementById('totalCommissions').textContent = '$12,745';
+            document.getElementById('systemStatus').textContent = '98%';
+            
+            // Load mock team table
+            const tableBody = document.getElementById('agentOverviewTable');
+            tableBody.innerHTML = `
+                <tr>
+                    <td><strong>Sarah Johnson</strong><br><small style="opacity: 0.7;">SJ001</small></td>
+                    <td><strong>15</strong></td>
+                    <td class=\"premium-amount\">$32,450</td>
+                    <td class=\"conversion-rate\">31.2%</td>
+                    <td>
+                        <button class=\"btn\" style=\"padding: 0.25rem 0.5rem; font-size: 0.8rem;\">
+                            <i data-lucide=\"trending-up\" style=\"width: 14px; height: 14px; margin-right: 4px;\"></i>View
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Mike Chen</strong><br><small style="opacity: 0.7;">MC002</small></td>
+                    <td><strong>12</strong></td>
+                    <td class=\"premium-amount\">$28,900</td>
+                    <td class=\"conversion-rate\">28.7%</td>
+                    <td>
+                        <button class=\"btn\" style=\"padding: 0.25rem 0.5rem; font-size: 0.8rem;\">
+                            <i data-lucide=\"trending-up\" style=\"width: 14px; height: 14px; margin-right: 4px;\"></i>View
+                        </button>
+                    </td>
+                </tr>
+            `;
+            
+            // Load other sections with mock data
+            loadRecentLeads();
+            loadCommissionSummary();
+        }
+        
+        function viewAgentPerformance(agentId) {
+            window.location.href = `/admin/agent-performance.html?agent=${agentId}&timeframe=month`;
+        }
+        
+        function setGoalForAgent(agentId, agentName) {
+            window.location.href = `/admin/goals.html?agent=${agentId}&name=${encodeURIComponent(agentName)}`;
+        }
+        
+        function manageUserAccount(userId) {
+            window.location.href = `/admin/user-management.html?user=${userId}`;
+        }
+        
+        function manageCommissions() {
+            window.location.href = 'https://insurance.syncedupsolutions.com/admin/commissions.html';
+        }
+        
+        function viewAnalytics() {
+            window.location.href = 'https://insurance.syncedupsolutions.com/admin/agent-performance.html';
+        }
+        
+        function manageApiKeys() {
+            window.location.href = 'https://insurance.syncedupsolutions.com/admin/settings.html';
+        }
+        
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+            
+            if (diffInHours < 1) return 'Just now';
+            if (diffInHours < 24) return `${diffInHours}h ago`;
+            return `${Math.floor(diffInHours / 24)}d ago`;
         }
         
         function logout() {
             localStorage.clear();
-            window.location.href = '/login.html';
+            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
         }
         
-        // Add some additional styling for the new elements
+        // Enhanced glassmorphism styling for admin dashboard
         const style = document.createElement('style');
         style.textContent = `
-            .premium-amount { color: #667eea; font-weight: 600; }
-            .commission-amount { color: #059669; font-weight: 600; }
-            .status-active { 
-                background: #48bb78; 
-                color: white; 
+            .goal-item {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 12px;
+                transition: all 0.3s ease;
+            }
+            .goal-item:hover {
+                background: rgba(255, 255, 255, 0.15);
+                transform: translateY(-2px);
+            }
+            .goal-item.urgent { 
+                border-left: 4px solid #f56565 !important; 
+                background: rgba(245, 101, 101, 0.1);
+            }
+            .goal-item.warning { 
+                border-left: 4px solid #ed8936 !important; 
+                background: rgba(237, 137, 54, 0.1);
+            }
+            .goal-item.normal { 
+                border-left: 4px solid #48bb78 !important; 
+                background: rgba(72, 187, 120, 0.1);
+            }
+            .activity-type { 
+                background: rgba(255, 255, 255, 0.2);
+                backdrop-filter: blur(5px);
                 padding: 0.25rem 0.75rem; 
                 border-radius: 20px; 
-                font-size: 0.85rem; 
-                font-weight: 500; 
+                font-size: 0.75rem; 
+                font-weight: 600;
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.3);
             }
-            .status-inactive { 
-                background: #f56565; 
-                color: white; 
-                padding: 0.25rem 0.75rem; 
-                border-radius: 20px; 
-                font-size: 0.85rem; 
-                font-weight: 500; 
+            .alert-item {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                transition: all 0.3s ease;
             }
-            h3 { margin-bottom: 1rem; color: #2d3748; font-size: 1.25rem; }
+            .alert-item:hover {
+                background: rgba(255, 255, 255, 0.15);
+                transform: translateY(-2px);
+            }
+            .alert-high { 
+                background: rgba(245, 101, 101, 0.15);
+                border-left: 4px solid #f56565 !important; 
+            }
+            .alert-medium { 
+                background: rgba(237, 137, 54, 0.15);
+                border-left: 4px solid #ed8936 !important; 
+            }
+            .alert-low { 
+                background: rgba(72, 187, 120, 0.15);
+                border-left: 4px solid #48bb78 !important; 
+            }
+            
+            /* Enhanced glassmorphism elements */
+            div[style*="background: #e6fffa"],
+            div[style*="background: #f0fff4"],
+            div[style*="background: #fefcbf"],
+            div[style*="background: #fed7d7"],
+            div[style*="background: #edf2f7"] {
+                background: rgba(255, 255, 255, 0.1) !important;
+                backdrop-filter: blur(20px) !important;
+                -webkit-backdrop-filter: blur(20px) !important;
+                border: 1px solid rgba(255, 255, 255, 0.15) !important;
+                border-radius: 12px !important;
+                box-shadow: 
+                    0 8px 32px rgba(139, 92, 246, 0.1),
+                    0 4px 16px rgba(0, 0, 0, 0.05),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                position: relative !important;
+            }
+            
+            div[style*="background: #e6fffa"]:hover,
+            div[style*="background: #f0fff4"]:hover,
+            div[style*="background: #fefcbf"]:hover,
+            div[style*="background: #fed7d7"]:hover,
+            div[style*="background: #edf2f7"]:hover {
+                background: rgba(255, 255, 255, 0.18) !important;
+                transform: translateY(-5px) scale(1.02) !important;
+                box-shadow: 
+                    0 16px 48px rgba(139, 92, 246, 0.15),
+                    0 8px 24px rgba(0, 0, 0, 0.08),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+            }
+            
+            /* Glass card overlays for depth */
+            .card::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 60%;
+                height: 60%;
+                background: radial-gradient(ellipse, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+                transform: translate(-50%, -50%);
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.4s ease;
+            }
+            
+            .card:hover::after {
+                opacity: 1;
+            }
         `;
         document.head.appendChild(style);
     </script>
+    
+    <!-- Initialize Lucide Icons -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+        });
+        
+        // Re-initialize icons after dynamic content is loaded
+        function initializeIcons() {
+            setTimeout(() => {
+                lucide.createIcons();
+            }, 100);
+        }
+        
+        // Call initializeIcons after loading dashboard data
+        const originalUpdateAdminDashboardUI = updateAdminDashboardUI;
+        updateAdminDashboardUI = function() {
+            originalUpdateAdminDashboardUI();
+            initializeIcons();
+        };
+        
+        const originalLoadFallbackData = loadFallbackData;
+        loadFallbackData = function() {
+            originalLoadFallbackData();
+            initializeIcons();
+        };
+    </script>
+    
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
 </body>
 </html>
