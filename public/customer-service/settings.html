@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - SyncedUp Insurance</title>
+    <link rel="stylesheet" href="customer-service-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Customer Service Settings</h1>
+        <div class="user-info">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn btn-secondary" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="index.html" class="nav-link">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="member-search.html" class="nav-link">
+            <i data-lucide="search" class="icon"></i>
+            Member Search
+        </a>
+        <a href="member-profile.html" class="nav-link">
+            <i data-lucide="user-check" class="icon"></i>
+            Member History
+        </a>
+        <a href="settings.html" class="nav-link active">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Interface Settings -->
+        <div class="card">
+            <h3><i data-lucide="palette" class="card-icon"></i>Interface Theme</h3>
+            <p style="color: var(--cs-text-secondary); margin-bottom: 2rem;">Customize your customer service portal experience</p>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; background: rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 2rem;">
+                <div>
+                    <h4 style="color: var(--cs-text-primary); margin-bottom: 0.5rem;">Classic Mode</h4>
+                    <p style="color: var(--cs-text-secondary); margin: 0; font-size: 0.9rem;">Switch to Windows 95 retro theme for a nostalgic experience</p>
+                </div>
+                <button id="classicModeToggle" class="btn btn-secondary" onclick="toggleClassicMode()">
+                    <i data-lucide="monitor" style="margin-right: 0.5rem;"></i>
+                    <span id="classicModeText">Enable Classic Mode</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Customer Service Preferences -->
+        <div class="card">
+            <h3><i data-lucide="user-cog" class="card-icon"></i>Customer Service Preferences</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="defaultView">Default Dashboard View</label>
+                    <select id="defaultView" class="form-control">
+                        <option value="overview">Overview Dashboard</option>
+                        <option value="cases">Active Cases</option>
+                        <option value="search">Member Search</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="itemsPerPage">Search Results Per Page</label>
+                    <select id="itemsPerPage" class="form-control">
+                        <option value="10">10 items</option>
+                        <option value="25" selected>25 items</option>
+                        <option value="50">50 items</option>
+                        <option value="100">100 items</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="autoRefresh">Auto Refresh Dashboard</label>
+                    <select id="autoRefresh" class="form-control">
+                        <option value="0">Disabled</option>
+                        <option value="30">Every 30 seconds</option>
+                        <option value="60" selected>Every minute</option>
+                        <option value="300">Every 5 minutes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="timezone">Time Zone</label>
+                    <select id="timezone" class="form-control">
+                        <option value="EST">Eastern Time (EST)</option>
+                        <option value="CST">Central Time (CST)</option>
+                        <option value="MST">Mountain Time (MST)</option>
+                        <option value="PST">Pacific Time (PST)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="quick-actions" style="margin-top: 2rem;">
+                <button class="btn btn-primary" onclick="saveSettings()">
+                    <i data-lucide="save"></i>
+                    Save Settings
+                </button>
+                <button class="btn btn-secondary" onclick="resetSettings()">
+                    <i data-lucide="rotate-ccw"></i>
+                    Reset to Defaults
+                </button>
+            </div>
+        </div>
+
+        <!-- Case Management Settings -->
+        <div class="card">
+            <h3><i data-lucide="clipboard-list" class="card-icon"></i>Case Management</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="defaultPriority">Default New Case Priority</label>
+                    <select id="defaultPriority" class="form-control">
+                        <option value="low">Low Priority</option>
+                        <option value="medium" selected>Medium Priority</option>
+                        <option value="high">High Priority</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="caseAutoAssign">Auto-Assign Cases</label>
+                    <select id="caseAutoAssign" class="form-control">
+                        <option value="yes">Yes, assign to me</option>
+                        <option value="no" selected>No, leave unassigned</option>
+                        <option value="team">Distribute to team</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+                <label>
+                    <input type="checkbox" id="emailNotifications" checked style="margin-right: 0.5rem;">
+                    <span style="color: var(--cs-text-primary);">Email notifications for new cases</span>
+                </label>
+            </div>
+            <div style="margin-top: 0.5rem;">
+                <label>
+                    <input type="checkbox" id="escalationAlerts" checked style="margin-right: 0.5rem;">
+                    <span style="color: var(--cs-text-primary);">Alerts for escalated cases</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Data Export Settings -->
+        <div class="card">
+            <h3><i data-lucide="download" class="card-icon"></i>Data Export & Reports</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="exportFormat">Default Export Format</label>
+                    <select id="exportFormat" class="form-control">
+                        <option value="csv" selected>CSV Spreadsheet</option>
+                        <option value="excel">Excel Workbook</option>
+                        <option value="pdf">PDF Report</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="reportFrequency">Automated Reports</label>
+                    <select id="reportFrequency" class="form-control">
+                        <option value="none" selected>Disabled</option>
+                        <option value="daily">Daily Summary</option>
+                        <option value="weekly">Weekly Report</option>
+                        <option value="monthly">Monthly Report</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="quick-actions" style="margin-top: 1.5rem;">
+                <button class="btn btn-warning" onclick="exportData()">
+                    <i data-lucide="download"></i>
+                    Export Current Data
+                </button>
+                <button class="btn btn-secondary" onclick="generateReport()">
+                    <i data-lucide="file-text"></i>
+                    Generate Report
+                </button>
+            </div>
+        </div>
+
+        <!-- Account Information -->
+        <div class="card">
+            <h3><i data-lucide="user" class="card-icon"></i>Account Information</h3>
+            
+            <div class="profile-section" style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 12px;">
+                <div class="profile-field">
+                    <span class="profile-label">Name:</span>
+                    <span class="profile-value" id="userName">Loading...</span>
+                </div>
+                <div class="profile-field">
+                    <span class="profile-label">Email:</span>
+                    <span class="profile-value" id="userEmail">Loading...</span>
+                </div>
+                <div class="profile-field">
+                    <span class="profile-label">Role:</span>
+                    <span class="profile-value" id="userRole">Loading...</span>
+                </div>
+                <div class="profile-field">
+                    <span class="profile-label">Last Login:</span>
+                    <span class="profile-value" id="lastLogin">Loading...</span>
+                </div>
+            </div>
+
+            <div class="quick-actions" style="margin-top: 1.5rem;">
+                <button class="btn btn-secondary" onclick="changePassword()">
+                    <i data-lucide="key"></i>
+                    Change Password
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        // Authentication check
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token || !user.email) {
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            // Check if user has customer service permissions
+            if (!['customer-service', 'manager', 'admin', 'super-admin'].includes(user.role)) {
+                alert('Access denied. Customer service permissions required.');
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            document.getElementById('userDisplay').textContent = `${user.firstName || user.name} ${user.lastName || ''}`.trim() + ` (${user.role})`;
+            currentUser = user;
+            return true;
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            // Load user information
+            loadUserInfo();
+            loadSettings();
+            updateClassicModeButton();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Load user information
+        function loadUserInfo() {
+            if (currentUser) {
+                document.getElementById('userName').textContent = currentUser.firstName ? `${currentUser.firstName} ${currentUser.lastName || ''}`.trim() : (currentUser.name || 'User');
+                document.getElementById('userEmail').textContent = currentUser.email;
+                document.getElementById('userRole').textContent = currentUser.role;
+                document.getElementById('lastLogin').textContent = new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString();
+            }
+        }
+
+        // Load settings from localStorage
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('customerServiceSettings') || '{}');
+            
+            // Apply saved settings
+            if (settings.defaultView) document.getElementById('defaultView').value = settings.defaultView;
+            if (settings.itemsPerPage) document.getElementById('itemsPerPage').value = settings.itemsPerPage;
+            if (settings.autoRefresh) document.getElementById('autoRefresh').value = settings.autoRefresh;
+            if (settings.timezone) document.getElementById('timezone').value = settings.timezone;
+            if (settings.defaultPriority) document.getElementById('defaultPriority').value = settings.defaultPriority;
+            if (settings.caseAutoAssign) document.getElementById('caseAutoAssign').value = settings.caseAutoAssign;
+            if (settings.exportFormat) document.getElementById('exportFormat').value = settings.exportFormat;
+            if (settings.reportFrequency) document.getElementById('reportFrequency').value = settings.reportFrequency;
+            
+            // Checkboxes
+            if (settings.emailNotifications !== undefined) document.getElementById('emailNotifications').checked = settings.emailNotifications;
+            if (settings.escalationAlerts !== undefined) document.getElementById('escalationAlerts').checked = settings.escalationAlerts;
+        }
+
+        // Save settings
+        function saveSettings() {
+            const settings = {
+                defaultView: document.getElementById('defaultView').value,
+                itemsPerPage: document.getElementById('itemsPerPage').value,
+                autoRefresh: document.getElementById('autoRefresh').value,
+                timezone: document.getElementById('timezone').value,
+                defaultPriority: document.getElementById('defaultPriority').value,
+                caseAutoAssign: document.getElementById('caseAutoAssign').value,
+                exportFormat: document.getElementById('exportFormat').value,
+                reportFrequency: document.getElementById('reportFrequency').value,
+                emailNotifications: document.getElementById('emailNotifications').checked,
+                escalationAlerts: document.getElementById('escalationAlerts').checked,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            localStorage.setItem('customerServiceSettings', JSON.stringify(settings));
+            alert('Settings saved successfully!');
+        }
+
+        // Reset settings to defaults
+        function resetSettings() {
+            if (confirm('Are you sure you want to reset all settings to their default values?')) {
+                localStorage.removeItem('customerServiceSettings');
+                
+                // Reset form values
+                document.getElementById('defaultView').value = 'overview';
+                document.getElementById('itemsPerPage').value = '25';
+                document.getElementById('autoRefresh').value = '60';
+                document.getElementById('timezone').value = 'EST';
+                document.getElementById('defaultPriority').value = 'medium';
+                document.getElementById('caseAutoAssign').value = 'no';
+                document.getElementById('exportFormat').value = 'csv';
+                document.getElementById('reportFrequency').value = 'none';
+                document.getElementById('emailNotifications').checked = true;
+                document.getElementById('escalationAlerts').checked = true;
+                
+                alert('Settings reset to defaults!');
+            }
+        }
+
+        // Classic mode toggle functionality
+        function updateClassicModeButton() {
+            const isClassicMode = localStorage.getItem('classicMode') === 'true';
+            const button = document.getElementById('classicModeToggle');
+            const text = document.getElementById('classicModeText');
+            
+            if (isClassicMode) {
+                button.className = 'btn btn-warning';
+                text.textContent = 'Disable Classic Mode';
+            } else {
+                button.className = 'btn btn-secondary';
+                text.textContent = 'Enable Classic Mode';
+            }
+        }
+
+        function toggleClassicMode() {
+            const isCurrentlyClassic = localStorage.getItem('classicMode') === 'true';
+            
+            if (isCurrentlyClassic) {
+                localStorage.setItem('classicMode', 'false');
+                alert('Classic Mode disabled! The page will reload.');
+            } else {
+                localStorage.setItem('classicMode', 'true');
+                alert('Classic Mode enabled! The page will reload with Windows 95 styling.');
+            }
+            
+            // Reload the page to apply the theme change
+            window.location.reload();
+        }
+
+        // Action functions
+        function exportData() {
+            alert('Data Export - This will generate and download member/case data export');
+        }
+
+        function generateReport() {
+            alert('Generate Report - This will create a comprehensive customer service report');
+        }
+
+        function changePassword() {
+            alert('Change Password - This will redirect to password change form');
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
+</body>
+</html>
