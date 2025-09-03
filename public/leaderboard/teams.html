@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Rankings - SyncedUp Insurance</title>
+    <link rel="stylesheet" href="leaderboard-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Team Rankings</h1>
+        <div class="header-info">
+            <span>🏢 <span id="totalTeams">0</span> Offices Competing</span>
+            <span>📊 Updated: <span id="lastUpdated">Loading...</span></span>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="index.html" class="nav-link">
+            <i data-lucide="trophy" class="icon"></i>
+            Overall Rankings
+        </a>
+        <a href="monthly.html" class="nav-link">
+            <i data-lucide="calendar" class="icon"></i>
+            Monthly Leaders
+        </a>
+        <a href="teams.html" class="nav-link active">
+            <i data-lucide="users" class="icon"></i>
+            Team Rankings
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Team Competition Filters -->
+        <div class="card">
+            <h3><i data-lucide="filter" class="card-icon"></i>Competition Filters</h3>
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="timeframSelect">Time Period</label>
+                    <select id="timeframSelect" class="filter-select" onchange="loadTeamData()">
+                        <option value="quarter" selected>This Quarter</option>
+                        <option value="year">This Year</option>
+                        <option value="month">This Month</option>
+                        <option value="all-time">All Time</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="metricSelect">Ranking Metric</label>
+                    <select id="metricSelect" class="filter-select" onchange="loadTeamData()">
+                        <option value="total-sales" selected>Total Sales</option>
+                        <option value="avg-per-agent">Average per Agent</option>
+                        <option value="growth-rate">Growth Rate</option>
+                        <option value="goal-achievement">Goal Achievement</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="regionSelect">Region</label>
+                    <select id="regionSelect" class="filter-select" onchange="loadTeamData()">
+                        <option value="all">All Regions</option>
+                        <option value="west">West Coast</option>
+                        <option value="east">East Coast</option>
+                        <option value="central">Central</option>
+                        <option value="south">South</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Teams Podium -->
+        <div class="card">
+            <h2><i data-lucide="building" class="card-icon"></i>Top Performing Teams</h2>
+            <div class="grid">
+                <div class="card" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1));">
+                    <div style="text-align: center;">
+                        <div style="font-size: 4rem; margin-bottom: 0.5rem;">🥇</div>
+                        <h3 style="color: var(--lb-accent); margin-bottom: 0.5rem;">Team Champion</h3>
+                        <h4 id="topTeamName" style="color: var(--lb-text-primary); margin-bottom: 0.5rem;">Loading...</h4>
+                        <div class="stat-value" style="font-size: 2rem;" id="topTeamSales">$0</div>
+                        <div class="stat-label"><span id="topTeamAgents">0</span> Agents • <span id="topTeamGrowth">0%</span> Growth</div>
+                        <div style="margin-top: 1rem;">
+                            <span class="achievement achievement-gold">Team Champions</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" style="background: linear-gradient(135deg, rgba(192, 192, 192, 0.2), rgba(192, 192, 192, 0.1));">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 0.5rem;">🥈</div>
+                        <h4 id="secondTeamName" style="color: var(--lb-silver); margin-bottom: 0.5rem;">Loading...</h4>
+                        <div class="stat-value" style="font-size: 1.8rem; color: var(--lb-silver);" id="secondTeamSales">$0</div>
+                        <div class="stat-label"><span id="secondTeamAgents">0</span> Agents</div>
+                    </div>
+                </div>
+                <div class="card" style="background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(205, 127, 50, 0.1));">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 0.5rem;">🥉</div>
+                        <h4 id="thirdTeamName" style="color: var(--lb-bronze); margin-bottom: 0.5rem;">Loading...</h4>
+                        <div class="stat-value" style="font-size: 1.8rem; color: var(--lb-bronze);" id="thirdTeamSales">$0</div>
+                        <div class="stat-label"><span id="thirdTeamAgents">0</span> Agents</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Competition Stats -->
+        <div class="grid">
+            <div class="card">
+                <h3><i data-lucide="trending-up" class="card-icon"></i>Competition Overview</h3>
+                <div class="grid grid-4">
+                    <div style="text-align: center;">
+                        <div class="stat-value" style="font-size: 1.8rem;" id="totalTeamSales">$0</div>
+                        <div class="stat-label">Combined Sales</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-value" style="font-size: 1.8rem;" id="avgTeamSize">0</div>
+                        <div class="stat-label">Avg Team Size</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-value" style="font-size: 1.8rem;" id="topTeamGap">0%</div>
+                        <div class="stat-label">Lead Margin</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-value" style="font-size: 1.8rem;" id="competingOffices">0</div>
+                        <div class="stat-label">Active Offices</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h3><i data-lucide="zap" class="card-icon"></i>Team Rivalries</h3>
+                <div id="teamRivalries">
+                    <div style="text-align: center; color: var(--lb-text-muted); padding: 2rem;">
+                        <div class="loading"></div>
+                        Loading rivalry data...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Leaderboard -->
+        <div class="card">
+            <h3><i data-lucide="building-2" class="card-icon"></i>Office Rankings <span id="teamRankingCount">(Loading...)</span></h3>
+            <div class="leaderboard-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="text-align: center;">Rank</th>
+                            <th>Office/Team</th>
+                            <th>Location</th>
+                            <th style="text-align: right;">Team Sales</th>
+                            <th style="text-align: center;">Team Size</th>
+                            <th style="text-align: right;">Avg per Agent</th>
+                            <th style="text-align: right;">Growth</th>
+                            <th style="text-align: center;">Goal %</th>
+                            <th style="text-align: center;">Top Agent</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teamLeaderboardBody">
+                        <tr>
+                            <td colspan="9" style="text-align: center; color: var(--lb-text-muted); padding: 3rem;">
+                                <div class="loading"></div>
+                                Loading team rankings...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Team Insights -->
+        <div class="grid">
+            <div class="card">
+                <h3><i data-lucide="award" class="card-icon"></i>Team Achievements</h3>
+                <div id="teamAchievements">
+                    <div style="text-align: center; color: var(--lb-text-muted); padding: 2rem;">
+                        <div class="loading"></div>
+                        Loading team achievements...
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h3><i data-lucide="activity" class="card-icon"></i>Regional Performance</h3>
+                <div id="regionalPerformance">
+                    <div style="text-align: center; color: var(--lb-text-muted); padding: 2rem;">
+                        <div class="loading"></div>
+                        Loading regional data...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Battle Updates -->
+        <div class="card">
+            <h3><i data-lucide="sword" class="card-icon"></i>Team Battle Feed</h3>
+            <div id="teamBattleFeed">
+                <div style="text-align: center; color: var(--lb-text-muted); padding: 2rem;">
+                    <div class="loading"></div>
+                    Loading team battle updates...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let teamData = [];
+        let currentTimeframe = 'quarter';
+        let currentMetric = 'total-sales';
+        let currentRegion = 'all';
+
+        // Authentication check
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token || !user.email) {
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            if (!['agent', 'manager', 'admin', 'super-admin', 'customer-service'].includes(user.role)) {
+                alert('Access denied. Valid account required to view leaderboard.');
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            return true;
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            // Load team data
+            await loadTeamData();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Load team data
+        async function loadTeamData() {
+            try {
+                currentTimeframe = document.getElementById('timeframSelect').value;
+                currentMetric = document.getElementById('metricSelect').value;
+                currentRegion = document.getElementById('regionSelect').value;
+                
+                // Update timestamp
+                document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+                
+                // Load all team components
+                await loadTeamStats();
+                await loadTeamRankings();
+                await loadTopTeams();
+                await loadTeamRivalries();
+                await loadTeamAchievements();
+                await loadRegionalPerformance();
+                await loadTeamBattleFeed();
+                
+            } catch (error) {
+                console.error('Error loading team data:', error);
+                loadFallbackData();
+            }
+        }
+
+        // Load team statistics
+        async function loadTeamStats() {
+            const stats = {
+                totalTeamSales: 8450000,
+                avgTeamSize: 12,
+                topTeamGap: 15.3,
+                competingOffices: 8
+            };
+            
+            document.getElementById('totalTeamSales').textContent = '$' + (stats.totalTeamSales / 1000000).toFixed(1) + 'M';
+            document.getElementById('avgTeamSize').textContent = stats.avgTeamSize;
+            document.getElementById('topTeamGap').textContent = '+' + stats.topTeamGap + '%';
+            document.getElementById('competingOffices').textContent = stats.competingOffices;
+            document.getElementById('totalTeams').textContent = stats.competingOffices;
+        }
+
+        // Load team rankings
+        async function loadTeamRankings() {
+            teamData = [
+                {
+                    rank: 1,
+                    name: 'West Coast HQ',
+                    location: 'Los Angeles, CA',
+                    teamSales: 1850000,
+                    teamSize: 15,
+                    avgPerAgent: 123333,
+                    growth: 18.5,
+                    goalPercent: 142,
+                    topAgent: 'Sarah Chen',
+                    region: 'west'
+                },
+                {
+                    rank: 2,
+                    name: 'East Coast Central',
+                    location: 'New York, NY',
+                    teamSales: 1680000,
+                    teamSize: 14,
+                    avgPerAgent: 120000,
+                    growth: 12.3,
+                    goalPercent: 128,
+                    topAgent: 'Michael Rodriguez',
+                    region: 'east'
+                },
+                {
+                    rank: 3,
+                    name: 'Midwest Operations',
+                    location: 'Chicago, IL',
+                    teamSales: 1520000,
+                    teamSize: 12,
+                    avgPerAgent: 126667,
+                    growth: 15.8,
+                    goalPercent: 135,
+                    topAgent: 'Emily Watson',
+                    region: 'central'
+                },
+                {
+                    rank: 4,
+                    name: 'South Region Hub',
+                    location: 'Dallas, TX',
+                    teamSales: 1450000,
+                    teamSize: 13,
+                    avgPerAgent: 111538,
+                    growth: 10.2,
+                    goalPercent: 118,
+                    topAgent: 'David Kim',
+                    region: 'south'
+                },
+                {
+                    rank: 5,
+                    name: 'Corporate Headquarters',
+                    location: 'Denver, CO',
+                    teamSales: 1380000,
+                    teamSize: 11,
+                    avgPerAgent: 125455,
+                    growth: 8.7,
+                    goalPercent: 125,
+                    topAgent: 'Jessica Martinez',
+                    region: 'central'
+                }
+            ];
+
+            // Filter by region if selected
+            let filteredTeams = currentRegion === 'all' ? teamData : 
+                                teamData.filter(team => team.region === currentRegion);
+
+            // Sort by selected metric
+            filteredTeams.sort((a, b) => {
+                switch (currentMetric) {
+                    case 'avg-per-agent':
+                        return b.avgPerAgent - a.avgPerAgent;
+                    case 'growth-rate':
+                        return b.growth - a.growth;
+                    case 'goal-achievement':
+                        return b.goalPercent - a.goalPercent;
+                    default:
+                        return b.teamSales - a.teamSales;
+                }
+            });
+
+            displayTeamRankings(filteredTeams);
+        }
+
+        // Display team rankings
+        function displayTeamRankings(teams) {
+            const tableBody = document.getElementById('teamLeaderboardBody');
+            const count = document.getElementById('teamRankingCount');
+            
+            count.textContent = `(${teams.length} offices)`;
+
+            if (teams.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; color: var(--lb-text-muted); padding: 3rem;">
+                            No teams found for selected region.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const tableHTML = teams.map((team, index) => {
+                const rank = index + 1;
+                const rankClass = rank <= 3 ? `rank-${rank}` : '';
+                const rankBadgeClass = rank <= 3 ? `rank-badge rank-badge-${rank}` : 'rank-badge';
+                
+                const growthColor = team.growth >= 15 ? 'var(--lb-accent)' : 
+                                   team.growth >= 10 ? 'var(--lb-text-primary)' : 'var(--lb-text-secondary)';
+                const goalColor = team.goalPercent >= 130 ? 'var(--lb-accent)' : 
+                                 team.goalPercent >= 100 ? 'var(--lb-text-primary)' : 'var(--lb-text-secondary)';
+
+                return `
+                    <tr onclick="viewTeamDetails('${team.name}')">
+                        <td class="rank ${rankClass}">
+                            ${rank <= 3 ? `<span class="${rankBadgeClass}">#${rank}</span>` : rank}
+                        </td>
+                        <td>
+                            <div>
+                                <h4 style="color: var(--lb-text-primary); margin-bottom: 0.25rem; font-weight: 600;">${team.name}</h4>
+                                <p style="color: var(--lb-text-muted); font-size: 0.85rem;">${team.region.charAt(0).toUpperCase() + team.region.slice(1)} Region</p>
+                            </div>
+                        </td>
+                        <td style="color: var(--lb-text-secondary);">${team.location}</td>
+                        <td style="text-align: right; font-weight: 600; color: var(--lb-accent);">$${(team.teamSales / 1000).toFixed(0)}K</td>
+                        <td style="text-align: center;">${team.teamSize}</td>
+                        <td style="text-align: right;">$${(team.avgPerAgent / 1000).toFixed(0)}K</td>
+                        <td style="text-align: right; color: ${growthColor}; font-weight: 600;">+${team.growth}%</td>
+                        <td style="text-align: center; color: ${goalColor}; font-weight: 600;">${team.goalPercent}%</td>
+                        <td style="text-align: center;">
+                            <div style="font-size: 0.85rem; color: var(--lb-text-secondary);">
+                                ${team.topAgent}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            tableBody.innerHTML = tableHTML;
+            lucide.createIcons();
+        }
+
+        // Load top teams
+        async function loadTopTeams() {
+            if (teamData.length >= 3) {
+                document.getElementById('topTeamName').textContent = teamData[0].name;
+                document.getElementById('topTeamSales').textContent = '$' + (teamData[0].teamSales / 1000).toFixed(0) + 'K';
+                document.getElementById('topTeamAgents').textContent = teamData[0].teamSize;
+                document.getElementById('topTeamGrowth').textContent = '+' + teamData[0].growth;
+
+                document.getElementById('secondTeamName').textContent = teamData[1].name;
+                document.getElementById('secondTeamSales').textContent = '$' + (teamData[1].teamSales / 1000).toFixed(0) + 'K';
+                document.getElementById('secondTeamAgents').textContent = teamData[1].teamSize;
+
+                document.getElementById('thirdTeamName').textContent = teamData[2].name;
+                document.getElementById('thirdTeamSales').textContent = '$' + (teamData[2].teamSales / 1000).toFixed(0) + 'K';
+                document.getElementById('thirdTeamAgents').textContent = teamData[2].teamSize;
+            }
+        }
+
+        // Load team rivalries
+        async function loadTeamRivalries() {
+            const rivalries = [
+                { teams: 'West Coast vs East Coast', status: 'West Coast leads by $170K', intensity: 'Heated' },
+                { teams: 'Midwest vs South Region', status: 'Midwest ahead by $70K', intensity: 'Close' },
+                { teams: 'HQ vs Regional Offices', status: 'Regionals dominating', intensity: 'Intense' }
+            ];
+
+            const rivalriesHTML = rivalries.map(rivalry => {
+                const intensityColor = rivalry.intensity === 'Heated' ? 'var(--lb-accent-secondary)' : 
+                                      rivalry.intensity === 'Intense' ? 'var(--lb-accent)' : 'var(--lb-text-secondary)';
+                
+                return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px; margin-bottom: 0.75rem; border-left: 3px solid ${intensityColor};">
+                        <div>
+                            <div style="font-weight: 600; color: var(--lb-text-primary); margin-bottom: 0.25rem;">${rivalry.teams}</div>
+                            <div style="font-size: 0.85rem; color: var(--lb-text-secondary);">${rivalry.status}</div>
+                        </div>
+                        <div style="color: ${intensityColor}; font-weight: 600; font-size: 0.9rem;">
+                            ${rivalry.intensity}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('teamRivalries').innerHTML = rivalriesHTML;
+        }
+
+        // Load team achievements
+        async function loadTeamAchievements() {
+            const achievements = [
+                { team: 'West Coast HQ', achievement: 'Monthly Champions', icon: '🏆' },
+                { team: 'Midwest Operations', achievement: 'Fastest Growth', icon: '🚀' },
+                { team: 'East Coast Central', achievement: 'Consistency Award', icon: '⭐' },
+                { team: 'All Teams', achievement: 'Company Record Quarter', icon: '🎉' }
+            ];
+
+            const achievementsHTML = achievements.map(achievement => `
+                <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(255, 215, 0, 0.1); border-radius: 8px; margin-bottom: 0.75rem;">
+                    <div style="font-size: 2rem;">${achievement.icon}</div>
+                    <div>
+                        <div style="font-weight: 600; color: var(--lb-text-primary);">${achievement.team}</div>
+                        <div style="color: var(--lb-accent); font-size: 0.9rem;">${achievement.achievement}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('teamAchievements').innerHTML = achievementsHTML;
+        }
+
+        // Load regional performance
+        async function loadRegionalPerformance() {
+            const regions = [
+                { name: 'West Coast', performance: 95, trend: 'up' },
+                { name: 'East Coast', performance: 88, trend: 'up' },
+                { name: 'Central', performance: 82, trend: 'stable' },
+                { name: 'South', performance: 78, trend: 'down' }
+            ];
+
+            const regionsHTML = regions.map(region => {
+                const trendIcon = region.trend === 'up' ? '📈' : region.trend === 'down' ? '📉' : '➡️';
+                const performanceColor = region.performance >= 90 ? 'var(--lb-accent)' : 
+                                        region.performance >= 80 ? 'var(--lb-text-primary)' : 'var(--lb-text-secondary)';
+                
+                return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px; margin-bottom: 0.75rem;">
+                        <div style="font-weight: 600; color: var(--lb-text-primary);">${region.name}</div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span style="color: ${performanceColor}; font-weight: 600;">${region.performance}%</span>
+                            <span>${trendIcon}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('regionalPerformance').innerHTML = regionsHTML;
+        }
+
+        // Load team battle feed
+        async function loadTeamBattleFeed() {
+            const battleFeed = [
+                { action: '🔥 West Coast HQ extends their lead with a massive $45K day!', time: '15 min ago' },
+                { action: '⚡ Midwest Operations closes the gap - now only $70K behind South Region!', time: '45 min ago' },
+                { action: '🎯 East Coast Central hits their quarterly goal 2 weeks early!', time: '1 hour ago' },
+                { action: '🚀 Corporate HQ moves up one position in the rankings!', time: '2 hours ago' },
+                { action: '👑 Sarah Chen gives West Coast the edge with another record sale!', time: '3 hours ago' }
+            ];
+
+            const feedHTML = battleFeed.map(item => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px; margin-bottom: 0.75rem; border-left: 3px solid var(--lb-accent);">
+                    <div style="color: var(--lb-text-primary); line-height: 1.5;">${item.action}</div>
+                    <div style="color: var(--lb-text-muted); font-size: 0.85rem; white-space: nowrap; margin-left: 1rem;">${item.time}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('teamBattleFeed').innerHTML = feedHTML;
+        }
+
+        // View team details
+        function viewTeamDetails(teamName) {
+            alert(`View detailed profile for ${teamName} - This would show team member breakdown, individual performances, and team statistics`);
+        }
+
+        // Fallback data
+        function loadFallbackData() {
+            document.getElementById('totalTeamSales').textContent = '$7.0M';
+            document.getElementById('avgTeamSize').textContent = '10';
+            document.getElementById('topTeamGap').textContent = '+12%';
+            document.getElementById('competingOffices').textContent = '6';
+            document.getElementById('totalTeams').textContent = '6';
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
+</body>
+</html>

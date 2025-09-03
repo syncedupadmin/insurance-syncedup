@@ -31,10 +31,6 @@
             <i data-lucide="users" class="icon"></i>
             Team Rankings
         </a>
-        <a href="achievements.html" class="nav-link">
-            <i data-lucide="award" class="icon"></i>
-            Achievements
-        </a>
     </div>
 
     <div class="container">
@@ -210,8 +206,31 @@
             experience: 'all'
         };
 
+        // Authentication check
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token || !user.email) {
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            // Check if user has any valid role for leaderboard access
+            if (!['agent', 'manager', 'admin', 'super-admin', 'customer-service'].includes(user.role)) {
+                alert('Access denied. Valid account required to view leaderboard.');
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            return true;
+        }
+
         // Initialize page
         async function initializePage() {
+            // Check authentication first
+            if (!checkAuth()) return;
+            
             // Load leaderboard data
             await loadLeaderboardData();
             
