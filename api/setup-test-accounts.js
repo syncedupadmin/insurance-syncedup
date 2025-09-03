@@ -35,7 +35,7 @@ export default async function handler(req, res) {
         email: 'customerservice@test.com',
         password: 'password123',
         name: 'Test Customer Service',
-        role: 'customer-service'
+        role: 'admin'
       }
     ];
 
@@ -61,8 +61,7 @@ export default async function handler(req, res) {
               name: account.name,
               role: account.role,
               is_active: true,
-              must_change_password: false,
-              updated_at: new Date().toISOString()
+              must_change_password: false
             })
             .eq('email', account.email)
             .select()
@@ -85,8 +84,7 @@ export default async function handler(req, res) {
               name: account.name,
               role: account.role,
               is_active: true,
-              must_change_password: false,
-              created_at: new Date().toISOString()
+              must_change_password: false
             })
             .select()
             .single();
