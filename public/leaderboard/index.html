@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Sales Leaderboard - SyncedUp Insurance</title>
+    <link rel="stylesheet" href="leaderboard-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Global Sales Leaderboard</h1>
+        <div class="header-info">
+            <span>🌍 All Offices Worldwide</span>
+            <span>📅 Updated: <span id="lastUpdated">Loading...</span></span>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="index.html" class="nav-link active">
+            <i data-lucide="trophy" class="icon"></i>
+            Overall Rankings
+        </a>
+        <a href="monthly.html" class="nav-link">
+            <i data-lucide="calendar" class="icon"></i>
+            Monthly Leaders
+        </a>
+        <a href="teams.html" class="nav-link">
+            <i data-lucide="users" class="icon"></i>
+            Team Rankings
+        </a>
+        <a href="achievements.html" class="nav-link">
+            <i data-lucide="award" class="icon"></i>
+            Achievements
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Global Stats -->
+        <div class="grid grid-4">
+            <div class="card">
+                <div class="stat-value" id="totalAgents">0</div>
+                <div class="stat-label">Active Agents</div>
+            </div>
+            <div class="card">
+                <div class="stat-value" id="totalSales">$0</div>
+                <div class="stat-label">Total Sales</div>
+            </div>
+            <div class="card">
+                <div class="stat-value" id="totalCommissions">$0</div>
+                <div class="stat-label">Commissions Paid</div>
+            </div>
+            <div class="card">
+                <div class="stat-value" id="totalOffices">0</div>
+                <div class="stat-label">Offices Competing</div>
+            </div>
+        </div>
+
+        <!-- Top Performers Showcase -->
+        <div class="card">
+            <h2><i data-lucide="crown" class="card-icon"></i>Hall of Champions</h2>
+            <div class="grid">
+                <div id="champion1" class="card" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1));">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 0.5rem;">🥇</div>
+                        <h3 style="color: var(--lb-accent); margin-bottom: 0.5rem;" id="champ1Name">Loading...</h3>
+                        <div class="stat-value" style="font-size: 2rem;" id="champ1Sales">$0</div>
+                        <div class="stat-label" id="champ1Office">Office</div>
+                    </div>
+                </div>
+                <div id="champion2" class="card" style="background: linear-gradient(135deg, rgba(192, 192, 192, 0.2), rgba(192, 192, 192, 0.1));">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 0.5rem;">🥈</div>
+                        <h3 style="color: var(--lb-silver); margin-bottom: 0.5rem;" id="champ2Name">Loading...</h3>
+                        <div class="stat-value" style="font-size: 2rem; color: var(--lb-silver);" id="champ2Sales">$0</div>
+                        <div class="stat-label" id="champ2Office">Office</div>
+                    </div>
+                </div>
+                <div id="champion3" class="card" style="background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(205, 127, 50, 0.1));">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 0.5rem;">🥉</div>
+                        <h3 style="color: var(--lb-bronze); margin-bottom: 0.5rem;" id="champ3Name">Loading...</h3>
+                        <div class="stat-value" style="font-size: 2rem; color: var(--lb-bronze);" id="champ3Sales">$0</div>
+                        <div class="stat-label" id="champ3Office">Office</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card">
+            <h3><i data-lucide="filter" class="card-icon"></i>Filter Rankings</h3>
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="timeframe">Time Period</label>
+                    <select id="timeframe" class="filter-select" onchange="applyFilters()">
+                        <option value="all-time">All Time</option>
+                        <option value="year" selected>This Year</option>
+                        <option value="quarter">This Quarter</option>
+                        <option value="month">This Month</option>
+                        <option value="week">This Week</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="category">Category</label>
+                    <select id="category" class="filter-select" onchange="applyFilters()">
+                        <option value="total-sales" selected>Total Sales</option>
+                        <option value="commissions">Total Commissions</option>
+                        <option value="policies">Policies Sold</option>
+                        <option value="conversion">Conversion Rate</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="office">Office Filter</label>
+                    <select id="office" class="filter-select" onchange="applyFilters()">
+                        <option value="all">All Offices</option>
+                        <option value="headquarters">Headquarters</option>
+                        <option value="west-coast">West Coast</option>
+                        <option value="east-coast">East Coast</option>
+                        <option value="midwest">Midwest</option>
+                        <option value="south">South Region</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="experience">Experience</label>
+                    <select id="experience" class="filter-select" onchange="applyFilters()">
+                        <option value="all">All Levels</option>
+                        <option value="rookie">Rookie (0-1 years)</option>
+                        <option value="experienced">Experienced (2-5 years)</option>
+                        <option value="veteran">Veteran (5+ years)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Leaderboard -->
+        <div class="card">
+            <h3><i data-lucide="list" class="card-icon"></i>Global Rankings <span id="rankingCount">(Loading...)</span></h3>
+            <div class="leaderboard-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="text-align: center;">Rank</th>
+                            <th>Agent</th>
+                            <th>Office</th>
+                            <th style="text-align: right;">Sales</th>
+                            <th style="text-align: right;">Commissions</th>
+                            <th style="text-align: right;">Policies</th>
+                            <th style="text-align: center;">Streak</th>
+                            <th style="text-align: center;">Achievements</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody">
+                        <tr>
+                            <td colspan="8" style="text-align: center; color: var(--lb-text-muted); padding: 3rem;">
+                                <div class="loading"></div>
+                                Loading global leaderboard data...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Performance Insights -->
+        <div class="grid">
+            <div class="card">
+                <h3><i data-lucide="trending-up" class="card-icon"></i>Top Movers</h3>
+                <div id="topMovers">
+                    <div style="text-align: center; color: var(--lb-text-muted); padding: 2rem;">
+                        <div class="loading"></div>
+                        Loading top movers...
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3><i data-lucide="target" class="card-icon"></i>Goal Crushers</h3>
+                <div id="goalCrushers">
+                    <div style="text-align: center; color: var(--lb-text-muted); padding: 2rem;">
+                        <div class="loading"></div>
+                        Loading goal achievements...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Competition Updates -->
+        <div class="card">
+            <h3><i data-lucide="zap" class="card-icon"></i>Live Competition Feed</h3>
+            <div id="competitionFeed">
+                <div style="text-align: center; color: var(--lb-text-muted); padding: 2rem;">
+                    <div class="loading"></div>
+                    Loading live updates...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global data storage
+        let leaderboardData = [];
+        let filteredData = [];
+        let currentFilters = {
+            timeframe: 'year',
+            category: 'total-sales',
+            office: 'all',
+            experience: 'all'
+        };
+
+        // Initialize page
+        async function initializePage() {
+            // Load leaderboard data
+            await loadLeaderboardData();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+            
+            // Set up auto-refresh
+            setInterval(loadLeaderboardData, 60000); // Refresh every minute
+        }
+
+        // Load leaderboard data
+        async function loadLeaderboardData() {
+            try {
+                // Update timestamp
+                document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+                
+                // Load global stats
+                await loadGlobalStats();
+                
+                // Load leaderboard rankings
+                await loadRankings();
+                
+                // Load top champions
+                await loadTopChampions();
+                
+                // Load additional insights
+                await loadTopMovers();
+                await loadGoalCrushers();
+                await loadCompetitionFeed();
+                
+            } catch (error) {
+                console.error('Error loading leaderboard data:', error);
+                loadFallbackData();
+            }
+        }
+
+        // Load global statistics
+        async function loadGlobalStats() {
+            // Mock API call - replace with actual endpoint
+            const stats = {
+                totalAgents: 247,
+                totalSales: 12847650,
+                totalCommissions: 3854295,
+                totalOffices: 15
+            };
+            
+            document.getElementById('totalAgents').textContent = stats.totalAgents.toLocaleString();
+            document.getElementById('totalSales').textContent = '$' + (stats.totalSales / 1000000).toFixed(1) + 'M';
+            document.getElementById('totalCommissions').textContent = '$' + (stats.totalCommissions / 1000000).toFixed(1) + 'M';
+            document.getElementById('totalOffices').textContent = stats.totalOffices;
+        }
+
+        // Load leaderboard rankings
+        async function loadRankings() {
+            // Mock leaderboard data - replace with actual API
+            leaderboardData = [
+                {
+                    rank: 1,
+                    name: 'Sarah Chen',
+                    office: 'West Coast HQ',
+                    totalSales: 1250000,
+                    commissions: 375000,
+                    policies: 156,
+                    streak: 8,
+                    experience: 'veteran',
+                    achievements: ['Top Seller', 'Goal Crusher', 'Streak Master']
+                },
+                {
+                    rank: 2,
+                    name: 'Michael Rodriguez',
+                    office: 'East Coast',
+                    totalSales: 1180000,
+                    commissions: 354000,
+                    policies: 142,
+                    streak: 6,
+                    experience: 'experienced',
+                    achievements: ['Consistent Performer', 'Team Player']
+                },
+                {
+                    rank: 3,
+                    name: 'Emily Watson',
+                    office: 'Midwest Central',
+                    totalSales: 1045000,
+                    commissions: 313500,
+                    policies: 128,
+                    streak: 12,
+                    experience: 'veteran',
+                    achievements: ['Streak Legend', 'Customer Favorite']
+                },
+                {
+                    rank: 4,
+                    name: 'David Kim',
+                    office: 'South Region',
+                    totalSales: 985000,
+                    commissions: 295500,
+                    policies: 118,
+                    streak: 4,
+                    experience: 'experienced',
+                    achievements: ['Rising Star']
+                },
+                {
+                    rank: 5,
+                    name: 'Jessica Martinez',
+                    office: 'Headquarters',
+                    totalSales: 920000,
+                    commissions: 276000,
+                    policies: 105,
+                    streak: 3,
+                    experience: 'rookie',
+                    achievements: ['Rookie of the Year', 'Fast Starter']
+                }
+            ];
+
+            // Apply filters and display
+            applyFilters();
+        }
+
+        // Apply filters to leaderboard data
+        function applyFilters() {
+            // Get current filter values
+            currentFilters.timeframe = document.getElementById('timeframe').value;
+            currentFilters.category = document.getElementById('category').value;
+            currentFilters.office = document.getElementById('office').value;
+            currentFilters.experience = document.getElementById('experience').value;
+
+            // Filter data (mock filtering - replace with actual API filtering)
+            filteredData = leaderboardData.filter(agent => {
+                if (currentFilters.office !== 'all' && !agent.office.toLowerCase().includes(currentFilters.office.replace('-', ' '))) {
+                    return false;
+                }
+                if (currentFilters.experience !== 'all' && agent.experience !== currentFilters.experience) {
+                    return false;
+                }
+                return true;
+            });
+
+            // Sort by selected category
+            filteredData.sort((a, b) => {
+                switch (currentFilters.category) {
+                    case 'commissions':
+                        return b.commissions - a.commissions;
+                    case 'policies':
+                        return b.policies - a.policies;
+                    case 'conversion':
+                        return (b.policies / (b.totalSales / 10000)) - (a.policies / (a.totalSales / 10000));
+                    default:
+                        return b.totalSales - a.totalSales;
+                }
+            });
+
+            // Update rankings
+            displayLeaderboard();
+        }
+
+        // Display leaderboard table
+        function displayLeaderboard() {
+            const tableBody = document.getElementById('leaderboardBody');
+            const count = document.getElementById('rankingCount');
+            
+            count.textContent = `(${filteredData.length} agents)`;
+
+            if (filteredData.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: var(--lb-text-muted); padding: 3rem;">
+                            <i data-lucide="search-x"></i>
+                            <p>No agents found matching current filters.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const tableHTML = filteredData.map((agent, index) => {
+                const rank = index + 1;
+                const rankClass = rank <= 3 ? `rank-${rank}` : '';
+                const rankBadgeClass = rank <= 3 ? `rank-badge rank-badge-${rank}` : 'rank-badge';
+                
+                const achievements = agent.achievements.map(achievement => 
+                    `<span class="achievement achievement-${rank <= 3 ? ['gold', 'silver', 'bronze'][rank-1] : 'bronze'}">${achievement}</span>`
+                ).join('');
+
+                return `
+                    <tr onclick="viewAgentProfile('${agent.name}')">
+                        <td class="rank ${rankClass}">
+                            ${rank <= 3 ? `<span class="${rankBadgeClass}">#${rank}</span>` : rank}
+                        </td>
+                        <td>
+                            <div class="agent-profile">
+                                <div class="agent-avatar">
+                                    ${agent.name.split(' ').map(n => n[0]).join('')}
+                                </div>
+                                <div class="agent-info">
+                                    <h4>${agent.name}</h4>
+                                    <p>${agent.experience} • ${agent.streak} month streak</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${agent.office}</td>
+                        <td style="text-align: right; font-weight: 600;">$${agent.totalSales.toLocaleString()}</td>
+                        <td style="text-align: right; color: var(--lb-accent);">$${agent.commissions.toLocaleString()}</td>
+                        <td style="text-align: right;">${agent.policies}</td>
+                        <td style="text-align: center;">
+                            <span style="color: ${agent.streak >= 6 ? 'var(--lb-accent)' : 'var(--lb-text-secondary)'};">
+                                ${agent.streak} ${agent.streak >= 6 ? '🔥' : '📈'}
+                            </span>
+                        </td>
+                        <td style="text-align: center;">
+                            <div style="max-width: 200px;">${achievements}</div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            tableBody.innerHTML = tableHTML;
+            lucide.createIcons();
+        }
+
+        // Load top champions
+        async function loadTopChampions() {
+            if (filteredData.length >= 3) {
+                document.getElementById('champ1Name').textContent = filteredData[0].name;
+                document.getElementById('champ1Sales').textContent = '$' + (filteredData[0].totalSales / 1000).toFixed(0) + 'K';
+                document.getElementById('champ1Office').textContent = filteredData[0].office;
+
+                document.getElementById('champ2Name').textContent = filteredData[1].name;
+                document.getElementById('champ2Sales').textContent = '$' + (filteredData[1].totalSales / 1000).toFixed(0) + 'K';
+                document.getElementById('champ2Office').textContent = filteredData[1].office;
+
+                document.getElementById('champ3Name').textContent = filteredData[2].name;
+                document.getElementById('champ3Sales').textContent = '$' + (filteredData[2].totalSales / 1000).toFixed(0) + 'K';
+                document.getElementById('champ3Office').textContent = filteredData[2].office;
+            }
+        }
+
+        // Load top movers
+        async function loadTopMovers() {
+            const movers = [
+                { name: 'Alex Thompson', change: '+15 positions', trend: 'up' },
+                { name: 'Maria Gonzalez', change: '+12 positions', trend: 'up' },
+                { name: 'Robert Lee', change: '+8 positions', trend: 'up' }
+            ];
+
+            const moversHTML = movers.map(mover => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px; margin-bottom: 0.5rem;">
+                    <div>
+                        <div style="font-weight: 600; color: var(--lb-text-primary);">${mover.name}</div>
+                        <div style="font-size: 0.85rem; color: var(--lb-text-muted);">${mover.change}</div>
+                    </div>
+                    <div style="color: var(--lb-accent); font-size: 1.5rem;">📈</div>
+                </div>
+            `).join('');
+
+            document.getElementById('topMovers').innerHTML = moversHTML;
+        }
+
+        // Load goal crushers
+        async function loadGoalCrushers() {
+            const goalCrushers = [
+                { name: 'Sarah Chen', percentage: 245 },
+                { name: 'Emily Watson', percentage: 198 },
+                { name: 'Michael Rodriguez', percentage: 187 }
+            ];
+
+            const crushersHTML = goalCrushers.map(crusher => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(255, 215, 0, 0.1); border-radius: 8px; margin-bottom: 0.5rem;">
+                    <div>
+                        <div style="font-weight: 600; color: var(--lb-text-primary);">${crusher.name}</div>
+                        <div style="font-size: 0.85rem; color: var(--lb-accent);">${crusher.percentage}% of goal</div>
+                    </div>
+                    <div style="color: var(--lb-accent); font-size: 1.5rem;">🎯</div>
+                </div>
+            `).join('');
+
+            document.getElementById('goalCrushers').innerHTML = crushersHTML;
+        }
+
+        // Load competition feed
+        async function loadCompetitionFeed() {
+            const feed = [
+                { action: 'Sarah Chen just closed a $45K deal! 🔥', time: '2 min ago', type: 'sale' },
+                { action: 'Michael Rodriguez moved up 3 positions in monthly rankings! 📈', time: '15 min ago', type: 'rank' },
+                { action: 'Emily Watson achieved her 12th consecutive month streak! 🏆', time: '1 hour ago', type: 'achievement' },
+                { action: 'West Coast office takes the lead in team rankings! 🥇', time: '2 hours ago', type: 'team' }
+            ];
+
+            const feedHTML = feed.map(item => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px; margin-bottom: 0.75rem; border-left: 3px solid var(--lb-accent);">
+                    <div style="color: var(--lb-text-primary);">${item.action}</div>
+                    <div style="color: var(--lb-text-muted); font-size: 0.85rem;">${item.time}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('competitionFeed').innerHTML = feedHTML;
+        }
+
+        // View agent profile
+        function viewAgentProfile(agentName) {
+            alert(`View profile for ${agentName} - This would show detailed agent statistics and achievements`);
+        }
+
+        // Fallback data
+        function loadFallbackData() {
+            document.getElementById('totalAgents').textContent = '200+';
+            document.getElementById('totalSales').textContent = '$10M+';
+            document.getElementById('totalCommissions').textContent = '$3M+';
+            document.getElementById('totalOffices').textContent = '12';
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
+</body>
+</html>
