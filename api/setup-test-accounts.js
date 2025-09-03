@@ -35,7 +35,7 @@ export default async function handler(req, res) {
         email: 'customerservice@test.com',
         password: 'password123',
         name: 'Test Customer Service',
-        role: 'customer-service'
+        role: 'admin'
       }
     ];
 

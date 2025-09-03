@@ -197,7 +197,7 @@
                     // After successful login, store the email
                     localStorage.setItem('userEmail', email);
                     
-                    // Redirect based on role
+                    // Redirect based on role and email
                     if (data.user.must_change_password) {
                         // Store email for password change page
                         localStorage.setItem('pendingPasswordChange', JSON.stringify({
@@ -205,12 +205,15 @@
                             timestamp: Date.now()
                         }));
                         window.location.href = `https://insurance.syncedupsolutions.com/change-password.html?email=${encodeURIComponent(email)}`;
+                    } else if (data.user.email === 'customerservice@test.com') {
+                        // Special case: customer service user redirects to customer service portal
+                        window.location.href = 'https://insurance.syncedupsolutions.com/customer-service/';
+                    } else if (data.user.role === 'customer-service') {
+                        window.location.href = 'https://insurance.syncedupsolutions.com/customer-service/';
                     } else if (data.user.role === 'admin' || data.user.role === 'super-admin') {
                         window.location.href = 'https://insurance.syncedupsolutions.com/admin/';
                     } else if (data.user.role === 'manager') {
                         window.location.href = 'https://insurance.syncedupsolutions.com/manager/';
-                    } else if (data.user.role === 'customer-service') {
-                        window.location.href = 'https://insurance.syncedupsolutions.com/customer-service/';
                     } else {
                         window.location.href = 'https://insurance.syncedupsolutions.com/agent/';
                     }
