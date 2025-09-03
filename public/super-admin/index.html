@@ -397,7 +397,8 @@
                 return false;
             }
 
-            if (user.role !== 'super-admin') {
+            // Allow both 'admin' role (super-admin users) and 'super-admin' role
+            if (user.role !== 'admin' && user.role !== 'super-admin') {
                 alert('Access denied. Super Admin privileges required.');
                 window.location.href = '/login.html';
                 return false;

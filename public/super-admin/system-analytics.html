@@ -343,8 +343,8 @@
                 return false;
             }
 
-            if (user.role !== 'super-admin') {
-                alert('Access denied. Super Admin privileges required.');
+            if (user.role !== 'admin' && user.role !== 'super-admin') {
+                alert('Access denied. Admin privileges required.');
                 window.location.href = '/login.html';
                 return false;
             }
