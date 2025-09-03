@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Service Dashboard - SyncedUp Insurance</title>
+    <link rel="stylesheet" href="customer-service-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Customer Service Dashboard</h1>
+        <div class="user-info">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn btn-secondary" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="index.html" class="nav-link active">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="member-search.html" class="nav-link">
+            <i data-lucide="search" class="icon"></i>
+            Member Search
+        </a>
+        <a href="interactions.html" class="nav-link">
+            <i data-lucide="clipboard-list" class="icon"></i>
+            Active Cases
+        </a>
+        <a href="member-profile.html" class="nav-link">
+            <i data-lucide="user-check" class="icon"></i>
+            Member History
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Customer Service Welcome Notice -->
+        <div class="cs-notice">
+            <h3><i data-lucide="headphones"></i> Customer Service Portal</h3>
+            <p>Comprehensive member support dashboard. Search members, manage cases, and track interaction history.</p>
+        </div>
+        
+        <!-- Performance Stats -->
+        <div class="grid grid-4">
+            <div class="stat-card">
+                <div class="stat-value" id="dailyCases">0</div>
+                <div class="stat-label">Daily Cases</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="activeCases">0</div>
+                <div class="stat-label">Active Cases</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalMembers">0</div>
+                <div class="stat-label">Total Members</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgResponseTime">0m</div>
+                <div class="stat-label">Avg Response Time</div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button class="btn btn-primary" onclick="location.href='member-search.html'">
+                <i data-lucide="search"></i>
+                Search Member
+            </button>
+            <button class="btn btn-success" onclick="createNewCase()">
+                <i data-lucide="plus-circle"></i>
+                New Case
+            </button>
+            <button class="btn btn-warning" onclick="location.href='interactions.html'">
+                <i data-lucide="clock"></i>
+                View Active Cases
+            </button>
+            <button class="btn btn-secondary" onclick="generateReport()">
+                <i data-lucide="download"></i>
+                Generate Report
+            </button>
+        </div>
+        
+        <!-- Dashboard Content Grid -->
+        <div class="grid">
+            <div class="card">
+                <h3><i data-lucide="clock" class="card-icon"></i>Recent Activity</h3>
+                <div id="recentActivity">
+                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                        <div class="loading"></div>
+                        Loading recent activity...
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3><i data-lucide="trending-up" class="card-icon"></i>Case Statistics</h3>
+                <div id="caseStatistics">
+                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                        <div class="loading"></div>
+                        Loading case statistics...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Priority Cases -->
+        <div class="card">
+            <h3><i data-lucide="alert-triangle" class="card-icon"></i>Priority Cases</h3>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Case ID</th>
+                            <th>Member Name</th>
+                            <th>Issue Type</th>
+                            <th>Priority</th>
+                            <th>Created</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="priorityCasesBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                                <div class="loading"></div>
+                                Loading priority cases...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Today's Assigned Cases -->
+        <div class="card">
+            <h3><i data-lucide="user-check" class="card-icon"></i>Today's Assigned Cases</h3>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Case ID</th>
+                            <th>Member</th>
+                            <th>Contact Info</th>
+                            <th>Issue</th>
+                            <th>Last Update</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="assignedCasesBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                                <div class="loading"></div>
+                                Loading assigned cases...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        // Authentication check
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token || !user.email) {
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            // Check if user has customer service permissions
+            if (!['customer-service', 'manager', 'admin', 'super-admin'].includes(user.role)) {
+                alert('Access denied. Customer service permissions required.');
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
+            currentUser = user;
+            return true;
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            // Load dashboard data
+            await loadDashboardData();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                await loadStats();
+                await loadRecentActivity();
+                await loadCaseStatistics();
+                await loadPriorityCases();
+                await loadAssignedCases();
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                loadFallbackData();
+            }
+        }
+
+        // Load performance stats
+        async function loadStats() {
+            // Mock data - replace with actual API calls
+            document.getElementById('dailyCases').textContent = '24';
+            document.getElementById('activeCases').textContent = '8';
+            document.getElementById('totalMembers').textContent = '1,247';
+            document.getElementById('avgResponseTime').textContent = '12m';
+        }
+
+        // Load recent activity
+        async function loadRecentActivity() {
+            const activityContainer = document.getElementById('recentActivity');
+            
+            // Mock data - replace with actual API calls
+            const activities = [
+                { type: 'case_created', member: 'John Smith', action: 'New billing inquiry case created', time: '5 minutes ago' },
+                { type: 'case_updated', member: 'Mary Johnson', action: 'Policy change case updated', time: '12 minutes ago' },
+                { type: 'case_resolved', member: 'Bob Wilson', action: 'Coverage question resolved', time: '23 minutes ago' },
+                { type: 'member_contacted', member: 'Sarah Davis', action: 'Member contacted via phone', time: '35 minutes ago' }
+            ];
+
+            const activityHTML = activities.map(activity => `
+                <div class="interaction-item">
+                    <div class="interaction-header">
+                        <span class="interaction-type">${activity.member}</span>
+                        <span class="interaction-date">${activity.time}</span>
+                    </div>
+                    <div class="interaction-note">${activity.action}</div>
+                </div>
+            `).join('');
+
+            activityContainer.innerHTML = activityHTML;
+        }
+
+        // Load case statistics
+        async function loadCaseStatistics() {
+            const statsContainer = document.getElementById('caseStatistics');
+            
+            // Mock data - replace with actual API calls
+            const stats = `
+                <div style="display: grid; gap: 1rem;">
+                    <div class="profile-field">
+                        <span class="profile-label">Total Cases Today:</span>
+                        <span class="profile-value">24</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-label">Resolved Cases:</span>
+                        <span class="profile-value">16</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-label">Pending Cases:</span>
+                        <span class="profile-value">8</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-label">Escalated Cases:</span>
+                        <span class="profile-value">2</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-label">Resolution Rate:</span>
+                        <span class="profile-value">67%</span>
+                    </div>
+                </div>
+            `;
+
+            statsContainer.innerHTML = stats;
+        }
+
+        // Load priority cases
+        async function loadPriorityCases() {
+            const tableBody = document.getElementById('priorityCasesBody');
+            
+            // Mock data - replace with actual API calls
+            const cases = [
+                { id: 'CS001', member: 'John Smith', type: 'Billing Dispute', priority: 'High', created: '2025-09-03 09:15', status: 'Open' },
+                { id: 'CS002', member: 'Mary Johnson', type: 'Policy Change', priority: 'Medium', created: '2025-09-03 10:30', status: 'In Progress' },
+                { id: 'CS003', member: 'Bob Wilson', type: 'Claims Issue', priority: 'High', created: '2025-09-03 11:45', status: 'Escalated' }
+            ];
+
+            const casesHTML = cases.map(caseItem => `
+                <tr onclick="viewCase('${caseItem.id}')">
+                    <td>${caseItem.id}</td>
+                    <td>${caseItem.member}</td>
+                    <td>${caseItem.type}</td>
+                    <td><span class="status-badge status-${caseItem.priority.toLowerCase()}">${caseItem.priority}</span></td>
+                    <td>${caseItem.created}</td>
+                    <td><span class="status-badge status-${caseItem.status.toLowerCase().replace(' ', '')}">${caseItem.status}</span></td>
+                    <td>
+                        <button class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="event.stopPropagation(); viewCase('${caseItem.id}')">View</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            tableBody.innerHTML = casesHTML;
+        }
+
+        // Load assigned cases
+        async function loadAssignedCases() {
+            const tableBody = document.getElementById('assignedCasesBody');
+            
+            // Mock data - replace with actual API calls
+            const cases = [
+                { id: 'CS004', member: 'Alice Cooper', contact: '(555) 123-4567', issue: 'Payment Issue', lastUpdate: '11:30 AM', status: 'Active' },
+                { id: 'CS005', member: 'David Lee', contact: 'david@email.com', issue: 'Coverage Question', lastUpdate: '10:15 AM', status: 'Pending' },
+                { id: 'CS006', member: 'Lisa Brown', contact: '(555) 987-6543', issue: 'Account Access', lastUpdate: '09:45 AM', status: 'Active' }
+            ];
+
+            const casesHTML = cases.map(caseItem => `
+                <tr onclick="viewCase('${caseItem.id}')">
+                    <td>${caseItem.id}</td>
+                    <td>${caseItem.member}</td>
+                    <td>${caseItem.contact}</td>
+                    <td>${caseItem.issue}</td>
+                    <td>${caseItem.lastUpdate}</td>
+                    <td><span class="status-badge status-${caseItem.status.toLowerCase()}">${caseItem.status}</span></td>
+                    <td>
+                        <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="event.stopPropagation(); viewCase('${caseItem.id}')">View</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            tableBody.innerHTML = casesHTML;
+        }
+
+        // Fallback data for when API fails
+        function loadFallbackData() {
+            document.getElementById('dailyCases').textContent = '20';
+            document.getElementById('activeCases').textContent = '5';
+            document.getElementById('totalMembers').textContent = '1,000';
+            document.getElementById('avgResponseTime').textContent = '15m';
+        }
+
+        // Action functions
+        function createNewCase() {
+            alert('New Case creation - This will redirect to case creation form');
+        }
+
+        function generateReport() {
+            alert('Report generation - This will generate and download case reports');
+        }
+
+        function viewCase(caseId) {
+            alert(`View Case ${caseId} - This will redirect to detailed case view`);
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
+</body>
+</html>

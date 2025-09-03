@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Cases - SyncedUp Insurance</title>
+    <link rel="stylesheet" href="customer-service-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Active Cases</h1>
+        <div class="user-info">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn btn-secondary" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="index.html" class="nav-link">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="member-search.html" class="nav-link">
+            <i data-lucide="search" class="icon"></i>
+            Member Search
+        </a>
+        <a href="interactions.html" class="nav-link active">
+            <i data-lucide="clipboard-list" class="icon"></i>
+            Active Cases
+        </a>
+        <a href="member-profile.html" class="nav-link">
+            <i data-lucide="user-check" class="icon"></i>
+            Member History
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Case Management Header -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3><i data-lucide="clipboard-list" class="card-icon"></i>Case Management</h3>
+                    <p style="color: var(--cs-text-secondary); margin: 0;">Track and manage active customer service cases</p>
+                </div>
+                <div class="quick-actions">
+                    <button class="btn btn-primary" onclick="createNewCase()">
+                        <i data-lucide="plus-circle"></i>
+                        New Case
+                    </button>
+                    <button class="btn btn-warning" onclick="bulkUpdate()">
+                        <i data-lucide="edit-3"></i>
+                        Bulk Update
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportCases()">
+                        <i data-lucide="download"></i>
+                        Export
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Case Filters -->
+        <div class="card">
+            <h3><i data-lucide="filter" class="card-icon"></i>Filter Cases</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="statusFilter">Status</label>
+                    <select id="statusFilter" class="form-control" onchange="filterCases()">
+                        <option value="">All Statuses</option>
+                        <option value="open">Open</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="pending">Pending</option>
+                        <option value="escalated">Escalated</option>
+                        <option value="resolved">Resolved</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="priorityFilter">Priority</label>
+                    <select id="priorityFilter" class="form-control" onchange="filterCases()">
+                        <option value="">All Priorities</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="typeFilter">Case Type</label>
+                    <select id="typeFilter" class="form-control" onchange="filterCases()">
+                        <option value="">All Types</option>
+                        <option value="billing">Billing</option>
+                        <option value="policy">Policy</option>
+                        <option value="claims">Claims</option>
+                        <option value="technical">Technical</option>
+                        <option value="general">General Inquiry</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="assignedFilter">Assigned To</label>
+                    <select id="assignedFilter" class="form-control" onchange="filterCases()">
+                        <option value="">All Agents</option>
+                        <option value="me">My Cases</option>
+                        <option value="unassigned">Unassigned</option>
+                        <option value="sarah">Sarah Johnson</option>
+                        <option value="mike">Mike Davis</option>
+                        <option value="lisa">Lisa Brown</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Cases Table -->
+        <div class="card">
+            <h3><i data-lucide="list" class="card-icon"></i>Active Cases <span id="caseCount">(0 cases)</span></h3>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Case ID</th>
+                            <th>Member</th>
+                            <th>Type</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Last Update</th>
+                            <th>Assigned To</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activeCasesBody">
+                        <tr>
+                            <td colspan="9" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                                <div class="loading"></div>
+                                Loading active cases...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Case Statistics -->
+        <div class="grid grid-4">
+            <div class="stat-card">
+                <div class="stat-value" id="openCases">0</div>
+                <div class="stat-label">Open Cases</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="inProgressCases">0</div>
+                <div class="stat-label">In Progress</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="escalatedCases">0</div>
+                <div class="stat-label">Escalated</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgResolutionTime">0h</div>
+                <div class="stat-label">Avg Resolution</div>
+            </div>
+        </div>
+
+        <!-- Recent Case Activity -->
+        <div class="card">
+            <h3><i data-lucide="activity" class="card-icon"></i>Recent Case Activity</h3>
+            <div id="recentCaseActivity">
+                <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                    <div class="loading"></div>
+                    Loading recent activity...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let allCases = [];
+        let filteredCases = [];
+
+        // Authentication check
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token || !user.email) {
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            // Check if user has customer service permissions
+            if (!['customer-service', 'manager', 'admin', 'super-admin'].includes(user.role)) {
+                alert('Access denied. Customer service permissions required.');
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
+            currentUser = user;
+            return true;
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            // Load case data
+            await loadCaseData();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Load all case data
+        async function loadCaseData() {
+            try {
+                await loadActiveCases();
+                await loadCaseStatistics();
+                await loadRecentActivity();
+                updateCaseCount();
+            } catch (error) {
+                console.error('Error loading case data:', error);
+                loadFallbackData();
+            }
+        }
+
+        // Load active cases
+        async function loadActiveCases() {
+            // Mock data - replace with actual API call
+            allCases = [
+                {
+                    id: 'CS001',
+                    member: 'John Smith',
+                    memberId: 'MEM001234',
+                    type: 'billing',
+                    priority: 'high',
+                    status: 'open',
+                    created: '2025-09-03 09:15',
+                    lastUpdate: '2025-09-03 10:30',
+                    assignedTo: 'sarah',
+                    assignedName: 'Sarah Johnson'
+                },
+                {
+                    id: 'CS002',
+                    member: 'Mary Johnson',
+                    memberId: 'MEM001235',
+                    type: 'policy',
+                    priority: 'medium',
+                    status: 'in-progress',
+                    created: '2025-09-02 14:20',
+                    lastUpdate: '2025-09-03 09:45',
+                    assignedTo: 'mike',
+                    assignedName: 'Mike Davis'
+                },
+                {
+                    id: 'CS003',
+                    member: 'Bob Wilson',
+                    memberId: 'MEM001236',
+                    type: 'claims',
+                    priority: 'high',
+                    status: 'escalated',
+                    created: '2025-09-01 11:30',
+                    lastUpdate: '2025-09-03 08:15',
+                    assignedTo: 'lisa',
+                    assignedName: 'Lisa Brown'
+                },
+                {
+                    id: 'CS004',
+                    member: 'Alice Cooper',
+                    memberId: 'MEM001237',
+                    type: 'technical',
+                    priority: 'low',
+                    status: 'pending',
+                    created: '2025-09-01 16:45',
+                    lastUpdate: '2025-09-02 10:20',
+                    assignedTo: 'sarah',
+                    assignedName: 'Sarah Johnson'
+                },
+                {
+                    id: 'CS005',
+                    member: 'David Lee',
+                    memberId: 'MEM001238',
+                    type: 'general',
+                    priority: 'medium',
+                    status: 'in-progress',
+                    created: '2025-08-31 13:10',
+                    lastUpdate: '2025-09-02 15:30',
+                    assignedTo: 'mike',
+                    assignedName: 'Mike Davis'
+                }
+            ];
+
+            filteredCases = [...allCases];
+            displayCases(filteredCases);
+        }
+
+        // Display cases in table
+        function displayCases(cases) {
+            const tableBody = document.getElementById('activeCasesBody');
+            
+            if (cases.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                            <i data-lucide="clipboard-x"></i>
+                            <p>No cases found matching the current filters.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const casesHTML = cases.map(caseItem => `
+                <tr onclick="viewCase('${caseItem.id}')">
+                    <td>${caseItem.id}</td>
+                    <td>${caseItem.member}</td>
+                    <td>${capitalizeFirst(caseItem.type)}</td>
+                    <td><span class="status-badge status-${caseItem.priority}">${capitalizeFirst(caseItem.priority)}</span></td>
+                    <td><span class="status-badge status-${caseItem.status.replace(' ', '').toLowerCase()}">${capitalizeFirst(caseItem.status)}</span></td>
+                    <td>${formatDate(caseItem.created)}</td>
+                    <td>${formatDate(caseItem.lastUpdate)}</td>
+                    <td>${caseItem.assignedName}</td>
+                    <td>
+                        <button class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="event.stopPropagation(); viewCase('${caseItem.id}')">View</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            tableBody.innerHTML = casesHTML;
+            lucide.createIcons();
+        }
+
+        // Load case statistics
+        async function loadCaseStatistics() {
+            // Calculate stats from all cases
+            const openCases = allCases.filter(c => c.status === 'open').length;
+            const inProgressCases = allCases.filter(c => c.status === 'in-progress').length;
+            const escalatedCases = allCases.filter(c => c.status === 'escalated').length;
+            
+            document.getElementById('openCases').textContent = openCases;
+            document.getElementById('inProgressCases').textContent = inProgressCases;
+            document.getElementById('escalatedCases').textContent = escalatedCases;
+            document.getElementById('avgResolutionTime').textContent = '4.2h';
+        }
+
+        // Load recent activity
+        async function loadRecentActivity() {
+            const activityContainer = document.getElementById('recentCaseActivity');
+            
+            // Mock recent activity
+            const activities = [
+                { case: 'CS001', member: 'John Smith', action: 'Case escalated to supervisor', time: '10:30 AM', agent: 'Sarah Johnson' },
+                { case: 'CS002', member: 'Mary Johnson', action: 'Policy documentation updated', time: '9:45 AM', agent: 'Mike Davis' },
+                { case: 'CS003', member: 'Bob Wilson', action: 'Customer contacted via phone', time: '8:15 AM', agent: 'Lisa Brown' },
+                { case: 'CS004', member: 'Alice Cooper', action: 'Technical issue resolved', time: 'Yesterday 4:20 PM', agent: 'Sarah Johnson' }
+            ];
+
+            const activityHTML = activities.map(activity => `
+                <div class="interaction-item">
+                    <div class="interaction-header">
+                        <span class="interaction-type">Case ${activity.case} - ${activity.member}</span>
+                        <span class="interaction-date">${activity.time}</span>
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--cs-text-secondary); margin-bottom: 0.5rem;">
+                        Agent: ${activity.agent}
+                    </div>
+                    <div class="interaction-note">${activity.action}</div>
+                </div>
+            `).join('');
+
+            activityContainer.innerHTML = activityHTML;
+        }
+
+        // Filter cases based on current filter selections
+        function filterCases() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const priorityFilter = document.getElementById('priorityFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            const assignedFilter = document.getElementById('assignedFilter').value;
+
+            filteredCases = allCases.filter(caseItem => {
+                if (statusFilter && caseItem.status !== statusFilter) return false;
+                if (priorityFilter && caseItem.priority !== priorityFilter) return false;
+                if (typeFilter && caseItem.type !== typeFilter) return false;
+                if (assignedFilter) {
+                    if (assignedFilter === 'me' && caseItem.assignedTo !== getCurrentUserName()) return false;
+                    if (assignedFilter === 'unassigned' && caseItem.assignedTo) return false;
+                    if (assignedFilter !== 'me' && assignedFilter !== 'unassigned' && caseItem.assignedTo !== assignedFilter) return false;
+                }
+                return true;
+            });
+
+            displayCases(filteredCases);
+            updateCaseCount();
+        }
+
+        // Update case count display
+        function updateCaseCount() {
+            const count = filteredCases.length;
+            document.getElementById('caseCount').textContent = `(${count} case${count !== 1 ? 's' : ''})`;
+        }
+
+        // Helper functions
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1).replace('-', ' ');
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        function getCurrentUserName() {
+            return currentUser?.firstName?.toLowerCase() || 'unknown';
+        }
+
+        // Action functions
+        function createNewCase() {
+            alert('Create New Case - This will redirect to case creation form');
+        }
+
+        function bulkUpdate() {
+            alert('Bulk Update Cases - This will open bulk action interface');
+        }
+
+        function exportCases() {
+            alert('Export Cases - This will download filtered cases as CSV/Excel');
+        }
+
+        function viewCase(caseId) {
+            alert(`View Case ${caseId} - This will redirect to detailed case view`);
+        }
+
+        // Fallback data
+        function loadFallbackData() {
+            document.getElementById('openCases').textContent = '3';
+            document.getElementById('inProgressCases').textContent = '2';
+            document.getElementById('escalatedCases').textContent = '1';
+            document.getElementById('avgResolutionTime').textContent = '5.0h';
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
+</body>
+</html>
