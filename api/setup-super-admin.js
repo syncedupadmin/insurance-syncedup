@@ -16,7 +16,7 @@ export default async function handler(req, res) {
       email: 'superadmin@syncedup.com',
       password: 'superadmin123',
       name: 'Super Admin',
-      role: 'super-admin'
+      role: 'admin' // Using admin role until database constraint is updated
     };
 
     // Check if super-admin already exists
