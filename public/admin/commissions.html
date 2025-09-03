@@ -42,8 +42,12 @@
             Users
         </a>
         <a href="leads.html" class="nav-link">
-            <i data-lucide="zap" class="icon"></i>
+            <i data-lucide="user-plus" class="icon"></i>
             Leads
+        </a>
+        <a href="vendors.html" class="nav-link">
+            <i data-lucide="building-2" class="icon"></i>
+            Vendors
         </a>
         <a href="commissions.html" class="nav-link active">
             <i data-lucide="dollar-sign" class="icon"></i>
@@ -457,7 +461,7 @@
             }
 
             // Check if user has appropriate permissions
-            if (!['admin', 'super-admin'].includes(user.role)) {
+            if (user.role !== 'admin') {
                 alert('Access denied. Insufficient permissions.');
                 if (user.role === 'manager') { window.location.href = 'https://insurance.syncedupsolutions.com/manager/'; } else { window.location.href = 'https://insurance.syncedupsolutions.com/agent/'; }
                 return false;

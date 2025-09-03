@@ -42,8 +42,12 @@
             Users
         </a>
         <a href="leads.html" class="nav-link">
-            <i data-lucide="zap" class="icon"></i>
+            <i data-lucide="user-plus" class="icon"></i>
             Leads
+        </a>
+        <a href="vendors.html" class="nav-link">
+            <i data-lucide="building-2" class="icon"></i>
+            Vendors
         </a>
         <a href="commissions.html" class="nav-link">
             <i data-lucide="dollar-sign" class="icon"></i>
@@ -466,8 +470,8 @@ Business City, ST 12345</textarea>
                 return false;
             }
 
-            // Check if user has appropriate permissions (only admin/super-admin for settings)
-            if (!['admin', 'super-admin'].includes(user.role)) {
+            // Check if user has appropriate permissions (only admin for settings)
+            if (user.role !== 'admin') {
                 alert('Access denied. Only administrators can access system settings.');
                 window.location.href = 'https://insurance.syncedupsolutions.com/admin/';
                 return false;

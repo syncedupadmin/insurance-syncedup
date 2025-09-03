@@ -349,4 +349,4 @@ async function sendWelcomeEmail(email, fullName, tempPassword) {
   return true;
 }
 
-export default requireAuth(['admin', 'super_admin'])(userManagementHandler);
+export default requireAuth(['admin'])(userManagementHandler);

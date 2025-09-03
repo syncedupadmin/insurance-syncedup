@@ -181,7 +181,7 @@
             }
 
             // Check if user has customer service permissions
-            if (!['customer-service', 'manager', 'admin', 'super-admin'].includes(user.role)) {
+            if (!['customer-service', 'manager', 'admin'].includes(user.role)) {
                 alert('Access denied. Customer service permissions required.');
                 window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
                 return false;

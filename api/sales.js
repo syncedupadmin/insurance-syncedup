@@ -67,7 +67,7 @@ async function handleGetSales(req, res, agencyId, agentId, role) {
         query = query.eq('agent_id', queryAgentId);
       }
     }
-    // super_admin sees all
+    // admin and super_admin see all
 
     // Date filtering
     if (date_from) {
@@ -291,9 +291,10 @@ async function handleUpdateSale(req, res, agencyId, agentId, role) {
     
     if (role === 'agent') {
       query = query.eq('agent_id', agentId);
-    } else if (['manager', 'admin'].includes(role)) {
+    } else if (role === 'manager') {
       query = query.eq('agency_id', agencyId);
     }
+    // admin role has universal access - no filtering needed
 
     const { data: existingSale, error: fetchError } = await query.single();
 

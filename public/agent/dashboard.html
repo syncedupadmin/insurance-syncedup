@@ -617,8 +617,8 @@
                 currentAgent = JSON.parse(userData);
                 console.log('Logged in as:', currentAgent.name, '- ID:', currentAgent.id);
                 
-                // Only agents can access this dashboard
-                if (currentAgent.role !== 'agent') {
+                // Allow agents and admin to access this dashboard
+                if (currentAgent.role !== 'agent' && currentAgent.role !== 'admin') {
                     window.location.href = '/login.html';
                 }
             } else {

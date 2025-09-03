@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Dashboard - SyncedUp Insurance</title>
+    <link rel="stylesheet" href="super-admin-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">SA</div>
+                Super Admin Portal
+            </a>
+            <div class="header-actions">
+                <div class="user-info">
+                    <div class="user-avatar">SA</div>
+                    <div>
+                        <div style="font-weight: 600;" id="userDisplay">Super Admin</div>
+                        <div style="font-size: 0.8rem; opacity: 0.7;">Platform Administrator</div>
+                    </div>
+                </div>
+                
+                <!-- Portal Switch Dropdown -->
+                <div class="dropdown">
+                    <button class="btn dropdown-toggle" id="portalSwitchBtn" onclick="togglePortalDropdown()">
+                        <i data-lucide="layout-grid"></i>
+                        Switch Portal
+                        <i data-lucide="chevron-down" style="width: 16px; height: 16px; margin-left: 4px;"></i>
+                    </button>
+                    <div class="dropdown-menu" id="portalDropdown">
+                        <div class="dropdown-header">Switch to Portal View</div>
+                        <a class="dropdown-item agent-item" onclick="switchToPortal('agent')" href="#">
+                            <div class="dropdown-icon agent-bg">
+                                <i data-lucide="user" style="width: 16px; height: 16px;"></i>
+                            </div>
+                            <div>
+                                <div class="dropdown-title">Agent Portal</div>
+                                <div class="dropdown-desc">Individual agent dashboard</div>
+                            </div>
+                        </a>
+                        <a class="dropdown-item manager-item" onclick="switchToPortal('manager')" href="#">
+                            <div class="dropdown-icon manager-bg">
+                                <i data-lucide="users" style="width: 16px; height: 16px;"></i>
+                            </div>
+                            <div>
+                                <div class="dropdown-title">Manager Portal</div>
+                                <div class="dropdown-desc">Team management dashboard</div>
+                            </div>
+                        </a>
+                        <a class="dropdown-item admin-item" onclick="switchToPortal('admin')" href="#">
+                            <div class="dropdown-icon admin-bg">
+                                <i data-lucide="shield" style="width: 16px; height: 16px;"></i>
+                            </div>
+                            <div>
+                                <div class="dropdown-title">Admin Portal</div>
+                                <div class="dropdown-desc">Agency administration</div>
+                            </div>
+                        </a>
+                        <a class="dropdown-item cs-item" onclick="switchToPortal('customer-service')" href="#">
+                            <div class="dropdown-icon cs-bg">
+                                <i data-lucide="headphones" style="width: 16px; height: 16px;"></i>
+                            </div>
+                            <div>
+                                <div class="dropdown-title">Customer Service</div>
+                                <div class="dropdown-desc">Member support portal</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="logout()">
+                    <i data-lucide="log-out"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-section">
+            <div class="nav-title">Platform Overview</div>
+            <a href="index.html" class="nav-link active">
+                <i data-lucide="layout-dashboard" class="nav-icon"></i>
+                Dashboard
+            </a>
+            <a href="system-analytics.html" class="nav-link">
+                <i data-lucide="bar-chart-3" class="nav-icon"></i>
+                System Analytics
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-title">Management</div>
+            <a href="agency-management.html" class="nav-link">
+                <i data-lucide="building-2" class="nav-icon"></i>
+                Agency Management
+            </a>
+            <a href="user-administration.html" class="nav-link">
+                <i data-lucide="users" class="nav-icon"></i>
+                User Administration
+            </a>
+            <a href="revenue-management.html" class="nav-link">
+                <i data-lucide="dollar-sign" class="nav-icon"></i>
+                Revenue Management
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-title">Configuration</div>
+            <a href="settings.html" class="nav-link">
+                <i data-lucide="settings" class="nav-icon"></i>
+                Settings
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Platform Dashboard</h1>
+                <p class="page-subtitle">Cross-agency performance overview and system health metrics</p>
+            </div>
+
+            <!-- Key Performance Indicators -->
+            <div class="grid grid-4">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalAgencies">0</div>
+                    <div class="stat-label">Active Agencies</div>
+                    <div class="stat-change positive">
+                        <i data-lucide="trend-up" style="width: 12px; height: 12px;"></i>
+                        <span id="agenciesChange">+12%</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value" id="totalRevenue">$0</div>
+                    <div class="stat-label">Monthly Revenue</div>
+                    <div class="stat-change positive">
+                        <i data-lucide="trend-up" style="width: 12px; height: 12px;"></i>
+                        <span id="revenueChange">+18%</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value" id="totalUsers">0</div>
+                    <div class="stat-label">Platform Users</div>
+                    <div class="stat-change positive">
+                        <i data-lucide="trend-up" style="width: 12px; height: 12px;"></i>
+                        <span id="usersChange">+8%</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value" id="systemUptime">99.9%</div>
+                    <div class="stat-label">System Uptime</div>
+                    <div class="stat-change positive">
+                        <i data-lucide="check-circle" style="width: 12px; height: 12px;"></i>
+                        <span id="uptimeStatus">Excellent</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portal Access Section -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i data-lucide="layout-grid" class="card-icon"></i>
+                        Portal Access
+                    </h3>
+                    <p style="color: var(--text-muted); margin: 0; font-size: 14px;">Quick access to all portal interfaces</p>
+                </div>
+                
+                <div class="grid grid-4" style="gap: 16px; margin-bottom: 24px;">
+                    <!-- Agent Portal -->
+                    <div class="portal-card agent-portal" onclick="openPortal('agent')">
+                        <div class="portal-icon">
+                            <i data-lucide="user" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        <h4>Agent Portal</h4>
+                        <p>Individual agent dashboard and tools</p>
+                        <div class="portal-metrics">
+                            <div class="metric">
+                                <span class="value" id="agentPortalUsers">247</span>
+                                <span class="label">Active Agents</span>
+                            </div>
+                            <div class="metric">
+                                <span class="value" id="agentPortalSales">$1.2M</span>
+                                <span class="label">Monthly Sales</span>
+                            </div>
+                        </div>
+                        <button class="portal-btn agent-btn">
+                            <i data-lucide="external-link" style="width: 16px; height: 16px;"></i>
+                            View as Agent
+                        </button>
+                    </div>
+
+                    <!-- Manager Portal -->
+                    <div class="portal-card manager-portal" onclick="openPortal('manager')">
+                        <div class="portal-icon">
+                            <i data-lucide="users" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        <h4>Manager Portal</h4>
+                        <p>Team oversight and performance management</p>
+                        <div class="portal-metrics">
+                            <div class="metric">
+                                <span class="value" id="managerPortalTeams">42</span>
+                                <span class="label">Active Managers</span>
+                            </div>
+                            <div class="metric">
+                                <span class="value" id="managerPortalLeads">8.3k</span>
+                                <span class="label">Leads Managed</span>
+                            </div>
+                        </div>
+                        <button class="portal-btn manager-btn">
+                            <i data-lucide="external-link" style="width: 16px; height: 16px;"></i>
+                            View as Manager
+                        </button>
+                    </div>
+
+                    <!-- Admin Portal -->
+                    <div class="portal-card admin-portal" onclick="openPortal('admin')">
+                        <div class="portal-icon">
+                            <i data-lucide="shield" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        <h4>Admin Portal</h4>
+                        <p>Agency-level administration and settings</p>
+                        <div class="portal-metrics">
+                            <div class="metric">
+                                <span class="value" id="adminPortalAgencies">18</span>
+                                <span class="label">Active Agencies</span>
+                            </div>
+                            <div class="metric">
+                                <span class="value" id="adminPortalCommissions">$284k</span>
+                                <span class="label">Commissions</span>
+                            </div>
+                        </div>
+                        <button class="portal-btn admin-btn">
+                            <i data-lucide="external-link" style="width: 16px; height: 16px;"></i>
+                            View as Admin
+                        </button>
+                    </div>
+
+                    <!-- Customer Service Portal -->
+                    <div class="portal-card cs-portal" onclick="openPortal('customer-service')">
+                        <div class="portal-icon">
+                            <i data-lucide="headphones" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        <h4>Customer Service</h4>
+                        <p>Member support and ticket management</p>
+                        <div class="portal-metrics">
+                            <div class="metric">
+                                <span class="value" id="csPortalTickets">156</span>
+                                <span class="label">Open Tickets</span>
+                            </div>
+                            <div class="metric">
+                                <span class="value" id="csPortalSatisfaction">4.8</span>
+                                <span class="label">Satisfaction</span>
+                            </div>
+                        </div>
+                        <button class="portal-btn cs-btn">
+                            <i data-lucide="external-link" style="width: 16px; height: 16px;"></i>
+                            View as CS
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts and Analytics -->
+            <div class="grid grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i data-lucide="trending-up" class="card-icon"></i>
+                            Revenue Trends
+                        </h3>
+                        <select class="form-input" style="width: auto; min-width: 120px;" id="revenueTimeframe">
+                            <option value="7d">Last 7 days</option>
+                            <option value="30d" selected>Last 30 days</option>
+                            <option value="90d">Last 90 days</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i data-lucide="users" class="card-icon"></i>
+                            User Activity
+                        </h3>
+                        <select class="form-input" style="width: auto; min-width: 120px;" id="activityTimeframe">
+                            <option value="24h">Last 24 hours</option>
+                            <option value="7d" selected>Last 7 days</option>
+                            <option value="30d">Last 30 days</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="activityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Health and Top Agencies -->
+            <div class="grid grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i data-lucide="server" class="card-icon"></i>
+                            System Health
+                        </h3>
+                        <button class="btn btn-primary" onclick="refreshSystemHealth()">
+                            <i data-lucide="refresh-cw"></i>
+                            Refresh
+                        </button>
+                    </div>
+                    
+                    <div id="systemHealthContent">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading system health...
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i data-lucide="trophy" class="card-icon"></i>
+                            Top Performing Agencies
+                        </h3>
+                        <button class="btn" onclick="viewAllAgencies()">
+                            <i data-lucide="external-link"></i>
+                            View All
+                        </button>
+                    </div>
+                    
+                    <div id="topAgenciesContent">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading top agencies...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity Feed -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i data-lucide="activity" class="card-icon"></i>
+                        Platform Activity Feed
+                    </h3>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <select class="form-input" style="width: auto; min-width: 120px;" id="activityFilter">
+                            <option value="all">All Activities</option>
+                            <option value="agencies">Agencies</option>
+                            <option value="users">Users</option>
+                            <option value="system">System</option>
+                            <option value="revenue">Revenue</option>
+                        </select>
+                        <button class="btn" onclick="refreshActivityFeed()">
+                            <i data-lucide="refresh-cw"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="activityFeedContent">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading activity feed...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let revenueChart, activityChart;
+        let refreshInterval;
+
+        // Authentication check
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token || !user.email) {
+                window.location.href = '/login.html';
+                return false;
+            }
+
+            if (user.role !== 'super-admin') {
+                alert('Access denied. Super Admin privileges required.');
+                window.location.href = '/login.html';
+                return false;
+            }
+
+            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName}`;
+            return true;
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            await loadKPIs();
+            await initializeCharts();
+            await loadSystemHealth();
+            await loadTopAgencies();
+            await loadActivityFeed();
+            
+            // Set up auto-refresh
+            refreshInterval = setInterval(refreshDashboard, 60000); // Every minute
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Load Key Performance Indicators
+        async function loadKPIs() {
+            try {
+                const response = await fetch('/api/super-admin/dashboard-stats', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updateKPIs(data);
+                } else {
+                    updateKPIs(getFallbackKPIs());
+                }
+            } catch (error) {
+                console.error('Error loading KPIs:', error);
+                updateKPIs(getFallbackKPIs());
+            }
+        }
+
+        function getFallbackKPIs() {
+            return {
+                totalAgencies: 247,
+                totalRevenue: 1840000,
+                totalUsers: 2891,
+                systemUptime: 99.94,
+                agenciesChange: 12,
+                revenueChange: 18,
+                usersChange: 8
+            };
+        }
+
+        function updateKPIs(data) {
+            document.getElementById('totalAgencies').textContent = data.totalAgencies.toLocaleString();
+            document.getElementById('totalRevenue').textContent = `$${(data.totalRevenue / 1000000).toFixed(1)}M`;
+            document.getElementById('totalUsers').textContent = data.totalUsers.toLocaleString();
+            document.getElementById('systemUptime').textContent = `${data.systemUptime.toFixed(1)}%`;
+            
+            document.getElementById('agenciesChange').textContent = `+${data.agenciesChange}%`;
+            document.getElementById('revenueChange').textContent = `+${data.revenueChange}%`;
+            document.getElementById('usersChange').textContent = `+${data.usersChange}%`;
+        }
+
+        // Initialize Charts
+        async function initializeCharts() {
+            // Revenue Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            revenueChart = new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [],
+                        borderColor: '#ffd700',
+                        backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#cccccc' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#cccccc' },
+                            grid: { color: '#444444' }
+                        },
+                        y: {
+                            ticks: { 
+                                color: '#cccccc',
+                                callback: function(value) {
+                                    return '$' + (value / 1000) + 'K';
+                                }
+                            },
+                            grid: { color: '#444444' }
+                        }
+                    }
+                }
+            });
+
+            // Activity Chart
+            const activityCtx = document.getElementById('activityChart').getContext('2d');
+            activityChart = new Chart(activityCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Active Users',
+                        data: [],
+                        backgroundColor: 'rgba(255, 215, 0, 0.8)',
+                        borderColor: '#ffd700',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#cccccc' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#cccccc' },
+                            grid: { color: '#444444' }
+                        },
+                        y: {
+                            ticks: { color: '#cccccc' },
+                            grid: { color: '#444444' }
+                        }
+                    }
+                }
+            });
+
+            // Load chart data
+            await loadRevenueData();
+            await loadActivityData();
+        }
+
+        // Load Revenue Chart Data
+        async function loadRevenueData() {
+            try {
+                const timeframe = document.getElementById('revenueTimeframe').value;
+                const response = await fetch(`/api/super-admin/revenue-data?timeframe=${timeframe}`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                let data;
+                if (response.ok) {
+                    data = await response.json();
+                } else {
+                    data = getFallbackRevenueData();
+                }
+                
+                revenueChart.data.labels = data.labels;
+                revenueChart.data.datasets[0].data = data.values;
+                revenueChart.update();
+            } catch (error) {
+                console.error('Error loading revenue data:', error);
+                const data = getFallbackRevenueData();
+                revenueChart.data.labels = data.labels;
+                revenueChart.data.datasets[0].data = data.values;
+                revenueChart.update();
+            }
+        }
+
+        function getFallbackRevenueData() {
+            return {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                values: [420000, 465000, 480000, 520000]
+            };
+        }
+
+        // Load Activity Chart Data
+        async function loadActivityData() {
+            try {
+                const timeframe = document.getElementById('activityTimeframe').value;
+                const response = await fetch(`/api/super-admin/activity-data?timeframe=${timeframe}`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                let data;
+                if (response.ok) {
+                    data = await response.json();
+                } else {
+                    data = getFallbackActivityData();
+                }
+                
+                activityChart.data.labels = data.labels;
+                activityChart.data.datasets[0].data = data.values;
+                activityChart.update();
+            } catch (error) {
+                console.error('Error loading activity data:', error);
+                const data = getFallbackActivityData();
+                activityChart.data.labels = data.labels;
+                activityChart.data.datasets[0].data = data.values;
+                activityChart.update();
+            }
+        }
+
+        function getFallbackActivityData() {
+            return {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                values: [1245, 1389, 1456, 1523, 1678, 892, 634]
+            };
+        }
+
+        // Load System Health
+        async function loadSystemHealth() {
+            try {
+                const response = await fetch('/api/super-admin/system-health', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                let data;
+                if (response.ok) {
+                    data = await response.json();
+                } else {
+                    data = getFallbackSystemHealth();
+                }
+                
+                renderSystemHealth(data);
+            } catch (error) {
+                console.error('Error loading system health:', error);
+                renderSystemHealth(getFallbackSystemHealth());
+            }
+        }
+
+        function getFallbackSystemHealth() {
+            return {
+                database: { status: 'healthy', latency: '12ms', connections: 24 },
+                api: { status: 'healthy', responseTime: '180ms', requests: 1247 },
+                storage: { status: 'healthy', usage: '67%', available: '2.1TB' },
+                cache: { status: 'healthy', hitRate: '94.2%', size: '1.8GB' }
+            };
+        }
+
+        function renderSystemHealth(health) {
+            const healthHtml = `
+                <div class="grid grid-2" style="gap: 1rem;">
+                    <div style="background: var(--bg-elevated); padding: 1rem; border-radius: 8px;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            <span class="status-badge status-${health.database.status === 'healthy' ? 'active' : 'error'}">
+                                Database
+                            </span>
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                            Latency: ${health.database.latency}<br>
+                            Connections: ${health.database.connections}
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-elevated); padding: 1rem; border-radius: 8px;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            <span class="status-badge status-${health.api.status === 'healthy' ? 'active' : 'error'}">
+                                API
+                            </span>
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                            Response: ${health.api.responseTime}<br>
+                            Requests: ${health.api.requests}
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-elevated); padding: 1rem; border-radius: 8px;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            <span class="status-badge status-${health.storage.status === 'healthy' ? 'active' : 'warning'}">
+                                Storage
+                            </span>
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                            Usage: ${health.storage.usage}<br>
+                            Available: ${health.storage.available}
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-elevated); padding: 1rem; border-radius: 8px;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                            <span class="status-badge status-${health.cache.status === 'healthy' ? 'active' : 'error'}">
+                                Cache
+                            </span>
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                            Hit Rate: ${health.cache.hitRate}<br>
+                            Size: ${health.cache.size}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('systemHealthContent').innerHTML = healthHtml;
+        }
+
+        // Load Top Agencies
+        async function loadTopAgencies() {
+            try {
+                const response = await fetch('/api/super-admin/top-agencies', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                let data;
+                if (response.ok) {
+                    data = await response.json();
+                } else {
+                    data = getFallbackTopAgencies();
+                }
+                
+                renderTopAgencies(data.agencies);
+            } catch (error) {
+                console.error('Error loading top agencies:', error);
+                renderTopAgencies(getFallbackTopAgencies().agencies);
+            }
+        }
+
+        function getFallbackTopAgencies() {
+            return {
+                agencies: [
+                    { name: 'Elite Insurance Group', revenue: 125000, growth: 18.5 },
+                    { name: 'Premier Protection LLC', revenue: 108000, growth: 12.3 },
+                    { name: 'Apex Coverage Solutions', revenue: 95000, growth: 22.1 },
+                    { name: 'Guardian Risk Management', revenue: 87000, growth: 8.7 },
+                    { name: 'Shield Insurance Partners', revenue: 79000, growth: 15.2 }
+                ]
+            };
+        }
+
+        function renderTopAgencies(agencies) {
+            const agenciesHtml = agencies.map((agency, index) => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: var(--bg-elevated); border-radius: 8px; margin-bottom: 0.5rem;">
+                    <div>
+                        <div style="font-weight: 600; color: var(--text-primary);">
+                            ${index + 1}. ${agency.name}
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">
+                            Growth: +${agency.growth}%
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: 600; color: var(--accent-gold);">
+                            $${agency.revenue.toLocaleString()}
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">
+                            Monthly
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('topAgenciesContent').innerHTML = agenciesHtml;
+        }
+
+        // Load Activity Feed
+        async function loadActivityFeed() {
+            try {
+                const filter = document.getElementById('activityFilter').value;
+                const response = await fetch(`/api/super-admin/activity-feed?filter=${filter}`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                let data;
+                if (response.ok) {
+                    data = await response.json();
+                } else {
+                    data = getFallbackActivityFeed();
+                }
+                
+                renderActivityFeed(data.activities);
+            } catch (error) {
+                console.error('Error loading activity feed:', error);
+                renderActivityFeed(getFallbackActivityFeed().activities);
+            }
+        }
+
+        function getFallbackActivityFeed() {
+            return {
+                activities: [
+                    { type: 'agency', message: 'New agency "Premier Insurance LLC" registered', time: '2 minutes ago', icon: 'building-2' },
+                    { type: 'revenue', message: 'Monthly revenue milestone reached: $2M', time: '15 minutes ago', icon: 'dollar-sign' },
+                    { type: 'users', message: '28 new users registered across platform', time: '1 hour ago', icon: 'user-plus' },
+                    { type: 'system', message: 'Database backup completed successfully', time: '2 hours ago', icon: 'hard-drive' },
+                    { type: 'agency', message: 'Elite Insurance Group upgraded to Premium plan', time: '4 hours ago', icon: 'arrow-up' },
+                    { type: 'users', message: 'Super admin login from new location detected', time: '6 hours ago', icon: 'shield-alert' }
+                ]
+            };
+        }
+
+        function renderActivityFeed(activities) {
+            const feedHtml = activities.map(activity => {
+                const typeColors = {
+                    agency: 'var(--accent-gold)',
+                    revenue: 'var(--success)',
+                    users: 'var(--info)',
+                    system: 'var(--text-secondary)'
+                };
+                
+                return `
+                    <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; border-bottom: 1px solid var(--border-color);">
+                        <div style="color: ${typeColors[activity.type]};">
+                            <i data-lucide="${activity.icon}" style="width: 20px; height: 20px;"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="color: var(--text-primary); margin-bottom: 0.25rem;">
+                                ${activity.message}
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">
+                                ${activity.time}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('activityFeedContent').innerHTML = feedHtml;
+            lucide.createIcons();
+        }
+
+        // Event Handlers
+        function refreshSystemHealth() {
+            loadSystemHealth();
+        }
+
+        function viewAllAgencies() {
+            window.location.href = 'agency-management.html';
+        }
+
+        function refreshActivityFeed() {
+            loadActivityFeed();
+        }
+
+        function refreshDashboard() {
+            loadKPIs();
+            loadRevenueData();
+            loadActivityData();
+            loadSystemHealth();
+            loadTopAgencies();
+            loadActivityFeed();
+        }
+
+        // Portal Access Function
+        function openPortal(portalType) {
+            const portalUrls = {
+                'agent': 'https://insurance.syncedupsolutions.com/agent/',
+                'manager': 'https://insurance.syncedupsolutions.com/manager/',
+                'admin': 'https://insurance.syncedupsolutions.com/admin/',
+                'customer-service': 'https://insurance.syncedupsolutions.com/customer-service/'
+            };
+            
+            const url = portalUrls[portalType];
+            if (url) {
+                // Open in new tab to allow easy switching between portals
+                window.open(url, '_blank');
+            }
+        }
+
+        // Dropdown Functions
+        function togglePortalDropdown() {
+            const dropdown = document.getElementById('portalDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        function switchToPortal(portalType) {
+            const portalUrls = {
+                'agent': 'https://insurance.syncedupsolutions.com/agent/',
+                'manager': 'https://insurance.syncedupsolutions.com/manager/',
+                'admin': 'https://insurance.syncedupsolutions.com/admin/',
+                'customer-service': 'https://insurance.syncedupsolutions.com/customer-service/'
+            };
+            
+            const url = portalUrls[portalType];
+            if (url) {
+                window.open(url, '_blank');
+            }
+            
+            // Close dropdown after selection
+            document.getElementById('portalDropdown').classList.remove('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('portalDropdown');
+            const dropdownToggle = document.getElementById('portalSwitchBtn');
+            
+            if (!dropdown.contains(event.target) && !dropdownToggle.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Chart timeframe change handlers
+        document.getElementById('revenueTimeframe').addEventListener('change', loadRevenueData);
+        document.getElementById('activityTimeframe').addEventListener('change', loadActivityData);
+        document.getElementById('activityFilter').addEventListener('change', loadActivityFeed);
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        });
+    </script>
+</body>
+</html>

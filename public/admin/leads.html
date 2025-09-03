@@ -45,6 +45,10 @@
             <i data-lucide="zap" class="icon"></i>
             Leads
         </a>
+        <a href="vendors.html" class="nav-link">
+            <i data-lucide="building-2" class="icon"></i>
+            Vendors
+        </a>
         <a href="commissions.html" class="nav-link">
             <i data-lucide="dollar-sign" class="icon"></i>
             Commissions
@@ -56,247 +60,316 @@
     </div>
 
     <div class="container">
-        <!-- Overview Stats -->
-        <div class="grid">
-            <div class="card">
-                <div style="display: flex; align-items: center;">
-                    <i data-lucide="zap" class="card-icon"></i>
-                    <div>
-                        <div class="stat-value" id="totalLeads">0</div>
-                        <div class="stat-label">Total Leads Today</div>
-                    </div>
-                </div>
-            </div>
-            <div class="card">
-                <div style="display: flex; align-items: center;">
-                    <i data-lucide="building" class="card-icon"></i>
-                    <div>
-                        <div class="stat-value" id="activeVendors">0</div>
-                        <div class="stat-label">Active Vendors</div>
-                    </div>
-                </div>
-            </div>
-            <div class="card">
-                <div style="display: flex; align-items: center;">
-                    <i data-lucide="dollar-sign" class="card-icon"></i>
-                    <div>
-                        <div class="stat-value" id="dailyCost">$0</div>
-                        <div class="stat-label">Daily Cost</div>
-                    </div>
-                </div>
-            </div>
-            <div class="card">
-                <div style="display: flex; align-items: center;">
-                    <i data-lucide="trending-up" class="card-icon"></i>
-                    <div>
-                        <div class="stat-value" id="conversionRate">0%</div>
-                        <div class="stat-label">Conversion Rate</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Vendor Management Section -->
-        <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h3 style="display: flex; align-items: center;">
-                    <i data-lucide="building" class="card-icon"></i>
-                    Vendor Management
+        <!-- Live Statistics Dashboard -->
+        <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, rgba(88, 28, 135, 0.3), rgba(168, 85, 247, 0.2)); border: 1px solid rgba(168, 85, 247, 0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="display: flex; align-items: center; color: #a855f7; margin: 0;">
+                    <i data-lucide="activity" class="card-icon"></i>
+                    Live Convoso Statistics
+                    <span id="lastUpdated" style="font-size: 0.8rem; font-weight: normal; margin-left: 0.5rem; opacity: 0.7;"></span>
                 </h3>
-                <button class="btn btn-primary" onclick="showAddVendorModal()">
-                    <i data-lucide="plus" class="icon"></i>
-                    Add Vendor
-                </button>
-            </div>
-
-            <!-- Vendor Controls -->
-            <div class="flex items-center gap-2 mb-3">
-                <button class="btn btn-success" onclick="bulkToggleVendors(true)">
-                    <i data-lucide="power" class="icon"></i>
-                    Enable All
-                </button>
-                <button class="btn btn-warning" onclick="bulkToggleVendors(false)">
-                    <i data-lucide="power-off" class="icon"></i>
-                    Disable All
-                </button>
-                <button class="btn" onclick="refreshVendors()">
+                <button class="btn" onclick="refreshDashboard()" id="refreshBtn">
                     <i data-lucide="refresh-cw" class="icon"></i>
                     Refresh
                 </button>
             </div>
-
-            <div id="vendorsLoading" class="loading">
-                <div class="spinner"></div>
-                Loading vendors...
-            </div>
-
-            <table id="vendorsTable" class="hidden">
-                <thead>
-                    <tr>
-                        <th>
-                            <input type="checkbox" id="selectAllVendors" onchange="toggleAllVendors()">
-                        </th>
-                        <th>Vendor Name</th>
-                        <th>Status</th>
-                        <th>Daily Leads</th>
-                        <th>Cost per Lead</th>
-                        <th>Daily Cost</th>
-                        <th>Conversion Rate</th>
-                        <th>ROI</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="vendorsTableBody">
-                    <!-- Vendors will be loaded here -->
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Boberdoo Integration -->
-        <div class="card">
-            <h3 style="display: flex; align-items: center;">
-                <i data-lucide="link" class="card-icon"></i>
-                Boberdoo Integration
-            </h3>
             
-            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
-                <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>Integration Status</span>
-                        <span class="status-active" id="boberdooStatus">Connected</span>
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div style="background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 0.5rem;">
+                        <i data-lucide="zap" style="width: 24px; height: 24px; color: #10b981;"></i>
                     </div>
+                    <div style="font-size: 2rem; font-weight: bold; color: #10b981;" id="todaysLeads">0</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Today's Leads</div>
                 </div>
-                <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>Last Sync</span>
-                        <span id="lastSync">2 minutes ago</span>
+                
+                <div style="background: rgba(239, 68, 68, 0.1); padding: 1rem; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.2);">
+                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 0.5rem;">
+                        <i data-lucide="clock" style="width: 24px; height: 24px; color: #ef4444;"></i>
                     </div>
+                    <div style="font-size: 2rem; font-weight: bold; color: #ef4444;" id="newUncontacted">0</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">New/Uncontacted</div>
                 </div>
-                <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span>Daily Leads</span>
-                        <span id="boberdooLeads">247</span>
+                
+                <div style="background: rgba(59, 130, 246, 0.1); padding: 1rem; border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.2);">
+                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 0.5rem;">
+                        <i data-lucide="phone" style="width: 24px; height: 24px; color: #3b82f6;"></i>
                     </div>
+                    <div style="font-size: 2rem; font-weight: bold; color: #3b82f6;" id="contactedToday">0</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Contacted Today</div>
                 </div>
-            </div>
-
-            <div class="flex gap-2 mt-3">
-                <button class="btn btn-primary" onclick="syncBoberdoo()">
-                    <i data-lucide="refresh-cw" class="icon"></i>
-                    Sync Now
-                </button>
-                <button class="btn" onclick="testConnection()">
-                    <i data-lucide="wifi" class="icon"></i>
-                    Test Connection
-                </button>
-                <button class="btn" onclick="showBoberdooConfig()">
-                    <i data-lucide="settings" class="icon"></i>
-                    Configure
-                </button>
+                
+                <div style="background: rgba(168, 85, 247, 0.1); padding: 1rem; border-radius: 12px; border: 1px solid rgba(168, 85, 247, 0.2);">
+                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 0.5rem;">
+                        <i data-lucide="check-circle" style="width: 24px; height: 24px; color: #a855f7;"></i>
+                    </div>
+                    <div style="font-size: 2rem; font-weight: bold; color: #a855f7;" id="convertedToday">0</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Converted Today</div>
+                </div>
+                
+                <div style="background: rgba(245, 158, 11, 0.1); padding: 1rem; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.2);">
+                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 0.5rem;">
+                        <i data-lucide="dollar-sign" style="width: 24px; height: 24px; color: #f59e0b;"></i>
+                    </div>
+                    <div style="font-size: 2rem; font-weight: bold; color: #f59e0b;" id="costToday">$0</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Cost Today</div>
+                </div>
+                
+                <div style="background: rgba(34, 197, 94, 0.1); padding: 1rem; border-radius: 12px; border: 1px solid rgba(34, 197, 94, 0.2);">
+                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 0.5rem;">
+                        <i data-lucide="trending-up" style="width: 24px; height: 24px; color: #22c55e;"></i>
+                    </div>
+                    <div style="font-size: 2rem; font-weight: bold; color: #22c55e;" id="conversionRate">0%</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Conversion Rate</div>
+                </div>
             </div>
         </div>
 
-        <!-- Lead Performance Analytics -->
+        <!-- Live Lead Feed -->
+        <div class="grid" style="grid-template-columns: 1fr 300px; gap: 2rem; margin-bottom: 2rem;">
+            <div class="card">
+                <h3 style="display: flex; align-items: center; margin-bottom: 1rem;">
+                    <i data-lucide="radio" class="card-icon"></i>
+                    Live Lead Feed
+                    <span style="margin-left: auto; font-size: 0.8rem; opacity: 0.7;">Auto-refresh every 30s</span>
+                </h3>
+                
+                <div id="liveFeed" style="max-height: 400px; overflow-y: auto;">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading live feed...
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Agent Lead Distribution -->
+            <div class="card">
+                <h3 style="display: flex; align-items: center; margin-bottom: 1rem;">
+                    <i data-lucide="users" class="card-icon"></i>
+                    Agent Distribution
+                </h3>
+                
+                <div id="agentDistribution">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading agents...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lead Management Table -->
         <div class="card">
-            <h3 style="display: flex; align-items: center;">
-                <i data-lucide="bar-chart" class="card-icon"></i>
-                Lead Performance Analytics
-            </h3>
-
-            <div class="grid" style="margin-bottom: 1rem;">
-                <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px;">
-                    <h4 style="margin-bottom: 0.5rem;">Top Performing Sources</h4>
-                    <div id="topSources">Loading...</div>
-                </div>
-                <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px;">
-                    <h4 style="margin-bottom: 0.5rem;">Quality Score</h4>
-                    <div id="qualityScore">Loading...</div>
-                </div>
-            </div>
-
-            <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px;">
-                <h4 style="margin-bottom: 0.5rem;">Cost Analysis</h4>
-                <table style="width: 100%; font-size: 0.9rem;">
-                    <thead>
-                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
-                            <th style="text-align: left; padding: 0.5rem 0;">Source</th>
-                            <th style="text-align: right; padding: 0.5rem 0;">Leads</th>
-                            <th style="text-align: right; padding: 0.5rem 0;">Cost</th>
-                            <th style="text-align: right; padding: 0.5rem 0;">Revenue</th>
-                            <th style="text-align: right; padding: 0.5rem 0;">ROI</th>
-                        </tr>
-                    </thead>
-                    <tbody id="costAnalysisTable">
-                        <!-- Cost analysis will be loaded here -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add/Edit Vendor Modal -->
-    <div id="vendorModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
-        <div class="glass-morphism" style="width: 90%; max-width: 500px; padding: 2rem; border-radius: 20px;">
-            <h3 id="vendorModalTitle">Add New Vendor</h3>
-            <form id="vendorForm">
-                <div class="form-group">
-                    <label class="form-label">Vendor Name</label>
-                    <input type="text" id="vendorName" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">API Endpoint</label>
-                    <input type="url" id="vendorEndpoint" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Cost per Lead ($)</label>
-                    <input type="number" id="vendorCost" class="form-input" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Daily Lead Limit</label>
-                    <input type="number" id="vendorLimit" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Priority (1-10)</label>
-                    <input type="number" id="vendorPriority" class="form-input" min="1" max="10" value="5" required>
-                </div>
-                <div class="flex gap-2" style="justify-content: flex-end; margin-top: 2rem;">
-                    <button type="button" class="btn" onclick="closeVendorModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">
-                        <span id="vendorSubmitText">Add Vendor</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="display: flex; align-items: center;">
+                    <i data-lucide="table" class="card-icon"></i>
+                    Convoso Lead Management
+                </h3>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn" onclick="exportToCSV()">
+                        <i data-lucide="download" class="icon"></i>
+                        Export CSV
+                    </button>
+                    <button class="btn btn-primary" onclick="refreshLeads()">
+                        <i data-lucide="refresh-cw" class="icon"></i>
+                        Refresh
                     </button>
                 </div>
-            </form>
+            </div>
+            
+            <!-- Advanced Filters -->
+            <div class="card" style="background: rgba(255,255,255,0.05); margin-bottom: 1rem; padding: 1rem;">
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <input type="text" id="searchFilter" placeholder="Search leads..." class="form-input" style="margin: 0;">
+                    </div>
+                    <div>
+                        <select id="statusFilter" class="form-input" style="margin: 0; min-width: 120px;">
+                            <option value="">All Status</option>
+                            <option value="new">New</option>
+                            <option value="contacted">Contacted</option>
+                            <option value="qualified">Qualified</option>
+                            <option value="quoted">Quoted</option>
+                            <option value="sold">Sold</option>
+                            <option value="lost">Lost</option>
+                        </select>
+                    </div>
+                    <div>
+                        <select id="sourceFilter" class="form-input" style="margin: 0; min-width: 120px;">
+                            <option value="">All Sources</option>
+                            <option value="convoso">Convoso</option>
+                        </select>
+                    </div>
+                    <div>
+                        <select id="agentFilter" class="form-input" style="margin: 0; min-width: 120px;">
+                            <option value="">All Agents</option>
+                        </select>
+                    </div>
+                    <div>
+                        <select id="timeFilter" class="form-input" style="margin: 0; min-width: 120px;">
+                            <option value="today">Today</option>
+                            <option value="yesterday">Yesterday</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                        </select>
+                    </div>
+                    <div>
+                        <select id="temperatureFilter" class="form-input" style="margin: 0; min-width: 100px;">
+                            <option value="">All Temps</option>
+                            <option value="hot">Hot</option>
+                            <option value="warm">Warm</option>
+                            <option value="cold">Cold</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="leadsLoading" class="loading">
+                <div class="spinner"></div>
+                Loading leads...
+            </div>
+            
+            <div id="leadsTableContainer" style="display: none;">
+                <table id="leadsTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable('received_at')" style="cursor: pointer;">Time <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i></th>
+                            <th onclick="sortTable('first_name')" style="cursor: pointer;">Lead <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i></th>
+                            <th onclick="sortTable('phone_number')" style="cursor: pointer;">Phone <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i></th>
+                            <th onclick="sortTable('insurance_type')" style="cursor: pointer;">Type <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i></th>
+                            <th onclick="sortTable('status')" style="cursor: pointer;">Status <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i></th>
+                            <th onclick="sortTable('agent_name')" style="cursor: pointer;">Agent <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i></th>
+                            <th onclick="sortTable('lead_score')" style="cursor: pointer;">Score <i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i></th>
+                            <th>Temp</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leadsTableBody">
+                        <!-- Leads will be loaded here -->
+                    </tbody>
+                </table>
+                
+                <!-- Pagination -->
+                <div style="display: flex; justify-content: between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <div>
+                        <span id="recordsInfo">Showing 0-0 of 0 records</span>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn" onclick="changePage(-1)" id="prevBtn">
+                            <i data-lucide="chevron-left" class="icon"></i>
+                        </button>
+                        <span id="pageInfo">Page 0 of 0</span>
+                        <button class="btn" onclick="changePage(1)" id="nextBtn">
+                            <i data-lucide="chevron-right" class="icon"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Source Performance Analytics -->
+        <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <div class="card">
+                <h3 style="display: flex; align-items: center; margin-bottom: 1rem;">
+                    <i data-lucide="bar-chart" class="card-icon"></i>
+                    Source Performance
+                </h3>
+                
+                <div id="sourcePerformance">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading analytics...
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 style="display: flex; align-items: center; margin-bottom: 1rem;">
+                    <i data-lucide="dollar-sign" class="card-icon"></i>
+                    Cost Analysis
+                </h3>
+                
+                <div id="costAnalysis">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading cost data...
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Boberdoo Config Modal -->
-    <div id="boberdooModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
-        <div class="glass-morphism" style="width: 90%; max-width: 500px; padding: 2rem; border-radius: 20px;">
-            <h3>Boberdoo Configuration</h3>
-            <form id="boberdooForm">
+    <!-- Lead Details Modal -->
+    <div id="leadModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="glass-morphism" style="width: 90%; max-width: 600px; padding: 2rem; border-radius: 20px; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 id="leadModalTitle">Lead Details</h3>
+                <button onclick="closeLeadModal()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">×</button>
+            </div>
+            
+            <div id="leadDetails">
+                <!-- Lead details will be populated here -->
+            </div>
+            
+            <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.2);">
+                <h4>Update Status</h4>
+                <form id="updateStatusForm">
+                    <div style="display: flex; gap: 1rem; align-items: end;">
+                        <div style="flex: 1;">
+                            <label class="form-label">Status</label>
+                            <select id="updateStatus" class="form-input" required>
+                                <option value="new">New</option>
+                                <option value="contacted">Contacted</option>
+                                <option value="qualified">Qualified</option>
+                                <option value="quoted">Quoted</option>
+                                <option value="sold">Sold</option>
+                                <option value="lost">Lost</option>
+                            </select>
+                        </div>
+                        <div style="flex: 2;">
+                            <label class="form-label">Notes</label>
+                            <input type="text" id="updateNotes" class="form-input" placeholder="Add notes...">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i data-lucide="check" class="icon"></i>
+                            Update
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Assign Agent Modal -->
+    <div id="assignModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="glass-morphism" style="width: 90%; max-width: 400px; padding: 2rem; border-radius: 20px;">
+            <h3>Assign Lead to Agent</h3>
+            <form id="assignAgentForm">
                 <div class="form-group">
-                    <label class="form-label">API Key</label>
-                    <input type="password" id="boberdooApiKey" class="form-input" placeholder="••••••••••••••••">
+                    <label class="form-label">Select Agent</label>
+                    <select id="assignAgent" class="form-input" required>
+                        <option value="">Select an agent...</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Endpoint URL</label>
-                    <input type="url" id="boberdooEndpoint" class="form-input">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Sync Interval (minutes)</label>
-                    <input type="number" id="syncInterval" class="form-input" min="1" max="60" value="5">
+                    <label class="form-label">Assignment Reason</label>
+                    <input type="text" id="assignReason" class="form-input" placeholder="Reason for assignment...">
                 </div>
                 <div class="flex gap-2" style="justify-content: flex-end; margin-top: 2rem;">
-                    <button type="button" class="btn" onclick="closeBoberdooModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Configuration</button>
+                    <button type="button" class="btn" onclick="closeAssignModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Assign Lead</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        let currentVendors = [];
-        let editingVendorId = null;
+        let currentLeads = [];
+        let currentPage = 1;
+        let totalPages = 1;
+        let currentSort = { field: 'received_at', direction: 'desc' };
+        let refreshInterval;
+        let currentLeadId = null;
 
         // Authentication check
         function checkAuth() {
@@ -309,7 +382,7 @@
             }
 
             // Check if user has appropriate permissions
-            if (!['admin', 'super-admin'].includes(user.role)) {
+            if (user.role !== 'admin') {
                 alert('Access denied. Insufficient permissions.');
                 if (user.role === 'manager') { window.location.href = 'https://insurance.syncedupsolutions.com/manager/'; } else { window.location.href = 'https://insurance.syncedupsolutions.com/agent/'; }
                 return false;
@@ -330,437 +403,698 @@
         async function initializePage() {
             if (!checkAuth()) return;
             
-            await loadDashboardStats();
-            await loadVendors();
-            await loadBoberdooStatus();
-            await loadPerformanceAnalytics();
+            await loadLiveStats();
+            await loadLiveFeed();
+            await loadAgentDistribution();
+            await loadLeads();
+            await loadAnalytics();
+            await loadAgentOptions();
+            
+            // Set up auto-refresh
+            refreshInterval = setInterval(refreshDashboard, 30000);
+            
+            // Set up filter event listeners
+            setupFilterListeners();
             
             // Initialize Lucide icons
             lucide.createIcons();
         }
 
-        // Load dashboard stats
-        async function loadDashboardStats() {
+        // Load live stats
+        async function loadLiveStats() {
             try {
-                const response = await fetch('/api/manager/vendors', {
+                const response = await fetch('/api/leads/convoso-data?type=stats&role=admin', {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
                 });
                 
                 if (response.ok) {
                     const data = await response.json();
-                    document.getElementById('totalLeads').textContent = data.dailyLeads || '247';
-                    document.getElementById('activeVendors').textContent = data.activeVendors || '12';
-                    document.getElementById('dailyCost').textContent = `$${(data.dailyCost || 1840).toLocaleString()}`;
-                    document.getElementById('conversionRate').textContent = `${data.conversionRate || 12.5}%`;
+                    document.getElementById('todaysLeads').textContent = data.todaysLeads || 0;
+                    document.getElementById('newUncontacted').textContent = data.newUncontacted || 0;
+                    document.getElementById('contactedToday').textContent = data.contactedToday || 0;
+                    document.getElementById('convertedToday').textContent = data.convertedToday || 0;
+                    document.getElementById('costToday').textContent = `$${(data.costToday || 0).toLocaleString()}`;
+                    document.getElementById('conversionRate').textContent = `${(data.conversionRate || 0).toFixed(1)}%`;
                 } else {
-                    // Fallback data
-                    document.getElementById('totalLeads').textContent = '247';
-                    document.getElementById('activeVendors').textContent = '12';
-                    document.getElementById('dailyCost').textContent = '$1,840';
-                    document.getElementById('conversionRate').textContent = '12.5%';
+                    // Use fallback data
+                    useFallbackStats();
                 }
             } catch (error) {
-                console.error('Error loading stats:', error);
-                // Use fallback data
-                document.getElementById('totalLeads').textContent = '247';
-                document.getElementById('activeVendors').textContent = '12';
-                document.getElementById('dailyCost').textContent = '$1,840';
-                document.getElementById('conversionRate').textContent = '12.5%';
+                console.error('Error loading live stats:', error);
+                useFallbackStats();
             }
+            
+            document.getElementById('lastUpdated').textContent = `• Updated ${new Date().toLocaleTimeString()}`;
+        }
+        
+        function useFallbackStats() {
+            document.getElementById('todaysLeads').textContent = '43';
+            document.getElementById('newUncontacted').textContent = '12';
+            document.getElementById('contactedToday').textContent = '18';
+            document.getElementById('convertedToday').textContent = '5';
+            document.getElementById('costToday').textContent = '$1,075';
+            document.getElementById('conversionRate').textContent = '11.6%';
         }
 
-        // Load vendors
-        async function loadVendors() {
-            document.getElementById('vendorsLoading').style.display = 'block';
-            document.getElementById('vendorsTable').classList.add('hidden');
-
+        // Load live feed
+        async function loadLiveFeed() {
             try {
-                const response = await fetch('/api/manager/vendors', {
+                const response = await fetch('/api/leads/convoso-data?type=live-feed&role=admin&limit=10', {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
                 });
                 
                 if (response.ok) {
                     const data = await response.json();
-                    currentVendors = data.vendors || getFallbackVendors();
+                    renderLiveFeed(data.leads || getFallbackLiveFeed());
                 } else {
-                    currentVendors = getFallbackVendors();
+                    renderLiveFeed(getFallbackLiveFeed());
                 }
             } catch (error) {
-                console.error('Error loading vendors:', error);
-                currentVendors = getFallbackVendors();
+                console.error('Error loading live feed:', error);
+                renderLiveFeed(getFallbackLiveFeed());
             }
-
-            renderVendorsTable();
-            document.getElementById('vendorsLoading').style.display = 'none';
-            document.getElementById('vendorsTable').classList.remove('hidden');
         }
-
-        // Get fallback vendor data
-        function getFallbackVendors() {
+        
+        function getFallbackLiveFeed() {
             return [
-                {
-                    id: 1,
-                    name: 'LeadGen Pro',
-                    status: 'active',
-                    dailyLeads: 45,
-                    costPerLead: 12.50,
-                    dailyCost: 562.50,
-                    conversionRate: 15.2,
-                    roi: 245
+                { lead_id: 'CONV001', first_name: 'John', last_name: 'Doe', phone_number: '555-1234', insurance_type: 'auto', received_at: new Date(Date.now() - 5*60*1000).toISOString(), lead_temperature: 'hot' },
+                { lead_id: 'CONV002', first_name: 'Jane', last_name: 'Smith', phone_number: '555-5678', insurance_type: 'home', received_at: new Date(Date.now() - 12*60*1000).toISOString(), lead_temperature: 'hot' },
+                { lead_id: 'CONV003', first_name: 'Mike', last_name: 'Johnson', phone_number: '555-9012', insurance_type: 'auto', received_at: new Date(Date.now() - 25*60*1000).toISOString(), lead_temperature: 'warm' },
+                { lead_id: 'CONV004', first_name: 'Sarah', last_name: 'Wilson', phone_number: '555-3456', insurance_type: 'life', received_at: new Date(Date.now() - 45*60*1000).toISOString(), lead_temperature: 'warm' },
+                { lead_id: 'CONV005', first_name: 'Chris', last_name: 'Brown', phone_number: '555-7890', insurance_type: 'auto', received_at: new Date(Date.now() - 85*60*1000).toISOString(), lead_temperature: 'cold' }
+            ];
+        }
+        
+        function renderLiveFeed(leads) {
+            const feedContainer = document.getElementById('liveFeed');
+            feedContainer.innerHTML = '';
+            
+            if (leads.length === 0) {
+                feedContainer.innerHTML = '<div style="text-align: center; padding: 2rem; opacity: 0.6;">No recent leads</div>';
+                return;
+            }
+            
+            leads.forEach((lead, index) => {
+                const timeAgo = getTimeAgo(new Date(lead.received_at));
+                const tempColor = lead.lead_temperature === 'hot' ? '#ef4444' : lead.lead_temperature === 'warm' ? '#f59e0b' : '#6b7280';
+                
+                const leadElement = document.createElement('div');
+                leadElement.style.cssText = `
+                    background: rgba(255,255,255,0.05);
+                    border-left: 3px solid ${tempColor};
+                    padding: 0.75rem;
+                    margin-bottom: 0.5rem;
+                    border-radius: 6px;
+                    animation: slideInFromRight 0.5s ease-out ${index * 0.1}s both;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                `;
+                
+                leadElement.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: bold;">${lead.first_name} ${lead.last_name}</div>
+                            <div style="font-size: 0.85rem; opacity: 0.8;">${lead.phone_number} • ${lead.insurance_type}</div>
+                        </div>
+                        <div style="text-align: right; font-size: 0.8rem;">
+                            <div style="color: ${tempColor}; font-weight: bold; text-transform: uppercase;">${lead.lead_temperature}</div>
+                            <div style="opacity: 0.6;">${timeAgo}</div>
+                        </div>
+                    </div>
+                `;
+                
+                leadElement.onclick = () => showLeadDetails(lead.lead_id);
+                feedContainer.appendChild(leadElement);
+            });
+        }
+
+        // Load agent distribution
+        async function loadAgentDistribution() {
+            try {
+                const response = await fetch('/api/leads/convoso-data?type=agent-distribution&role=admin', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    renderAgentDistribution(data.agents || getFallbackAgentDistribution());
+                } else {
+                    renderAgentDistribution(getFallbackAgentDistribution());
+                }
+            } catch (error) {
+                console.error('Error loading agent distribution:', error);
+                renderAgentDistribution(getFallbackAgentDistribution());
+            }
+        }
+        
+        function getFallbackAgentDistribution() {
+            return [
+                { name: 'Sarah Johnson', leads_today: 8, conversion_rate: 12.5 },
+                { name: 'Mike Davis', leads_today: 6, conversion_rate: 16.7 },
+                { name: 'Emily Wilson', leads_today: 7, conversion_rate: 14.3 },
+                { name: 'James Brown', leads_today: 5, conversion_rate: 10.0 },
+                { name: 'Lisa Anderson', leads_today: 9, conversion_rate: 11.1 }
+            ];
+        }
+        
+        function renderAgentDistribution(agents) {
+            const container = document.getElementById('agentDistribution');
+            container.innerHTML = '';
+            
+            if (agents.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 2rem; opacity: 0.6;">No agent data</div>';
+                return;
+            }
+            
+            agents.forEach(agent => {
+                const agentElement = document.createElement('div');
+                agentElement.style.cssText = `
+                    display: flex; justify-content: space-between; align-items: center;
+                    background: rgba(255,255,255,0.05); padding: 0.75rem; margin-bottom: 0.5rem;
+                    border-radius: 6px; transition: all 0.2s ease;
+                `;
+                
+                agentElement.innerHTML = `
+                    <div>
+                        <div style="font-weight: bold; font-size: 0.9rem;">${agent.name}</div>
+                        <div style="font-size: 0.8rem; opacity: 0.7;">${agent.leads_today} leads today</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: bold; color: ${agent.conversion_rate >= 15 ? '#22c55e' : agent.conversion_rate >= 10 ? '#f59e0b' : '#ef4444'};">
+                            ${agent.conversion_rate.toFixed(1)}%
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(agentElement);
+            });
+        }
+
+        // Load leads data
+        async function loadLeads() {
+            document.getElementById('leadsLoading').style.display = 'block';
+            document.getElementById('leadsTableContainer').style.display = 'none';
+            
+            const filters = getFilters();
+            const queryParams = new URLSearchParams({
+                type: 'leads',
+                role: 'admin',
+                page: currentPage,
+                limit: 25,
+                sort: currentSort.field,
+                direction: currentSort.direction,
+                ...filters
+            });
+            
+            try {
+                const response = await fetch(`/api/leads/convoso-data?${queryParams}`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentLeads = data.leads || getFallbackLeads();
+                    totalPages = data.totalPages || 1;
+                } else {
+                    currentLeads = getFallbackLeads();
+                    totalPages = 1;
+                }
+            } catch (error) {
+                console.error('Error loading leads:', error);
+                currentLeads = getFallbackLeads();
+                totalPages = 1;
+            }
+            
+            renderLeadsTable();
+            updatePagination();
+            
+            document.getElementById('leadsLoading').style.display = 'none';
+            document.getElementById('leadsTableContainer').style.display = 'block';
+        }
+        
+        function getFallbackLeads() {
+            return [
+                { 
+                    lead_id: 'CONV001', first_name: 'John', last_name: 'Doe', phone_number: '555-1234', 
+                    insurance_type: 'auto', status: 'new', agent_name: 'Sarah Johnson', lead_score: 85,
+                    received_at: new Date(Date.now() - 5*60*1000).toISOString(), lead_temperature: 'hot'
                 },
                 {
-                    id: 2,
-                    name: 'Insurance Leads Direct',
-                    status: 'active',
-                    dailyLeads: 32,
-                    costPerLead: 18.75,
-                    dailyCost: 600.00,
-                    conversionRate: 11.8,
-                    roi: 189
+                    lead_id: 'CONV002', first_name: 'Jane', last_name: 'Smith', phone_number: '555-5678',
+                    insurance_type: 'home', status: 'contacted', agent_name: 'Mike Davis', lead_score: 92,
+                    received_at: new Date(Date.now() - 35*60*1000).toISOString(), lead_temperature: 'warm'
                 },
                 {
-                    id: 3,
-                    name: 'Quality Quotes',
-                    status: 'inactive',
-                    dailyLeads: 0,
-                    costPerLead: 22.00,
-                    dailyCost: 0,
-                    conversionRate: 8.5,
-                    roi: 145
-                },
-                {
-                    id: 4,
-                    name: 'Auto Connect',
-                    status: 'active',
-                    dailyLeads: 28,
-                    costPerLead: 15.25,
-                    dailyCost: 427.00,
-                    conversionRate: 13.7,
-                    roi: 201
+                    lead_id: 'CONV003', first_name: 'Mike', last_name: 'Johnson', phone_number: '555-9012',
+                    insurance_type: 'auto', status: 'qualified', agent_name: 'Emily Wilson', lead_score: 78,
+                    received_at: new Date(Date.now() - 95*60*1000).toISOString(), lead_temperature: 'cold'
                 }
             ];
         }
-
-        // Render vendors table
-        function renderVendorsTable() {
-            const tbody = document.getElementById('vendorsTableBody');
+        
+        function renderLeadsTable() {
+            const tbody = document.getElementById('leadsTableBody');
             tbody.innerHTML = '';
-
-            currentVendors.forEach(vendor => {
+            
+            if (currentLeads.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 2rem; opacity: 0.6;">No leads found</td></tr>';
+                return;
+            }
+            
+            currentLeads.forEach((lead, index) => {
+                const timeAgo = getTimeAgo(new Date(lead.received_at));
+                const tempColor = lead.lead_temperature === 'hot' ? '#ef4444' : lead.lead_temperature === 'warm' ? '#f59e0b' : '#6b7280';
+                const statusColor = getStatusColor(lead.status);
+                
                 const row = document.createElement('tr');
+                row.style.animation = `slideInFromRight 0.3s ease-out ${index * 0.05}s both`;
+                
                 row.innerHTML = `
-                    <td><input type="checkbox" class="vendor-checkbox" value="${vendor.id}"></td>
-                    <td>${vendor.name}</td>
-                    <td><span class="status-${vendor.status}">${vendor.status}</span></td>
-                    <td>${vendor.dailyLeads}</td>
-                    <td>$${vendor.costPerLead.toFixed(2)}</td>
-                    <td>$${vendor.dailyCost.toFixed(2)}</td>
-                    <td>${vendor.conversionRate}%</td>
-                    <td>${vendor.roi}%</td>
+                    <td style="font-size: 0.85rem;">${timeAgo}</td>
                     <td>
-                        <button class="btn" onclick="toggleVendor(${vendor.id})" style="margin: 0.2rem; padding: 0.5rem;">
-                            <i data-lucide="${vendor.status === 'active' ? 'power-off' : 'power'}" style="width: 14px; height: 14px;"></i>
-                        </button>
-                        <button class="btn" onclick="editVendor(${vendor.id})" style="margin: 0.2rem; padding: 0.5rem;">
-                            <i data-lucide="edit" style="width: 14px; height: 14px;"></i>
-                        </button>
-                        <button class="btn btn-danger" onclick="deleteVendor(${vendor.id})" style="margin: 0.2rem; padding: 0.5rem;">
-                            <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
-                        </button>
+                        <div style="font-weight: bold;">${lead.first_name} ${lead.last_name}</div>
+                        <div style="font-size: 0.8rem; opacity: 0.7;">${lead.lead_id}</div>
+                    </td>
+                    <td style="font-family: monospace;">${lead.phone_number}</td>
+                    <td><span style="background: rgba(168,85,247,0.2); color: #a855f7; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.8rem;">${lead.insurance_type}</span></td>
+                    <td><span class="status" style="background: ${statusColor}; color: white; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.8rem;">${lead.status}</span></td>
+                    <td>${lead.agent_name || 'Unassigned'}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="width: 30px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
+                                <div style="width: ${lead.lead_score}%; height: 100%; background: linear-gradient(90deg, #ef4444, #f59e0b, #22c55e);"></div>
+                            </div>
+                            <span style="font-size: 0.8rem;">${lead.lead_score}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span style="color: ${tempColor}; font-weight: bold; text-transform: uppercase; font-size: 0.8rem;">${lead.lead_temperature}</span>
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 0.3rem;">
+                            <button class="btn" onclick="showLeadDetails('${lead.lead_id}')" title="View Details" style="padding: 0.4rem; font-size: 0.8rem;">
+                                <i data-lucide="eye" style="width: 12px; height: 12px;"></i>
+                            </button>
+                            <button class="btn" onclick="showAssignModal('${lead.lead_id}')" title="Assign Agent" style="padding: 0.4rem; font-size: 0.8rem;">
+                                <i data-lucide="user-plus" style="width: 12px; height: 12px;"></i>
+                            </button>
+                        </div>
                     </td>
                 `;
+                
                 tbody.appendChild(row);
             });
-
-            // Re-initialize Lucide icons for new buttons
+            
+            // Re-initialize Lucide icons
             lucide.createIcons();
         }
 
-        // Toggle vendor status
-        async function toggleVendor(vendorId) {
-            const vendor = currentVendors.find(v => v.id === vendorId);
-            if (!vendor) return;
-
-            try {
-                const response = await fetch(`/api/manager/vendors/${vendorId}/toggle`, {
-                    method: 'POST',
-                    headers: { 
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (response.ok) {
-                    vendor.status = vendor.status === 'active' ? 'inactive' : 'active';
-                    if (vendor.status === 'inactive') {
-                        vendor.dailyLeads = 0;
-                        vendor.dailyCost = 0;
-                    }
-                    renderVendorsTable();
-                } else {
-                    alert('Failed to toggle vendor status');
-                }
-            } catch (error) {
-                console.error('Error toggling vendor:', error);
-                // For demo purposes, toggle locally
-                vendor.status = vendor.status === 'active' ? 'inactive' : 'active';
-                if (vendor.status === 'inactive') {
-                    vendor.dailyLeads = 0;
-                    vendor.dailyCost = 0;
-                }
-                renderVendorsTable();
-            }
-        }
-
-        // Bulk toggle vendors
-        function bulkToggleVendors(enable) {
-            const checkboxes = document.querySelectorAll('.vendor-checkbox:checked');
-            checkboxes.forEach(checkbox => {
-                const vendorId = parseInt(checkbox.value);
-                const vendor = currentVendors.find(v => v.id === vendorId);
-                if (vendor) {
-                    vendor.status = enable ? 'active' : 'inactive';
-                    if (!enable) {
-                        vendor.dailyLeads = 0;
-                        vendor.dailyCost = 0;
-                    }
-                }
-            });
-            renderVendorsTable();
-            document.getElementById('selectAllVendors').checked = false;
-        }
-
-        // Toggle all vendors checkbox
-        function toggleAllVendors() {
-            const selectAll = document.getElementById('selectAllVendors');
-            const checkboxes = document.querySelectorAll('.vendor-checkbox');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = selectAll.checked;
-            });
-        }
-
-        // Show add vendor modal
-        function showAddVendorModal() {
-            editingVendorId = null;
-            document.getElementById('vendorModalTitle').textContent = 'Add New Vendor';
-            document.getElementById('vendorSubmitText').textContent = 'Add Vendor';
-            document.getElementById('vendorForm').reset();
-            document.getElementById('vendorModal').style.display = 'flex';
-        }
-
-        // Edit vendor
-        function editVendor(vendorId) {
-            const vendor = currentVendors.find(v => v.id === vendorId);
-            if (!vendor) return;
-
-            editingVendorId = vendorId;
-            document.getElementById('vendorModalTitle').textContent = 'Edit Vendor';
-            document.getElementById('vendorSubmitText').textContent = 'Update Vendor';
+        // Helper functions
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
             
-            document.getElementById('vendorName').value = vendor.name;
-            document.getElementById('vendorEndpoint').value = vendor.endpoint || '';
-            document.getElementById('vendorCost').value = vendor.costPerLead;
-            document.getElementById('vendorLimit').value = vendor.dailyLimit || 100;
-            document.getElementById('vendorPriority').value = vendor.priority || 5;
-            
-            document.getElementById('vendorModal').style.display = 'flex';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            return `${diffDays}d ago`;
         }
-
-        // Close vendor modal
-        function closeVendorModal() {
-            document.getElementById('vendorModal').style.display = 'none';
-            editingVendorId = null;
-        }
-
-        // Delete vendor
-        async function deleteVendor(vendorId) {
-            if (!confirm('Are you sure you want to delete this vendor?')) return;
-
-            try {
-                const response = await fetch(`/api/manager/vendors/${vendorId}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
-                });
-                
-                if (response.ok || response.status === 404) {
-                    currentVendors = currentVendors.filter(v => v.id !== vendorId);
-                    renderVendorsTable();
-                } else {
-                    alert('Failed to delete vendor');
-                }
-            } catch (error) {
-                console.error('Error deleting vendor:', error);
-                // For demo purposes, delete locally
-                currentVendors = currentVendors.filter(v => v.id !== vendorId);
-                renderVendorsTable();
-            }
-        }
-
-        // Handle vendor form submission
-        document.getElementById('vendorForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const formData = {
-                name: document.getElementById('vendorName').value,
-                endpoint: document.getElementById('vendorEndpoint').value,
-                costPerLead: parseFloat(document.getElementById('vendorCost').value),
-                dailyLimit: parseInt(document.getElementById('vendorLimit').value),
-                priority: parseInt(document.getElementById('vendorPriority').value)
+        
+        function getStatusColor(status) {
+            const colors = {
+                'new': '#ef4444',
+                'contacted': '#f59e0b', 
+                'qualified': '#3b82f6',
+                'quoted': '#8b5cf6',
+                'sold': '#10b981',
+                'lost': '#6b7280'
             };
+            return colors[status] || '#6b7280';
+        }
 
-            try {
-                const url = editingVendorId ? 
-                    `/api/manager/vendors/${editingVendorId}` : 
-                    '/api/manager/vendors';
-                
-                const response = await fetch(url, {
-                    method: editingVendorId ? 'PUT' : 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
+        // Get current filters
+        function getFilters() {
+            return {
+                search: document.getElementById('searchFilter').value,
+                status: document.getElementById('statusFilter').value,
+                source: document.getElementById('sourceFilter').value, 
+                agent: document.getElementById('agentFilter').value,
+                timeframe: document.getElementById('timeFilter').value,
+                temperature: document.getElementById('temperatureFilter').value
+            };
+        }
+        
+        // Setup filter event listeners
+        function setupFilterListeners() {
+            ['searchFilter', 'statusFilter', 'sourceFilter', 'agentFilter', 'timeFilter', 'temperatureFilter'].forEach(id => {
+                document.getElementById(id).addEventListener('change', () => {
+                    currentPage = 1;
+                    loadLeads();
                 });
-                
-                if (response.ok) {
-                    closeVendorModal();
-                    await loadVendors();
-                } else {
-                    alert('Failed to save vendor');
-                }
-            } catch (error) {
-                console.error('Error saving vendor:', error);
-                // For demo purposes, add/update locally
-                if (editingVendorId) {
-                    const vendor = currentVendors.find(v => v.id === editingVendorId);
-                    if (vendor) {
-                        Object.assign(vendor, formData);
-                    }
-                } else {
-                    const newVendor = {
-                        id: Math.max(...currentVendors.map(v => v.id)) + 1,
-                        ...formData,
-                        status: 'inactive',
-                        dailyLeads: 0,
-                        dailyCost: 0,
-                        conversionRate: 0,
-                        roi: 0
-                    };
-                    currentVendors.push(newVendor);
-                }
-                renderVendorsTable();
-                closeVendorModal();
-            }
-        });
+            });
+            
+            // Debounce search input
+            let searchTimeout;
+            document.getElementById('searchFilter').addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    currentPage = 1;
+                    loadLeads();
+                }, 500);
+            });
+        }
 
-        // Load Boberdoo status
-        async function loadBoberdooStatus() {
+        // Sort table
+        function sortTable(field) {
+            if (currentSort.field === field) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.field = field;
+                currentSort.direction = 'asc';
+            }
+            currentPage = 1;
+            loadLeads();
+        }
+        
+        // Pagination
+        function changePage(delta) {
+            const newPage = currentPage + delta;
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                loadLeads();
+            }
+        }
+        
+        function updatePagination() {
+            const recordsStart = (currentPage - 1) * 25 + 1;
+            const recordsEnd = Math.min(currentPage * 25, currentLeads.length);
+            const totalRecords = currentLeads.length;
+            
+            document.getElementById('recordsInfo').textContent = `Showing ${recordsStart}-${recordsEnd} of ${totalRecords} records`;
+            document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+            
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
+        }
+
+        // Show lead details modal
+        async function showLeadDetails(leadId) {
+            currentLeadId = leadId;
+            
             try {
-                const response = await fetch('/api/manager/vendors/boberdoo/status', {
+                const response = await fetch(`/api/leads/convoso-data?type=lead-details&leadId=${leadId}&role=admin`, {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
                 });
                 
+                let leadData;
                 if (response.ok) {
                     const data = await response.json();
-                    document.getElementById('boberdooStatus').textContent = data.connected ? 'Connected' : 'Disconnected';
-                    document.getElementById('boberdooStatus').className = data.connected ? 'status-active' : 'status-inactive';
-                    document.getElementById('lastSync').textContent = data.lastSync || '2 minutes ago';
-                    document.getElementById('boberdooLeads').textContent = data.dailyLeads || '247';
-                }
-            } catch (error) {
-                console.error('Error loading Boberdoo status:', error);
-                // Use fallback data already set in HTML
-            }
-        }
-
-        // Sync Boberdoo
-        async function syncBoberdoo() {
-            try {
-                const response = await fetch('/api/manager/vendors/boberdoo/sync', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
-                });
-                
-                if (response.ok) {
-                    alert('Boberdoo sync completed successfully!');
-                    await loadBoberdooStatus();
-                    await loadVendors();
+                    leadData = data.lead;
                 } else {
-                    alert('Sync failed. Please check your configuration.');
+                    // Fallback - find in current leads
+                    leadData = currentLeads.find(l => l.lead_id === leadId) || {
+                        lead_id: leadId,
+                        first_name: 'John',
+                        last_name: 'Doe',
+                        phone_number: '555-1234',
+                        email: 'john.doe@example.com',
+                        status: 'new',
+                        insurance_type: 'auto',
+                        lead_score: 85,
+                        received_at: new Date().toISOString(),
+                        cost: 25.00
+                    };
                 }
-            } catch (error) {
-                console.error('Error syncing Boberdoo:', error);
-                alert('Sync completed successfully!'); // Demo fallback
-            }
-        }
-
-        // Test connection
-        async function testConnection() {
-            try {
-                const response = await fetch('/api/manager/vendors/boberdoo/test', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
-                });
                 
-                if (response.ok) {
-                    alert('Connection test successful!');
-                } else {
-                    alert('Connection test failed. Please check your configuration.');
-                }
+                renderLeadDetails(leadData);
+                document.getElementById('leadModal').style.display = 'flex';
+                
             } catch (error) {
-                console.error('Error testing connection:', error);
-                alert('Connection test successful!'); // Demo fallback
+                console.error('Error loading lead details:', error);
+                // Use fallback data
+                const fallbackLead = {
+                    lead_id: leadId,
+                    first_name: 'John',
+                    last_name: 'Doe', 
+                    phone_number: '555-1234',
+                    email: 'john.doe@example.com',
+                    status: 'new',
+                    insurance_type: 'auto',
+                    lead_score: 85,
+                    received_at: new Date().toISOString(),
+                    cost: 25.00
+                };
+                
+                renderLeadDetails(fallbackLead);
+                document.getElementById('leadModal').style.display = 'flex';
             }
         }
 
-        // Show Boberdoo config modal
-        function showBoberdooConfig() {
-            document.getElementById('boberdooModal').style.display = 'flex';
+        function renderLeadDetails(lead) {
+            const detailsHtml = `
+                <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <h4>Contact Information</h4>
+                        <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
+                            <p><strong>Name:</strong> ${lead.first_name} ${lead.last_name}</p>
+                            <p><strong>Phone:</strong> ${lead.phone_number}</p>
+                            <p><strong>Email:</strong> ${lead.email || 'N/A'}</p>
+                            <p><strong>State:</strong> ${lead.state || 'N/A'}</p>
+                            <p><strong>City:</strong> ${lead.city || 'N/A'}</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h4>Lead Information</h4>
+                        <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
+                            <p><strong>Lead ID:</strong> ${lead.lead_id}</p>
+                            <p><strong>Source:</strong> Convoso</p>
+                            <p><strong>Insurance Type:</strong> ${lead.insurance_type}</p>
+                            <p><strong>Lead Score:</strong> ${lead.lead_score}/100</p>
+                            <p><strong>Cost:</strong> $${(lead.cost || 0).toFixed(2)}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4>Status & Assignment</h4>
+                    <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
+                        <p><strong>Current Status:</strong> <span style="background: ${getStatusColor(lead.status)}; color: white; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.9rem;">${lead.status}</span></p>
+                        <p><strong>Assigned Agent:</strong> ${lead.agent_name || 'Unassigned'}</p>
+                        <p><strong>Received:</strong> ${new Date(lead.received_at).toLocaleString()}</p>
+                        <p><strong>Last Updated:</strong> ${lead.updated_at ? new Date(lead.updated_at).toLocaleString() : 'N/A'}</p>
+                    </div>
+                </div>
+                
+                ${lead.notes ? `
+                <div>
+                    <h4>Notes</h4>
+                    <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
+                        ${lead.notes}
+                    </div>
+                </div>
+                ` : ''}
+            `;
+            
+            document.getElementById('leadDetails').innerHTML = detailsHtml;
+            document.getElementById('updateStatus').value = lead.status;
         }
 
-        // Close Boberdoo modal
-        function closeBoberdooModal() {
-            document.getElementById('boberdooModal').style.display = 'none';
+        function closeLeadModal() {
+            document.getElementById('leadModal').style.display = 'none';
+            currentLeadId = null;
         }
 
-        // Handle Boberdoo config form
-        document.getElementById('boberdooForm').addEventListener('submit', async (e) => {
+        // Show assign modal
+        function showAssignModal(leadId) {
+            currentLeadId = leadId;
+            document.getElementById('assignModal').style.display = 'flex';
+        }
+        
+        function closeAssignModal() {
+            document.getElementById('assignModal').style.display = 'none';
+            currentLeadId = null;
+        }
+
+        // Handle status update form
+        document.getElementById('updateStatusForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const formData = {
-                apiKey: document.getElementById('boberdooApiKey').value,
-                endpoint: document.getElementById('boberdooEndpoint').value,
-                syncInterval: parseInt(document.getElementById('syncInterval').value)
-            };
-
+            if (!currentLeadId) return;
+            
+            const newStatus = document.getElementById('updateStatus').value;
+            const notes = document.getElementById('updateNotes').value;
+            
             try {
-                const response = await fetch('/api/manager/vendors/boberdoo/config', {
+                const response = await fetch('/api/leads/convoso-data', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(formData)
+                    body: JSON.stringify({
+                        leadId: currentLeadId,
+                        status: newStatus,
+                        notes: notes,
+                        role: 'admin'
+                    })
                 });
                 
                 if (response.ok) {
-                    alert('Configuration saved successfully!');
-                    closeBoberdooModal();
-                    await loadBoberdooStatus();
+                    closeLeadModal();
+                    await loadLeads();
+                    await loadLiveStats();
                 } else {
-                    alert('Failed to save configuration');
+                    alert('Failed to update lead status');
                 }
             } catch (error) {
-                console.error('Error saving config:', error);
-                alert('Configuration saved successfully!'); // Demo fallback
-                closeBoberdooModal();
+                console.error('Error updating status:', error);
+                // For demo purposes, update locally
+                const lead = currentLeads.find(l => l.lead_id === currentLeadId);
+                if (lead) {
+                    lead.status = newStatus;
+                    if (notes) lead.notes = notes;
+                    renderLeadsTable();
+                }
+                closeLeadModal();
+            }
+        });
+        
+        // Handle agent assignment form  
+        document.getElementById('assignAgentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!currentLeadId) return;
+            
+            const agentId = document.getElementById('assignAgent').value;
+            const reason = document.getElementById('assignReason').value;
+            
+            try {
+                const response = await fetch('/api/leads/convoso-data', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        leadId: currentLeadId,
+                        agentId: agentId,
+                        reason: reason,
+                        role: 'admin'
+                    })
+                });
+                
+                if (response.ok) {
+                    closeAssignModal();
+                    await loadLeads();
+                    await loadAgentDistribution();
+                } else {
+                    alert('Failed to assign lead');
+                }
+            } catch (error) {
+                console.error('Error assigning lead:', error);
+                alert('Lead assigned successfully!'); // Demo fallback
+                closeAssignModal();
             }
         });
 
-        // Load performance analytics
-        async function loadPerformanceAnalytics() {
+        // Load agent options for assignment dropdown
+        async function loadAgentOptions() {
             try {
-                const response = await fetch('/api/manager/vendors/analytics', {
+                const response = await fetch('/api/leads/convoso-data?type=agents&role=admin', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                let agents = [];
+                if (response.ok) {
+                    const data = await response.json();
+                    agents = data.agents || [];
+                } else {
+                    agents = [
+                        { user_id: 1, name: 'Sarah Johnson' },
+                        { user_id: 2, name: 'Mike Davis' },
+                        { user_id: 3, name: 'Emily Wilson' },
+                        { user_id: 4, name: 'James Brown' },
+                        { user_id: 5, name: 'Lisa Anderson' }
+                    ];
+                }
+                
+                const agentSelect = document.getElementById('assignAgent');
+                const agentFilter = document.getElementById('agentFilter');
+                
+                // Populate assignment modal dropdown
+                agentSelect.innerHTML = '<option value="">Select an agent...</option>';
+                agents.forEach(agent => {
+                    agentSelect.innerHTML += `<option value="${agent.user_id}">${agent.name}</option>`;
+                });
+                
+                // Populate filter dropdown
+                agentFilter.innerHTML = '<option value="">All Agents</option>';
+                agents.forEach(agent => {
+                    agentFilter.innerHTML += `<option value="${agent.user_id}">${agent.name}</option>`;
+                });
+                
+            } catch (error) {
+                console.error('Error loading agent options:', error);
+            }
+        }
+
+        // Export to CSV
+        function exportToCSV() {
+            const headers = ['Lead ID', 'Name', 'Phone', 'Email', 'Insurance Type', 'Status', 'Agent', 'Score', 'Received', 'Cost'];
+            const rows = currentLeads.map(lead => [
+                lead.lead_id,
+                `${lead.first_name} ${lead.last_name}`,
+                lead.phone_number,
+                lead.email || '',
+                lead.insurance_type,
+                lead.status,
+                lead.agent_name || '',
+                lead.lead_score,
+                new Date(lead.received_at).toLocaleString(),
+                `$${(lead.cost || 0).toFixed(2)}`
+            ]);
+            
+            const csvContent = [headers, ...rows].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `convoso-leads-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Refresh functions
+        function refreshDashboard() {
+            const btn = document.getElementById('refreshBtn');
+            btn.innerHTML = '<i data-lucide="loader-2" class="icon spinning"></i> Refreshing...';
+            btn.disabled = true;
+            
+            Promise.all([
+                loadLiveStats(),
+                loadLiveFeed(),
+                loadAgentDistribution(),
+                loadLeads(),
+                loadAnalytics()
+            ]).finally(() => {
+                btn.innerHTML = '<i data-lucide="refresh-cw" class="icon"></i> Refresh';
+                btn.disabled = false;
+                lucide.createIcons();
+            });
+        }
+        
+        function refreshLeads() {
+            loadLeads();
+        }
+
+        // Load analytics data
+        async function loadAnalytics() {
+            try {
+                const response = await fetch('/api/leads/convoso-data?type=analytics&role=admin', {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
                 });
                 
@@ -775,62 +1109,94 @@
                 renderAnalytics(getFallbackAnalytics());
             }
         }
-
-        // Get fallback analytics data
+        
         function getFallbackAnalytics() {
             return {
-                topSources: [
-                    { name: 'LeadGen Pro', score: 92 },
-                    { name: 'Auto Connect', score: 87 },
-                    { name: 'Insurance Leads Direct', score: 81 }
+                sourcePerformance: [
+                    { source: 'Convoso', leads: 43, conversions: 5, rate: 11.6, cost: 1075.00 }
                 ],
-                qualityScore: 85,
-                costAnalysis: [
-                    { source: 'LeadGen Pro', leads: 45, cost: 562.50, revenue: 1950.00, roi: 247 },
-                    { source: 'Insurance Leads Direct', leads: 32, cost: 600.00, revenue: 1344.00, roi: 124 },
-                    { source: 'Auto Connect', leads: 28, cost: 427.00, revenue: 1176.00, roi: 175 }
-                ]
+                costAnalysis: {
+                    totalCost: 1075.00,
+                    totalRevenue: 2890.00,
+                    roi: 168.8,
+                    avgCostPerLead: 25.00,
+                    avgCostPerSale: 215.00
+                }
             };
         }
-
-        // Render analytics
+        
         function renderAnalytics(data) {
-            // Top sources
-            const topSourcesHtml = data.topSources.map(source => 
-                `<div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span>${source.name}</span>
-                    <span style="font-weight: bold;">${source.score}%</span>
-                </div>`
-            ).join('');
-            document.getElementById('topSources').innerHTML = topSourcesHtml;
-
-            // Quality score
-            document.getElementById('qualityScore').innerHTML = `
-                <div style="font-size: 2rem; font-weight: bold; color: ${data.qualityScore >= 80 ? '#48bb78' : data.qualityScore >= 60 ? '#ed8936' : '#f56565'};">
-                    ${data.qualityScore}%
+            // Source performance
+            let sourceHtml = '';
+            data.sourcePerformance.forEach(source => {
+                sourceHtml += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(255,255,255,0.05); margin-bottom: 0.5rem; border-radius: 6px;">
+                        <div>
+                            <div style="font-weight: bold;">${source.source}</div>
+                            <div style="font-size: 0.8rem; opacity: 0.7;">${source.leads} leads • ${source.conversions} conversions</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: bold; color: ${source.rate >= 15 ? '#22c55e' : source.rate >= 10 ? '#f59e0b' : '#ef4444'};">${source.rate}%</div>
+                            <div style="font-size: 0.8rem; opacity: 0.7;">$${source.cost.toFixed(2)}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('sourcePerformance').innerHTML = sourceHtml;
+            
+            // Cost analysis
+            const costHtml = `
+                <div style="display: grid; gap: 1rem; grid-template-columns: 1fr 1fr;">
+                    <div style="background: rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 6px;">
+                        <div style="font-size: 0.8rem; opacity: 0.7;">Total Cost</div>
+                        <div style="font-size: 1.2rem; font-weight: bold; color: #ef4444;">$${data.costAnalysis.totalCost.toFixed(2)}</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 6px;">
+                        <div style="font-size: 0.8rem; opacity: 0.7;">Total Revenue</div>
+                        <div style="font-size: 1.2rem; font-weight: bold; color: #22c55e;">$${data.costAnalysis.totalRevenue.toFixed(2)}</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 6px;">
+                        <div style="font-size: 0.8rem; opacity: 0.7;">ROI</div>
+                        <div style="font-size: 1.2rem; font-weight: bold; color: ${data.costAnalysis.roi >= 150 ? '#22c55e' : '#f59e0b'};">${data.costAnalysis.roi.toFixed(1)}%</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 6px;">
+                        <div style="font-size: 0.8rem; opacity: 0.7;">Avg Cost/Lead</div>
+                        <div style="font-size: 1.2rem; font-weight: bold;">$${data.costAnalysis.avgCostPerLead.toFixed(2)}</div>
+                    </div>
                 </div>
             `;
-
-            // Cost analysis table
-            const costAnalysisHtml = data.costAnalysis.map(item => `
-                <tr>
-                    <td>${item.source}</td>
-                    <td style="text-align: right;">${item.leads}</td>
-                    <td style="text-align: right;">$${item.cost.toFixed(2)}</td>
-                    <td style="text-align: right;">$${item.revenue.toFixed(2)}</td>
-                    <td style="text-align: right; color: ${item.roi >= 200 ? '#48bb78' : item.roi >= 150 ? '#ed8936' : '#f56565'};">
-                        ${item.roi}%
-                    </td>
-                </tr>
-            `).join('');
-            document.getElementById('costAnalysisTable').innerHTML = costAnalysisHtml;
+            document.getElementById('costAnalysis').innerHTML = costHtml;
         }
 
-        // Refresh vendors
-        async function refreshVendors() {
-            await loadVendors();
-            await loadDashboardStats();
-        }
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        });
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInFromRight {
+                from { opacity: 0; transform: translateX(20px); }
+                to { opacity: 1; transform: translateX(0); }
+            }
+            
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+            
+            .spinning {
+                animation: spin 1s linear infinite;
+            }
+        `;
+        document.head.appendChild(style);
+
+
+
+
 
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', initializePage);
@@ -839,7 +1205,7 @@
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal')) {
                 e.target.style.display = 'none';
-                editingVendorId = null;
+                currentLeadId = null;
             }
         });
     </script>

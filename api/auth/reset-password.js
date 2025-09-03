@@ -24,7 +24,7 @@ export default async function handler(req, res) {
       .eq('id', adminId)
       .single();
 
-    if (!admin || !['admin', 'super_admin'].includes(admin.role)) {
+    if (!admin || admin.role !== 'admin') {
       return res.status(403).json({ error: 'Admin access required' });
     }
 
@@ -39,10 +39,7 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Verify same agency
-    if (user.agency_id !== admin.agency_id && admin.role !== 'super_admin') {
-      return res.status(403).json({ error: 'Cannot reset password for users in other agencies' });
-    }
+    // Admin has universal access - no agency verification needed
 
     // Generate new password
     const newPassword = Math.random().toString(36).slice(-8) + 'B2!';

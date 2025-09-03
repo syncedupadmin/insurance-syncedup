@@ -22,6 +22,10 @@
 
     <!-- Navigation -->
     <div class="nav">
+        <a href="leads.html" class="nav-link">
+            <i data-lucide="user-plus" class="icon"></i>
+            Leads
+        </a>
         <a href="index.html" class="nav-link active">
             <i data-lucide="layout-dashboard" class="icon"></i>
             Dashboard
@@ -162,13 +166,13 @@
             if (userData) {
                 currentUser = JSON.parse(userData);
                 
-                // Only manager role can access this portal
-                if (currentUser.role !== 'manager') {
+                // Allow manager and super-admin roles to access this portal
+                if (currentUser.role !== 'manager' && currentUser.role !== 'admin') {
                     // Redirect based on actual role
-                    if (currentUser.role === 'admin' || currentUser.role === 'super-admin') {
-                        window.location.href = 'https://insurance.syncedupsolutions.com/admin/';
-                    } else if (currentUser.role === 'agent') {
+                    if (currentUser.role === 'agent') {
                         window.location.href = 'https://insurance.syncedupsolutions.com/agent/';
+                    } else if (currentUser.role === 'customer-service') {
+                        window.location.href = 'https://insurance.syncedupsolutions.com/customer-service/';
                     } else {
                         window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
                     }

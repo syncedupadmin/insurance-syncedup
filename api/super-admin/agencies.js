@@ -251,4 +251,4 @@ async function agenciesHandler(req, res) {
   }
 }
 
-export default requireAuth(['super_admin'])(agenciesHandler);
+export default requireAuth(['admin'])(agenciesHandler);

@@ -14,6 +14,10 @@
         <div class="header-info">
             <span>📅 <span id="currentMonth">Loading...</span></span>
             <span>📊 Updated: <span id="lastUpdated">Loading...</span></span>
+            <button id="classicModeToggle" class="btn btn-secondary classic-toggle" onclick="toggleClassicMode()">
+                <i data-lucide="gamepad-2" class="icon"></i>
+                Classic Mode
+            </button>
         </div>
     </div>
 
@@ -198,7 +202,7 @@
                 return false;
             }
 
-            if (!['agent', 'manager', 'admin', 'super-admin', 'customer-service'].includes(user.role)) {
+            if (!['agent', 'manager', 'admin', 'customer-service'].includes(user.role)) {
                 alert('Access denied. Valid account required to view leaderboard.');
                 window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
                 return false;
@@ -502,7 +506,76 @@
         }
 
         // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', initializePage);
+        // Classic Mode Toggle Functions
+        function toggleClassicMode() {
+            const body = document.body;
+            const toggle = document.getElementById('classicModeToggle');
+            const icon = toggle.querySelector('.icon');
+            
+            if (body.classList.contains('classic-mode')) {
+                // Exit classic mode
+                body.classList.remove('classic-mode');
+                toggle.innerHTML = '<i data-lucide="gamepad-2" class="icon"></i>Classic Mode';
+                localStorage.setItem('leaderboard-classic-mode', 'false');
+                playPacmanSound('exit');
+            } else {
+                // Enter classic mode
+                body.classList.add('classic-mode');
+                toggle.innerHTML = '<i data-lucide="zap" class="icon"></i>Modern Mode';
+                localStorage.setItem('leaderboard-classic-mode', 'true');
+                playPacmanSound('enter');
+            }
+            
+            // Reinitialize lucide icons
+            lucide.createIcons();
+        }
+
+        function initializeClassicMode() {
+            const isClassicMode = localStorage.getItem('leaderboard-classic-mode') === 'true';
+            if (isClassicMode) {
+                document.body.classList.add('classic-mode');
+                const toggle = document.getElementById('classicModeToggle');
+                toggle.innerHTML = '<i data-lucide="zap" class="icon"></i>Modern Mode';
+            }
+        }
+
+        function playPacmanSound(type) {
+            // Create audio context for retro sound effects
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                
+                oscillator.connect(gain);
+                gain.connect(audioContext.destination);
+                
+                if (type === 'enter') {
+                    // Pac-Man startup sound sequence
+                    oscillator.frequency.setValueAtTime(264, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(297, audioContext.currentTime + 0.1);
+                    oscillator.frequency.setValueAtTime(330, audioContext.currentTime + 0.2);
+                    oscillator.frequency.setValueAtTime(352, audioContext.currentTime + 0.3);
+                } else {
+                    // Exit sound
+                    oscillator.frequency.setValueAtTime(352, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(264, audioContext.currentTime + 0.1);
+                }
+                
+                oscillator.type = 'square';
+                gain.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+                
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.4);
+            } catch (e) {
+                console.log('Audio context not available');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+            initializeClassicMode();
+        });
     </script>
 
     <!-- Classic Mode Toggle System -->

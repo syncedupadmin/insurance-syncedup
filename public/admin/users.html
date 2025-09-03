@@ -37,6 +37,9 @@
         <a href="/admin/leads.html">
             <i data-lucide="user-plus" class="icon"></i>Leads
         </a>
+        <a href="/admin/vendors.html">
+            <i data-lucide="building-2" class="icon"></i>Vendors
+        </a>
         <a href="/admin/commissions.html">
             <i data-lucide="dollar-sign" class="icon"></i>Commissions
         </a>
@@ -310,7 +313,7 @@
             const userData = localStorage.getItem('user');
             if (userData) {
                 currentUser = JSON.parse(userData);
-                if (!['admin', 'super_admin'].includes(currentUser.role)) {
+                if (currentUser.role !== 'admin') {
                     window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
                     return;
                 }

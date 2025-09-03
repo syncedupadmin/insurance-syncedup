@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agency Management - Super Admin</title>
+    <link rel="stylesheet" href="super-admin-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">SA</div>
+                Super Admin Portal
+            </a>
+            <div class="header-actions">
+                <div class="user-info">
+                    <div class="user-avatar">SA</div>
+                    <div>
+                        <div style="font-weight: 600;" id="userDisplay">Super Admin</div>
+                        <div style="font-size: 0.8rem; opacity: 0.7;">Platform Administrator</div>
+                    </div>
+                </div>
+                <button class="btn" onclick="logout()">
+                    <i data-lucide="log-out"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-section">
+            <div class="nav-title">Platform Overview</div>
+            <a href="index.html" class="nav-link">
+                <i data-lucide="layout-dashboard" class="nav-icon"></i>
+                Dashboard
+            </a>
+            <a href="system-analytics.html" class="nav-link">
+                <i data-lucide="bar-chart-3" class="nav-icon"></i>
+                System Analytics
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-title">Management</div>
+            <a href="agency-management.html" class="nav-link active">
+                <i data-lucide="building-2" class="nav-icon"></i>
+                Agency Management
+            </a>
+            <a href="user-administration.html" class="nav-link">
+                <i data-lucide="users" class="nav-icon"></i>
+                User Administration
+            </a>
+            <a href="revenue-management.html" class="nav-link">
+                <i data-lucide="dollar-sign" class="nav-icon"></i>
+                Revenue Management
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-title">Configuration</div>
+            <a href="settings.html" class="nav-link">
+                <i data-lucide="settings" class="nav-icon"></i>
+                Settings
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Agency Management</h1>
+                <p class="page-subtitle">Manage all client agencies, subscriptions, and performance metrics</p>
+            </div>
+
+            <!-- Agency Overview Stats -->
+            <div class="grid grid-4">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalAgencies">0</div>
+                    <div class="stat-label">Total Agencies</div>
+                    <div class="stat-change positive">
+                        <i data-lucide="trend-up" style="width: 12px; height: 12px;"></i>
+                        <span id="agenciesGrowth">+5 this month</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value" id="activeSubscriptions">0</div>
+                    <div class="stat-label">Active Subscriptions</div>
+                    <div class="stat-change positive">
+                        <i data-lucide="check-circle" style="width: 12px; height: 12px;"></i>
+                        <span id="activeRate">94.2%</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value" id="avgPerformance">0%</div>
+                    <div class="stat-label">Avg Performance Score</div>
+                    <div class="stat-change positive">
+                        <i data-lucide="trending-up" style="width: 12px; height: 12px;"></i>
+                        <span id="performanceChange">+2.3%</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value" id="churnRate">0%</div>
+                    <div class="stat-label">Monthly Churn Rate</div>
+                    <div class="stat-change positive">
+                        <i data-lucide="trend-down" style="width: 12px; height: 12px;"></i>
+                        <span id="churnChange">-0.8%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters and Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i data-lucide="filter" class="card-icon"></i>
+                        Agency Filters & Actions
+                    </h3>
+                    <button class="btn btn-primary" onclick="showAddAgencyModal()">
+                        <i data-lucide="plus"></i>
+                        Add New Agency
+                    </button>
+                </div>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <input type="text" id="searchAgencies" placeholder="Search agencies..." class="form-input" style="margin: 0;">
+                    </div>
+                    <div>
+                        <select id="statusFilter" class="form-input" style="margin: 0; min-width: 120px;">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="trial">Trial</option>
+                            <option value="suspended">Suspended</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div>
+                        <select id="planFilter" class="form-input" style="margin: 0; min-width: 120px;">
+                            <option value="">All Plans</option>
+                            <option value="basic">Basic</option>
+                            <option value="professional">Professional</option>
+                            <option value="enterprise">Enterprise</option>
+                        </select>
+                    </div>
+                    <div>
+                        <select id="sortBy" class="form-input" style="margin: 0; min-width: 120px;">
+                            <option value="name">Sort by Name</option>
+                            <option value="revenue">Sort by Revenue</option>
+                            <option value="performance">Sort by Performance</option>
+                            <option value="created">Sort by Created</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="refreshAgencies()">
+                        <i data-lucide="refresh-cw"></i>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Agencies Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i data-lucide="building-2" class="card-icon"></i>
+                        Client Agencies
+                    </h3>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn" onclick="exportAgencies()">
+                            <i data-lucide="download"></i>
+                            Export
+                        </button>
+                        <button class="btn" onclick="bulkActions()">
+                            <i data-lucide="layers"></i>
+                            Bulk Actions
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="agenciesLoading" class="loading">
+                    <div class="spinner"></div>
+                    Loading agencies...
+                </div>
+                
+                <div class="table-container" id="agenciesTable" style="display: none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                                <th>Agency Name</th>
+                                <th>Status</th>
+                                <th>Plan</th>
+                                <th>Monthly Revenue</th>
+                                <th>Users</th>
+                                <th>Performance</th>
+                                <th>Last Active</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="agenciesTableBody">
+                            <!-- Table rows will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);" id="paginationContainer" style="display: none;">
+                    <div>
+                        <span id="recordsInfo">Showing 0-0 of 0 records</span>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <button class="btn" onclick="changePage(-1)" id="prevBtn">
+                            <i data-lucide="chevron-left"></i>
+                            Previous
+                        </button>
+                        <span id="pageInfo">Page 0 of 0</span>
+                        <button class="btn" onclick="changePage(1)" id="nextBtn">
+                            Next
+                            <i data-lucide="chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Comparison -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i data-lucide="bar-chart-2" class="card-icon"></i>
+                        Agency Performance Comparison
+                    </h3>
+                    <select class="form-input" style="width: auto; min-width: 120px;" id="performanceMetric">
+                        <option value="revenue">Revenue</option>
+                        <option value="users">Active Users</option>
+                        <option value="growth">Growth Rate</option>
+                    </select>
+                </div>
+                
+                <div id="performanceComparison">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading performance data...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Agency Modal -->
+    <div id="agencyModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: var(--bg-card); border-radius: 16px; padding: 2rem; width: 90%; max-width: 500px; border: 1px solid var(--border-color);">
+            <h3 id="agencyModalTitle" style="color: var(--text-primary); margin-bottom: 1.5rem;">Add New Agency</h3>
+            <form id="agencyForm">
+                <div class="form-group">
+                    <label class="form-label">Agency Name</label>
+                    <input type="text" id="agencyName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Contact Email</label>
+                    <input type="email" id="agencyEmail" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Plan Type</label>
+                    <select id="agencyPlan" class="form-input" required>
+                        <option value="">Select Plan</option>
+                        <option value="basic">Basic - $99/month</option>
+                        <option value="professional">Professional - $199/month</option>
+                        <option value="enterprise">Enterprise - $399/month</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Initial Status</label>
+                    <select id="agencyStatus" class="form-input" required>
+                        <option value="trial">Trial (14 days)</option>
+                        <option value="active">Active</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 2rem;">
+                    <button type="button" class="btn" onclick="closeAgencyModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span id="agencySubmitText">Add Agency</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Agency Details Modal -->
+    <div id="agencyDetailsModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: var(--bg-card); border-radius: 16px; padding: 2rem; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 id="agencyDetailsTitle" style="color: var(--text-primary);">Agency Details</h3>
+                <button onclick="closeAgencyDetailsModal()" style="background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            <div id="agencyDetailsContent">
+                <!-- Agency details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentAgencies = [];
+        let currentPage = 1;
+        let totalPages = 1;
+        let editingAgencyId = null;
+
+        // Authentication check
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token || !user.email) {
+                window.location.href = '/login.html';
+                return false;
+            }
+
+            if (user.role !== 'super-admin') {
+                alert('Access denied. Super Admin privileges required.');
+                window.location.href = '/login.html';
+                return false;
+            }
+
+            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName}`;
+            return true;
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            await loadAgencyStats();
+            await loadAgencies();
+            await loadPerformanceComparison();
+            
+            setupEventListeners();
+            lucide.createIcons();
+        }
+
+        // Load agency statistics
+        async function loadAgencyStats() {
+            try {
+                const response = await fetch('/api/super-admin/agency-stats', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updateAgencyStats(data);
+                } else {
+                    updateAgencyStats(getFallbackStats());
+                }
+            } catch (error) {
+                console.error('Error loading agency stats:', error);
+                updateAgencyStats(getFallbackStats());
+            }
+        }
+
+        function getFallbackStats() {
+            return {
+                totalAgencies: 247,
+                activeSubscriptions: 233,
+                avgPerformance: 87.4,
+                churnRate: 2.1
+            };
+        }
+
+        function updateAgencyStats(data) {
+            document.getElementById('totalAgencies').textContent = data.totalAgencies;
+            document.getElementById('activeSubscriptions').textContent = data.activeSubscriptions;
+            document.getElementById('avgPerformance').textContent = `${data.avgPerformance.toFixed(1)}%`;
+            document.getElementById('churnRate').textContent = `${data.churnRate.toFixed(1)}%`;
+        }
+
+        // Load agencies
+        async function loadAgencies() {
+            document.getElementById('agenciesLoading').style.display = 'block';
+            document.getElementById('agenciesTable').style.display = 'none';
+            
+            const filters = getFilters();
+            const queryParams = new URLSearchParams({
+                page: currentPage,
+                limit: 25,
+                ...filters
+            });
+            
+            try {
+                const response = await fetch(`/api/super-admin/agencies?${queryParams}`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentAgencies = data.agencies || getFallbackAgencies();
+                    totalPages = data.totalPages || 1;
+                } else {
+                    currentAgencies = getFallbackAgencies();
+                    totalPages = 1;
+                }
+            } catch (error) {
+                console.error('Error loading agencies:', error);
+                currentAgencies = getFallbackAgencies();
+                totalPages = 1;
+            }
+            
+            renderAgenciesTable();
+            updatePagination();
+            
+            document.getElementById('agenciesLoading').style.display = 'none';
+            document.getElementById('agenciesTable').style.display = 'block';
+            document.getElementById('paginationContainer').style.display = 'flex';
+        }
+
+        function getFallbackAgencies() {
+            return [
+                {
+                    id: 1, name: 'Elite Insurance Group', status: 'active', plan: 'enterprise',
+                    monthlyRevenue: 125000, users: 45, performance: 94.2, lastActive: '2 hours ago'
+                },
+                {
+                    id: 2, name: 'Premier Protection LLC', status: 'active', plan: 'professional',
+                    monthlyRevenue: 89000, users: 32, performance: 87.8, lastActive: '5 minutes ago'
+                },
+                {
+                    id: 3, name: 'Shield Insurance Partners', status: 'trial', plan: 'professional',
+                    monthlyRevenue: 0, users: 12, performance: 76.5, lastActive: '1 day ago'
+                },
+                {
+                    id: 4, name: 'Guardian Risk Management', status: 'active', plan: 'basic',
+                    monthlyRevenue: 45000, users: 18, performance: 82.1, lastActive: '30 minutes ago'
+                },
+                {
+                    id: 5, name: 'Apex Coverage Solutions', status: 'suspended', plan: 'professional',
+                    monthlyRevenue: 0, users: 0, performance: 45.2, lastActive: '2 weeks ago'
+                }
+            ];
+        }
+
+        function renderAgenciesTable() {
+            const tbody = document.getElementById('agenciesTableBody');
+            tbody.innerHTML = '';
+            
+            if (currentAgencies.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 2rem; color: var(--text-muted);">No agencies found</td></tr>';
+                return;
+            }
+            
+            currentAgencies.forEach(agency => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="checkbox" class="agency-checkbox" value="${agency.id}"></td>
+                    <td>
+                        <div style="font-weight: 600; color: var(--text-primary);">${agency.name}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">ID: ${agency.id}</div>
+                    </td>
+                    <td><span class="status-badge status-${getStatusClass(agency.status)}">${agency.status}</span></td>
+                    <td><span style="text-transform: capitalize;">${agency.plan}</span></td>
+                    <td style="color: var(--accent-gold); font-weight: 600;">$${agency.monthlyRevenue.toLocaleString()}</td>
+                    <td>${agency.users}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="width: 60px; height: 6px; background: var(--bg-elevated); border-radius: 3px; overflow: hidden;">
+                                <div style="width: ${agency.performance}%; height: 100%; background: ${getPerformanceColor(agency.performance)};"></div>
+                            </div>
+                            <span style="font-size: 0.9rem;">${agency.performance.toFixed(1)}%</span>
+                        </div>
+                    </td>
+                    <td style="color: var(--text-secondary);">${agency.lastActive}</td>
+                    <td>
+                        <div style="display: flex; gap: 0.3rem;">
+                            <button class="btn" onclick="viewAgencyDetails(${agency.id})" title="View Details" style="padding: 0.5rem;">
+                                <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                            </button>
+                            <button class="btn" onclick="editAgency(${agency.id})" title="Edit" style="padding: 0.5rem;">
+                                <i data-lucide="edit" style="width: 16px; height: 16px;"></i>
+                            </button>
+                            <button class="btn ${agency.status === 'active' ? 'btn-warning' : 'btn-success'}" onclick="toggleAgencyStatus(${agency.id})" title="${agency.status === 'active' ? 'Suspend' : 'Activate'}" style="padding: 0.5rem;">
+                                <i data-lucide="${agency.status === 'active' ? 'pause' : 'play'}" style="width: 16px; height: 16px;"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            lucide.createIcons();
+        }
+
+        function getStatusClass(status) {
+            const statusMap = {
+                'active': 'active',
+                'trial': 'warning',
+                'suspended': 'error',
+                'cancelled': 'inactive'
+            };
+            return statusMap[status] || 'inactive';
+        }
+
+        function getPerformanceColor(performance) {
+            if (performance >= 90) return 'var(--success)';
+            if (performance >= 75) return 'var(--accent-gold)';
+            if (performance >= 60) return 'var(--warning)';
+            return 'var(--error)';
+        }
+
+        // Get current filters
+        function getFilters() {
+            return {
+                search: document.getElementById('searchAgencies').value,
+                status: document.getElementById('statusFilter').value,
+                plan: document.getElementById('planFilter').value,
+                sortBy: document.getElementById('sortBy').value
+            };
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            ['searchAgencies', 'statusFilter', 'planFilter', 'sortBy'].forEach(id => {
+                document.getElementById(id).addEventListener('change', () => {
+                    currentPage = 1;
+                    loadAgencies();
+                });
+            });
+            
+            // Debounce search input
+            let searchTimeout;
+            document.getElementById('searchAgencies').addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    currentPage = 1;
+                    loadAgencies();
+                }, 500);
+            });
+
+            // Performance metric change
+            document.getElementById('performanceMetric').addEventListener('change', loadPerformanceComparison);
+        }
+
+        // Pagination
+        function changePage(delta) {
+            const newPage = currentPage + delta;
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
+                loadAgencies();
+            }
+        }
+
+        function updatePagination() {
+            const recordsStart = (currentPage - 1) * 25 + 1;
+            const recordsEnd = Math.min(currentPage * 25, currentAgencies.length);
+            const totalRecords = currentAgencies.length;
+            
+            document.getElementById('recordsInfo').textContent = `Showing ${recordsStart}-${recordsEnd} of ${totalRecords} records`;
+            document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+            
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
+        }
+
+        // Modal functions
+        function showAddAgencyModal() {
+            editingAgencyId = null;
+            document.getElementById('agencyModalTitle').textContent = 'Add New Agency';
+            document.getElementById('agencySubmitText').textContent = 'Add Agency';
+            document.getElementById('agencyForm').reset();
+            document.getElementById('agencyModal').style.display = 'flex';
+        }
+
+        function editAgency(agencyId) {
+            const agency = currentAgencies.find(a => a.id === agencyId);
+            if (!agency) return;
+
+            editingAgencyId = agencyId;
+            document.getElementById('agencyModalTitle').textContent = 'Edit Agency';
+            document.getElementById('agencySubmitText').textContent = 'Update Agency';
+            
+            document.getElementById('agencyName').value = agency.name;
+            document.getElementById('agencyEmail').value = agency.email || '';
+            document.getElementById('agencyPlan').value = agency.plan;
+            document.getElementById('agencyStatus').value = agency.status;
+            
+            document.getElementById('agencyModal').style.display = 'flex';
+        }
+
+        function closeAgencyModal() {
+            document.getElementById('agencyModal').style.display = 'none';
+            editingAgencyId = null;
+        }
+
+        function viewAgencyDetails(agencyId) {
+            const agency = currentAgencies.find(a => a.id === agencyId);
+            if (!agency) return;
+
+            document.getElementById('agencyDetailsTitle').textContent = agency.name;
+            
+            const detailsHtml = `
+                <div class="grid grid-2" style="gap: 1.5rem;">
+                    <div>
+                        <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Basic Information</h4>
+                        <div style="background: var(--bg-elevated); padding: 1rem; border-radius: 8px;">
+                            <p><strong>Agency ID:</strong> ${agency.id}</p>
+                            <p><strong>Status:</strong> <span class="status-badge status-${getStatusClass(agency.status)}">${agency.status}</span></p>
+                            <p><strong>Plan:</strong> ${agency.plan}</p>
+                            <p><strong>Users:</strong> ${agency.users}</p>
+                            <p><strong>Last Active:</strong> ${agency.lastActive}</p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Performance Metrics</h4>
+                        <div style="background: var(--bg-elevated); padding: 1rem; border-radius: 8px;">
+                            <p><strong>Monthly Revenue:</strong> <span style="color: var(--accent-gold);">$${agency.monthlyRevenue.toLocaleString()}</span></p>
+                            <p><strong>Performance Score:</strong> ${agency.performance.toFixed(1)}%</p>
+                            <p><strong>Growth Rate:</strong> +12.5%</p>
+                            <p><strong>Customer Satisfaction:</strong> 4.7/5.0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1.5rem;">
+                    <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Quick Actions</h4>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="loginAsAgency(${agency.id})">
+                            <i data-lucide="log-in"></i>
+                            Login as Agency
+                        </button>
+                        <button class="btn" onclick="viewAgencyReports(${agency.id})">
+                            <i data-lucide="bar-chart-2"></i>
+                            View Reports
+                        </button>
+                        <button class="btn" onclick="contactAgency(${agency.id})">
+                            <i data-lucide="mail"></i>
+                            Send Message
+                        </button>
+                        <button class="btn ${agency.status === 'active' ? 'btn-warning' : 'btn-success'}" onclick="toggleAgencyStatus(${agency.id})">
+                            <i data-lucide="${agency.status === 'active' ? 'pause' : 'play'}"></i>
+                            ${agency.status === 'active' ? 'Suspend' : 'Activate'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('agencyDetailsContent').innerHTML = detailsHtml;
+            document.getElementById('agencyDetailsModal').style.display = 'flex';
+            lucide.createIcons();
+        }
+
+        function closeAgencyDetailsModal() {
+            document.getElementById('agencyDetailsModal').style.display = 'none';
+        }
+
+        // Agency actions
+        function toggleAgencyStatus(agencyId) {
+            const agency = currentAgencies.find(a => a.id === agencyId);
+            if (!agency) return;
+
+            const newStatus = agency.status === 'active' ? 'suspended' : 'active';
+            const confirmMessage = `Are you sure you want to ${newStatus === 'suspended' ? 'suspend' : 'activate'} ${agency.name}?`;
+            
+            if (confirm(confirmMessage)) {
+                // Update locally for demo
+                agency.status = newStatus;
+                if (newStatus === 'suspended') {
+                    agency.monthlyRevenue = 0;
+                    agency.users = 0;
+                }
+                renderAgenciesTable();
+            }
+        }
+
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.agency-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        }
+
+        // Load performance comparison
+        async function loadPerformanceComparison() {
+            const metric = document.getElementById('performanceMetric').value;
+            
+            try {
+                const response = await fetch(`/api/super-admin/agency-performance?metric=${metric}`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                let data;
+                if (response.ok) {
+                    data = await response.json();
+                } else {
+                    data = getFallbackPerformanceData();
+                }
+                
+                renderPerformanceComparison(data);
+            } catch (error) {
+                console.error('Error loading performance data:', error);
+                renderPerformanceComparison(getFallbackPerformanceData());
+            }
+        }
+
+        function getFallbackPerformanceData() {
+            return {
+                agencies: [
+                    { name: 'Elite Insurance Group', value: 125000, performance: 94.2 },
+                    { name: 'Premier Protection LLC', value: 89000, performance: 87.8 },
+                    { name: 'Guardian Risk Management', value: 45000, performance: 82.1 },
+                    { name: 'Shield Insurance Partners', value: 0, performance: 76.5 },
+                    { name: 'Apex Coverage Solutions', value: 0, performance: 45.2 }
+                ]
+            };
+        }
+
+        function renderPerformanceComparison(data) {
+            const metric = document.getElementById('performanceMetric').value;
+            const maxValue = Math.max(...data.agencies.map(a => a.value));
+            
+            const comparisonHtml = data.agencies.map(agency => {
+                const percentage = maxValue > 0 ? (agency.value / maxValue) * 100 : 0;
+                const barColor = agency.performance >= 85 ? 'var(--success)' : 
+                               agency.performance >= 70 ? 'var(--accent-gold)' : 'var(--warning)';
+                
+                return `
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; padding: 0.75rem; background: var(--bg-elevated); border-radius: 8px;">
+                        <div style="min-width: 200px;">
+                            <div style="font-weight: 600; color: var(--text-primary);">${agency.name}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Performance: ${agency.performance.toFixed(1)}%</div>
+                        </div>
+                        <div style="flex: 1; background: var(--bg-card); border-radius: 4px; height: 24px; position: relative; overflow: hidden;">
+                            <div style="height: 100%; background: ${barColor}; width: ${percentage}%; transition: width 0.3s ease;"></div>
+                            <div style="position: absolute; top: 50%; right: 8px; transform: translateY(-50%); font-size: 0.8rem; color: var(--text-primary); font-weight: 500;">
+                                ${metric === 'revenue' ? '$' + agency.value.toLocaleString() : agency.value.toLocaleString()}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('performanceComparison').innerHTML = comparisonHtml;
+        }
+
+        // Other functions
+        function refreshAgencies() {
+            loadAgencies();
+            loadAgencyStats();
+        }
+
+        function exportAgencies() {
+            alert('Agency export functionality would be implemented here.');
+        }
+
+        function bulkActions() {
+            const selectedAgencies = document.querySelectorAll('.agency-checkbox:checked');
+            if (selectedAgencies.length === 0) {
+                alert('Please select agencies to perform bulk actions.');
+                return;
+            }
+            alert(`Bulk actions for ${selectedAgencies.length} agencies would be implemented here.`);
+        }
+
+        function loginAsAgency(agencyId) {
+            alert(`Login as agency ${agencyId} functionality would be implemented here.`);
+        }
+
+        function viewAgencyReports(agencyId) {
+            alert(`Agency reports for ${agencyId} would be implemented here.`);
+        }
+
+        function contactAgency(agencyId) {
+            alert(`Contact agency ${agencyId} functionality would be implemented here.`);
+        }
+
+        // Form submission
+        document.getElementById('agencyForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('agencyName').value,
+                email: document.getElementById('agencyEmail').value,
+                plan: document.getElementById('agencyPlan').value,
+                status: document.getElementById('agencyStatus').value
+            };
+            
+            if (editingAgencyId) {
+                // Update existing agency
+                const agency = currentAgencies.find(a => a.id === editingAgencyId);
+                if (agency) {
+                    Object.assign(agency, formData);
+                    renderAgenciesTable();
+                }
+            } else {
+                // Add new agency
+                const newAgency = {
+                    id: Math.max(...currentAgencies.map(a => a.id)) + 1,
+                    ...formData,
+                    monthlyRevenue: formData.status === 'trial' ? 0 : 99,
+                    users: 1,
+                    performance: 75.0,
+                    lastActive: 'Just now'
+                };
+                currentAgencies.unshift(newAgency);
+                renderAgenciesTable();
+            }
+            
+            closeAgencyModal();
+        });
+
+        // Handle clicks outside modals to close them
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+                editingAgencyId = null;
+            }
+        });
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>

@@ -3,79 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vendor Management - Manager Portal</title>
-    <link rel="stylesheet" href="/manager/manager-global.css">
+    <title>Vendor Management - SyncedUp Insurance Admin</title>
+    <link rel="stylesheet" href="/admin/admin-global.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
+    <!-- Floating particles effect -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    
     <!-- Header -->
     <div class="header">
         <h1>Vendor Management</h1>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <span id="userDisplay">Loading...</span>
-            <button class="btn" onclick="logout()">
-                <i data-lucide="log-out" class="icon"></i>
-                Logout
-            </button>
-        </div>
-    </div>
-
-    <!-- Navigation -->
-    <div class="nav">
-        <a href="leads.html" class="nav-link">
-            <i data-lucide="user-plus" class="icon"></i>
-            Leads
-        </a>
-        <a href="index.html" class="nav-link">
-            <i data-lucide="layout-dashboard" class="icon"></i>
-            Dashboard
-        </a>
-        <a href="team-management.html" class="nav-link">
-            <i data-lucide="users" class="icon"></i>
-            Team Management
-        </a>
-        <a href="performance.html" class="nav-link">
-            <i data-lucide="trending-up" class="icon"></i>
-            Team Performance
-        </a>
-        <a href="reports.html" class="nav-link">
-            <i data-lucide="file-text" class="icon"></i>
-            Reports
-        </a>
-        <a href="goals.html" class="nav-link">
-            <i data-lucide="target" class="icon"></i>
-            Goals
-        </a>
-        <a href="vendors.html" class="nav-link active">
-            <i data-lucide="building-2" class="icon"></i>
-            Vendors
-        </a>
-        <a href="settings.html" class="nav-link">
-            <i data-lucide="settings" class="icon"></i>
-            Settings
-        </a>
+        <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">
+            <i data-lucide="log-out" class="icon"></i>Logout
+        </button>
     </div>
     
+    <!-- Navigation -->
+    <nav class="nav">
+        <a href="/admin/">
+            <i data-lucide="layout-dashboard" class="icon"></i>Dashboard
+        </a>
+        <a href="/admin/agent-performance.html">
+            <i data-lucide="trending-up" class="icon"></i>Agent Performance
+        </a>
+        <a href="/admin/users.html">
+            <i data-lucide="users" class="icon"></i>Users
+        </a>
+        <a href="/admin/leads.html">
+            <i data-lucide="user-plus" class="icon"></i>Leads
+        </a>
+        <a href="/admin/vendors.html" class="active">
+            <i data-lucide="building-2" class="icon"></i>Vendors
+        </a>
+        <a href="/admin/commissions.html">
+            <i data-lucide="dollar-sign" class="icon"></i>Commissions
+        </a>
+        <a href="/admin/settings.html">
+            <i data-lucide="settings" class="icon"></i>Settings
+        </a>
+    </nav>
+    
     <div class="container">
-        <div class="manager-notice">
-            <h3><i data-lucide="briefcase"></i> Lead Vendor Management</h3>
-            <p>Monitor lead vendors, track performance, and manage costs to optimize lead generation.</p>
+        <div class="admin-notice">
+            <h3><i data-lucide="briefcase"></i> Admin Vendor Management</h3>
+            <p>Comprehensive vendor oversight with cost analysis, performance tracking, and system-wide vendor management.</p>
         </div>
         
         <div class="grid">
-            <div class="stat-card">
+            <div class="card">
                 <div class="stat-value" id="activeVendors">0</div>
                 <div class="stat-label">Active Vendors</div>
             </div>
-            <div class="stat-card">
+            <div class="card">
                 <div class="stat-value" id="totalLeads">0</div>
                 <div class="stat-label">Leads This Month</div>
             </div>
-            <div class="stat-card">
+            <div class="card">
                 <div class="stat-value" id="avgCostPerLead">$0</div>
                 <div class="stat-label">Avg Cost Per Lead</div>
             </div>
-            <div class="stat-card">
+            <div class="card">
                 <div class="stat-value" id="conversionRate">0%</div>
                 <div class="stat-label">Overall Conversion</div>
             </div>
@@ -83,26 +75,26 @@
         
         <div class="quick-actions">
             <button class="btn" onclick="addVendor()">
-                <i data-lucide="plus-circle"></i>
+                <i data-lucide="plus-circle" class="icon"></i>
                 Add Vendor
             </button>
             <button class="btn btn-success" onclick="syncBoberdoo()">
-                <i data-lucide="refresh-cw"></i>
+                <i data-lucide="refresh-cw" class="icon"></i>
                 Sync Boberdoo
             </button>
             <button class="btn btn-warning" onclick="analyzeCosts()">
-                <i data-lucide="bar-chart"></i>
+                <i data-lucide="bar-chart" class="icon"></i>
                 Cost Analysis
             </button>
             <button class="btn btn-secondary" onclick="exportVendorData()">
-                <i data-lucide="download"></i>
+                <i data-lucide="download" class="icon"></i>
                 Export Data
             </button>
         </div>
         
         <!-- Vendor Performance Overview -->
         <div class="card">
-            <h3><i data-lucide="trending-up"></i> Vendor Performance Overview</h3>
+            <h3><i data-lucide="trending-up" class="card-icon"></i> Vendor Performance Overview</h3>
             <div class="form-row">
                 <div class="form-group">
                     <select id="timeframeFilter" onchange="filterVendorData()">
@@ -131,7 +123,7 @@
         
         <!-- Vendor Directory -->
         <div class="card">
-            <h3><i data-lucide="building"></i> Vendor Directory</h3>
+            <h3><i data-lucide="building" class="card-icon"></i> Vendor Directory</h3>
             <table id="vendorsTable">
                 <thead>
                     <tr>
@@ -154,37 +146,37 @@
         
         <!-- Boberdoo Integration -->
         <div class="card">
-            <h3><i data-lucide="zap"></i> Boberdoo Integration Status</h3>
+            <h3><i data-lucide="zap" class="card-icon"></i> Boberdoo Integration Status</h3>
             <div class="grid">
-                <div class="stat-card">
+                <div class="card">
                     <div class="stat-value" style="color: #22c55e;"><i data-lucide="check-circle"></i></div>
                     <div class="stat-label">Connection Status</div>
                     <small style="color: rgba(255,255,255,0.7);">Connected</small>
                 </div>
-                <div class="stat-card">
+                <div class="card">
                     <div class="stat-value" id="boberdooLeads">0</div>
                     <div class="stat-label">Leads Today</div>
                 </div>
-                <div class="stat-card">
+                <div class="card">
                     <div class="stat-value" id="lastSync">--</div>
                     <div class="stat-label">Last Sync</div>
                 </div>
-                <div class="stat-card">
+                <div class="card">
                     <div class="stat-value" id="pendingLeads">0</div>
                     <div class="stat-label">Pending Distribution</div>
                 </div>
             </div>
             <div class="quick-actions">
                 <button class="btn" onclick="configureBoberdoo()">
-                    <i data-lucide="settings"></i>
+                    <i data-lucide="settings" class="icon"></i>
                     Configure Settings
                 </button>
                 <button class="btn btn-success" onclick="testConnection()">
-                    <i data-lucide="wifi"></i>
+                    <i data-lucide="wifi" class="icon"></i>
                     Test Connection
                 </button>
                 <button class="btn btn-warning" onclick="viewLogs()">
-                    <i data-lucide="file-text"></i>
+                    <i data-lucide="file-text" class="icon"></i>
                     View Logs
                 </button>
             </div>
@@ -192,23 +184,23 @@
         
         <!-- Cost Analysis Chart -->
         <div class="card">
-            <h3><i data-lucide="pie-chart"></i> Cost Breakdown by Vendor</h3>
+            <h3><i data-lucide="pie-chart" class="card-icon"></i> Cost Breakdown by Vendor</h3>
             <div style="text-align: center; padding: 2rem;">
                 <div style="font-size: 1.2rem; color: rgba(255,255,255,0.8); margin-bottom: 1rem;">
                     Interactive cost analysis chart would be displayed here
                 </div>
                 <div class="grid" style="max-width: 600px; margin: 0 auto;">
-                    <div class="stat-card">
+                    <div class="card">
                         <div class="premium-amount">$2,450</div>
                         <div class="stat-label">Boberdoo</div>
                         <small>45% of total spend</small>
                     </div>
-                    <div class="stat-card">
+                    <div class="card">
                         <div class="premium-amount">$1,890</div>
                         <div class="stat-label">QuoteWizard</div>
                         <small>35% of total spend</small>
                     </div>
-                    <div class="stat-card">
+                    <div class="card">
                         <div class="premium-amount">$1,080</div>
                         <div class="stat-label">LeadsCon</div>
                         <small>20% of total spend</small>
@@ -356,9 +348,13 @@
             if (userData) {
                 currentUser = JSON.parse(userData);
                 
-                // Allow managers and admin to access this page
-                if (!['manager', 'admin', 'super-admin'].includes(currentUser.role)) {
-                    window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                // Only admin can access this page (admin role includes super-admin users)
+                if (currentUser.role !== 'admin') {
+                    if (currentUser.role === 'manager') {
+                        window.location.href = 'https://insurance.syncedupsolutions.com/manager/vendors.html';
+                    } else {
+                        window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                    }
                     return;
                 }
                 
@@ -377,7 +373,7 @@
             showLoadingState();
             try {
                 // Try to fetch real data from API
-                const response = await fetch('/api/manager/vendors', {
+                const response = await fetch('/api/admin/vendors', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -562,7 +558,7 @@
                     status: 'active'
                 };
                 
-                const response = await fetch('/api/manager/vendors', {
+                const response = await fetch('/api/admin/vendors', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -641,7 +637,7 @@
             syncButton.disabled = true;
             
             try {
-                const response = await fetch('/api/manager/vendors/boberdoo/sync', {
+                const response = await fetch('/api/admin/vendors/boberdoo/sync', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -743,7 +739,7 @@
             }
             
             try {
-                const response = await fetch(`/api/manager/vendors/${vendorId}/status`, {
+                const response = await fetch(`/api/admin/vendors/${vendorId}/status`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
@@ -794,100 +790,6 @@
         async function refreshVendorData() {
             console.log('Refreshing vendor data...');
             await loadVendorManagement();
-        }
-        
-        async function editVendor(vendorId) {
-            const vendor = vendorsData.find(v => v.id === vendorId);
-            
-            // Pre-fill the modal with existing vendor data
-            document.getElementById('vendorName').value = vendor.name;
-            document.getElementById('vendorType').value = vendor.type;
-            document.getElementById('costPerLead').value = vendor.costPerLead;
-            document.getElementById('monthlyBudget').value = vendor.monthlyBudget || '';
-            document.getElementById('vendorContact').value = vendor.contact || '';
-            document.getElementById('vendorNotes').value = vendor.notes || '';
-            
-            // Change modal title and button text
-            document.querySelector('.modal-content h3').innerHTML = '<i data-lucide="edit"></i> Edit Vendor';
-            document.querySelector('.modal-content .btn-success').innerHTML = '<i data-lucide="check"></i> Update Vendor';
-            document.querySelector('.modal-content .btn-success').onclick = function() { updateVendor(vendorId); };
-            
-            document.getElementById('addVendorModal').style.display = 'block';
-            
-            // Re-initialize icons
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
-        }
-        
-        async function updateVendor(vendorId) {
-            const name = document.getElementById('vendorName').value;
-            const type = document.getElementById('vendorType').value;
-            const priority = document.getElementById('vendorPriority').value;
-            const costPerLead = document.getElementById('costPerLead').value;
-            const monthlyBudget = document.getElementById('monthlyBudget').value;
-            const contact = document.getElementById('vendorContact').value;
-            const notes = document.getElementById('vendorNotes').value;
-            
-            if (!name || !costPerLead) {
-                alert('Please fill in vendor name and cost per lead');
-                return;
-            }
-            
-            try {
-                const response = await fetch(`/api/manager/vendors/${vendorId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
-                    },
-                    body: JSON.stringify({
-                        name,
-                        type,
-                        priority,
-                        cost_per_lead: parseFloat(costPerLead),
-                        monthly_budget: monthlyBudget ? parseFloat(monthlyBudget) : null,
-                        contact_info: contact,
-                        notes
-                    })
-                });
-                
-                if (response.ok) {
-                    // Update local data
-                    const vendor = vendorsData.find(v => v.id === vendorId);
-                    vendor.name = name;
-                    vendor.type = type;
-                    vendor.costPerLead = parseFloat(costPerLead);
-                    vendor.monthlyBudget = monthlyBudget ? parseFloat(monthlyBudget) : null;
-                    vendor.contact = contact;
-                    vendor.notes = notes;
-                    
-                    populateVendorFilter();
-                    displayVendorStats();
-                    displayVendorsTable();
-                    alert('Vendor updated successfully!');
-                    closeModal();
-                } else {
-                    throw new Error('API update failed');
-                }
-            } catch (error) {
-                console.error('Error updating vendor:', error);
-                
-                // Fallback: Update local data for demo
-                const vendor = vendorsData.find(v => v.id === vendorId);
-                vendor.name = name;
-                vendor.type = type;
-                vendor.costPerLead = parseFloat(costPerLead);
-                vendor.monthlyBudget = monthlyBudget ? parseFloat(monthlyBudget) : null;
-                vendor.contact = contact;
-                vendor.notes = notes;
-                
-                populateVendorFilter();
-                displayVendorStats();
-                displayVendorsTable();
-                alert('Vendor updated successfully! (Demo mode)');
-                closeModal();
-            }
         }
         
         // Close modal when clicking outside

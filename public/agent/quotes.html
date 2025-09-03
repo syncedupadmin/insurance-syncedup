@@ -231,7 +231,7 @@
                 return false;
             }
 
-            if (!['agent', 'manager', 'admin', 'super-admin'].includes(user.role)) {
+            if (!['agent', 'manager', 'admin'].includes(user.role)) {
                 alert('Access denied. Agent permissions required.');
                 window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
                 return false;

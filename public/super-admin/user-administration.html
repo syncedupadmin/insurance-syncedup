@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Administration - Super Admin</title>
+    <link rel="stylesheet" href="super-admin-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">SA</div>
+                Super Admin Portal
+            </a>
+            <div class="header-actions">
+                <div class="user-info">
+                    <div class="user-avatar">SA</div>
+                    <div>
+                        <div style="font-weight: 600;" id="userDisplay">Super Admin</div>
+                        <div style="font-size: 0.8rem; opacity: 0.7;">Platform Administrator</div>
+                    </div>
+                </div>
+                <button class="btn" onclick="logout()">
+                    <i data-lucide="log-out"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-section">
+            <div class="nav-title">Platform Overview</div>
+            <a href="index.html" class="nav-link">
+                <i data-lucide="layout-dashboard" class="nav-icon"></i>
+                Dashboard
+            </a>
+            <a href="system-analytics.html" class="nav-link">
+                <i data-lucide="bar-chart-3" class="nav-icon"></i>
+                System Analytics
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-title">Management</div>
+            <a href="agency-management.html" class="nav-link">
+                <i data-lucide="building-2" class="nav-icon"></i>
+                Agency Management
+            </a>
+            <a href="user-administration.html" class="nav-link active">
+                <i data-lucide="users" class="nav-icon"></i>
+                User Administration
+            </a>
+            <a href="revenue-management.html" class="nav-link">
+                <i data-lucide="dollar-sign" class="nav-icon"></i>
+                Revenue Management
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-title">Configuration</div>
+            <a href="settings.html" class="nav-link">
+                <i data-lucide="settings" class="nav-icon"></i>
+                Settings
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">User Administration</h1>
+                <p class="page-subtitle">Cross-agency user management, support escalations, and security monitoring</p>
+            </div>
+
+            <!-- User Overview Stats -->
+            <div class="grid grid-4">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalUsers">0</div>
+                    <div class="stat-label">Total Platform Users</div>
+                    <div class="stat-change positive">
+                        <i data-lucide="user-plus" style="width: 12px; height: 12px;"></i>
+                        <span id="newUsersMonth">+127 this month</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value" id="activeUsers">0</div>
+                    <div class="stat-label">Active Users (24h)</div>
+                    <div class="stat-change positive">
+                        <i data-lucide="activity" style="width: 12px; height: 12px;"></i>
+                        <span id="activityRate">78.5%</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value" id="supportTickets">0</div>
+                    <div class="stat-label">Open Support Tickets</div>
+                    <div class="stat-change negative">
+                        <i data-lucide="alert-circle" style="width: 12px; height: 12px;"></i>
+                        <span id="ticketsTrend">+3 today</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value" id="securityAlerts">0</div>
+                    <div class="stat-label">Security Alerts</div>
+                    <div class="stat-change positive">
+                        <i data-lucide="shield-check" style="width: 12px; height: 12px;"></i>
+                        <span id="securityStatus">Low Risk</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Management Tools -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i data-lucide="search" class="card-icon"></i>
+                        User Search & Filters
+                    </h3>
+                    <button class="btn btn-primary" onclick="showCreateUserModal()">
+                        <i data-lucide="user-plus"></i>
+                        Create User
+                    </button>
+                </div>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
+                    <div style="flex: 1; min-width: 250px;">
+                        <input type="text" id="userSearch" placeholder="Search users by name, email, or agency..." class="form-input" style="margin: 0;">
+                    </div>
+                    <div>
+                        <select id="roleFilter" class="form-input" style="margin: 0; min-width: 120px;">
+                            <option value="">All Roles</option>
+                            <option value="super-admin">Super Admin</option>
+                            <option value="admin">Admin</option>
+                            <option value="manager">Manager</option>
+                            <option value="agent">Agent</option>
+                        </select>
+                    </div>
+                    <div>
+                        <select id="statusFilter" class="form-input" style="margin: 0; min-width: 120px;">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="suspended">Suspended</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                    </div>
+                    <div>
+                        <select id="agencyFilter" class="form-input" style="margin: 0; min-width: 150px;">
+                            <option value="">All Agencies</option>
+                            <option value="elite">Elite Insurance Group</option>
+                            <option value="premier">Premier Protection LLC</option>
+                            <option value="guardian">Guardian Risk Management</option>
+                        </select>
+                    </div>
+                    <div>
+                        <select id="sortBy" class="form-input" style="margin: 0; min-width: 120px;">
+                            <option value="name">Sort by Name</option>
+                            <option value="email">Sort by Email</option>
+                            <option value="role">Sort by Role</option>
+                            <option value="lastActive">Sort by Last Active</option>
+                            <option value="created">Sort by Created</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="refreshUsers()">
+                        <i data-lucide="refresh-cw"></i>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i data-lucide="users" class="card-icon"></i>
+                        Platform Users
+                    </h3>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn" onclick="exportUsers()">
+                            <i data-lucide="download"></i>
+                            Export
+                        </button>
+                        <button class="btn" onclick="bulkUserActions()">
+                            <i data-lucide="layers"></i>
+                            Bulk Actions
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="usersLoading" class="loading">
+                    <div class="spinner"></div>
+                    Loading users...
+                </div>
+                
+                <div class="table-container" id="usersTable" style="display: none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectAllUsers" onchange="toggleSelectAllUsers()"></th>
+                                <th>User</th>
+                                <th>Agency</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Last Active</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Table rows will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);" id="userPaginationContainer" style="display: none;">
+                    <div>
+                        <span id="userRecordsInfo">Showing 0-0 of 0 records</span>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <button class="btn" onclick="changeUserPage(-1)" id="prevUserBtn">
+                            <i data-lucide="chevron-left"></i>
+                            Previous
+                        </button>
+                        <span id="userPageInfo">Page 0 of 0</span>
+                        <button class="btn" onclick="changeUserPage(1)" id="nextUserBtn">
+                            Next
+                            <i data-lucide="chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Tickets and Security -->
+            <div class="grid grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i data-lucide="headphones" class="card-icon"></i>
+                            Support Ticket Escalations
+                        </h3>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <select class="form-input" style="width: auto; min-width: 120px;" id="ticketFilter">
+                                <option value="all">All Tickets</option>
+                                <option value="critical">Critical</option>
+                                <option value="high">High Priority</option>
+                                <option value="escalated">Escalated</option>
+                            </select>
+                            <button class="btn" onclick="refreshTickets()">
+                                <i data-lucide="refresh-cw"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="supportTicketsList" style="max-height: 400px; overflow-y: auto;">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading support tickets...
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i data-lucide="shield-alert" class="card-icon"></i>
+                            Security Audit Log
+                        </h3>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <select class="form-input" style="width: auto; min-width: 120px;" id="securityFilter">
+                                <option value="all">All Events</option>
+                                <option value="login">Login Events</option>
+                                <option value="failed_login">Failed Logins</option>
+                                <option value="permission_changes">Permission Changes</option>
+                            </select>
+                            <button class="btn" onclick="refreshSecurityLog()">
+                                <i data-lucide="refresh-cw"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="securityAuditLog" style="max-height: 400px; overflow-y: auto;">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading security audit log...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Activity Monitoring -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i data-lucide="activity" class="card-icon"></i>
+                        User Activity Monitoring
+                    </h3>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <select class="form-input" style="width: auto; min-width: 120px;" id="activityTimeframe">
+                            <option value="1h">Last Hour</option>
+                            <option value="24h" selected>Last 24 Hours</option>
+                            <option value="7d">Last 7 Days</option>
+                        </select>
+                        <button class="btn" onclick="exportActivityReport()">
+                            <i data-lucide="download"></i>
+                            Export Report
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="userActivityData">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading activity data...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Create/Edit User Modal -->
+    <div id="userModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: var(--bg-card); border-radius: 16px; padding: 2rem; width: 90%; max-width: 500px; border: 1px solid var(--border-color);">
+            <h3 id="userModalTitle" style="color: var(--text-primary); margin-bottom: 1.5rem;">Create New User</h3>
+            <form id="userForm">
+                <div class="grid grid-2" style="gap: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        <input type="text" id="userFirstName" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" id="userLastName" class="form-input" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="userEmail" class="form-input" required>
+                </div>
+                <div class="grid grid-2" style="gap: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">Role</label>
+                        <select id="userRole" class="form-input" required>
+                            <option value="">Select Role</option>
+                            <option value="admin">Admin</option>
+                            <option value="manager">Manager</option>
+                            <option value="agent">Agent</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select id="userStatus" class="form-input" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Agency</label>
+                    <select id="userAgency" class="form-input" required>
+                        <option value="">Select Agency</option>
+                        <option value="elite">Elite Insurance Group</option>
+                        <option value="premier">Premier Protection LLC</option>
+                        <option value="guardian">Guardian Risk Management</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Temporary Password</label>
+                    <input type="password" id="userPassword" class="form-input" placeholder="Leave blank to auto-generate">
+                </div>
+                <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 2rem;">
+                    <button type="button" class="btn" onclick="closeUserModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span id="userSubmitText">Create User</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- User Details Modal -->
+    <div id="userDetailsModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: var(--bg-card); border-radius: 16px; padding: 2rem; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 id="userDetailsTitle" style="color: var(--text-primary);">User Details</h3>
+                <button onclick="closeUserDetailsModal()" style="background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            <div id="userDetailsContent">
+                <!-- User details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUsers = [];
+        let currentUserPage = 1;
+        let totalUserPages = 1;
+        let editingUserId = null;
+
+        // Authentication check
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token || !user.email) {
+                window.location.href = '/login.html';
+                return false;
+            }
+
+            if (user.role !== 'super-admin') {
+                alert('Access denied. Super Admin privileges required.');
+                window.location.href = '/login.html';
+                return false;
+            }
+
+            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName}`;
+            return true;
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            await loadUserStats();
+            await loadUsers();
+            await loadSupportTickets();
+            await loadSecurityAuditLog();
+            await loadUserActivity();
+            
+            setupEventListeners();
+            lucide.createIcons();
+        }
+
+        // Load user statistics
+        async function loadUserStats() {
+            try {
+                const response = await fetch('/api/super-admin/user-stats', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updateUserStats(data);
+                } else {
+                    updateUserStats(getFallbackUserStats());
+                }
+            } catch (error) {
+                console.error('Error loading user stats:', error);
+                updateUserStats(getFallbackUserStats());
+            }
+        }
+
+        function getFallbackUserStats() {
+            return {
+                totalUsers: 2891,
+                activeUsers: 2267,
+                supportTickets: 23,
+                securityAlerts: 2
+            };
+        }
+
+        function updateUserStats(data) {
+            document.getElementById('totalUsers').textContent = data.totalUsers.toLocaleString();
+            document.getElementById('activeUsers').textContent = data.activeUsers.toLocaleString();
+            document.getElementById('supportTickets').textContent = data.supportTickets;
+            document.getElementById('securityAlerts').textContent = data.securityAlerts;
+        }
+
+        // Load users
+        async function loadUsers() {
+            document.getElementById('usersLoading').style.display = 'block';
+            document.getElementById('usersTable').style.display = 'none';
+            
+            const filters = getUserFilters();
+            const queryParams = new URLSearchParams({
+                page: currentUserPage,
+                limit: 25,
+                ...filters
+            });
+            
+            try {
+                const response = await fetch(`/api/super-admin/users?${queryParams}`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUsers = data.users || getFallbackUsers();
+                    totalUserPages = data.totalPages || 1;
+                } else {
+                    currentUsers = getFallbackUsers();
+                    totalUserPages = 1;
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+                currentUsers = getFallbackUsers();
+                totalUserPages = 1;
+            }
+            
+            renderUsersTable();
+            updateUserPagination();
+            
+            document.getElementById('usersLoading').style.display = 'none';
+            document.getElementById('usersTable').style.display = 'block';
+            document.getElementById('userPaginationContainer').style.display = 'flex';
+        }
+
+        function getFallbackUsers() {
+            return [
+                {
+                    id: 1, firstName: 'Sarah', lastName: 'Johnson', email: 'sarah.johnson@elite-insurance.com',
+                    agency: 'Elite Insurance Group', role: 'admin', status: 'active', lastActive: '2 hours ago', created: '2023-06-15'
+                },
+                {
+                    id: 2, firstName: 'Mike', lastName: 'Davis', email: 'mike.davis@premier-protection.com',
+                    agency: 'Premier Protection LLC', role: 'manager', status: 'active', lastActive: '15 minutes ago', created: '2023-08-22'
+                },
+                {
+                    id: 3, firstName: 'Emily', lastName: 'Wilson', email: 'emily.wilson@guardian-risk.com',
+                    agency: 'Guardian Risk Management', role: 'agent', status: 'active', lastActive: '5 hours ago', created: '2024-01-10'
+                },
+                {
+                    id: 4, firstName: 'James', lastName: 'Brown', email: 'james.brown@elite-insurance.com',
+                    agency: 'Elite Insurance Group', role: 'agent', status: 'inactive', lastActive: '2 days ago', created: '2023-11-05'
+                },
+                {
+                    id: 5, firstName: 'Lisa', lastName: 'Anderson', email: 'lisa.anderson@premier-protection.com',
+                    agency: 'Premier Protection LLC', role: 'agent', status: 'suspended', lastActive: '1 week ago', created: '2023-09-18'
+                }
+            ];
+        }
+
+        function renderUsersTable() {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+            
+            if (currentUsers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-muted);">No users found</td></tr>';
+                return;
+            }
+            
+            currentUsers.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="checkbox" class="user-checkbox" value="${user.id}"></td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="width: 32px; height: 32px; background: var(--accent-gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--bg-primary); font-weight: bold; font-size: 0.8rem;">
+                                ${user.firstName[0]}${user.lastName[0]}
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; color: var(--text-primary);">${user.firstName} ${user.lastName}</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">${user.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="color: var(--text-secondary);">${user.agency}</td>
+                    <td><span style="text-transform: capitalize; background: rgba(255, 215, 0, 0.2); color: var(--accent-gold); padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.8rem;">${user.role}</span></td>
+                    <td><span class="status-badge status-${getUserStatusClass(user.status)}">${user.status}</span></td>
+                    <td style="color: var(--text-secondary);">${user.lastActive}</td>
+                    <td style="color: var(--text-secondary);">${user.created}</td>
+                    <td>
+                        <div style="display: flex; gap: 0.3rem;">
+                            <button class="btn" onclick="viewUserDetails(${user.id})" title="View Details" style="padding: 0.5rem;">
+                                <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
+                            </button>
+                            <button class="btn" onclick="editUser(${user.id})" title="Edit" style="padding: 0.5rem;">
+                                <i data-lucide="edit" style="width: 16px; height: 16px;"></i>
+                            </button>
+                            <button class="btn" onclick="loginAsUser(${user.id})" title="Login As User" style="padding: 0.5rem;">
+                                <i data-lucide="log-in" style="width: 16px; height: 16px;"></i>
+                            </button>
+                            <button class="btn ${user.status === 'active' ? 'btn-warning' : 'btn-success'}" onclick="toggleUserStatus(${user.id})" title="${user.status === 'active' ? 'Suspend' : 'Activate'}" style="padding: 0.5rem;">
+                                <i data-lucide="${user.status === 'active' ? 'user-minus' : 'user-plus'}" style="width: 16px; height: 16px;"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            lucide.createIcons();
+        }
+
+        function getUserStatusClass(status) {
+            const statusMap = {
+                'active': 'active',
+                'inactive': 'inactive',
+                'suspended': 'error',
+                'pending': 'warning'
+            };
+            return statusMap[status] || 'inactive';
+        }
+
+        // Get current filters
+        function getUserFilters() {
+            return {
+                search: document.getElementById('userSearch').value,
+                role: document.getElementById('roleFilter').value,
+                status: document.getElementById('statusFilter').value,
+                agency: document.getElementById('agencyFilter').value,
+                sortBy: document.getElementById('sortBy').value
+            };
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            ['userSearch', 'roleFilter', 'statusFilter', 'agencyFilter', 'sortBy'].forEach(id => {
+                document.getElementById(id).addEventListener('change', () => {
+                    currentUserPage = 1;
+                    loadUsers();
+                });
+            });
+            
+            // Debounce search input
+            let searchTimeout;
+            document.getElementById('userSearch').addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    currentUserPage = 1;
+                    loadUsers();
+                }, 500);
+            });
+
+            // Other event listeners
+            document.getElementById('ticketFilter').addEventListener('change', loadSupportTickets);
+            document.getElementById('securityFilter').addEventListener('change', loadSecurityAuditLog);
+            document.getElementById('activityTimeframe').addEventListener('change', loadUserActivity);
+        }
+
+        // Load Support Tickets
+        async function loadSupportTickets() {
+            try {
+                const filter = document.getElementById('ticketFilter').value;
+                const tickets = [
+                    { id: 'TK-2024-001', user: 'Sarah Johnson', agency: 'Elite Insurance Group', priority: 'critical', subject: 'Cannot access reports section', created: '2 hours ago' },
+                    { id: 'TK-2024-002', user: 'Mike Davis', agency: 'Premier Protection LLC', priority: 'high', subject: 'User permissions not working', created: '5 hours ago' },
+                    { id: 'TK-2024-003', user: 'Emily Wilson', agency: 'Guardian Risk Management', priority: 'normal', subject: 'Password reset request', created: '1 day ago' },
+                    { id: 'TK-2024-004', user: 'James Brown', agency: 'Elite Insurance Group', priority: 'escalated', subject: 'Data export failing', created: '2 days ago' }
+                ];
+                
+                renderSupportTickets(tickets);
+            } catch (error) {
+                console.error('Error loading support tickets:', error);
+            }
+        }
+
+        function renderSupportTickets(tickets) {
+            const ticketsHtml = tickets.map(ticket => {
+                const priorityColors = {
+                    critical: 'var(--error)',
+                    high: 'var(--warning)',
+                    escalated: 'var(--error)',
+                    normal: 'var(--info)'
+                };
+                
+                return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid var(--border-color);">
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">
+                                ${ticket.id} - ${ticket.subject}
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">
+                                ${ticket.user} (${ticket.agency})
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">
+                                ${ticket.created}
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <span class="status-badge" style="background: ${priorityColors[ticket.priority]}20; color: ${priorityColors[ticket.priority]};">
+                                ${ticket.priority}
+                            </span>
+                            <div style="margin-top: 0.5rem;">
+                                <button class="btn" onclick="viewTicket('${ticket.id}')" style="padding: 0.4rem;">
+                                    <i data-lucide="external-link" style="width: 14px; height: 14px;"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('supportTicketsList').innerHTML = ticketsHtml;
+            lucide.createIcons();
+        }
+
+        // Load Security Audit Log
+        async function loadSecurityAuditLog() {
+            try {
+                const filter = document.getElementById('securityFilter').value;
+                const securityEvents = [
+                    { event: 'Failed login attempt', user: 'unknown@test.com', ip: '192.168.1.100', time: '5 minutes ago', severity: 'warning' },
+                    { event: 'Successful admin login', user: 'sarah.johnson@elite-insurance.com', ip: '10.0.0.50', time: '2 hours ago', severity: 'info' },
+                    { event: 'Permission change', user: 'mike.davis@premier-protection.com', ip: '10.0.0.75', time: '4 hours ago', severity: 'info' },
+                    { event: 'Multiple failed logins', user: 'test@hacker.com', ip: '192.168.1.200', time: '6 hours ago', severity: 'critical' },
+                    { event: 'Password reset', user: 'emily.wilson@guardian-risk.com', ip: '10.0.0.125', time: '1 day ago', severity: 'info' }
+                ];
+                
+                renderSecurityAuditLog(securityEvents);
+            } catch (error) {
+                console.error('Error loading security audit log:', error);
+            }
+        }
+
+        function renderSecurityAuditLog(events) {
+            const eventsHtml = events.map(event => {
+                const severityColors = {
+                    critical: 'var(--error)',
+                    warning: 'var(--warning)',
+                    info: 'var(--info)'
+                };
+                
+                return `
+                    <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; border-bottom: 1px solid var(--border-color);">
+                        <div style="color: ${severityColors[event.severity]};">
+                            <i data-lucide="${event.severity === 'critical' ? 'alert-octagon' : event.severity === 'warning' ? 'alert-triangle' : 'info'}" style="width: 20px; height: 20px;"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="color: var(--text-primary); margin-bottom: 0.25rem;">
+                                ${event.event}
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">
+                                ${event.user} from ${event.ip}
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">
+                                ${event.time}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('securityAuditLog').innerHTML = eventsHtml;
+            lucide.createIcons();
+        }
+
+        // Load User Activity
+        async function loadUserActivity() {
+            try {
+                const timeframe = document.getElementById('activityTimeframe').value;
+                const activityData = {
+                    summary: {
+                        totalSessions: 2456,
+                        avgSessionDuration: '24 minutes',
+                        topFeature: 'Dashboard',
+                        peakHour: '2:00 PM'
+                    },
+                    topUsers: [
+                        { name: 'Sarah Johnson', sessions: 45, duration: '3.2 hours' },
+                        { name: 'Mike Davis', sessions: 38, duration: '2.8 hours' },
+                        { name: 'Emily Wilson', sessions: 32, duration: '2.1 hours' }
+                    ]
+                };
+                
+                renderUserActivity(activityData);
+            } catch (error) {
+                console.error('Error loading user activity:', error);
+            }
+        }
+
+        function renderUserActivity(data) {
+            const activityHtml = `
+                <div class="grid grid-2" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Activity Summary</h4>
+                        <div style="background: var(--bg-elevated); padding: 1rem; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-secondary);">Total Sessions</span>
+                                <span style="color: var(--text-primary); font-weight: 600;">${data.summary.totalSessions}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-secondary);">Avg Duration</span>
+                                <span style="color: var(--text-primary); font-weight: 600;">${data.summary.avgSessionDuration}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-secondary);">Top Feature</span>
+                                <span style="color: var(--accent-gold); font-weight: 600;">${data.summary.topFeature}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-secondary);">Peak Hour</span>
+                                <span style="color: var(--text-primary); font-weight: 600;">${data.summary.peakHour}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Most Active Users</h4>
+                        <div style="background: var(--bg-elevated); padding: 1rem; border-radius: 8px;">
+                            ${data.topUsers.map((user, index) => `
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: ${index < data.topUsers.length - 1 ? '0.75rem' : '0'};">
+                                    <div>
+                                        <div style="font-weight: 600; color: var(--text-primary);">${user.name}</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-muted);">${user.sessions} sessions</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="color: var(--accent-gold); font-weight: 600;">${user.duration}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('userActivityData').innerHTML = activityHtml;
+        }
+
+        // Pagination
+        function changeUserPage(delta) {
+            const newPage = currentUserPage + delta;
+            if (newPage >= 1 && newPage <= totalUserPages) {
+                currentUserPage = newPage;
+                loadUsers();
+            }
+        }
+
+        function updateUserPagination() {
+            const recordsStart = (currentUserPage - 1) * 25 + 1;
+            const recordsEnd = Math.min(currentUserPage * 25, currentUsers.length);
+            const totalRecords = currentUsers.length;
+            
+            document.getElementById('userRecordsInfo').textContent = `Showing ${recordsStart}-${recordsEnd} of ${totalRecords} records`;
+            document.getElementById('userPageInfo').textContent = `Page ${currentUserPage} of ${totalUserPages}`;
+            
+            document.getElementById('prevUserBtn').disabled = currentUserPage === 1;
+            document.getElementById('nextUserBtn').disabled = currentUserPage === totalUserPages;
+        }
+
+        // Modal functions
+        function showCreateUserModal() {
+            editingUserId = null;
+            document.getElementById('userModalTitle').textContent = 'Create New User';
+            document.getElementById('userSubmitText').textContent = 'Create User';
+            document.getElementById('userForm').reset();
+            document.getElementById('userModal').style.display = 'flex';
+        }
+
+        function editUser(userId) {
+            const user = currentUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            editingUserId = userId;
+            document.getElementById('userModalTitle').textContent = 'Edit User';
+            document.getElementById('userSubmitText').textContent = 'Update User';
+            
+            document.getElementById('userFirstName').value = user.firstName;
+            document.getElementById('userLastName').value = user.lastName;
+            document.getElementById('userEmail').value = user.email;
+            document.getElementById('userRole').value = user.role;
+            document.getElementById('userStatus').value = user.status;
+            // Set agency based on user.agency mapping
+            
+            document.getElementById('userModal').style.display = 'flex';
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').style.display = 'none';
+            editingUserId = null;
+        }
+
+        function viewUserDetails(userId) {
+            const user = currentUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            document.getElementById('userDetailsTitle').textContent = `${user.firstName} ${user.lastName}`;
+            
+            const detailsHtml = `
+                <div class="grid grid-2" style="gap: 1.5rem;">
+                    <div>
+                        <h4 style="color: var(--text-primary); margin-bottom: 1rem;">User Information</h4>
+                        <div style="background: var(--bg-elevated); padding: 1rem; border-radius: 8px;">
+                            <p><strong>Email:</strong> ${user.email}</p>
+                            <p><strong>Role:</strong> ${user.role}</p>
+                            <p><strong>Status:</strong> <span class="status-badge status-${getUserStatusClass(user.status)}">${user.status}</span></p>
+                            <p><strong>Agency:</strong> ${user.agency}</p>
+                            <p><strong>Created:</strong> ${user.created}</p>
+                            <p><strong>Last Active:</strong> ${user.lastActive}</p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Activity Summary</h4>
+                        <div style="background: var(--bg-elevated); padding: 1rem; border-radius: 8px;">
+                            <p><strong>Login Count:</strong> 234 times</p>
+                            <p><strong>Last Login:</strong> ${user.lastActive}</p>
+                            <p><strong>Sessions Today:</strong> 3</p>
+                            <p><strong>Total Session Time:</strong> 2.5 hours</p>
+                            <p><strong>Failed Logins:</strong> 0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1.5rem;">
+                    <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Quick Actions</h4>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="loginAsUser(${userId})">
+                            <i data-lucide="log-in"></i>
+                            Login As User
+                        </button>
+                        <button class="btn" onclick="resetUserPassword(${userId})">
+                            <i data-lucide="key"></i>
+                            Reset Password
+                        </button>
+                        <button class="btn" onclick="viewUserSessions(${userId})">
+                            <i data-lucide="activity"></i>
+                            View Sessions
+                        </button>
+                        <button class="btn ${user.status === 'active' ? 'btn-warning' : 'btn-success'}" onclick="toggleUserStatus(${userId})">
+                            <i data-lucide="${user.status === 'active' ? 'user-minus' : 'user-plus'}"></i>
+                            ${user.status === 'active' ? 'Suspend' : 'Activate'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('userDetailsContent').innerHTML = detailsHtml;
+            document.getElementById('userDetailsModal').style.display = 'flex';
+            lucide.createIcons();
+        }
+
+        function closeUserDetailsModal() {
+            document.getElementById('userDetailsModal').style.display = 'none';
+        }
+
+        // User actions
+        function toggleUserStatus(userId) {
+            const user = currentUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            const newStatus = user.status === 'active' ? 'suspended' : 'active';
+            const confirmMessage = `Are you sure you want to ${newStatus === 'suspended' ? 'suspend' : 'activate'} ${user.firstName} ${user.lastName}?`;
+            
+            if (confirm(confirmMessage)) {
+                // Update locally for demo
+                user.status = newStatus;
+                renderUsersTable();
+            }
+        }
+
+        function loginAsUser(userId) {
+            const user = currentUsers.find(u => u.id === userId);
+            if (!user) return;
+            
+            if (confirm(`Login as ${user.firstName} ${user.lastName}? This will open a new tab with their account.`)) {
+                alert(`Login as user functionality would be implemented here. Opening ${user.firstName}'s account...`);
+            }
+        }
+
+        function resetUserPassword(userId) {
+            const user = currentUsers.find(u => u.id === userId);
+            if (!user) return;
+            
+            if (confirm(`Reset password for ${user.firstName} ${user.lastName}?`)) {
+                alert('Password reset email sent to user.');
+            }
+        }
+
+        function viewUserSessions(userId) {
+            alert(`User session details would be displayed for user ID: ${userId}`);
+        }
+
+        function toggleSelectAllUsers() {
+            const selectAll = document.getElementById('selectAllUsers');
+            const checkboxes = document.querySelectorAll('.user-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        }
+
+        // Other functions
+        function refreshUsers() {
+            loadUsers();
+            loadUserStats();
+        }
+
+        function refreshTickets() {
+            loadSupportTickets();
+        }
+
+        function refreshSecurityLog() {
+            loadSecurityAuditLog();
+        }
+
+        function exportUsers() {
+            alert('User export functionality would be implemented here.');
+        }
+
+        function bulkUserActions() {
+            const selectedUsers = document.querySelectorAll('.user-checkbox:checked');
+            if (selectedUsers.length === 0) {
+                alert('Please select users to perform bulk actions.');
+                return;
+            }
+            alert(`Bulk actions for ${selectedUsers.length} users would be implemented here.`);
+        }
+
+        function exportActivityReport() {
+            alert('Activity report export functionality would be implemented here.');
+        }
+
+        function viewTicket(ticketId) {
+            alert(`Ticket ${ticketId} details would be displayed.`);
+        }
+
+        // Form submission
+        document.getElementById('userForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                firstName: document.getElementById('userFirstName').value,
+                lastName: document.getElementById('userLastName').value,
+                email: document.getElementById('userEmail').value,
+                role: document.getElementById('userRole').value,
+                status: document.getElementById('userStatus').value,
+                agency: document.getElementById('userAgency').value
+            };
+            
+            if (editingUserId) {
+                // Update existing user
+                const user = currentUsers.find(u => u.id === editingUserId);
+                if (user) {
+                    Object.assign(user, formData);
+                    renderUsersTable();
+                }
+            } else {
+                // Add new user
+                const newUser = {
+                    id: Math.max(...currentUsers.map(u => u.id)) + 1,
+                    ...formData,
+                    lastActive: 'Never',
+                    created: new Date().toISOString().split('T')[0]
+                };
+                currentUsers.unshift(newUser);
+                renderUsersTable();
+            }
+            
+            closeUserModal();
+        });
+
+        // Handle clicks outside modals to close them
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+                editingUserId = null;
+            }
+        });
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>

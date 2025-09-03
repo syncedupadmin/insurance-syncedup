@@ -20,13 +20,13 @@ export default async function handler(req, res) {
     
     if (role === 'agent') {
       query = query.eq('agent_id', agentId);
-    } else if (['manager', 'admin'].includes(role)) {
+    } else if (role === 'manager') {
       query = query.eq('agency_id', agencyId);
       if (queryAgentId) {
         query = query.eq('agent_id', queryAgentId);
       }
     }
-    // super_admin sees all
+    // admin role has universal access - no filtering needed
     
     const { data: commissions, error } = await query
       .select('*')

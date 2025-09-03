@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convoso Lead Management - Manager Portal</title>
+    <link rel="stylesheet" href="/manager/manager-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Convoso Lead Management</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="live-indicator" id="liveIndicator">
+                <div class="pulse"></div>
+                <span>Live</span>
+            </div>
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="leads.html" class="nav-link active">
+            <i data-lucide="user-plus" class="icon"></i>
+            Leads
+        </a>
+        <a href="index.html" class="nav-link">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="team-management.html" class="nav-link">
+            <i data-lucide="users" class="icon"></i>
+            Team Management
+        </a>
+        <a href="performance.html" class="nav-link">
+            <i data-lucide="trending-up" class="icon"></i>
+            Team Performance
+        </a>
+        <a href="reports.html" class="nav-link">
+            <i data-lucide="file-text" class="icon"></i>
+            Reports
+        </a>
+        <a href="goals.html" class="nav-link">
+            <i data-lucide="target" class="icon"></i>
+            Goals
+        </a>
+        <a href="vendors.html" class="nav-link">
+            <i data-lucide="building-2" class="icon"></i>
+            Vendors
+        </a>
+        <a href="settings.html" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+    </div>
+    
+    <div class="container">
+        <div class="manager-notice">
+            <h3><i data-lucide="zap"></i> Real-Time Convoso Lead Management</h3>
+            <p>Monitor team lead performance, track conversion rates, and manage real-time lead distribution from Convoso.</p>
+        </div>
+        
+        <!-- Live Statistics -->
+        <div class="grid">
+            <div class="stat-card live-stat">
+                <div class="stat-value" id="totalLeadsToday">0</div>
+                <div class="stat-label">Today's Leads</div>
+                <div class="stat-change" id="leadsLastHour">+0 last hour</div>
+            </div>
+            <div class="stat-card live-stat">
+                <div class="stat-value" id="newLeadsToday">0</div>
+                <div class="stat-label">New/Uncontacted</div>
+                <div class="stat-change" id="newLeadsChange">+0 since last check</div>
+            </div>
+            <div class="stat-card live-stat">
+                <div class="stat-value" id="contactedToday">0</div>
+                <div class="stat-label">Contacted Today</div>
+                <div class="stat-change" id="contactedChange">+0 since last check</div>
+            </div>
+            <div class="stat-card live-stat">
+                <div class="stat-value" id="soldToday">0</div>
+                <div class="stat-label">Converted Today</div>
+                <div class="stat-change" id="soldChange">+0 since last check</div>
+            </div>
+            <div class="stat-card live-stat cost-stat">
+                <div class="stat-value" id="totalCostToday">$0</div>
+                <div class="stat-label">Cost Today</div>
+                <div class="stat-change" id="avgCostPerLead">$0 avg/lead</div>
+            </div>
+            <div class="stat-card live-stat conversion-stat">
+                <div class="stat-value" id="conversionRateToday">0%</div>
+                <div class="stat-label">Conversion Rate</div>
+                <div class="stat-change" id="conversionTrend">- vs yesterday</div>
+            </div>
+        </div>
+        
+        <!-- Live Lead Feed & Quick Actions -->
+        <div class="grid grid-2">
+            <div class="card">
+                <h3><i data-lucide="activity" class="card-icon"></i>Live Lead Feed</h3>
+                <div id="liveFeed" class="live-feed">
+                    <div class="loading-state">
+                        <div class="loading"></div>
+                        Loading live feed...
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3><i data-lucide="zap" class="card-icon"></i>Quick Actions</h3>
+                <div class="quick-actions-grid">
+                    <button class="btn btn-success" onclick="assignHotLeads()">
+                        <i data-lucide="flame" class="icon"></i>
+                        Assign Hot Leads
+                    </button>
+                    <button class="btn btn-warning" onclick="redistributeLeads()">
+                        <i data-lucide="shuffle" class="icon"></i>
+                        Redistribute
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportDailyReport()">
+                        <i data-lucide="download" class="icon"></i>
+                        Export Report
+                    </button>
+                    <button class="btn" onclick="refreshAllData()">
+                        <i data-lucide="refresh-cw" class="icon"></i>
+                        Refresh All
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lead Filters & Search -->
+        <div class="card">
+            <h3><i data-lucide="filter" class="card-icon"></i>Lead Filters & Search</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <input type="text" id="searchInput" placeholder="Search by name, phone, email..." onchange="applyFilters()">
+                </div>
+                <div class="form-group">
+                    <select id="statusFilter" onchange="applyFilters()">
+                        <option value="">All Status</option>
+                        <option value="new">New</option>
+                        <option value="contacted">Contacted</option>
+                        <option value="qualified">Qualified</option>
+                        <option value="quoted">Quoted</option>
+                        <option value="sold">Sold</option>
+                        <option value="lost">Lost</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select id="sourceFilter" onchange="applyFilters()">
+                        <option value="">All Sources</option>
+                        <option value="convoso">Convoso</option>
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select id="agentFilter" onchange="applyFilters()">
+                        <option value="">All Agents</option>
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select id="timeframeFilter" onchange="applyFilters()">
+                        <option value="today">Today</option>
+                        <option value="week" selected>This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="quarter">This Quarter</option>
+                        <option value="all">All Time</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select id="temperatureFilter" onchange="applyFilters()">
+                        <option value="">All Temperature</option>
+                        <option value="hot">Hot (< 1hr)</option>
+                        <option value="warm">Warm (< 4hrs)</option>
+                        <option value="cold">Cold (> 4hrs)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Team Lead Distribution Analytics -->
+        <div class="card">
+            <h3><i data-lucide="users" class="card-icon"></i>Team Lead Distribution</h3>
+            <table id="distributionTable" class="performance-table">
+                <thead>
+                    <tr>
+                        <th>Agent</th>
+                        <th>Assigned Today</th>
+                        <th>Total Active</th>
+                        <th>Contacted</th>
+                        <th>Converted</th>
+                        <th>Conversion Rate</th>
+                        <th>Avg Response Time</th>
+                        <th>Lead Cost</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="distributionTableBody">
+                    <tr><td colspan="10" style="text-align: center;">Loading distribution data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Lead Management Table -->
+        <div class="card">
+            <h3><i data-lucide="list" class="card-icon"></i>Lead Management <span id="leadCount">(0 leads)</span></h3>
+            <div class="table-controls">
+                <div class="pagination-info" id="paginationInfo">
+                    Showing 0 to 0 of 0 leads
+                </div>
+                <div class="table-actions">
+                    <button class="btn btn-sm" onclick="previousPage()">
+                        <i data-lucide="chevron-left"></i>
+                    </button>
+                    <button class="btn btn-sm" onclick="nextPage()">
+                        <i data-lucide="chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            <table id="leadsTable" class="leads-table">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable('lead_temperature')" class="sortable">
+                            <i data-lucide="thermometer" class="icon-sm"></i>
+                        </th>
+                        <th onclick="sortTable('first_name')" class="sortable">Lead Info</th>
+                        <th onclick="sortTable('source')" class="sortable">Source/Campaign</th>
+                        <th onclick="sortTable('agent_name')" class="sortable">Agent</th>
+                        <th onclick="sortTable('status')" class="sortable">Status</th>
+                        <th onclick="sortTable('received_at')" class="sortable">Received</th>
+                        <th onclick="sortTable('last_call_time')" class="sortable">Last Contact</th>
+                        <th onclick="sortTable('cost')" class="sortable">Cost</th>
+                        <th onclick="sortTable('lead_score')" class="sortable">Score</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="leadsTableBody">
+                    <tr><td colspan="10" style="text-align: center;">Loading leads...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Source Performance Analytics -->
+        <div class="grid grid-2">
+            <div class="card">
+                <h3><i data-lucide="pie-chart" class="card-icon"></i>Source Performance</h3>
+                <div id="sourcePerformance">
+                    <div class="loading-state">
+                        <div class="loading"></div>
+                        Loading source performance...
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3><i data-lucide="trending-up" class="card-icon"></i>Cost & ROI Analysis</h3>
+                <div id="costAnalysis">
+                    <div class="loading-state">
+                        <div class="loading"></div>
+                        Loading cost analysis...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Lead Details Modal -->
+    <div id="leadDetailsModal" class="modal">
+        <div class="modal-content modal-lg">
+            <span class="close" onclick="closeModal('leadDetailsModal')">&times;</span>
+            <div id="leadDetailsContent">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Update Status Modal -->
+    <div id="updateStatusModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('updateStatusModal')">&times;</span>
+            <h3><i data-lucide="edit"></i> Update Lead Status</h3>
+            <div class="form-group">
+                <label for="newStatus">Status</label>
+                <select id="newStatus" required>
+                    <option value="new">New</option>
+                    <option value="contacted">Contacted</option>
+                    <option value="qualified">Qualified</option>
+                    <option value="quoted">Quoted</option>
+                    <option value="sold">Sold</option>
+                    <option value="lost">Lost</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="statusNotes">Notes</label>
+                <textarea id="statusNotes" rows="3" placeholder="Add notes about this status change..."></textarea>
+            </div>
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button class="btn btn-success" onclick="updateLeadStatus()">
+                    <i data-lucide="check"></i>
+                    Update Status
+                </button>
+                <button class="btn btn-secondary" onclick="closeModal('updateStatusModal')">
+                    <i data-lucide="x"></i>
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(34, 197, 94, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .live-stat {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .live-stat::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -100%;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #22c55e, transparent);
+            animation: shimmer 3s linear infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .stat-change {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 0.25rem;
+        }
+        
+        .live-feed {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .lead-feed-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid;
+            animation: slideIn 0.5s ease;
+        }
+        
+        .lead-feed-item.hot { border-left-color: #ef4444; }
+        .lead-feed-item.warm { border-left-color: #f59e0b; }
+        .lead-feed-item.cold { border-left-color: #6b7280; }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .performance-table th {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffffff;
+            font-weight: 600;
+            padding: 1rem 0.75rem;
+            text-align: left;
+            position: sticky;
+            top: 0;
+        }
+        
+        .performance-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .leads-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .leads-table th {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffffff;
+            padding: 1rem 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        
+        .leads-table th.sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .leads-table th.sortable:hover {
+            background: rgba(255, 165, 0, 0.3);
+        }
+        
+        .leads-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .temperature-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .temperature-hot { background-color: #ef4444; animation: pulse 2s infinite; }
+        .temperature-warm { background-color: #f59e0b; }
+        .temperature-cold { background-color: #6b7280; }
+        
+        .lead-score {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .score-high { background: rgba(34, 197, 94, 0.8); color: white; }
+        .score-medium { background: rgba(251, 191, 36, 0.8); color: black; }
+        .score-low { background: rgba(239, 68, 68, 0.8); color: white; }
+        
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0 0.5rem;
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+        }
+        
+        .icon-sm {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .modal-lg {
+            max-width: 800px;
+        }
+        
+        .loading-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .cost-stat .stat-value { color: #f59e0b; }
+        .conversion-stat .stat-value { color: #22c55e; }
+        
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .quick-actions-grid { grid-template-columns: 1fr; }
+            .table-controls { flex-direction: column; gap: 1rem; align-items: stretch; }
+        }
+    </style>
+    
+    <script>
+        let currentUser = null;
+        let leadsData = [];
+        let currentPage = 0;
+        let pageSize = 25;
+        let totalLeads = 0;
+        let currentFilters = {
+            search: '',
+            status: '',
+            source: '',
+            agent: '',
+            timeframe: 'week',
+            temperature: ''
+        };
+        let currentSort = { field: 'received_at', order: 'DESC' };
+        let selectedLeadId = null;
+        let refreshInterval = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            const userData = localStorage.getItem('user');
+            if (userData) {
+                currentUser = JSON.parse(userData);
+                
+                // Only managers can access this page
+                if (!['manager', 'admin', 'super_admin'].includes(currentUser.role)) {
+                    window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                    return;
+                }
+                
+                initializeLeadManagement();
+            } else {
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+            }
+            
+            // Initialize Lucide icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+        
+        async function initializeLeadManagement() {
+            showLoadingState();
+            
+            try {
+                // Load initial data
+                await Promise.all([
+                    loadLiveStats(),
+                    loadAgentPerformance(),
+                    loadSourcePerformance(),
+                    loadLeadsData(),
+                    loadLiveFeed()
+                ]);
+                
+                // Set up auto-refresh (every 30 seconds)
+                refreshInterval = setInterval(refreshLiveData, 30000);
+                
+                hideLoadingState();
+                
+            } catch (error) {
+                console.error('Error initializing lead management:', error);
+                showError('Failed to load lead data. Please refresh the page.');
+            }
+        }
+        
+        async function loadLiveStats() {
+            try {
+                const response = await fetch('/api/leads/convoso-data?type=live-stats', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
+                        'Content-Type': 'application/json',
+                        'x-user-role': currentUser.role,
+                        'x-user-id': currentUser.user_id
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to fetch live stats');
+                
+                const data = await response.json();
+                displayLiveStats(data.data);
+                
+            } catch (error) {
+                console.error('Error loading live stats:', error);
+                displayMockLiveStats();
+            }
+        }
+        
+        function displayLiveStats(data) {
+            const stats = data.stats;
+            
+            document.getElementById('totalLeadsToday').textContent = stats.total_leads_today || 0;
+            document.getElementById('newLeadsToday').textContent = stats.new_leads_today || 0;
+            document.getElementById('contactedToday').textContent = stats.contacted_today || 0;
+            document.getElementById('soldToday').textContent = stats.sold_today || 0;
+            document.getElementById('totalCostToday').textContent = '$' + (stats.total_cost_today || 0).toFixed(2);
+            
+            const conversionRate = stats.total_leads_today > 0 ? 
+                (stats.sold_today / stats.total_leads_today * 100).toFixed(1) : 0;
+            document.getElementById('conversionRateToday').textContent = conversionRate + '%';
+            
+            // Update change indicators
+            document.getElementById('leadsLastHour').textContent = `+${stats.leads_last_hour || 0} last hour`;
+            document.getElementById('avgCostPerLead').textContent = stats.total_leads_today > 0 ? 
+                '$' + (stats.total_cost_today / stats.total_leads_today).toFixed(2) + ' avg/lead' : '$0 avg/lead';
+        }
+        
+        function displayMockLiveStats() {
+            // Fallback mock data
+            document.getElementById('totalLeadsToday').textContent = '47';
+            document.getElementById('newLeadsToday').textContent = '12';
+            document.getElementById('contactedToday').textContent = '28';
+            document.getElementById('soldToday').textContent = '7';
+            document.getElementById('totalCostToday').textContent = '$1,175.00';
+            document.getElementById('conversionRateToday').textContent = '14.9%';
+            document.getElementById('leadsLastHour').textContent = '+3 last hour';
+            document.getElementById('avgCostPerLead').textContent = '$25.00 avg/lead';
+        }
+        
+        async function loadAgentPerformance() {
+            try {
+                const response = await fetch(`/api/leads/convoso-data?type=agent-performance&timeframe=${currentFilters.timeframe}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
+                        'Content-Type': 'application/json',
+                        'x-user-role': currentUser.role,
+                        'x-user-id': currentUser.user_id
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to fetch agent performance');
+                
+                const data = await response.json();
+                displayAgentPerformance(data.data);
+                
+            } catch (error) {
+                console.error('Error loading agent performance:', error);
+                displayMockAgentPerformance();
+            }
+        }
+        
+        function displayAgentPerformance(agents) {
+            const tableBody = document.getElementById('distributionTableBody');
+            
+            if (!agents || agents.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center;">No agent data available</td></tr>';
+                return;
+            }
+            
+            const rows = agents.map(agent => {
+                const conversionRate = agent.conversion_rate || 0;
+                const responseTime = agent.avg_response_time_hours ? 
+                    `${agent.avg_response_time_hours.toFixed(1)}h` : 'N/A';
+                const leadCost = agent.total_lead_cost ? 
+                    `$${agent.total_lead_cost.toFixed(2)}` : '$0';
+                
+                return `
+                    <tr>
+                        <td><strong>${agent.name}</strong><br><small>${agent.email}</small></td>
+                        <td><strong>${agent.total_leads || 0}</strong></td>
+                        <td>${agent.total_leads - (agent.converted_leads || 0)}</td>
+                        <td>${agent.contacted_leads || 0}</td>
+                        <td>${agent.converted_leads || 0}</td>
+                        <td><span class="conversion-rate">${conversionRate.toFixed(1)}%</span></td>
+                        <td>${responseTime}</td>
+                        <td class="premium-amount">${leadCost}</td>
+                        <td><span class="status-active">Active</span></td>
+                        <td>
+                            <button class="btn btn-sm" onclick="viewAgentLeads(${agent.user_id})">
+                                <i data-lucide="eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="reassignAgentLeads(${agent.user_id})">
+                                <i data-lucide="shuffle"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            tableBody.innerHTML = rows;
+        }
+        
+        function displayMockAgentPerformance() {
+            const mockAgents = [
+                { name: 'Sarah Johnson', email: 'sarah@example.com', total_leads: 15, contacted_leads: 12, converted_leads: 4, conversion_rate: 26.7, total_lead_cost: 375, avg_response_time_hours: 2.3 },
+                { name: 'Mike Chen', email: 'mike@example.com', total_leads: 12, contacted_leads: 10, converted_leads: 3, conversion_rate: 25.0, total_lead_cost: 300, avg_response_time_hours: 1.8 },
+                { name: 'Jennifer Lopez', email: 'jen@example.com', total_leads: 18, contacted_leads: 15, converted_leads: 5, conversion_rate: 27.8, total_lead_cost: 450, avg_response_time_hours: 3.1 }
+            ];
+            
+            displayAgentPerformance(mockAgents);
+        }
+        
+        async function loadSourcePerformance() {
+            try {
+                const response = await fetch(`/api/leads/convoso-data?type=source-performance&timeframe=${currentFilters.timeframe}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
+                        'Content-Type': 'application/json',
+                        'x-user-role': currentUser.role,
+                        'x-user-id': currentUser.user_id
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to fetch source performance');
+                
+                const data = await response.json();
+                displaySourcePerformance(data.data);
+                
+            } catch (error) {
+                console.error('Error loading source performance:', error);
+                displayMockSourcePerformance();
+            }
+        }
+        
+        function displaySourcePerformance(sources) {
+            const container = document.getElementById('sourcePerformance');
+            
+            if (!sources || sources.length === 0) {
+                container.innerHTML = '<p>No source data available</p>';
+                return;
+            }
+            
+            const html = sources.map(source => {
+                const conversionRate = source.conversion_rate || 0;
+                const costPerLead = source.avg_cost_per_lead || 0;
+                
+                return `
+                    <div class="source-item" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 0.5rem;">
+                        <div>
+                            <div style="font-weight: 600; color: #ffffff;">${source.source}</div>
+                            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">${source.campaign_name || 'All Campaigns'}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 600; color: #f59e0b;">${source.total_leads} leads</div>
+                            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">${conversionRate.toFixed(1)}% conversion</div>
+                            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">$${costPerLead.toFixed(2)}/lead</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        }
+        
+        function displayMockSourcePerformance() {
+            const mockSources = [
+                { source: 'Convoso', campaign_name: 'Auto Insurance Q4', total_leads: 45, conversion_rate: 15.6, avg_cost_per_lead: 25.00 },
+                { source: 'Convoso', campaign_name: 'Home Insurance Special', total_leads: 28, conversion_rate: 21.4, avg_cost_per_lead: 35.00 }
+            ];
+            
+            displaySourcePerformance(mockSources);
+        }
+        
+        async function loadLeadsData() {
+            try {
+                const params = new URLSearchParams({
+                    type: 'leads',
+                    timeframe: currentFilters.timeframe,
+                    status: currentFilters.status,
+                    source: currentFilters.source,
+                    agent: currentFilters.agent,
+                    limit: pageSize.toString(),
+                    offset: (currentPage * pageSize).toString(),
+                    sortBy: currentSort.field,
+                    sortOrder: currentSort.order
+                });
+                
+                if (currentFilters.search) {
+                    params.append('search', currentFilters.search);
+                }
+                
+                const response = await fetch(`/api/leads/convoso-data?${params}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
+                        'Content-Type': 'application/json',
+                        'x-user-role': currentUser.role,
+                        'x-user-id': currentUser.user_id
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to fetch leads data');
+                
+                const data = await response.json();
+                leadsData = data.data.leads;
+                totalLeads = data.data.total;
+                
+                displayLeadsTable();
+                updatePaginationInfo();
+                
+            } catch (error) {
+                console.error('Error loading leads data:', error);
+                displayMockLeadsData();
+            }
+        }
+        
+        function displayLeadsTable() {
+            const tableBody = document.getElementById('leadsTableBody');
+            
+            if (!leadsData || leadsData.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center;">No leads found matching current filters</td></tr>';
+                return;
+            }
+            
+            const rows = leadsData.map(lead => {
+                const temperatureIcon = getTemperatureIcon(lead.lead_temperature);
+                const scoreClass = getScoreClass(lead.lead_score);
+                const statusClass = getStatusClass(lead.status);
+                const receivedTime = new Date(lead.received_at).toLocaleString();
+                const lastContactTime = lead.last_call_time ? 
+                    new Date(lead.last_call_time).toLocaleString() : 'Never';
+                
+                return `
+                    <tr onclick="viewLeadDetails('${lead.lead_id}')" style="cursor: pointer;">
+                        <td>${temperatureIcon}</td>
+                        <td>
+                            <div><strong>${lead.first_name} ${lead.last_name}</strong></div>
+                            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">${lead.phone_number}</div>
+                            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">${lead.email || 'No email'}</div>
+                        </td>
+                        <td>
+                            <div><strong>${lead.source}</strong></div>
+                            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">${lead.campaign_name || 'N/A'}</div>
+                        </td>
+                        <td>${lead.agent_name || 'Unassigned'}</td>
+                        <td><span class="${statusClass}">${lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}</span></td>
+                        <td style="font-size: 0.85rem;">${receivedTime}</td>
+                        <td style="font-size: 0.85rem;">${lastContactTime}</td>
+                        <td class="premium-amount">$${(lead.cost || 0).toFixed(2)}</td>
+                        <td><span class="${scoreClass}">${lead.lead_score || 0}</span></td>
+                        <td>
+                            <button class="btn btn-sm" onclick="event.stopPropagation(); updateStatus('${lead.lead_id}')">
+                                <i data-lucide="edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-warning" onclick="event.stopPropagation(); reassignLead('${lead.lead_id}')">
+                                <i data-lucide="user-check"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            tableBody.innerHTML = rows;
+            document.getElementById('leadCount').textContent = `(${totalLeads} leads)`;
+        }
+        
+        function displayMockLeadsData() {
+            // Fallback mock data
+            const mockLeads = [
+                {
+                    lead_id: 'CONV001', first_name: 'John', last_name: 'Doe', phone_number: '555-1234',
+                    email: 'john@example.com', source: 'convoso', campaign_name: 'Auto Q4',
+                    agent_name: 'Sarah Johnson', status: 'new', received_at: new Date().toISOString(),
+                    cost: 25.00, lead_score: 85, lead_temperature: 'hot'
+                },
+                {
+                    lead_id: 'CONV002', first_name: 'Jane', last_name: 'Smith', phone_number: '555-5678',
+                    email: 'jane@example.com', source: 'convoso', campaign_name: 'Home Special',
+                    agent_name: 'Mike Chen', status: 'contacted', received_at: new Date(Date.now() - 2*3600000).toISOString(),
+                    cost: 35.00, lead_score: 72, lead_temperature: 'warm', last_call_time: new Date(Date.now() - 1800000).toISOString()
+                }
+            ];
+            
+            leadsData = mockLeads;
+            totalLeads = mockLeads.length;
+            displayLeadsTable();
+            updatePaginationInfo();
+        }
+        
+        async function loadLiveFeed() {
+            try {
+                const response = await fetch('/api/leads/convoso-data?type=live-stats', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
+                        'Content-Type': 'application/json',
+                        'x-user-role': currentUser.role,
+                        'x-user-id': currentUser.user_id
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to fetch live feed');
+                
+                const data = await response.json();
+                displayLiveFeed(data.data.latestLeads);
+                
+            } catch (error) {
+                console.error('Error loading live feed:', error);
+                displayMockLiveFeed();
+            }
+        }
+        
+        function displayLiveFeed(leads) {
+            const container = document.getElementById('liveFeed');
+            
+            if (!leads || leads.length === 0) {
+                container.innerHTML = '<div class="loading-state">No recent leads</div>';
+                return;
+            }
+            
+            const html = leads.map(lead => {
+                const temperature = getLeadTemperature(lead.received_at);
+                const timeAgo = getTimeAgo(new Date(lead.received_at));
+                
+                return `
+                    <div class="lead-feed-item ${temperature}">
+                        <div>
+                            <div style="font-weight: 600;">${lead.first_name} ${lead.last_name}</div>
+                            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">${lead.source} • $${(lead.cost || 0).toFixed(2)}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 0.75rem; color: rgba(255,255,255,0.7);">${timeAgo}</div>
+                            <div style="font-size: 0.75rem;">${lead.agent_name || 'Unassigned'}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        }
+        
+        function displayMockLiveFeed() {
+            const mockLatestLeads = [
+                { first_name: 'Alice', last_name: 'Johnson', source: 'convoso', cost: 25, received_at: new Date(), agent_name: 'Sarah Johnson' },
+                { first_name: 'Bob', last_name: 'Williams', source: 'convoso', cost: 30, received_at: new Date(Date.now() - 900000), agent_name: 'Mike Chen' }
+            ];
+            
+            displayLiveFeed(mockLatestLeads);
+        }
+        
+        // Utility functions
+        function getTemperatureIcon(temperature) {
+            const icons = {
+                hot: '<span class="temperature-indicator temperature-hot"></span>',
+                warm: '<span class="temperature-indicator temperature-warm"></span>',
+                cold: '<span class="temperature-indicator temperature-cold"></span>'
+            };
+            return icons[temperature] || icons.cold;
+        }
+        
+        function getScoreClass(score) {
+            if (score >= 80) return 'lead-score score-high';
+            if (score >= 60) return 'lead-score score-medium';
+            return 'lead-score score-low';
+        }
+        
+        function getStatusClass(status) {
+            const classes = {
+                new: 'status-pending',
+                contacted: 'status-active',
+                qualified: 'status-active',
+                quoted: 'status-warning',
+                sold: 'status-success',
+                lost: 'status-inactive'
+            };
+            return classes[status] || 'status-pending';
+        }
+        
+        function getLeadTemperature(receivedAt) {
+            const now = new Date();
+            const received = new Date(receivedAt);
+            const hoursAgo = (now - received) / (1000 * 60 * 60);
+            
+            if (hoursAgo < 1) return 'hot';
+            if (hoursAgo < 4) return 'warm';
+            return 'cold';
+        }
+        
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / (1000 * 60));
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            return `${diffDays}d ago`;
+        }
+        
+        // Event handlers
+        function applyFilters() {
+            currentFilters.search = document.getElementById('searchInput').value;
+            currentFilters.status = document.getElementById('statusFilter').value;
+            currentFilters.source = document.getElementById('sourceFilter').value;
+            currentFilters.agent = document.getElementById('agentFilter').value;
+            currentFilters.timeframe = document.getElementById('timeframeFilter').value;
+            currentFilters.temperature = document.getElementById('temperatureFilter').value;
+            
+            currentPage = 0;
+            loadLeadsData();
+            loadAgentPerformance();
+            loadSourcePerformance();
+        }
+        
+        function sortTable(field) {
+            if (currentSort.field === field) {
+                currentSort.order = currentSort.order === 'ASC' ? 'DESC' : 'ASC';
+            } else {
+                currentSort.field = field;
+                currentSort.order = 'DESC';
+            }
+            
+            loadLeadsData();
+        }
+        
+        function nextPage() {
+            if ((currentPage + 1) * pageSize < totalLeads) {
+                currentPage++;
+                loadLeadsData();
+            }
+        }
+        
+        function previousPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                loadLeadsData();
+            }
+        }
+        
+        function updatePaginationInfo() {
+            const start = currentPage * pageSize + 1;
+            const end = Math.min((currentPage + 1) * pageSize, totalLeads);
+            document.getElementById('paginationInfo').textContent = 
+                `Showing ${start} to ${end} of ${totalLeads} leads`;
+        }
+        
+        function viewLeadDetails(leadId) {
+            const lead = leadsData.find(l => l.lead_id === leadId);
+            if (!lead) return;
+            
+            const content = `
+                <h3><i data-lucide="user"></i> Lead Details - ${lead.first_name} ${lead.last_name}</h3>
+                <div class="grid grid-2" style="margin-top: 1rem;">
+                    <div>
+                        <h4>Contact Information</h4>
+                        <p><strong>Name:</strong> ${lead.first_name} ${lead.last_name}</p>
+                        <p><strong>Phone:</strong> ${lead.phone_number}</p>
+                        <p><strong>Email:</strong> ${lead.email || 'Not provided'}</p>
+                        <p><strong>Location:</strong> ${lead.city ? `${lead.city}, ${lead.state}` : 'Not provided'}</p>
+                    </div>
+                    <div>
+                        <h4>Lead Information</h4>
+                        <p><strong>Source:</strong> ${lead.source}</p>
+                        <p><strong>Campaign:</strong> ${lead.campaign_name || 'N/A'}</p>
+                        <p><strong>Cost:</strong> $${(lead.cost || 0).toFixed(2)}</p>
+                        <p><strong>Score:</strong> ${lead.lead_score || 0}/100</p>
+                    </div>
+                </div>
+                <div class="grid grid-2" style="margin-top: 1rem;">
+                    <div>
+                        <h4>Assignment & Status</h4>
+                        <p><strong>Assigned Agent:</strong> ${lead.agent_name || 'Unassigned'}</p>
+                        <p><strong>Status:</strong> ${lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}</p>
+                        <p><strong>Priority:</strong> ${lead.priority || 'Normal'}</p>
+                        <p><strong>Temperature:</strong> ${lead.lead_temperature}</p>
+                    </div>
+                    <div>
+                        <h4>Timing</h4>
+                        <p><strong>Received:</strong> ${new Date(lead.received_at).toLocaleString()}</p>
+                        <p><strong>Hours Since Received:</strong> ${(lead.hours_since_received || 0).toFixed(1)}</p>
+                        <p><strong>Last Contact:</strong> ${lead.last_call_time ? new Date(lead.last_call_time).toLocaleString() : 'Never'}</p>
+                        <p><strong>Call Attempts:</strong> ${lead.call_attempts || 0}</p>
+                    </div>
+                </div>
+                ${lead.notes ? `
+                    <div style="margin-top: 1rem;">
+                        <h4>Notes</h4>
+                        <p style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px;">${lead.notes}</p>
+                    </div>
+                ` : ''}
+            `;
+            
+            document.getElementById('leadDetailsContent').innerHTML = content;
+            document.getElementById('leadDetailsModal').style.display = 'block';
+            
+            lucide.createIcons();
+        }
+        
+        function updateStatus(leadId) {
+            selectedLeadId = leadId;
+            const lead = leadsData.find(l => l.lead_id === leadId);
+            if (lead) {
+                document.getElementById('newStatus').value = lead.status;
+            }
+            document.getElementById('updateStatusModal').style.display = 'block';
+        }
+        
+        async function updateLeadStatus() {
+            const status = document.getElementById('newStatus').value;
+            const notes = document.getElementById('statusNotes').value;
+            
+            try {
+                const response = await fetch('/api/leads/convoso-data', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
+                        'Content-Type': 'application/json',
+                        'x-user-role': currentUser.role,
+                        'x-user-id': currentUser.user_id
+                    },
+                    body: JSON.stringify({
+                        action: 'update-status',
+                        leadId: selectedLeadId,
+                        data: { status, notes }
+                    })
+                });
+                
+                if (response.ok) {
+                    closeModal('updateStatusModal');
+                    loadLeadsData();
+                    loadLiveStats();
+                    showSuccess('Lead status updated successfully');
+                } else {
+                    throw new Error('Failed to update lead status');
+                }
+                
+            } catch (error) {
+                console.error('Error updating lead status:', error);
+                showError('Failed to update lead status');
+            }
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            
+            // Clear form data
+            if (modalId === 'updateStatusModal') {
+                document.getElementById('statusNotes').value = '';
+                selectedLeadId = null;
+            }
+        }
+        
+        // Utility functions
+        function showLoadingState() {
+            // Show loading indicators
+        }
+        
+        function hideLoadingState() {
+            // Hide loading indicators
+        }
+        
+        function showError(message) {
+            // Could implement toast notification
+            alert('Error: ' + message);
+        }
+        
+        function showSuccess(message) {
+            // Could implement toast notification
+            alert('Success: ' + message);
+        }
+        
+        async function refreshLiveData() {
+            try {
+                await Promise.all([
+                    loadLiveStats(),
+                    loadLiveFeed()
+                ]);
+            } catch (error) {
+                console.error('Error refreshing live data:', error);
+            }
+        }
+        
+        async function refreshAllData() {
+            await Promise.all([
+                loadLiveStats(),
+                loadAgentPerformance(),
+                loadSourcePerformance(),
+                loadLeadsData(),
+                loadLiveFeed()
+            ]);
+        }
+        
+        // Quick action functions
+        function assignHotLeads() {
+            alert('Hot lead assignment feature would assign all leads received in the last hour to available agents based on workload.');
+        }
+        
+        function redistributeLeads() {
+            alert('Lead redistribution feature would rebalance uncontacted leads across all active agents.');
+        }
+        
+        function exportDailyReport() {
+            // Create CSV export
+            let csvContent = 'Lead ID,Name,Phone,Email,Source,Agent,Status,Cost,Score,Received\\n';
+            
+            leadsData.forEach(lead => {
+                csvContent += `"${lead.lead_id}","${lead.first_name} ${lead.last_name}","${lead.phone_number}","${lead.email || ''}","${lead.source}","${lead.agent_name || 'Unassigned'}","${lead.status}","${lead.cost || 0}","${lead.lead_score || 0}","${lead.received_at}"\\n`;
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `convoso-leads-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+        
+        function viewAgentLeads(agentId) {
+            // Set agent filter and refresh
+            document.getElementById('agentFilter').value = agentId;
+            applyFilters();
+        }
+        
+        function reassignAgentLeads(agentId) {
+            alert(`Reassignment interface for agent ${agentId} would open here with bulk reassignment options.`);
+        }
+        
+        function reassignLead(leadId) {
+            alert(`Lead reassignment interface for ${leadId} would open here with agent selection.`);
+        }
+        
+        function logout() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+            localStorage.clear();
+            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+        }
+        
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const modals = ['leadDetailsModal', 'updateStatusModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    closeModal(modalId);
+                }
+            });
+        }
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        });
+    </script>
+    
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
+</body>
+</html>

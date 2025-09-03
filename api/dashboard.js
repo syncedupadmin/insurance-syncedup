@@ -50,10 +50,10 @@ export default async function handler(req, res) {
 
     if (role === 'agent') {
       query = query.eq('agent_id', agentId);
-    } else if (role === 'manager' || role === 'admin') {
+    } else if (role === 'manager') {
       query = query.eq('agency_id', agencyId);
     }
-    // Super admin sees all data (no additional filtering)
+    // Admin has universal access - no filtering needed
 
     // Add date filtering
     query = query

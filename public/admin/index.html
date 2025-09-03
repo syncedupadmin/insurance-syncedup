@@ -335,6 +335,9 @@
         <a href="/admin/leads.html">
             <i data-lucide="user-plus" class="icon"></i>Leads
         </a>
+        <a href="/admin/vendors.html">
+            <i data-lucide="building-2" class="icon"></i>Vendors
+        </a>
         <a href="/admin/commissions.html">
             <i data-lucide="dollar-sign" class="icon"></i>Commissions
         </a>
@@ -455,8 +458,8 @@
             if (userData) {
                 currentUser = JSON.parse(userData);
                 
-                // Only manager, admin and super-admin can access manager portal
-                if (!['manager', 'admin', 'super_admin'].includes(currentUser.role)) {
+                // Only manager and admin can access admin portal
+                if (!['manager', 'admin'].includes(currentUser.role)) {
                     window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
                     return;
                 }

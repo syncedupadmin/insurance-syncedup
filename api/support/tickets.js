@@ -7,11 +7,11 @@ async function ticketsHandler(req, res) {
     if (req.method === 'GET') {
       let query = supabase.from('support_tickets');
       
-      if (req.user.role === 'super_admin') {
-        // Super admin sees all tickets but limited info
-        query = query.select('id, ticket_number, title, status, priority, created_at');
+      if (req.user.role === 'admin') {
+        // Admin sees all tickets with full details
+        query = query.select('*');
       } else {
-        // Agencies see full details of their tickets
+        // Other roles see only their agency's tickets
         query = query
           .select('*')
           .eq('agency_id', req.user.agency_id);
@@ -66,8 +66,8 @@ async function ticketsHandler(req, res) {
         })
         .eq('id', id);
       
-      // Non-super admins can only update their agency's tickets
-      if (req.user.role !== 'super_admin') {
+      // Non-admin users can only update their agency's tickets
+      if (req.user.role !== 'admin') {
         query = query.eq('agency_id', req.user.agency_id);
       }
       
