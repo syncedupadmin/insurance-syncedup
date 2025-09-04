@@ -338,23 +338,25 @@
 
         async function loadUsersData() {
             try {
-                const response = await fetch('/api/admin/user-management', {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || 'demo-token'}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    usersData = data.users || [];
-                    filteredUsers = [...usersData];
-                } else {
-                    throw new Error('Failed to load users data');
-                }
+                const users = await __api('/users');
+                usersData = users.map(user => ({
+                    user_id: user.id,
+                    first_name: user.name ? user.name.split(' ')[0] : 'Unknown',
+                    last_name: user.name ? user.name.split(' ').slice(1).join(' ') : '',
+                    email: user.email,
+                    role: user.role,
+                    team: user.team || '',
+                    status: user.status || 'active',
+                    phone: user.phone || '',
+                    notes: user.notes || '',
+                    created_at: user.createdAt || new Date().toISOString(),
+                    last_login: user.lastLogin || 'Never'
+                }));
+                filteredUsers = [...usersData];
             } catch (error) {
                 console.error('Error loading users data:', error);
-                loadFallbackUsersData();
+                usersData = [];
+                filteredUsers = [];
             }
         }
 
@@ -592,52 +594,58 @@
         async function submitUser(event) {
             event.preventDefault();
             
-            const userData = {
-                first_name: document.getElementById('firstName').value,
-                last_name: document.getElementById('lastName').value,
-                email: document.getElementById('email').value,
-                role: document.getElementById('role').value,
-                team: document.getElementById('team').value || null,
-                phone: document.getElementById('phone').value || null,
-                status: document.getElementById('status').value,
-                license_number: document.getElementById('licenseNumber').value || null,
-                license_expiry: document.getElementById('licenseExpiry').value || null,
-                notes: document.getElementById('notes').value || null
-            };
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const email = document.getElementById('email').value;
+            const role = document.getElementById('role').value;
+            const team = document.getElementById('team').value;
+            const status = document.getElementById('status').value;
+            
+            if (!firstName || !lastName || !email || !role) {
+                alert('Please fill in all required fields');
+                return;
+            }
 
             try {
+                const currentUser = JSON.parse(sessionStorage.getItem('syncedup:user') || '{}');
+                const userData = {
+                    id: editingUserId || `u-${Date.now()}`,
+                    name: `${firstName} ${lastName}`,
+                    email,
+                    role,
+                    team: team || null,
+                    phone: document.getElementById('phone').value || null,
+                    status: status,
+                    agencyId: currentUser.agencyId,
+                    isDemoAccount: currentUser.isDemoAccount || false,
+                    notes: document.getElementById('notes').value || null,
+                    createdAt: new Date().toISOString()
+                };
+
                 let response;
                 if (editingUserId) {
-                    response = await fetch(`/api/admin/user-management/${editingUserId}`, {
+                    response = await __api(`/users/${editingUserId}`, {
                         method: 'PUT',
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('authToken') || 'demo-token'}`,
-                            'Content-Type': 'application/json'
-                        },
                         body: JSON.stringify(userData)
                     });
                 } else {
-                    response = await fetch('/api/admin/user-management', {
+                    response = await __api('/users', {
                         method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('authToken') || 'demo-token'}`,
-                            'Content-Type': 'application/json'
-                        },
                         body: JSON.stringify(userData)
                     });
                 }
 
                 if (response.ok) {
-                    showSuccessMessage(editingUserId ? 'User updated successfully!' : 'User created successfully!');
+                    alert(editingUserId ? 'User updated successfully!' : 'User created successfully!');
                     closeUserModal();
                     await loadUsersData();
                     updateUI();
                 } else {
-                    throw new Error('Failed to save user');
+                    alert('Failed to save user');
                 }
             } catch (error) {
                 console.error('Error saving user:', error);
-                showErrorMessage('Failed to save user. Please try again.');
+                alert('Failed to save user. Please try again.');
             }
         }
 
@@ -933,5 +941,6 @@
     
     <!-- Classic Mode Toggle System -->
     <script src="/js/classic-mode.js"></script>
+    <script src="/assets/session.js"></script>
 </body>
 </html>

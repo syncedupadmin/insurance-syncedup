@@ -148,14 +148,8 @@
         let selectedAgent = null;
         let currentTimeframe = 'thismonth';
         
-        // Mock agent data (managers can see agent data but not commissions)
-        const agents = [
-            { id: 'AGENT001', name: 'John Smith', email: 'john@example.com', active: true },
-            { id: 'AGENT002', name: 'Jane Doe', email: 'jane@example.com', active: true },
-            { id: 'AGENT003', name: 'Mike Johnson', email: 'mike@example.com', active: true },
-            { id: 'AGENT004', name: 'Sarah Wilson', email: 'sarah@example.com', active: false },
-            { id: 'AGENT005', name: 'David Brown', email: 'david@example.com', active: true }
-        ];
+        // No hardcoded agent data - will be loaded from API
+        const agents = [];
         
         // Sales data will be loaded from API - no fake data
         let salesData = [];
@@ -289,9 +283,9 @@
             tableBody.innerHTML = '';
             
             // Filter sales data based on selected agent
-            let salesToShow = mockSalesData;
+            let salesToShow = salesData;
             if (agentId !== 'ALL') {
-                salesToShow = mockSalesData.filter(sale => sale.agentId === agentId);
+                salesToShow = salesData.filter(sale => sale.agentId === agentId);
             }
             
             if (salesToShow.length === 0) {
@@ -331,8 +325,8 @@
             // Manager export does NOT include commission data
             let csvContent = 'Date,Agent ID,Agent Name,Customer,Product,Premium,Status\\n';
             
-            const salesToExport = selectedAgent === 'ALL' ? mockSalesData : 
-                mockSalesData.filter(sale => sale.agentId === selectedAgent);
+            const salesToExport = selectedAgent === 'ALL' ? salesData : 
+                salesData.filter(sale => sale.agentId === selectedAgent);
             
             salesToExport.forEach(sale => {
                 csvContent += `${sale.date},${sale.agentId},${sale.agentName},${sale.customer},${sale.product},${sale.premium},${sale.status}\\n`;
@@ -373,5 +367,6 @@
     
     <!-- Classic Mode Toggle System -->
     <script src="/js/classic-mode.js"></script>
+    <script src="/assets/session.js"></script>
 </body>
 </html>

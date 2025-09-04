@@ -108,6 +108,25 @@
                 </a>
             </div>
 
+            <!-- Demo Login Buttons -->
+            <div class="mt-6 border-t border-white/20 pt-6">
+                <p class="text-center text-white/70 text-sm mb-4">Quick Demo Access</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <button data-demo-email="agent@demo.com" class="bg-blue-500/20 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-500/30 transition-colors">
+                        Demo Agent
+                    </button>
+                    <button data-demo-email="manager@demo.com" class="bg-green-500/20 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-green-500/30 transition-colors">
+                        Demo Manager
+                    </button>
+                    <button data-demo-email="admin@demo.com" class="bg-purple-500/20 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-purple-500/30 transition-colors">
+                        Demo Admin
+                    </button>
+                    <button data-demo-email="superadmin@demo.com" class="bg-red-500/20 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-red-500/30 transition-colors">
+                        Demo Super Admin
+                    </button>
+                </div>
+            </div>
+
             <!-- Error message -->
             <div id="errorMessage" class="mt-4 p-3 bg-red-500/20 border border-red-500/50 text-white rounded-xl hidden"></div>
         </div>
@@ -261,6 +280,50 @@
                 messageDiv.className = 'mt-4 p-3 bg-red-500/20 border border-red-500/50 text-white rounded-xl';
                 messageDiv.classList.remove('hidden');
             }
+        });
+
+        // Demo login handler
+        async function handleLogin(email) {
+          try {
+            const response = await fetch(`http://localhost:5050/users?email=${encodeURIComponent(email)}`);
+            const users = await response.json();
+            const user = users[0];
+            
+            if (!user) {
+              const errorDiv = document.getElementById('errorMessage');
+              errorDiv.textContent = "User not found";
+              errorDiv.classList.remove('hidden');
+              setTimeout(() => errorDiv.classList.add('hidden'), 5000);
+              return;
+            }
+            
+            sessionStorage.setItem('syncedup:user', JSON.stringify(user));
+            
+            // Redirect based on role
+            const redirectMap = {
+              'agent': '/agent/',
+              'manager': '/manager/',  
+              'admin': '/admin/',
+              'customerservice': '/customer-service/',
+              'customer-service': '/customer-service/',
+              'super_admin': '/super-admin/',
+              'superadmin': '/super-admin/'
+            };
+            
+            window.location.href = redirectMap[user.role] || '/agent/';
+          } catch (error) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = "Login failed";
+            errorDiv.classList.remove('hidden');
+            setTimeout(() => errorDiv.classList.add('hidden'), 5000);
+          }
+        }
+
+        // Update existing demo login buttons to use handleLogin
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[data-demo-email]').forEach(btn => {
+              btn.onclick = () => handleLogin(btn.dataset.demoEmail);
+            });
         });
     </script>
 </body>

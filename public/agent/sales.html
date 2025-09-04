@@ -228,30 +228,30 @@
         // Record Sale function
         async function recordSale(agentId, customerName, customerEmail, productId, productName, addonId, addonName, totalPremium, commissionAmount) {
             try {
-                const response = await fetch('/api/record-sale', {
+                const sale = {
+                    id: `S-${Date.now()}`,
+                    agentId,
+                    customer: customerName,
+                    customerEmail,
+                    product: productName,
+                    productId,
+                    addonId: addonId || null,
+                    addonName: addonName || null,
+                    amount: totalPremium,
+                    commission: commissionAmount,
+                    createdAt: new Date().toISOString()
+                };
+
+                const response = await __api('/sales', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        agentId,
-                        customerName,
-                        customerEmail,
-                        productId,
-                        productName,
-                        addonId,
-                        addonName,
-                        premium: totalPremium,
-                        commissionAmount
-                    })
+                    body: JSON.stringify(sale)
                 });
 
-                if (!response.ok) {
+                if (response.ok) {
+                    return { success: true, message: 'Sale recorded successfully!' };
+                } else {
                     throw new Error('Failed to record sale');
                 }
-
-                const result = await response.json();
-                return result;
             } catch (error) {
                 console.error('Error recording sale:', error);
                 throw error;
@@ -261,10 +261,9 @@
         async function handleRecordSale(event) {
             event.preventDefault();
 
-            // Get agent ID from token
-            const token = localStorage.getItem('authToken');
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            const agentId = payload.sub || payload.id;
+            // Get agent ID from session
+            const user = JSON.parse(sessionStorage.getItem('syncedup:user') || '{}');
+            const agentId = user.id;
 
             // Get form data
             const customerName = document.getElementById('customerName').value;
@@ -360,5 +359,6 @@
         // Initialize calculations on page load
         updateCalculations();
     </script>
+    <script src="/assets/session.js"></script>
 </body>
 </html>

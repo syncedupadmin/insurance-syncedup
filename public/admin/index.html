@@ -476,31 +476,31 @@
                 const [dashboardResponse, analyticsResponse, userStatsResponse, commissionStatsResponse, apiKeysResponse] = await Promise.all([
                     fetch('/api/manager/dashboard', {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
                             'Content-Type': 'application/json'
                         }
                     }),
                     fetch('/api/admin/analytics?analytics_type=overview', {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
                             'Content-Type': 'application/json'
                         }
                     }),
                     fetch('/api/admin/user-management', {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
                             'Content-Type': 'application/json'
                         }
                     }),
                     fetch('/api/admin/commission-settings', {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
                             'Content-Type': 'application/json'
                         }
                     }),
                     fetch('/api/admin/api-keys', {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
                             'Content-Type': 'application/json'
                         }
                     })
@@ -850,37 +850,18 @@
         
         function loadFallbackData() {
             // Use fallback mock data
-            document.getElementById('activeAgents').textContent = '8';
-            document.getElementById('mtdRevenue').textContent = '$127,450';
-            document.getElementById('activeLeads').textContent = '34';
-            document.getElementById('conversionRate').textContent = '24.8%';
-            document.getElementById('totalCommissions').textContent = '$12,745';
-            document.getElementById('systemStatus').textContent = '98%';
+            document.getElementById('activeAgents').textContent = '0';
+            document.getElementById('mtdRevenue').textContent = '$0';
+            document.getElementById('activeLeads').textContent = '0';
+            document.getElementById('conversionRate').textContent = '0%';
+            document.getElementById('totalCommissions').textContent = '$0';
+            document.getElementById('systemStatus').textContent = '0%';
             
             // Load mock team table
             const tableBody = document.getElementById('agentOverviewTable');
             tableBody.innerHTML = `
                 <tr>
-                    <td><strong>Sarah Johnson</strong><br><small style="opacity: 0.7;">SJ001</small></td>
-                    <td><strong>15</strong></td>
-                    <td class=\"premium-amount\">$32,450</td>
-                    <td class=\"conversion-rate\">31.2%</td>
-                    <td>
-                        <button class=\"btn\" style=\"padding: 0.25rem 0.5rem; font-size: 0.8rem;\">
-                            <i data-lucide=\"trending-up\" style=\"width: 14px; height: 14px; margin-right: 4px;\"></i>View
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>Mike Chen</strong><br><small style="opacity: 0.7;">MC002</small></td>
-                    <td><strong>12</strong></td>
-                    <td class=\"premium-amount\">$28,900</td>
-                    <td class=\"conversion-rate\">28.7%</td>
-                    <td>
-                        <button class=\"btn\" style=\"padding: 0.25rem 0.5rem; font-size: 0.8rem;\">
-                            <i data-lucide=\"trending-up\" style=\"width: 14px; height: 14px; margin-right: 4px;\"></i>View
-                        </button>
-                    </td>
+                    <td colspan="5" style="text-align: center; color: #666; padding: 2rem;">No agent data available</td>
                 </tr>
             `;
             
@@ -1069,5 +1050,6 @@
     
     <!-- Classic Mode Toggle System -->
     <script src="/js/classic-mode.js"></script>
+    <script src="/assets/session.js"></script>
 </body>
 </html>

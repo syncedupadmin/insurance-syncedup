@@ -343,22 +343,17 @@
                 return;
             }
 
-            const quoteData = {
-                customer: {
-                    firstName: document.getElementById('customerFirstName').value,
-                    lastName: document.getElementById('customerLastName').value,
-                    email: document.getElementById('customerEmail').value,
-                    phone: document.getElementById('customerPhone').value,
-                    dob: document.getElementById('customerDOB').value,
-                    state: document.getElementById('customerState').value
-                },
-                product: selectedProduct,
-                options: {
-                    coverageAmount: document.getElementById('coverageAmount').value,
-                    deductible: document.getElementById('deductible').value,
-                    specialNotes: document.getElementById('specialNotes').value
-                }
-            };
+            const firstName = document.getElementById('customerFirstName').value;
+            const lastName = document.getElementById('customerLastName').value;
+            const email = document.getElementById('customerEmail').value;
+            const phone = document.getElementById('customerPhone').value;
+            const dob = document.getElementById('customerDOB').value;
+            const state = document.getElementById('customerState').value;
+            
+            if (!firstName || !lastName || !email || !phone || !dob || !state) {
+                alert('Please complete all fields');
+                return;
+            }
 
             try {
                 // Show loading
@@ -367,40 +362,63 @@
                 submitBtn.innerHTML = '<div class="loading"></div> Generating Quote...';
                 submitBtn.disabled = true;
 
-                // Simulate API call
-                await new Promise(resolve => setTimeout(resolve, 2000));
-
-                // Calculate quote (simple logic - replace with actual API)
+                const user = JSON.parse(sessionStorage.getItem('syncedup:user') || '{}');
+                
+                // Calculate quote (simple logic)
                 const basePrice = selectedProduct.basePrice;
-                const coverageMultiplier = parseInt(quoteData.options.coverageAmount) / 100000;
-                const deductibleDiscount = (5000 - parseInt(quoteData.options.deductible)) / 5000 * 0.1;
+                const coverageAmount = document.getElementById('coverageAmount').value;
+                const deductible = document.getElementById('deductible').value;
+                const coverageMultiplier = parseInt(coverageAmount) / 100000;
+                const deductibleDiscount = (5000 - parseInt(deductible)) / 5000 * 0.1;
                 
                 const finalPrice = basePrice * coverageMultiplier * (1 - deductibleDiscount);
                 const commission = finalPrice * 0.10; // 10% commission
 
-                displayQuoteResults({
-                    ...quoteData,
-                    quote: {
-                        monthlyPremium: finalPrice.toFixed(2),
-                        annualPremium: (finalPrice * 12).toFixed(2),
-                        commission: commission.toFixed(2),
-                        quoteId: 'Q' + Date.now(),
-                        validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-                    }
+                const quote = {
+                    id: `Q-${Date.now()}`,
+                    agentId: user.id,
+                    firstName,
+                    lastName,
+                    email,
+                    phone,
+                    dob,
+                    state,
+                    productType: selectedProduct.name,
+                    coverageAmount,
+                    deductible,
+                    monthlyPremium: finalPrice.toFixed(2),
+                    annualPremium: (finalPrice * 12).toFixed(2),
+                    commission: commission.toFixed(2),
+                    specialNotes: document.getElementById('specialNotes').value,
+                    status: 'pending',
+                    createdAt: new Date().toISOString(),
+                    validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+                };
+                
+                const response = await __api('/quotes', {
+                    method: 'POST',
+                    body: JSON.stringify(quote)
                 });
+                
+                if (response.ok) {
+                    displayQuoteResults(quote);
+                    alert('Quote generated successfully!');
+                    clearForm();
+                    await loadRecentQuotes();
+                } else {
+                    alert('Failed to generate quote');
+                }
 
                 // Reset button
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
 
-                // Refresh recent quotes
-                loadRecentQuotes();
-
             } catch (error) {
                 console.error('Error generating quote:', error);
                 alert('Error generating quote. Please try again.');
                 
-                submitBtn.innerHTML = originalText;
+                const submitBtn = document.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = 'Generate Quote';
                 submitBtn.disabled = false;
             }
         }
@@ -412,50 +430,50 @@
             resultsContainer.innerHTML = `
                 <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h4>Quote #${data.quote.quoteId}</h4>
-                        <span style="color: rgba(255,255,255,0.8);">Valid until: ${data.quote.validUntil}</span>
+                        <h4>Quote #${data.id}</h4>
+                        <span style="color: rgba(255,255,255,0.8);">Valid until: ${new Date(data.validUntil).toLocaleDateString()}</span>
                     </div>
                     
                     <div class="grid" style="margin-bottom: 1rem;">
                         <div>
                             <strong>Customer:</strong><br>
-                            ${data.customer.firstName} ${data.customer.lastName}<br>
-                            ${data.customer.email}<br>
-                            ${data.customer.phone}
+                            ${data.firstName} ${data.lastName}<br>
+                            ${data.email}<br>
+                            ${data.phone}
                         </div>
                         <div>
                             <strong>Product:</strong><br>
-                            ${data.product.name}<br>
-                            Coverage: $${parseInt(data.options.coverageAmount).toLocaleString()}<br>
-                            Deductible: $${parseInt(data.options.deductible).toLocaleString()}
+                            ${data.productType}<br>
+                            Coverage: $${parseInt(data.coverageAmount).toLocaleString()}<br>
+                            Deductible: $${parseInt(data.deductible).toLocaleString()}
                         </div>
                     </div>
                     
                     <div style="background: rgba(16, 185, 129, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                             <span>Monthly Premium:</span>
-                            <span class="premium-amount">$${data.quote.monthlyPremium}</span>
+                            <span class="premium-amount">$${data.monthlyPremium}</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                             <span>Annual Premium:</span>
-                            <span class="premium-amount">$${data.quote.annualPremium}</span>
+                            <span class="premium-amount">$${data.annualPremium}</span>
                         </div>
                         <div style="display: flex; justify-content: space-between;">
                             <span>Your Commission:</span>
-                            <span style="color: #34d399; font-weight: 600;">$${data.quote.commission}</span>
+                            <span style="color: #34d399; font-weight: 600;">$${data.commission}</span>
                         </div>
                     </div>
                     
                     <div class="flex gap-2">
-                        <button class="btn btn-success" onclick="convertToSale('${data.quote.quoteId}')">
+                        <button class="btn btn-success" onclick="convertToSale('${data.id}')">
                             <i data-lucide="handshake" class="icon"></i>
                             Convert to Sale
                         </button>
-                        <button class="btn btn-warning" onclick="emailQuote('${data.quote.quoteId}')">
+                        <button class="btn btn-warning" onclick="emailQuote('${data.id}')">
                             <i data-lucide="mail" class="icon"></i>
                             Email to Customer
                         </button>
-                        <button class="btn btn-secondary" onclick="printQuote('${data.quote.quoteId}')">
+                        <button class="btn btn-secondary" onclick="printQuote('${data.id}')">
                             <i data-lucide="printer" class="icon"></i>
                             Print Quote
                         </button>
@@ -473,41 +491,84 @@
         async function loadRecentQuotes() {
             const tableBody = document.getElementById('recentQuotesTable');
             
-            // Quotes will be loaded from API - no fake data
-            const quotes = [];
+            try {
+                const user = JSON.parse(sessionStorage.getItem('syncedup:user') || '{}');
+                const quotes = await __api(`/quotes?agentId=${user.id}&_limit=10&_sort=createdAt&_order=desc`);
 
-            let quotesHTML;
-            if (quotes.length === 0) {
-                quotesHTML = `<tr><td colspan="6" style="text-align: center; color: #666; padding: 2rem;">No quotes found</td></tr>`;
-            } else {
-                quotesHTML = quotes.map(quote => `
-                    <tr>
-                        <td>${quote.date}</td>
-                        <td>${quote.customer}</td>
-                        <td>${quote.product}</td>
-                        <td class="premium-amount">${quote.premium}</td>
-                        <td><span class="status-${quote.status.toLowerCase()}">${quote.status}</span></td>
-                        <td>
-                            <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
-                                <i data-lucide="eye" style="width: 12px; height: 12px;"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
+                let quotesHTML;
+                if (quotes.length === 0) {
+                    quotesHTML = `<tr><td colspan="6" style="text-align: center; color: #666; padding: 2rem;">No quotes found</td></tr>`;
+                } else {
+                    quotesHTML = quotes.map(quote => `
+                        <tr>
+                            <td>${new Date(quote.createdAt).toLocaleDateString()}</td>
+                            <td>${quote.firstName} ${quote.lastName}</td>
+                            <td>${quote.productType}</td>
+                            <td class="premium-amount">$${quote.monthlyPremium}</td>
+                            <td><span class="status-${quote.status.toLowerCase()}">${quote.status}</span></td>
+                            <td>
+                                <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="viewQuote('${quote.id}')">
+                                    <i data-lucide="eye" style="width: 12px; height: 12px;"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+
+                tableBody.innerHTML = quotesHTML;
+                lucide.createIcons();
+            } catch (error) {
+                console.error('Failed to load quotes:', error);
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #666; padding: 2rem;">Error loading quotes</td></tr>`;
             }
+        }
 
-            tableBody.innerHTML = quotesHTML;
-            lucide.createIcons();
+        // View quote details
+        async function viewQuote(quoteId) {
+            try {
+                const quote = await __api(`/quotes/${quoteId}`);
+                displayQuoteResults(quote);
+            } catch (error) {
+                console.error('Failed to load quote:', error);
+                alert('Error loading quote details');
+            }
         }
 
         // Convert to sale
-        function convertToSale(quoteId) {
-            if (confirm('Convert this quote to a sale?')) {
-                alert(`Quote ${quoteId} converted to sale! Redirecting to sales page...`);
-                // In real implementation, would make API call and redirect
-                setTimeout(() => {
-                    window.location.href = 'sales.html';
-                }, 1500);
+        async function convertToSale(quoteId) {
+            if (!confirm('Convert this quote to a sale?')) return;
+            
+            try {
+                const user = JSON.parse(sessionStorage.getItem('syncedup:user') || '{}');
+                const quote = await __api(`/quotes/${quoteId}`);
+                
+                const sale = {
+                    id: `S-${Date.now()}`,
+                    agentId: user.id,
+                    quoteId: quoteId,
+                    customer: `${quote.firstName} ${quote.lastName}`,
+                    product: quote.productType,
+                    amount: parseFloat(quote.annualPremium),
+                    commission: parseFloat(quote.commission),
+                    createdAt: new Date().toISOString()
+                };
+                
+                const response = await __api('/sales', {
+                    method: 'POST',
+                    body: JSON.stringify(sale)
+                });
+                
+                if (response.ok) {
+                    alert('Quote converted to sale successfully!');
+                    setTimeout(() => {
+                        window.location.href = 'sales.html';
+                    }, 1500);
+                } else {
+                    alert('Failed to convert quote to sale');
+                }
+            } catch (error) {
+                console.error('Error converting to sale:', error);
+                alert('Error converting quote to sale');
             }
         }
 
@@ -571,5 +632,6 @@
 
     <!-- Classic Mode Toggle System -->
     <script src="/js/classic-mode.js"></script>
+    <script src="/assets/session.js"></script>
 </body>
 </html>

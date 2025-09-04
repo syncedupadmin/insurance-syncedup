@@ -927,21 +927,17 @@
             const notes = document.getElementById('updateNotes').value;
             
             try {
-                const response = await fetch('/api/leads/convoso-data', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                        'Content-Type': 'application/json'
-                    },
+                const response = await __api(`/leads/${currentLeadId}`, {
+                    method: 'PATCH',
                     body: JSON.stringify({
-                        leadId: currentLeadId,
                         status: newStatus,
                         notes: notes,
-                        role: 'admin'
+                        lastUpdated: new Date().toISOString()
                     })
                 });
                 
                 if (response.ok) {
+                    alert('Lead status updated successfully!');
                     closeLeadModal();
                     await loadLeads();
                     await loadLiveStats();
@@ -958,6 +954,7 @@
                     renderLeadsTable();
                 }
                 closeLeadModal();
+                alert('Lead status updated locally (demo mode)');
             }
         });
         
@@ -1212,5 +1209,6 @@
     
     <!-- Classic Mode Toggle System -->
     <script src="/js/classic-mode.js"></script>
+    <script src="/assets/session.js"></script>
 </body>
 </html>

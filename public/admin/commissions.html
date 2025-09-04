@@ -667,7 +667,7 @@
                 {
                     id: 1,
                     agentId: 1,
-                    agentName: 'Sarah Johnson',
+                    agentName: 'Sample Agent',
                     productType: 'auto',
                     customRate: 10.5,
                     effectiveDate: '2025-01-01',
@@ -678,7 +678,7 @@
                 {
                     id: 2,
                     agentId: 2,
-                    agentName: 'Mike Chen',
+                    agentName: 'Sample Agent',
                     productType: 'life',
                     customRate: 30.0,
                     effectiveDate: '2025-01-15',
@@ -1054,11 +1054,8 @@
             const format = document.getElementById('exportFormat').value;
             const period = document.getElementById('payPeriod').value;
             
-            // Create mock CSV data
-            const csvData = "Agent Name,Product,Commission Rate,Volume,Total Commission\n" +
-                           "Sarah Johnson,Auto,10.5%,25,$2,100\n" +
-                           "Mike Chen,Life,30.0%,8,$3,200\n" +
-                           "Jennifer Davis,Home,15.0%,12,$1,800";
+            // No hardcoded data - generate from actual commission data
+            const csvData = "Agent Name,Product,Commission Rate,Volume,Total Commission\n";
             
             // Create and download file
             const blob = new Blob([csvData], { type: 'text/csv' });
@@ -1121,5 +1118,6 @@
     
     <!-- Classic Mode Toggle System -->
     <script src="/js/classic-mode.js"></script>
+    <script src="/assets/session.js"></script>
 </body>
 </html>

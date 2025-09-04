@@ -30,17 +30,9 @@
             <i data-lucide="calculator" class="icon"></i>
             Quote Products
         </a>
-        <a href="sales.html" class="nav-link">
-            <i data-lucide="handshake" class="icon"></i>
-            Sales History
-        </a>
         <a href="commissions.html" class="nav-link">
             <i data-lucide="dollar-sign" class="icon"></i>
             My Commissions
-        </a>
-        <a href="customers.html" class="nav-link">
-            <i data-lucide="users" class="icon"></i>
-            Customers
         </a>
         <a href="settings.html" class="nav-link">
             <i data-lucide="settings" class="icon"></i>
@@ -81,17 +73,9 @@
                 <i data-lucide="calculator"></i>
                 Generate Quote
             </button>
-            <button class="btn btn-success" onclick="location.href='sales.html'">
-                <i data-lucide="handshake"></i>
-                Record Sale
-            </button>
             <button class="btn btn-warning" onclick="location.href='commissions.html'">
                 <i data-lucide="download"></i>
                 Download Commissions
-            </button>
-            <button class="btn btn-secondary" onclick="location.href='customers.html'">
-                <i data-lucide="users"></i>
-                Manage Customers
             </button>
         </div>
         
@@ -223,89 +207,116 @@
 
         // Load performance stats
         async function loadStats() {
-            // Mock data - replace with actual API calls
-            document.getElementById('monthlyCommissions').textContent = '$2,847';
-            document.getElementById('monthlySales').textContent = '12';
-            document.getElementById('totalCustomers').textContent = '47';
-            document.getElementById('conversionRate').textContent = '68%';
+            try {
+                const user = JSON.parse(sessionStorage.getItem('syncedup:user') || '{}');
+                
+                const [commissions, sales, quotes] = await Promise.all([
+                    __api(`/commissions?agentId=${user.id}`),
+                    __api(`/sales?agentId=${user.id}`),
+                    __api(`/quotes?agentId=${user.id}`)
+                ]);
+                
+                const totalCommissions = commissions.reduce((sum, c) => sum + (c.amount || 0), 0);
+                const monthlySales = sales.length;
+                const totalCustomers = new Set(sales.map(s => s.customer)).size;
+                const conversionRate = quotes.length > 0 ? Math.round((sales.length / quotes.length) * 100) : 0;
+                
+                document.getElementById('monthlyCommissions').textContent = `$${totalCommissions.toLocaleString()}`;
+                document.getElementById('monthlySales').textContent = monthlySales.toString();
+                document.getElementById('totalCustomers').textContent = totalCustomers.toString();
+                document.getElementById('conversionRate').textContent = `${conversionRate}%`;
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+                document.getElementById('monthlyCommissions').textContent = '$0';
+                document.getElementById('monthlySales').textContent = '0';
+                document.getElementById('totalCustomers').textContent = '0';
+                document.getElementById('conversionRate').textContent = '0%';
+            }
         }
 
         // Load recent activity
         async function loadRecentActivity() {
             const activityContainer = document.getElementById('recentActivity');
             
-            // Mock data - replace with actual API calls
-            const activities = [
-                { type: 'quote', customer: 'John Smith', product: 'Health Plan', time: '2 hours ago' },
-                { type: 'sale', customer: 'Mary Johnson', product: 'Life Insurance', time: '4 hours ago' },
-                { type: 'quote', customer: 'Bob Wilson', product: 'Auto Insurance', time: '1 day ago' }
-            ];
-
-            const activityHTML = activities.map(activity => `
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(255,255,255,0.1); border-radius: 8px; margin-bottom: 0.5rem;">
-                    <div>
-                        <div style="font-weight: 500;">${activity.customer}</div>
-                        <div style="font-size: 0.9rem; opacity: 0.8;">${activity.type === 'quote' ? 'Generated quote for' : 'Purchased'} ${activity.product}</div>
-                    </div>
-                    <div style="font-size: 0.9rem; opacity: 0.7;">${activity.time}</div>
+            // No hardcoded data - show empty state
+            activityContainer.innerHTML = `
+                <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                    No recent activity found
                 </div>
-            `).join('');
-
-            activityContainer.innerHTML = activityHTML;
+            `;
         }
 
         // Load recent quotes
         async function loadRecentQuotes() {
             const tableBody = document.getElementById('quotesTableBody');
             
-            // Quotes will be loaded from API - no fake data
-            const quotes = [];
+            try {
+                const user = JSON.parse(sessionStorage.getItem('syncedup:user') || '{}');
+                const quotes = await __api(`/quotes?agentId=${user.id}&_limit=5&_sort=createdAt&_order=desc`);
 
-            let quotesHTML;
-            if (quotes.length === 0) {
-                quotesHTML = `<tr><td colspan="6" style="text-align: center; color: #666; padding: 2rem;">No quotes found</td></tr>`;
-            } else {
-                quotesHTML = quotes.map(quote => `
-                    <tr>
-                        <td>${quote.date}</td>
-                        <td>${quote.customer}</td>
-                        <td>${quote.product}</td>
-                        <td class="premium-amount">${quote.premium}</td>
-                        <td><span class="status-${quote.status.toLowerCase()}">${quote.status}</span></td>
-                        <td>
-                            <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">View</button>
-                        </td>
-                    </tr>
-                `).join('');
+                let quotesHTML;
+                if (quotes.length === 0) {
+                    quotesHTML = `<tr><td colspan="6" style="text-align: center; color: #666; padding: 2rem;">No quotes found</td></tr>`;
+                } else {
+                    quotesHTML = quotes.map(quote => `
+                        <tr>
+                            <td>${new Date(quote.createdAt).toLocaleDateString()}</td>
+                            <td>${quote.firstName} ${quote.lastName}</td>
+                            <td>${quote.productType}</td>
+                            <td class="premium-amount">$${quote.premium || 'TBD'}</td>
+                            <td><span class="status-${quote.status || 'pending'}">${quote.status || 'Pending'}</span></td>
+                            <td>
+                                <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">View</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+
+                tableBody.innerHTML = quotesHTML;
+            } catch (error) {
+                console.error('Failed to load quotes:', error);
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #666; padding: 2rem;">Error loading quotes</td></tr>`;
             }
-
-            tableBody.innerHTML = quotesHTML;
         }
 
         // Load goal progress
         async function loadGoalProgress() {
-            // Mock data - replace with actual API calls
-            const salesGoal = 15;
-            const currentSales = 12;
-            const commissionGoal = 5000;
-            const currentCommissions = 2847;
+            try {
+                const user = JSON.parse(sessionStorage.getItem('syncedup:user') || '{}');
+                const [goals, sales, commissions] = await Promise.all([
+                    __api(`/goals?agentId=${user.id}`),
+                    __api(`/sales?agentId=${user.id}`),
+                    __api(`/commissions?agentId=${user.id}`)
+                ]);
 
-            const salesProgress = (currentSales / salesGoal) * 100;
-            const commissionProgress = (currentCommissions / commissionGoal) * 100;
+                const salesGoal = goals.find(g => g.type === 'monthly-sales')?.target || 30;
+                const currentSales = sales.length;
+                const salesProgress = Math.min((currentSales / salesGoal) * 100, 100);
 
-            document.getElementById('salesGoalText').textContent = `${currentSales} / ${salesGoal}`;
-            document.getElementById('salesGoalProgress').style.width = `${salesProgress}%`;
-            
-            document.getElementById('commissionGoalText').textContent = `$${currentCommissions.toLocaleString()} / $${commissionGoal.toLocaleString()}`;
-            document.getElementById('commissionGoalProgress').style.width = `${commissionProgress}%`;
+                const commissionGoal = 5000; // Default goal
+                const currentCommissions = commissions.reduce((sum, c) => sum + (c.amount || 0), 0);
+                const commissionProgress = Math.min((currentCommissions / commissionGoal) * 100, 100);
+
+                document.getElementById('salesGoalText').textContent = `${currentSales} / ${salesGoal}`;
+                document.getElementById('salesGoalProgress').style.width = `${salesProgress}%`;
+                
+                document.getElementById('commissionGoalText').textContent = `$${currentCommissions.toLocaleString()} / $${commissionGoal.toLocaleString()}`;
+                document.getElementById('commissionGoalProgress').style.width = `${commissionProgress}%`;
+            } catch (error) {
+                console.error('Failed to load goals:', error);
+                document.getElementById('salesGoalText').textContent = '0 / 30';
+                document.getElementById('salesGoalProgress').style.width = '0%';
+                document.getElementById('commissionGoalText').textContent = '$0 / $5,000';
+                document.getElementById('commissionGoalProgress').style.width = '0%';
+            }
         }
 
         // Fallback data for when API fails
         function loadFallbackData() {
-            document.getElementById('monthlyCommissions').textContent = '$2,500';
-            document.getElementById('monthlySales').textContent = '10';
-            document.getElementById('totalCustomers').textContent = '35';
-            document.getElementById('conversionRate').textContent = '65%';
+            document.getElementById('monthlyCommissions').textContent = '$0';
+            document.getElementById('monthlySales').textContent = '0';
+            document.getElementById('totalCustomers').textContent = '0';
+            document.getElementById('conversionRate').textContent = '0%';
         }
 
         // Logout function
@@ -321,5 +332,6 @@
 
     <!-- Classic Mode Toggle System -->
     <script src="/js/classic-mode.js"></script>
+    <script src="/assets/session.js"></script>
 </body>
 </html>

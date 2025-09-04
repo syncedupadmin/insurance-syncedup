@@ -283,74 +283,8 @@
         let currentUser = null;
         let vendorsData = [];
         
-        // Mock vendor data
-        const mockVendorsData = [
-            {
-                id: 'VEND001',
-                name: 'Boberdoo',
-                type: 'lead_aggregator',
-                leadsThisMonth: 145,
-                costPerLead: 28.50,
-                totalCost: 4132.50,
-                conversions: 23,
-                conversionRate: 15.9,
-                roi: 245,
-                status: 'active',
-                lastSync: '2025-08-30 16:30'
-            },
-            {
-                id: 'VEND002',
-                name: 'QuoteWizard',
-                type: 'comparison_site',
-                leadsThisMonth: 89,
-                costPerLead: 32.00,
-                totalCost: 2848.00,
-                conversions: 18,
-                conversionRate: 20.2,
-                roi: 198,
-                status: 'active',
-                lastSync: '2025-08-30 14:15'
-            },
-            {
-                id: 'VEND003',
-                name: 'LeadsCon Network',
-                type: 'affiliate_network',
-                leadsThisMonth: 67,
-                costPerLead: 24.75,
-                totalCost: 1658.25,
-                conversions: 8,
-                conversionRate: 11.9,
-                roi: 156,
-                status: 'testing',
-                lastSync: '2025-08-30 12:00'
-            },
-            {
-                id: 'VEND004',
-                name: 'Insurance.com',
-                type: 'direct_publisher',
-                leadsThisMonth: 34,
-                costPerLead: 35.50,
-                totalCost: 1207.00,
-                conversions: 9,
-                conversionRate: 26.5,
-                roi: 312,
-                status: 'active',
-                lastSync: '2025-08-30 10:45'
-            },
-            {
-                id: 'VEND005',
-                name: 'HealthPlanFinder',
-                type: 'comparison_site',
-                leadsThisMonth: 12,
-                costPerLead: 29.00,
-                totalCost: 348.00,
-                conversions: 1,
-                conversionRate: 8.3,
-                roi: 89,
-                status: 'paused',
-                lastSync: '2025-08-28 16:20'
-            }
-        ];
+        // No hardcoded vendor data - will be loaded from API
+        const mockVendorsData = [];
         
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication
@@ -393,14 +327,14 @@
                 
                 if (response.ok) {
                     const data = await response.json();
-                    vendorsData = data.vendors || mockVendorsData;
+                    vendorsData = data.vendors || [];
                     console.log('Vendor data loaded from API');
                 } else {
                     throw new Error('API not available');
                 }
             } catch (error) {
-                console.log('Using mock data:', error);
-                vendorsData = mockVendorsData;
+                console.log('API not available:', error);
+                vendorsData = [];
             }
             
             populateVendorFilter();
@@ -615,7 +549,7 @@
             } catch (error) {
                 console.error('Error saving vendor:', error);
                 
-                // Fallback: Add to local mock data for demo
+                // Error saving vendor - no fallback data
                 const newVendor = {
                     id: 'VEND' + (vendorsData.length + 1),
                     name,
@@ -817,5 +751,6 @@
     
     <!-- Classic Mode Toggle System -->
     <script src="/js/classic-mode.js"></script>
+    <script src="/assets/session.js"></script>
 </body>
 </html>
