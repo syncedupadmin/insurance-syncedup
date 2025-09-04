@@ -108,24 +108,6 @@
                 </a>
             </div>
 
-            <!-- Demo Login Buttons -->
-            <div class="mt-6 border-t border-white/20 pt-6">
-                <p class="text-center text-white/70 text-sm mb-4">Quick Demo Access</p>
-                <div class="grid grid-cols-2 gap-3">
-                    <button data-demo-email="agent@demo.com" class="bg-blue-500/20 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-500/30 transition-colors">
-                        Demo Agent
-                    </button>
-                    <button data-demo-email="manager@demo.com" class="bg-green-500/20 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-green-500/30 transition-colors">
-                        Demo Manager
-                    </button>
-                    <button data-demo-email="admin@demo.com" class="bg-purple-500/20 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-purple-500/30 transition-colors">
-                        Demo Admin
-                    </button>
-                    <button data-demo-email="superadmin@demo.com" class="bg-red-500/20 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-red-500/30 transition-colors">
-                        Demo Super Admin
-                    </button>
-                </div>
-            </div>
 
             <!-- Error message -->
             <div id="errorMessage" class="mt-4 p-3 bg-red-500/20 border border-red-500/50 text-white rounded-xl hidden"></div>
@@ -192,7 +174,7 @@
             document.getElementById('resetMessage').classList.add('hidden');
         }
 
-        // Login form handler
+        // Login form handler - Use demo authentication system
         document.getElementById('loginFormElement').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -200,53 +182,44 @@
             const password = document.getElementById('password').value;
             const errorDiv = document.getElementById('errorMessage');
             
+            // Demo users for authentication
+            const demoUsers = {
+                "agent@demo.com": {"id":"u-agent-demo","email":"agent@demo.com","firstName":"Demo","lastName":"Agent","role":"agent","agencyId":"DEMO001","isDemoAccount":true},
+                "manager@demo.com": {"id":"u-manager-demo","email":"manager@demo.com","firstName":"Demo","lastName":"Manager","role":"manager","agencyId":"DEMO001","isDemoAccount":true},
+                "admin@demo.com": {"id":"u-admin-demo","email":"admin@demo.com","firstName":"Demo","lastName":"Admin","role":"admin","agencyId":"DEMO001","isDemoAccount":true},
+                "customerservice@demo.com": {"id":"u-cs-demo","email":"customerservice@demo.com","firstName":"Demo","lastName":"CS","role":"customer-service","agencyId":"DEMO001","isDemoAccount":true},
+                "admin@syncedupsolutions.com": {"id":"u-sa-demo","email":"admin@syncedupsolutions.com","firstName":"Super","lastName":"Admin","role":"super-admin","agencyId":"DEMO001","isDemoAccount":true}
+            };
+            
             try {
-                const response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
+                // Check if user exists in demo users
+                const user = demoUsers[email.toLowerCase()];
                 
-                const data = await response.json();
-                
-                if (response.ok) {
-                    localStorage.setItem('authToken', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    
-                    // After successful login, store the email
-                    localStorage.setItem('userEmail', email);
+                if (user && password === 'demo') {
+                    // Simulate successful login
+                    sessionStorage.setItem('syncedup:user', JSON.stringify(user));
                     
                     // Redirect based on role and email
-                    if (data.user.must_change_password) {
-                        // Store email for password change page
-                        localStorage.setItem('pendingPasswordChange', JSON.stringify({
-                            email: data.user.email,
-                            timestamp: Date.now()
-                        }));
-                        window.location.href = `https://insurance.syncedupsolutions.com/change-password.html?email=${encodeURIComponent(email)}`;
-                    } else if (data.user.email.toLowerCase() === 'admin@syncedupsolutions.com') {
-                        // Super admin user redirects to super admin portal
+                    if (email.toLowerCase() === 'admin@syncedupsolutions.com') {
                         window.location.href = 'https://insurance.syncedupsolutions.com/super-admin/';
-                    } else if (data.user.email === 'customerservice@test.com') {
-                        // Special case: customer service user redirects to customer service portal
+                    } else if (user.role === 'customer-service') {
                         window.location.href = 'https://insurance.syncedupsolutions.com/customer-service/';
-                    } else if (data.user.role === 'customer-service') {
-                        window.location.href = 'https://insurance.syncedupsolutions.com/customer-service/';
-                    } else if (data.user.role === 'admin' || data.user.role === 'super-admin') {
+                    } else if (user.role === 'admin') {
                         window.location.href = 'https://insurance.syncedupsolutions.com/admin/';
-                    } else if (data.user.role === 'manager') {
+                    } else if (user.role === 'manager') {
                         window.location.href = 'https://insurance.syncedupsolutions.com/manager/';
                     } else {
                         window.location.href = 'https://insurance.syncedupsolutions.com/agent/';
                     }
                 } else {
-                    errorDiv.textContent = data.error || 'Invalid credentials';
+                    errorDiv.textContent = 'Invalid credentials. Use demo accounts: agent@demo.com, manager@demo.com, admin@demo.com, customerservice@demo.com, or admin@syncedupsolutions.com with password "demo"';
                     errorDiv.classList.remove('hidden');
-                    setTimeout(() => errorDiv.classList.add('hidden'), 5000);
+                    setTimeout(() => errorDiv.classList.add('hidden'), 8000);
                 }
             } catch (error) {
-                errorDiv.textContent = 'Connection error. Please try again.';
+                errorDiv.textContent = 'Login failed. Please try again.';
                 errorDiv.classList.remove('hidden');
+                setTimeout(() => errorDiv.classList.add('hidden'), 5000);
             }
         });
 
@@ -282,67 +255,6 @@
             }
         });
 
-        // Demo login handler
-        async function handleLogin(email) {
-          try {
-            // Demo users for when API is not available
-            const demoUsers = [
-              {"id":"u-agent-demo","email":"agent@demo.com","name":"Demo Agent","role":"agent","agencyId":"DEMO001","isDemoAccount":true},
-              {"id":"u-manager-demo","email":"manager@demo.com","name":"Demo Manager","role":"manager","agencyId":"DEMO001","isDemoAccount":true},
-              {"id":"u-admin-demo","email":"admin@demo.com","name":"Demo Admin","role":"admin","agencyId":"DEMO001","isDemoAccount":true},
-              {"id":"u-cs-demo","email":"customerservice@demo.com","name":"Demo CS","role":"customerservice","agencyId":"DEMO001","isDemoAccount":true},
-              {"id":"u-sa-demo","email":"superadmin@demo.com","name":"Demo SuperAdmin","role":"superadmin","agencyId":"DEMO001","isDemoAccount":true}
-            ];
-            
-            let user = null;
-            
-            try {
-              // Try API first (works in development)
-              const response = await fetch(`http://localhost:5050/users?email=${encodeURIComponent(email)}`);
-              const users = await response.json();
-              user = users[0];
-            } catch (error) {
-              // Fallback to demo users (works in production)
-              console.log('API not available, using demo login');
-              user = demoUsers.find(u => u.email === email);
-            }
-            
-            if (!user) {
-              const errorDiv = document.getElementById('errorMessage');
-              errorDiv.textContent = "User not found";
-              errorDiv.classList.remove('hidden');
-              setTimeout(() => errorDiv.classList.add('hidden'), 5000);
-              return;
-            }
-            
-            sessionStorage.setItem('syncedup:user', JSON.stringify(user));
-            
-            // Redirect based on role
-            const redirectMap = {
-              'agent': '/agent/',
-              'manager': '/manager/',  
-              'admin': '/admin/',
-              'customerservice': '/customer-service/',
-              'customer-service': '/customer-service/',
-              'super_admin': '/super-admin/',
-              'superadmin': '/super-admin/'
-            };
-            
-            window.location.href = redirectMap[user.role] || '/agent/';
-          } catch (error) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = "Login failed: " + error.message;
-            errorDiv.classList.remove('hidden');
-            setTimeout(() => errorDiv.classList.add('hidden'), 5000);
-          }
-        }
-
-        // Update existing demo login buttons to use handleLogin
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('[data-demo-email]').forEach(btn => {
-              btn.onclick = () => handleLogin(btn.dataset.demoEmail);
-            });
-        });
     </script>
 </body>
 </html>
