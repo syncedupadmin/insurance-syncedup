@@ -737,7 +737,7 @@
         // Check for logged in user on page load
         document.addEventListener('DOMContentLoaded', function() {
             // Get agent data from localStorage (set during login)
-            const userData = localStorage.getItem('user');
+            const userData = localStorage.getItem('syncedup_user');
             if (userData) {
                 currentAgent = JSON.parse(userData);
                 console.log('Logged in as:', currentAgent.name, '- ID:', currentAgent.id);

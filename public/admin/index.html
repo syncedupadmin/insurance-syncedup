@@ -7,6 +7,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    
+    <!-- Auth Guard Script - Must be loaded in HEAD before content renders -->
+    <script src="/auth-check.js" defer></script>
+    
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
         * { 
@@ -454,12 +459,12 @@
         
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication
-            const userData = localStorage.getItem('user');
+            const userData = localStorage.getItem('syncedup_user');
             if (userData) {
                 currentUser = JSON.parse(userData);
                 
                 // Only manager and admin can access admin portal
-                if (!['manager', 'admin'].includes(currentUser.role)) {
+                if (!['manager', 'admin', 'super-admin'].includes(currentUser.role)) {
                     window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
                     return;
                 }

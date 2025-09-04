@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Analytics - Super Admin</title>
     <link rel="stylesheet" href="super-admin-global.css">
+    <script src="/auth-check.js" defer></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -335,8 +336,8 @@
 
         // Authentication check
         function checkAuth() {
-            const token = localStorage.getItem('authToken');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const token = localStorage.getItem('syncedup_token');
+            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
             
             if (!token || !user.email) {
                 window.location.href = '/login.html';
@@ -355,7 +356,7 @@
 
         // Logout function
         function logout() {
-            localStorage.removeItem('authToken');
+            localStorage.removeItem('syncedup_token');
             localStorage.removeItem('user');
             window.location.href = '/login.html';
         }
@@ -383,7 +384,7 @@
         async function loadSystemKPIs() {
             try {
                 const response = await fetch('/api/super-admin/system-kpis', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
                 });
                 
                 if (response.ok) {
@@ -418,7 +419,7 @@
         async function loadRealTimeMonitoring() {
             try {
                 const response = await fetch('/api/super-admin/real-time-monitoring', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
                 });
                 
                 let data;

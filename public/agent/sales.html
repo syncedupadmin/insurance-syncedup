@@ -148,7 +148,7 @@
 
         // Authentication check
         document.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('authToken');
+            const token = localStorage.getItem('syncedup_token');
             if (!token) {
                 window.location.href = '/login.html';
                 return;

@@ -1,6 +1,6 @@
 // Load dashboard data
 async function loadDashboardData() {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('syncedup_token') || localStorage.getItem('token');
     
     try {
         const response = await fetch('/api/agent/dashboard', {

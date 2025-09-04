@@ -373,8 +373,8 @@
 
         // Authentication check
         function checkAuth() {
-            const token = localStorage.getItem('authToken');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const token = localStorage.getItem('syncedup_token');
+            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
             
             if (!token || !user.email) {
                 window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
@@ -382,7 +382,7 @@
             }
 
             // Check if user has appropriate permissions
-            if (user.role !== 'admin') {
+            if (!['admin', 'super-admin', 'manager'].includes(user.role)) {
                 alert('Access denied. Insufficient permissions.');
                 if (user.role === 'manager') { window.location.href = 'https://insurance.syncedupsolutions.com/manager/'; } else { window.location.href = 'https://insurance.syncedupsolutions.com/agent/'; }
                 return false;
@@ -394,8 +394,8 @@
 
         // Logout function
         function logout() {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('user');
+            localStorage.removeItem('syncedup_token');
+            localStorage.removeItem('syncedup_user');
             window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
         }
 

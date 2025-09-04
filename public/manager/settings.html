@@ -22,13 +22,13 @@
 
     <!-- Navigation -->
     <div class="nav">
-        <a href="leads.html" class="nav-link">
-            <i data-lucide="user-plus" class="icon"></i>
-            Leads
-        </a>
         <a href="index.html" class="nav-link">
             <i data-lucide="layout-dashboard" class="icon"></i>
             Dashboard
+        </a>
+        <a href="leads.html" class="nav-link">
+            <i data-lucide="user-plus" class="icon"></i>
+            Leads
         </a>
         <a href="team-management.html" class="nav-link">
             <i data-lucide="users" class="icon"></i>
@@ -203,8 +203,8 @@
 
         // Authentication check
         function checkAuth() {
-            const token = localStorage.getItem('authToken');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const token = localStorage.getItem('syncedup_token');
+            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
             
             if (!token || !user.email) {
                 window.location.href = 'https://insurance.syncedupsolutions.com/login.html';

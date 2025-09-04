@@ -22,13 +22,13 @@
 
     <!-- Navigation -->
     <div class="nav">
-        <a href="leads.html" class="nav-link">
-            <i data-lucide="user-plus" class="icon"></i>
-            Leads
-        </a>
         <a href="index.html" class="nav-link">
             <i data-lucide="layout-dashboard" class="icon"></i>
             Dashboard
+        </a>
+        <a href="leads.html" class="nav-link">
+            <i data-lucide="user-plus" class="icon"></i>
+            Leads
         </a>
         <a href="team-management.html" class="nav-link">
             <i data-lucide="users" class="icon"></i>
@@ -64,7 +64,7 @@
             </h3>
             <div class="restricted-notice">
                 <i data-lucide="info" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
-                Commission data is restricted to admin level. You can view sales counts and premium volumes.
+                Manager access allows you to view team sales performance and premium volumes.
             </div>
             <div class="form-row">
                 <div class="form-group">
@@ -101,9 +101,8 @@
                     <div class="stat-label">Premium Volume</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">⛔</div>
-                    <div class="stat-label">Commission Data</div>
-                    <div style="font-size: 0.8rem; margin-top: 0.5rem; color: #ed8936;">Admin Only</div>
+                    <div class="stat-number" id="conversionRate">0%</div>
+                    <div class="stat-label">Conversion Rate</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="avgSale">$0</div>
@@ -112,7 +111,7 @@
             </div>
             
             <div class="card">
-                <h3>📊 Recent Sales Activity (No Commission Details)</h3>
+                <h3>📊 Recent Sales Activity</h3>
                 <div id="salesTableContainer">
                     <table id="salesTable">
                         <thead>
@@ -132,7 +131,7 @@
             </div>
             
             <div class="export-section">
-                <button class="btn btn-success" onclick="exportData('csv')">📊 Export Sales Data (No Commissions)</button>
+                <button class="btn btn-success" onclick="exportData('csv')">📊 Export Sales Data</button>
                 <button class="btn btn-warning" onclick="generateReport()">📄 Generate Team Report</button>
                 <button class="btn" onclick="refreshData()">🔄 Refresh Data</button>
             </div>
@@ -156,8 +155,8 @@
         
         // Authentication check
         function checkAuth() {
-            const token = localStorage.getItem('authToken');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const token = localStorage.getItem('syncedup_token');
+            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
             
             if (!token || !user.email) {
                 window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
@@ -257,7 +256,7 @@
         }
         
         function displayMockData(agentId) {
-            // Use mock data when API fails (no commission data for managers)
+            // Use mock data when API fails
             let totalSales = 12;
             let totalPremium = 28500;
             let avgSale = 2375;
@@ -271,6 +270,10 @@
             document.getElementById('totalSales').textContent = totalSales;
             document.getElementById('totalPremium').textContent = `$${totalPremium.toLocaleString()}`;
             document.getElementById('avgSale').textContent = `$${avgSale.toLocaleString()}`;
+            
+            // Calculate conversion rate (mock calculation)
+            const conversionRate = Math.round((totalSales / (totalSales + 3)) * 100); // Assume some leads didn't convert
+            document.getElementById('conversionRate').textContent = `${conversionRate}%`;
             
             document.getElementById('performanceData').style.display = 'block';
             document.getElementById('noDataMessage').style.display = 'none';
@@ -322,7 +325,7 @@
         }
         
         function exportToCSV(agentName) {
-            // Manager export does NOT include commission data
+            // Manager export includes sales and premium data
             let csvContent = 'Date,Agent ID,Agent Name,Customer,Product,Premium,Status\\n';
             
             const salesToExport = selectedAgent === 'ALL' ? salesData : 
@@ -349,7 +352,7 @@
                 return;
             }
             
-            alert('Team report generation would be implemented here. This would create a comprehensive sales report without commission details.');
+            alert('Team report generation would be implemented here. This would create a comprehensive sales and performance report.');
         }
         
         function refreshData() {

@@ -462,8 +462,8 @@ Business City, ST 12345</textarea>
 
         // Authentication check
         function checkAuth() {
-            const token = localStorage.getItem('authToken');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const token = localStorage.getItem('syncedup_token');
+            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
             
             if (!token || !user.email) {
                 window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
@@ -471,7 +471,7 @@ Business City, ST 12345</textarea>
             }
 
             // Check if user has appropriate permissions (only admin for settings)
-            if (user.role !== 'admin') {
+            if (!['admin', 'super-admin'].includes(user.role)) {
                 alert('Access denied. Only administrators can access system settings.');
                 window.location.href = 'https://insurance.syncedupsolutions.com/admin/';
                 return false;
@@ -512,7 +512,7 @@ Business City, ST 12345</textarea>
 
             try {
                 const response = await fetch('/api/admin/api-keys', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
                 });
                 
                 if (response.ok) {
@@ -611,7 +611,7 @@ Business City, ST 12345</textarea>
         async function loadSystemSettings() {
             try {
                 const response = await fetch('/api/admin/settings', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
                 });
                 
                 if (response.ok) {
@@ -704,7 +704,7 @@ Business City, ST 12345</textarea>
                 const response = await fetch('/api/admin/settings/system', {
                     method: 'PUT',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(formData)
@@ -737,7 +737,7 @@ Business City, ST 12345</textarea>
                 const response = await fetch('/api/admin/settings/branding', {
                     method: 'PUT',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(formData)
@@ -771,7 +771,7 @@ Business City, ST 12345</textarea>
                 const response = await fetch('/api/admin/settings/agency', {
                     method: 'PUT',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(formData)
@@ -836,7 +836,7 @@ Business City, ST 12345</textarea>
                 const response = await fetch(url, {
                     method: editingApiKeyId ? 'PUT' : 'POST',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(formData)
@@ -891,7 +891,7 @@ Business City, ST 12345</textarea>
             try {
                 const response = await fetch(`/api/admin/api-keys/${keyId}`, {
                     method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
                 });
                 
                 if (response.ok || response.status === 404) {
@@ -917,7 +917,7 @@ Business City, ST 12345</textarea>
             try {
                 const response = await fetch(`/api/admin/api-keys/${keyId}/test`, {
                     method: 'POST',
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
                 });
                 
                 if (response.ok) {

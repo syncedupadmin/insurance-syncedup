@@ -452,8 +452,8 @@
 
         // Authentication check
         function checkAuth() {
-            const token = localStorage.getItem('authToken');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const token = localStorage.getItem('syncedup_token');
+            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
             
             if (!token || !user.email) {
                 window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
@@ -461,7 +461,7 @@
             }
 
             // Check if user has appropriate permissions
-            if (user.role !== 'admin') {
+            if (!['admin', 'super-admin', 'manager'].includes(user.role)) {
                 alert('Access denied. Insufficient permissions.');
                 if (user.role === 'manager') { window.location.href = 'https://insurance.syncedupsolutions.com/manager/'; } else { window.location.href = 'https://insurance.syncedupsolutions.com/agent/'; }
                 return false;
@@ -498,7 +498,7 @@
         async function loadCommissionStats() {
             try {
                 const response = await fetch('/api/admin/commission-settings', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
                 });
                 
                 if (response.ok) {
@@ -531,7 +531,7 @@
 
             try {
                 const response = await fetch('/api/admin/commission-settings', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
                 });
                 
                 if (response.ok) {
@@ -642,7 +642,7 @@
 
             try {
                 const response = await fetch('/api/admin/commission-overrides', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
                 });
                 
                 if (response.ok) {
@@ -763,7 +763,7 @@
         async function loadAgentsForOverride() {
             try {
                 const response = await fetch('/api/admin/user-management', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
                 });
                 
                 if (response.ok) {
@@ -886,7 +886,7 @@
             try {
                 const response = await fetch(`/api/admin/commission-settings/${rateId}`, {
                     method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
                 });
                 
                 if (response.ok || response.status === 404) {
@@ -909,7 +909,7 @@
             try {
                 const response = await fetch(`/api/admin/commission-overrides/${overrideId}`, {
                     method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
                 });
                 
                 if (response.ok || response.status === 404) {
@@ -947,7 +947,7 @@
                 const response = await fetch(url, {
                     method: editingRateId ? 'PUT' : 'POST',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(formData)
@@ -1003,7 +1003,7 @@
                 const response = await fetch(url, {
                     method: editingOverrideId ? 'PUT' : 'POST',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(formData)

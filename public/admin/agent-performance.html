@@ -207,7 +207,7 @@
 
         // Authentication Check
         document.addEventListener('DOMContentLoaded', function() {
-            const userData = localStorage.getItem('user');
+            const userData = localStorage.getItem('syncedup_user');
             if (userData) {
                 currentUser = JSON.parse(userData);
                 if (!['admin', 'manager'].includes(currentUser.role)) {

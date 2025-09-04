@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manager Dashboard - SyncedUp Insurance</title>
     <link rel="stylesheet" href="/manager/manager-global.css">
+    
+    
+    <!-- Auth Guard Script - Must be loaded in HEAD before content renders -->
+    <script src="/auth-check.js" defer></script>
+    
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
@@ -22,13 +27,13 @@
 
     <!-- Navigation -->
     <div class="nav">
-        <a href="leads.html" class="nav-link">
-            <i data-lucide="user-plus" class="icon"></i>
-            Leads
-        </a>
         <a href="index.html" class="nav-link active">
             <i data-lucide="layout-dashboard" class="icon"></i>
             Dashboard
+        </a>
+        <a href="leads.html" class="nav-link">
+            <i data-lucide="user-plus" class="icon"></i>
+            Leads
         </a>
         <a href="team-management.html" class="nav-link">
             <i data-lucide="users" class="icon"></i>
@@ -59,7 +64,7 @@
     <div class="container">
         <div class="manager-notice">
             <h3><i data-lucide="shield-check"></i> Manager Portal</h3>
-            <p>You have access to agent data and performance metrics. Commission data is restricted to admin level.</p>
+            <p>You have access to agent data and performance metrics for your team.</p>
         </div>
         
         <div class="grid">
@@ -76,9 +81,8 @@
                 <div class="stat-label">Policies Sold</div>
             </div>
             <div class="card">
-                <div class="stat-value">⛔</div>
-                <div class="stat-label">Commission Data</div>
-                <div class="restricted-notice">Restricted - Admin Only</div>
+                <div class="stat-value" id="avgSaleSize">$0</div>
+                <div class="stat-label">Average Sale Size</div>
             </div>
         </div>
         
@@ -150,7 +154,7 @@
         
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication
-            const userData = localStorage.getItem('user');
+            const userData = localStorage.getItem('syncedup_user');
             if (userData) {
                 currentUser = JSON.parse(userData);
                 
@@ -212,6 +216,12 @@
             document.getElementById('mtdRevenue').textContent = `$${(data.agency_overview?.total_sales || 0).toLocaleString()}`;
             document.getElementById('policiesSold').textContent = data.quick_stats?.total_sales_mtd || 0;
             
+            // Calculate and display average sale size
+            const totalSales = data.agency_overview?.total_sales || 0;
+            const totalPolicies = data.quick_stats?.total_sales_mtd || 0;
+            const avgSale = totalPolicies > 0 ? Math.round(totalSales / totalPolicies) : 0;
+            document.getElementById('avgSaleSize').textContent = `$${avgSale.toLocaleString()}`;
+            
             // Update team data with real data
             if (data.team_performance?.top_performers) {
                 teamData = data.team_performance.top_performers.map(agent => ({
@@ -238,6 +248,7 @@
             document.getElementById('activeAgents').textContent = '0';
             document.getElementById('mtdRevenue').textContent = '$0';
             document.getElementById('policiesSold').textContent = '0';
+            document.getElementById('avgSaleSize').textContent = '$0';
             
             // Show empty tables
             loadEmptyTeamTable();

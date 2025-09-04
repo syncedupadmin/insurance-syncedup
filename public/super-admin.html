@@ -639,9 +639,9 @@
 
     <script>
         const token = localStorage.getItem('authToken');
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
         
-        if (!token || user.role !== 'super_admin') {
+        if (!token || user.role !== 'super-admin') {
             window.location.href = '/login.html';
         }
 
@@ -713,7 +713,7 @@
                 'manager@demo.com': 'manager', 
                 'admin@demo.com': 'admin',
                 'customerservice@demo.com': 'customer-service',
-                'superadmin@demo.com': 'super_admin'
+                'superadmin@demo.com': 'super-admin'
             };
             
             const role = emailToRole[email];
@@ -746,7 +746,7 @@
                         'manager': 'https://insurance.syncedupsolutions.com/manager/',
                         'admin': 'https://insurance.syncedupsolutions.com/admin/',
                         'customer-service': 'https://insurance.syncedupsolutions.com/customer-service/',
-                        'super_admin': 'https://insurance.syncedupsolutions.com/super-admin/'
+                        'super-admin': 'https://insurance.syncedupsolutions.com/super-admin/'
                     };
                     
                     window.location.href = roleRedirects[data.user.role] || 'https://insurance.syncedupsolutions.com/agent/';

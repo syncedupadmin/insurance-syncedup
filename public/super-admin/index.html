@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Admin Dashboard - SyncedUp Platform</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    
+    <!-- Auth Guard Script - Must be loaded in HEAD before content renders -->
+    <script src="/auth-check.js" defer></script>
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -638,10 +643,10 @@
     </div>
 
     <script>
-        const token = localStorage.getItem('authToken');
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const token = localStorage.getItem('syncedup_token');
+        const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
         
-        if (!token || user.role !== 'super_admin') {
+        if (!token || user.role !== 'super-admin') {
             window.location.href = '/login.html';
         }
 
@@ -713,7 +718,7 @@
                 'manager@demo.com': 'manager', 
                 'admin@demo.com': 'admin',
                 'customerservice@demo.com': 'customer-service',
-                'superadmin@demo.com': 'super_admin'
+                'superadmin@demo.com': 'super-admin'
             };
             
             const role = emailToRole[email];
@@ -737,7 +742,7 @@
                 const data = await response.json();
                 
                 if (response.ok && data.success) {
-                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('syncedup_token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
                     
                     // Redirect based on role
@@ -746,7 +751,7 @@
                         'manager': 'https://insurance.syncedupsolutions.com/manager/',
                         'admin': 'https://insurance.syncedupsolutions.com/admin/',
                         'customer-service': 'https://insurance.syncedupsolutions.com/customer-service/',
-                        'super_admin': 'https://insurance.syncedupsolutions.com/super-admin/'
+                        'super-admin': 'https://insurance.syncedupsolutions.com/super-admin/'
                     };
                     
                     window.location.href = roleRedirects[data.user.role] || 'https://insurance.syncedupsolutions.com/agent/';
@@ -846,7 +851,7 @@
         }
 
         function logout() {
-            localStorage.removeItem('authToken');
+            localStorage.removeItem('syncedup_token');
             localStorage.removeItem('user');
             window.location.href = '/login.html';
         }

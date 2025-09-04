@@ -288,7 +288,7 @@
         
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication
-            const userData = localStorage.getItem('user');
+            const userData = localStorage.getItem('syncedup_user');
             if (userData) {
                 currentUser = JSON.parse(userData);
                 

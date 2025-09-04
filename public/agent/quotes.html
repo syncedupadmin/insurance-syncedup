@@ -215,15 +215,15 @@
 
         // Authentication check
         function checkAuth() {
-            const token = localStorage.getItem('authToken');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const token = localStorage.getItem('syncedup_token');
+            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
             
             if (!token || !user.email) {
                 window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
                 return false;
             }
 
-            if (!['agent', 'manager', 'admin'].includes(user.role)) {
+            if (!['agent', 'manager', 'admin', 'super-admin'].includes(user.role)) {
                 alert('Access denied. Agent permissions required.');
                 window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
                 return false;

@@ -355,9 +355,9 @@
 
         // Authentication check
         const token = localStorage.getItem('authToken');
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
         
-        if (!token || !['admin', 'super_admin'].includes(user.role)) {
+        if (!token || !['admin', 'super-admin'].includes(user.role)) {
             window.location.href = '/login.html';
         }
 

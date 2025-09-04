@@ -134,7 +134,7 @@
             log('Checking stored authentication...');
             
             const token = localStorage.getItem('token');
-            const user = localStorage.getItem('user');
+            const user = localStorage.getItem('syncedup_user');
             
             if (token) {
                 log('✅ Token found: ' + token.substring(0, 50) + '...');

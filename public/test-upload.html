@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Storage Test - SyncedUp Insurance</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        .upload-area:hover {
+            border-color: #007bff;
+        }
+        .upload-area.dragover {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .progress {
+            width: 100%;
+            height: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background: #28a745;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .file-list {
+            margin: 20px 0;
+        }
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.pending { background: #ffeaa7; color: #d63031; }
+        .status.uploading { background: #74b9ff; color: white; }
+        .status.completed { background: #00b894; color: white; }
+        .status.failed { background: #e17055; color: white; }
+        .login-section {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .error {
+            color: #d63031;
+            background: #ffe0e0;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            color: #00b894;
+            background: #e0ffe0;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>File Storage Test Interface</h1>
+        
+        <!-- Login Section -->
+        <div class="login-section">
+            <h3>Authentication</h3>
+            <div>
+                <input type="email" id="email" placeholder="Email" value="admin@demo.com">
+                <input type="password" id="password" placeholder="Password" value="demo123">
+                <button onclick="login()">Login</button>
+                <button onclick="logout()">Logout</button>
+            </div>
+            <div id="authStatus">Not logged in</div>
+        </div>
+
+        <!-- Upload Section -->
+        <div id="uploadSection" style="display: none;">
+            <h3>Upload Files</h3>
+            
+            <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                <p>Click here or drag files to upload</p>
+                <input type="file" id="fileInput" multiple>
+            </div>
+            
+            <div id="uploadProgress" style="display: none;">
+                <div class="progress">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div id="uploadStatus">Uploading...</div>
+            </div>
+            
+            <div class="file-list">
+                <h4>Uploaded Files</h4>
+                <div id="fileList">No files uploaded yet</div>
+                <button onclick="refreshFileList()">Refresh List</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let authToken = null;
+        let uploadedFiles = [];
+
+        // Check if already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const userData = localStorage.getItem('syncedup_user');
+            const token = localStorage.getItem('syncedup_token');
+            if (userData && token) {
+                authToken = token;
+                document.getElementById('authStatus').innerHTML = `<span class="success">Logged in as: ${JSON.parse(userData).email}</span>`;
+                document.getElementById('uploadSection').style.display = 'block';
+                refreshFileList();
+            }
+        });
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    authToken = data.token;
+                    localStorage.setItem('syncedup_token', data.token);
+                    localStorage.setItem('syncedup_user', JSON.stringify(data.user));
+                    
+                    document.getElementById('authStatus').innerHTML = `<span class="success">Logged in as: ${data.user.email}</span>`;
+                    document.getElementById('uploadSection').style.display = 'block';
+                    refreshFileList();
+                } else {
+                    document.getElementById('authStatus').innerHTML = `<span class="error">Login failed: ${data.error}</span>`;
+                }
+            } catch (error) {
+                document.getElementById('authStatus').innerHTML = `<span class="error">Login error: ${error.message}</span>`;
+            }
+        }
+
+        function logout() {
+            authToken = null;
+            localStorage.removeItem('syncedup_token');
+            localStorage.removeItem('syncedup_user');
+            document.getElementById('authStatus').innerHTML = 'Not logged in';
+            document.getElementById('uploadSection').style.display = 'none';
+            uploadedFiles = [];
+        }
+
+        // File upload handling
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files);
+            handleFiles(files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            handleFiles(files);
+        });
+
+        async function handleFiles(files) {
+            if (!authToken) {
+                alert('Please login first');
+                return;
+            }
+
+            for (let file of files) {
+                await uploadFile(file);
+            }
+        }
+
+        async function uploadFile(file) {
+            try {
+                document.getElementById('uploadProgress').style.display = 'block';
+                document.getElementById('uploadStatus').textContent = `Getting upload URL for ${file.name}...`;
+                updateProgress(10);
+
+                // Step 1: Get presigned upload URL
+                const urlResponse = await fetch('/api/storage/upload-url', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        fileName: file.name,
+                        fileType: file.type,
+                        fileSize: file.size
+                    })
+                });
+
+                if (!urlResponse.ok) {
+                    throw new Error('Failed to get upload URL');
+                }
+
+                const { uploadUrl, fileId, fileKey } = await urlResponse.json();
+                updateProgress(30);
+
+                // Step 2: Upload file to R2
+                document.getElementById('uploadStatus').textContent = `Uploading ${file.name}...`;
+                
+                const uploadResponse = await fetch(uploadUrl, {
+                    method: 'PUT',
+                    body: file,
+                    headers: {
+                        'Content-Type': file.type
+                    }
+                });
+
+                if (!uploadResponse.ok) {
+                    throw new Error('Failed to upload file');
+                }
+
+                updateProgress(80);
+
+                // Step 3: Mark as completed in database
+                document.getElementById('uploadStatus').textContent = `Finalizing ${file.name}...`;
+                
+                const completeResponse = await fetch('/api/storage/complete-upload', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ fileId })
+                });
+
+                if (!completeResponse.ok) {
+                    throw new Error('Failed to finalize upload');
+                }
+
+                document.getElementById('uploadStatus').textContent = `Upload completed: ${file.name}`;
+                updateProgress(100);
+
+                // Add to uploaded files list
+                uploadedFiles.push({
+                    id: fileId,
+                    name: file.name,
+                    type: file.type,
+                    size: file.size,
+                    key: fileKey,
+                    status: 'completed'
+                });
+
+                setTimeout(() => {
+                    document.getElementById('uploadProgress').style.display = 'none';
+                    updateProgress(0);
+                    refreshFileList();
+                }, 1000);
+
+            } catch (error) {
+                document.getElementById('uploadStatus').innerHTML = `<span class="error">Upload failed: ${error.message}</span>`;
+                console.error('Upload error:', error);
+            }
+        }
+
+        function updateProgress(percent) {
+            document.getElementById('progressBar').style.width = percent + '%';
+        }
+
+        async function refreshFileList() {
+            if (!authToken) return;
+
+            try {
+                // For now, just show the files we've uploaded in this session
+                // In production, you'd fetch from an API that lists user files
+                displayFileList();
+            } catch (error) {
+                console.error('Failed to refresh file list:', error);
+            }
+        }
+
+        function displayFileList() {
+            const fileListDiv = document.getElementById('fileList');
+            
+            if (uploadedFiles.length === 0) {
+                fileListDiv.innerHTML = 'No files uploaded yet';
+                return;
+            }
+
+            fileListDiv.innerHTML = uploadedFiles.map(file => `
+                <div class="file-item">
+                    <div>
+                        <strong>${file.name}</strong><br>
+                        <small>${file.type} | ${formatFileSize(file.size)}</small>
+                    </div>
+                    <div>
+                        <span class="status ${file.status}">${file.status}</span>
+                        <button onclick="downloadFile('${file.id}', '${file.name}')">Download</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function downloadFile(fileId, fileName) {
+            try {
+                const response = await fetch(`/api/storage/get-url?fileId=${fileId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to get download URL');
+                }
+
+                const { downloadUrl } = await response.json();
+                
+                // Open download in new tab
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                link.download = fileName;
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+            } catch (error) {
+                alert('Download failed: ' + error.message);
+                console.error('Download error:', error);
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    </script>
+</body>
+</html>

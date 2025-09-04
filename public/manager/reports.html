@@ -22,13 +22,13 @@
 
     <!-- Navigation -->
     <div class="nav">
-        <a href="leads.html" class="nav-link">
-            <i data-lucide="user-plus" class="icon"></i>
-            Leads
-        </a>
         <a href="index.html" class="nav-link">
             <i data-lucide="layout-dashboard" class="icon"></i>
             Dashboard
+        </a>
+        <a href="leads.html" class="nav-link">
+            <i data-lucide="user-plus" class="icon"></i>
+            Leads
         </a>
         <a href="team-management.html" class="nav-link">
             <i data-lucide="users" class="icon"></i>
@@ -331,7 +331,7 @@
         
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication
-            const userData = localStorage.getItem('user');
+            const userData = localStorage.getItem('syncedup_user');
             if (userData) {
                 currentUser = JSON.parse(userData);
                 
