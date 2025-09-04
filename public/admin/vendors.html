@@ -211,50 +211,60 @@
     </div>
     
     <!-- Add Vendor Modal -->
-    <div id="addVendorModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h3><i data-lucide="plus-circle"></i> Add New Vendor</h3>
-            <div class="form-group">
-                <label for="vendorName">Vendor Name</label>
-                <input type="text" id="vendorName" placeholder="e.g., QuoteWizard" required>
+    <div id="addVendorModal" class="modal" style="display: none;">
+        <div class="modal-content glass-morphism" style="width: 90%; max-width: 600px; padding: 2rem; border-radius: 20px; position: relative;">
+            <span class="close" onclick="closeModal()" style="position: absolute; top: 1rem; right: 1.5rem; font-size: 2rem; color: rgba(255,255,255,0.7); cursor: pointer; z-index: 1001; transition: color 0.3s ease;" onmouseover="this.style.color='rgba(255,255,255,1)'" onmouseout="this.style.color='rgba(255,255,255,0.7)'">&times;</span>
+            <h3 style="margin-bottom: 1.5rem; color: rgba(255,255,255,0.95); font-size: 1.5rem;"><i data-lucide="plus-circle"></i> Add New Vendor</h3>
+            <style>
+                #addVendorModal input::placeholder,
+                #addVendorModal textarea::placeholder {
+                    color: rgba(255,255,255,0.5);
+                }
+                #addVendorModal select option {
+                    background: #2d1b69;
+                    color: white;
+                }
+            </style>
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label for="vendorName" style="display: block; margin-bottom: 0.5rem; color: rgba(255,255,255,0.9); font-weight: 500;">Vendor Name</label>
+                <input type="text" id="vendorName" placeholder="e.g., QuoteWizard" required style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem; outline: none;" onblur="this.style.borderColor='rgba(255,255,255,0.2)'" onfocus="this.style.borderColor='rgba(168,85,247,0.8)'">
             </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="vendorType">Vendor Type</label>
-                    <select id="vendorType" required>
-                        <option value="lead_aggregator">Lead Aggregator</option>
-                        <option value="direct_publisher">Direct Publisher</option>
-                        <option value="affiliate_network">Affiliate Network</option>
-                        <option value="comparison_site">Comparison Site</option>
+            <div class="form-row" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                <div class="form-group" style="flex: 1;">
+                    <label for="vendorType" style="display: block; margin-bottom: 0.5rem; color: rgba(255,255,255,0.9); font-weight: 500;">Vendor Type</label>
+                    <select id="vendorType" required style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem;">
+                        <option value="lead_aggregator" style="background: #2d1b69; color: white;">Lead Aggregator</option>
+                        <option value="direct_publisher" style="background: #2d1b69; color: white;">Direct Publisher</option>
+                        <option value="affiliate_network" style="background: #2d1b69; color: white;">Affiliate Network</option>
+                        <option value="comparison_site" style="background: #2d1b69; color: white;">Comparison Site</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="vendorPriority">Priority Level</label>
-                    <select id="vendorPriority">
-                        <option value="high">High</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="low">Low</option>
+                <div class="form-group" style="flex: 1;">
+                    <label for="vendorPriority" style="display: block; margin-bottom: 0.5rem; color: rgba(255,255,255,0.9); font-weight: 500;">Priority Level</label>
+                    <select id="vendorPriority" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem;">
+                        <option value="high" style="background: #2d1b69; color: white;">High</option>
+                        <option value="medium" selected style="background: #2d1b69; color: white;">Medium</option>
+                        <option value="low" style="background: #2d1b69; color: white;">Low</option>
                     </select>
                 </div>
             </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="costPerLead">Cost Per Lead ($)</label>
-                    <input type="number" id="costPerLead" step="0.01" placeholder="25.00" required>
+            <div class="form-row" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                <div class="form-group" style="flex: 1;">
+                    <label for="costPerLead" style="display: block; margin-bottom: 0.5rem; color: rgba(255,255,255,0.9); font-weight: 500;">Cost Per Lead ($)</label>
+                    <input type="number" id="costPerLead" step="0.01" placeholder="25.00" required style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem; outline: none;" onblur="this.style.borderColor='rgba(255,255,255,0.2)'" onfocus="this.style.borderColor='rgba(168,85,247,0.8)'">
                 </div>
-                <div class="form-group">
-                    <label for="monthlyBudget">Monthly Budget ($)</label>
-                    <input type="number" id="monthlyBudget" step="0.01" placeholder="5000.00">
+                <div class="form-group" style="flex: 1;">
+                    <label for="monthlyBudget" style="display: block; margin-bottom: 0.5rem; color: rgba(255,255,255,0.9); font-weight: 500;">Monthly Budget ($)</label>
+                    <input type="number" id="monthlyBudget" step="0.01" placeholder="5000.00" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem; outline: none;" onblur="this.style.borderColor='rgba(255,255,255,0.2)'" onfocus="this.style.borderColor='rgba(168,85,247,0.8)'">
                 </div>
             </div>
-            <div class="form-group">
-                <label for="vendorContact">Contact Information</label>
-                <textarea id="vendorContact" rows="3" placeholder="Contact name, email, phone..."></textarea>
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label for="vendorContact" style="display: block; margin-bottom: 0.5rem; color: rgba(255,255,255,0.9); font-weight: 500;">Contact Information</label>
+                <textarea id="vendorContact" rows="3" placeholder="Contact name, email, phone..." style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem; resize: vertical; outline: none;" onblur="this.style.borderColor='rgba(255,255,255,0.2)'" onfocus="this.style.borderColor='rgba(168,85,247,0.8)'"></textarea>
             </div>
-            <div class="form-group">
-                <label for="vendorNotes">Notes</label>
-                <textarea id="vendorNotes" rows="2" placeholder="Additional notes about this vendor..."></textarea>
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label for="vendorNotes" style="display: block; margin-bottom: 0.5rem; color: rgba(255,255,255,0.9); font-weight: 500;">Notes</label>
+                <textarea id="vendorNotes" rows="2" placeholder="Additional notes about this vendor..." style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem; resize: vertical; outline: none;" onblur="this.style.borderColor='rgba(255,255,255,0.2)'" onfocus="this.style.borderColor='rgba(168,85,247,0.8)'"></textarea>
             </div>
             <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
                 <button class="btn btn-success" onclick="saveVendor()">
@@ -502,7 +512,11 @@
         }
         
         function addVendor() {
-            document.getElementById('addVendorModal').style.display = 'block';
+            document.getElementById('addVendorModal').style.display = 'flex';
+            // Re-initialize icons
+            if (typeof lucide !== 'undefined') {
+                setTimeout(() => lucide.createIcons(), 100);
+            }
         }
         
         function closeModal() {
