@@ -167,7 +167,7 @@ async function createAgency(req, res) {
         const is_active = status === 'active';
         const monthly_revenue = status === 'trial' ? 0 : (planPricing[plan_type] || 0);
 
-        // Create agency data that matches existing database schema
+        // Create agency data that matches the improved database schema
         const newAgency = {
             name: name.trim(),
             code: agencyCode,
@@ -186,7 +186,18 @@ async function createAgency(req, res) {
             settings: {
                 plan_type: plan_type,
                 status: status,
-                monthly_revenue: monthly_revenue
+                monthly_revenue: monthly_revenue,
+                features: {
+                    api_access: plan_type === 'enterprise',
+                    csv_upload: true,
+                    advanced_reporting: plan_type !== 'basic',
+                    white_labeling: plan_type === 'enterprise'
+                },
+                billing: {
+                    cycle: 'monthly',
+                    auto_renewal: true,
+                    next_billing_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+                }
             },
             commission_structure: {
                 rate: 80,

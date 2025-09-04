@@ -29,7 +29,14 @@
       "Bash(git add:*)",
       "Bash(npm run dev:*)",
       "Bash(npm run:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(NEXT_PUBLIC_SUPABASE_URL=\"https://zgkszwkxibpnxhvlenct.supabase.co\" SUPABASE_SERVICE_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpna3N6d2t4aWJwbnhodmxlbmN0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjMxOTc5MywiZXhwIjoyMDcxODk1NzkzfQ.Cy15WKK89KKa4SrwwD-0Wpkyu6PK_VMx0Wc-_xmsoCI\" node test-agency-schema.js)",
+      "Bash(NEXT_PUBLIC_SUPABASE_URL=\"https://zgkszwkxibpnxhvlenct.supabase.co\" SUPABASE_SERVICE_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpna3N6d2t4aWJwbnhodmxlbmN0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjMxOTc5MywiZXhwIjoyMDcxODk1NzkzfQ.Cy15WKK89KKa4SrwwD-0Wpkyu6PK_VMx0Wc-_xmsoCI\" node analyze-database-schema.js)",
+      "Bash(NEXT_PUBLIC_SUPABASE_URL=\"https://zgkszwkxibpnxhvlenct.supabase.co\" SUPABASE_SERVICE_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpna3N6d2t4aWJwbnhodmxlbmN0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjMxOTc5MywiZXhwIjoyMDcxODk1NzkzfQ.Cy15WKK89KKa4SrwwD-0Wpkyu6PK_VMx0Wc-_xmsoCI\" node database-inventory.js)",
+      "Bash(NEXT_PUBLIC_SUPABASE_URL=\"https://zgkszwkxibpnxhvlenct.supabase.co\" SUPABASE_SERVICE_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpna3N6d2t4aWJwbnhodmxlbmN0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjMxOTc5MywiZXhwIjoyMDcxODk1NzkzfQ.Cy15WKK89KKa4SrwwD-0Wpkyu6PK_VMx0Wc-_xmsoCI\" node create-tables-step-by-step.js)",
+      "Bash(NEXT_PUBLIC_SUPABASE_URL=\"https://zgkszwkxibpnxhvlenct.supabase.co\" SUPABASE_SERVICE_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpna3N6d2t4aWJwbnhodmxlbmN0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjMxOTc5MywiZXhwIjoyMDcxODk1NzkzfQ.Cy15WKK89KKa4SrwwD-0Wpkyu6PK_VMx0Wc-_xmsoCI\" node create-tables-rpc.js)",
+      "Bash(NEXT_PUBLIC_SUPABASE_URL=\"https://zgkszwkxibpnxhvlenct.supabase.co\" SUPABASE_SERVICE_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpna3N6d2t4aWJwbnhodmxlbmN0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjMxOTc5MywiZXhwIjoyMDcxODk1NzkzfQ.Cy15WKK89KKa4SrwwD-0Wpkyu6PK_VMx0Wc-_xmsoCI\" node fix-agency-settings.js)",
+      "Bash(NEXT_PUBLIC_SUPABASE_URL=\"https://zgkszwkxibpnxhvlenct.supabase.co\" SUPABASE_SERVICE_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpna3N6d2t4aWJwbnhodmxlbmN0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjMxOTc5MywiZXhwIjoyMDcxODk1NzkzfQ.Cy15WKK89KKa4SrwwD-0Wpkyu6PK_VMx0Wc-_xmsoCI\" node test-agency-creation-fixed.js)"
     ],
     "deny": [],
     "ask": []
