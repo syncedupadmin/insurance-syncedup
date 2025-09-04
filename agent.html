@@ -581,32 +581,7 @@
                     </thead>
                     <tbody id="recentSalesTable">
                         <tr>
-                            <td>2024-12-28</td>
-                            <td>John Smith</td>
-                            <td>Auto Insurance</td>
-                            <td>$1,245</td>
-                            <td><span class="status completed">Completed</span></td>
-                        </tr>
-                        <tr>
-                            <td>2024-12-27</td>
-                            <td>Sarah Johnson</td>
-                            <td>Home Insurance</td>
-                            <td>$892</td>
-                            <td><span class="status pending">Pending</span></td>
-                        </tr>
-                        <tr>
-                            <td>2024-12-26</td>
-                            <td>Mike Wilson</td>
-                            <td>Life Insurance</td>
-                            <td>$2,340</td>
-                            <td><span class="status completed">Completed</span></td>
-                        </tr>
-                        <tr>
-                            <td>2024-12-25</td>
-                            <td>Emily Davis</td>
-                            <td>Auto Insurance</td>
-                            <td>$756</td>
-                            <td><span class="status cancelled">Cancelled</span></td>
+                            <td colspan="5" style="text-align: center; color: #666; padding: 2rem;">No sales data available</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1080,11 +1055,8 @@
         function exportPayroll() {
             // This would typically generate a CSV or PDF export
             const csvData = [
-                ['Date', 'Policy Type', 'Premium', 'Commission Rate', 'Commission Amount'],
-                ['2024-12-28', 'Auto Insurance', '$1,245', '5%', '$62.25'],
-                ['2024-12-27', 'Home Insurance', '$892', '7%', '$62.44'],
-                ['2024-12-26', 'Life Insurance', '$2,340', '10%', '$234.00'],
-                ['2024-12-25', 'Auto Insurance', '$756', '5%', '$37.80']
+                ['Date', 'Policy Type', 'Premium', 'Commission Rate', 'Commission Amount']
+                // No hardcoded data - will be populated from API
             ];
 
             let csvContent = "data:text/csv;charset=utf-8,";

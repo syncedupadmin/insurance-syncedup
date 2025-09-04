@@ -1,41 +1,23 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx vercel:*)",
-      "Bash(cat:*)",
-      "Bash(npm install:*)",
-      "Bash(vercel:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(mkdir:*)",
-      "WebFetch(domain:syncedup-insurance-demo-kbno0t75i-nicks-projects-f40381ea.vercel.app)",
-      "Bash(git restore:*)",
-      "Bash(curl:*)",
-      "Bash(rm:*)",
-      "Read(C:\\c\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app/**)",
-      "Read(C:\\c\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app/**)",
-      "Bash(cp:*)",
-      "Read(C:\\c\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app/**)",
-      "Bash(tree:*)",
-      "Bash(grep:*)",
-      "Bash(npx tailwindcss:*)",
-      "Read(C:\\Users\\nicho\\Projects\\syncedup-insurance\\frontend/**)",
-      "Read(C:\\Users\\nicho\\Projects\\syncedup-insurance\\backend/**)",
-      "Read(\\c\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public/**)",
-      "Bash(sed:*)",
-      "WebFetch(domain:insurance.syncedupsolutions.com)",
-      "Bash(notepad:*)",
-      "Bash(dir api)",
-      "Bash(dir public)",
-      "Bash(dir:*)",
-<<<<<<< Updated upstream
-      "Bash(git push:*)",
-      "Bash(git rm:*)",
-      "Bash(node:*)"
-=======
-      "Bash(git pull:*)",
-      "Bash(git stash:*)"
->>>>>>> Stashed changes
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\agent/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\admin/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\admin/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\agent/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\admin/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\admin/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\admin/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\admin/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\admin/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\admin/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\admin/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\agent/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\agent/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\agent/**)",
+      "Bash(vercel:*)"
     ],
     "deny": [],
     "ask": []
