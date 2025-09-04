@@ -174,52 +174,61 @@
             document.getElementById('resetMessage').classList.add('hidden');
         }
 
-        // Login form handler - Use demo authentication system
+        // Production login form handler
         document.getElementById('loginFormElement').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const errorDiv = document.getElementById('errorMessage');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
             
-            // Demo users for authentication
-            const demoUsers = {
-                "agent@demo.com": {"id":"u-agent-demo","email":"agent@demo.com","firstName":"Demo","lastName":"Agent","role":"agent","agencyId":"DEMO001","isDemoAccount":true},
-                "manager@demo.com": {"id":"u-manager-demo","email":"manager@demo.com","firstName":"Demo","lastName":"Manager","role":"manager","agencyId":"DEMO001","isDemoAccount":true},
-                "admin@demo.com": {"id":"u-admin-demo","email":"admin@demo.com","firstName":"Demo","lastName":"Admin","role":"admin","agencyId":"DEMO001","isDemoAccount":true},
-                "customerservice@demo.com": {"id":"u-cs-demo","email":"customerservice@demo.com","firstName":"Demo","lastName":"CS","role":"customer-service","agencyId":"DEMO001","isDemoAccount":true},
-                "admin@syncedupsolutions.com": {"id":"u-sa-demo","email":"admin@syncedupsolutions.com","firstName":"Super","lastName":"Admin","role":"super-admin","agencyId":"DEMO001","isDemoAccount":true}
-            };
+            // Disable submit button and show loading
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Signing In...';
             
             try {
-                // Check if user exists in demo users
-                const user = demoUsers[email.toLowerCase()];
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
                 
-                if (user && password === 'demo') {
-                    // Simulate successful login
-                    sessionStorage.setItem('syncedup:user', JSON.stringify(user));
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Store user session
+                    sessionStorage.setItem('syncedup:user', JSON.stringify(data.user));
+                    if (data.token) {
+                        sessionStorage.setItem('syncedup:token', data.token);
+                    }
                     
                     // Redirect based on role and email
                     if (email.toLowerCase() === 'admin@syncedupsolutions.com') {
-                        window.location.href = 'https://insurance.syncedupsolutions.com/super-admin/';
-                    } else if (user.role === 'customer-service') {
-                        window.location.href = 'https://insurance.syncedupsolutions.com/customer-service/';
-                    } else if (user.role === 'admin') {
-                        window.location.href = 'https://insurance.syncedupsolutions.com/admin/';
-                    } else if (user.role === 'manager') {
-                        window.location.href = 'https://insurance.syncedupsolutions.com/manager/';
+                        window.location.href = '/super-admin/';
+                    } else if (data.user.role === 'customer-service') {
+                        window.location.href = '/customer-service/';
+                    } else if (data.user.role === 'admin') {
+                        window.location.href = '/admin/';
+                    } else if (data.user.role === 'manager') {
+                        window.location.href = '/manager/';
                     } else {
-                        window.location.href = 'https://insurance.syncedupsolutions.com/agent/';
+                        window.location.href = '/agent/';
                     }
                 } else {
-                    errorDiv.textContent = 'Invalid credentials. Use demo accounts: agent@demo.com, manager@demo.com, admin@demo.com, customerservice@demo.com, or admin@syncedupsolutions.com with password "demo"';
+                    errorDiv.textContent = data.error || 'Invalid email or password';
                     errorDiv.classList.remove('hidden');
-                    setTimeout(() => errorDiv.classList.add('hidden'), 8000);
+                    setTimeout(() => errorDiv.classList.add('hidden'), 5000);
                 }
             } catch (error) {
-                errorDiv.textContent = 'Login failed. Please try again.';
+                console.error('Login error:', error);
+                errorDiv.textContent = 'Unable to sign in. Please try again.';
                 errorDiv.classList.remove('hidden');
                 setTimeout(() => errorDiv.classList.add('hidden'), 5000);
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Sign In <i class="fas fa-arrow-right ml-2"></i>';
             }
         });
 
