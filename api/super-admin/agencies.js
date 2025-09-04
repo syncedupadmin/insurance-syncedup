@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -152,8 +153,8 @@ async function createAgency(req, res) {
             });
         }
 
-        // Generate unique agency ID
-        const agency_id = await generateAgencyId(name);
+        // Generate unique agency code
+        const agencyCode = await generateAgencyId(name);
 
         // Calculate initial monthly revenue based on plan
         const planPricing = {
@@ -162,21 +163,39 @@ async function createAgency(req, res) {
             enterprise: 399
         };
 
+        // Map status to is_active boolean
+        const is_active = status === 'active';
         const monthly_revenue = status === 'trial' ? 0 : (planPricing[plan_type] || 0);
 
-        // Try to create agencies table if it doesn't exist
+        // Create agency data that matches existing database schema
         const newAgency = {
             name: name.trim(),
-            agency_id,
-            contact_email: contact_email.trim().toLowerCase(),
-            plan_type,
-            status,
-            monthly_revenue,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            code: agencyCode,
+            admin_email: contact_email.trim().toLowerCase(),
+            is_active,
+            commission_split: 20, // Default commission split
+            pay_period: 'monthly',
+            pay_day: 1,
+            is_demo: false,
+            participate_global_leaderboard: false,
+            api_credentials: {},
+            features: {
+                api_access: false,
+                csv_upload: true
+            },
+            settings: {
+                plan_type: plan_type,
+                status: status,
+                monthly_revenue: monthly_revenue
+            },
+            commission_structure: {
+                rate: 80,
+                type: 'percentage',
+                tiers: []
+            }
         };
 
-        // Try to insert into agencies table
+        // Insert into agencies table
         let { data: agency, error } = await supabase
             .from('agencies')
             .insert([newAgency])
@@ -184,21 +203,27 @@ async function createAgency(req, res) {
             .single();
 
         if (error) {
-            console.log('Agencies table might not exist, error:', error.message);
-            // Return the agency data as if it was created
-            agency = {
-                id: `agency_${Date.now()}`,
-                ...newAgency
-            };
+            console.error('Error creating agency in database:', error.message);
+            return res.status(400).json({ 
+                error: `Failed to create agency: ${error.message}` 
+            });
         }
+
+        // TODO: Create an admin user for the agency (disabled until we know the exact user table schema)
+        // const token = req.headers.authorization.substring(7);
+        // const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        // await createAgencyAdmin(agency, contact_email, decoded.id);
 
         return res.status(201).json({
             success: true,
             data: {
                 ...agency,
-                user_count: 0,
-                performance_score: 75.0,
-                last_active: 'Just created'
+                // Add computed fields for frontend compatibility
+                agency_id: agency.code,
+                contact_email: agency.admin_email,
+                plan_type: agency.settings?.plan_type || plan_type,
+                status: agency.settings?.status || (agency.is_active ? 'active' : 'trial'),
+                monthly_revenue: agency.settings?.monthly_revenue || 0
             }
         });
 
@@ -217,14 +242,31 @@ async function updateAgency(req, res) {
             return res.status(400).json({ error: 'Agency ID is required' });
         }
 
-        const updateData = {
-            updated_at: new Date().toISOString()
-        };
+        const updateData = {};
 
+        // Update fields that match the database schema
         if (name) updateData.name = name.trim();
-        if (contact_email) updateData.contact_email = contact_email.trim().toLowerCase();
-        if (plan_type) updateData.plan_type = plan_type;
-        if (status) updateData.status = status;
+        if (contact_email) updateData.admin_email = contact_email.trim().toLowerCase();
+        
+        // Handle status changes
+        if (status) {
+            updateData.is_active = (status === 'active');
+            
+            // Update settings object
+            const { data: currentAgency } = await supabase
+                .from('agencies')
+                .select('settings')
+                .eq('id', id)
+                .single();
+                
+            const currentSettings = currentAgency?.settings || {};
+            updateData.settings = {
+                ...currentSettings,
+                status: status,
+                plan_type: plan_type || currentSettings.plan_type,
+                monthly_revenue: status === 'trial' ? 0 : (currentSettings.monthly_revenue || 0)
+            };
+        }
 
         // Update monthly revenue if plan changes
         if (plan_type) {
@@ -233,7 +275,21 @@ async function updateAgency(req, res) {
                 professional: 199,
                 enterprise: 399
             };
-            updateData.monthly_revenue = status === 'trial' ? 0 : (planPricing[plan_type] || 0);
+            
+            const { data: currentAgency } = await supabase
+                .from('agencies')
+                .select('settings')
+                .eq('id', id)
+                .single();
+                
+            const currentSettings = currentAgency?.settings || {};
+            const monthly_revenue = status === 'trial' ? 0 : (planPricing[plan_type] || 0);
+            
+            updateData.settings = {
+                ...currentSettings,
+                plan_type: plan_type,
+                monthly_revenue: monthly_revenue
+            };
         }
 
         let { data: agency, error } = await supabase
@@ -244,20 +300,22 @@ async function updateAgency(req, res) {
             .single();
 
         if (error) {
-            console.log('Update error (agencies table might not exist):', error.message);
-            // Return mock success for demo
-            agency = {
-                id,
-                ...updateData,
-                performance_score: 80.0,
-                last_active: 'Just updated'
-            };
+            console.error('Update agency error:', error.message);
+            return res.status(400).json({ 
+                error: `Failed to update agency: ${error.message}` 
+            });
         }
 
         return res.status(200).json({
             success: true,
             data: {
                 ...agency,
+                // Add computed fields for frontend compatibility
+                agency_id: agency.code,
+                contact_email: agency.admin_email,
+                plan_type: agency.settings?.plan_type,
+                status: agency.settings?.status || (agency.is_active ? 'active' : 'suspended'),
+                monthly_revenue: agency.settings?.monthly_revenue || 0,
                 performance_score: calculatePerformanceScore(agency),
                 last_active: 'Just updated'
             }
@@ -346,4 +404,67 @@ function calculateLastActive(updatedAt) {
     if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
     
     return `${Math.floor(diffDays / 30)} months ago`;
+}
+
+// Create an admin user for the newly created agency
+async function createAgencyAdmin(agency, contactEmail, createdBySuperAdminId) {
+    try {
+        // bcrypt is already imported at the top
+        
+        // Generate a temporary password for the admin
+        const tempPassword = generateTemporaryPassword();
+        const hashedPassword = await bcrypt.hash(tempPassword, 12);
+        
+        // Extract first and last name from agency name (simple approach)
+        const nameParts = agency.name.split(' ');
+        const firstName = nameParts[0] || 'Admin';
+        const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : 'User';
+        
+        // Create admin user - only use columns that exist in the users table
+        const adminUser = {
+            email: contactEmail.toLowerCase(),
+            password: hashedPassword,
+            firstName: firstName,
+            lastName: lastName,
+            role: 'admin',
+            agency_id: agency.id,
+            isActive: true,
+            mustChangePassword: true,
+            loginCount: 0
+        };
+        
+        const { data: newAdmin, error } = await supabase
+            .from('users')
+            .insert([adminUser])
+            .select()
+            .single();
+            
+        if (error) {
+            console.error('Error creating agency admin user:', error.message);
+            // Don't fail the agency creation if admin creation fails
+            return null;
+        }
+        
+        console.log(`✅ Created admin user for agency ${agency.name}: ${contactEmail}`);
+        console.log(`🔑 Temporary password: ${tempPassword}`);
+        
+        // In a real system, you'd send this password via email
+        // For now, we'll just log it
+        
+        return newAdmin;
+        
+    } catch (error) {
+        console.error('Error in createAgencyAdmin:', error);
+        return null;
+    }
+}
+
+// Generate a temporary password for new admin users
+function generateTemporaryPassword() {
+    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+    let password = '';
+    for (let i = 0; i < 12; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
 }
