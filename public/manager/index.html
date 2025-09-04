@@ -159,7 +159,7 @@
                 currentUser = JSON.parse(userData);
                 
                 // Allow manager and super-admin roles to access this portal
-                if (currentUser.role !== 'manager' && currentUser.role !== 'admin') {
+                if (!['manager', 'admin', 'super-admin'].includes(currentUser.role)) {
                     // Redirect based on actual role
                     if (currentUser.role === 'agent') {
                         window.location.href = 'https://insurance.syncedupsolutions.com/agent/';

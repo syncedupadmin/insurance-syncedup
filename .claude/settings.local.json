@@ -17,7 +17,19 @@
       "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\agent/**)",
       "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\agent/**)",
       "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\agent/**)",
-      "Bash(vercel:*)"
+      "Bash(vercel:*)",
+      "Bash(npm config:*)",
+      "Bash(node:*)",
+      "Bash(npm install:*)",
+      "Bash(curl:*)",
+      "Read(/C:\\Users\\nicho\\OneDrive\\Pictures\\Screenshots 1/**)",
+      "Read(/C:\\Users\\nicho\\OneDrive\\Pictures\\Screenshots 1/**)",
+      "Bash(find:*)",
+      "Bash(rg:*)",
+      "Bash(git add:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm run:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []

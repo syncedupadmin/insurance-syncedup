@@ -210,7 +210,7 @@
             const userData = localStorage.getItem('syncedup_user');
             if (userData) {
                 currentUser = JSON.parse(userData);
-                if (!['admin', 'manager'].includes(currentUser.role)) {
+                if (!['admin', 'manager', 'super-admin'].includes(currentUser.role)) {
                     window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
                     return;
                 }

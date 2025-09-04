@@ -202,7 +202,7 @@
                 return false;
             }
 
-            if (!['agent', 'manager', 'admin', 'customer-service'].includes(user.role)) {
+            if (!['agent', 'manager', 'admin', 'customer-service', 'super-admin'].includes(user.role)) {
                 alert('Access denied. Valid account required to view leaderboard.');
                 window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
                 return false;
