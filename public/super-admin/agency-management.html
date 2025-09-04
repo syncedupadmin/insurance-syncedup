@@ -405,9 +405,14 @@
                 });
                 
                 if (response.ok) {
-                    const data = await response.json();
-                    currentAgencies = data.agencies || getFallbackAgencies();
-                    totalPages = data.totalPages || 1;
+                    const result = await response.json();
+                    if (result.success) {
+                        currentAgencies = result.data || getFallbackAgencies();
+                        totalPages = result.pagination?.totalPages || 1;
+                    } else {
+                        currentAgencies = getFallbackAgencies();
+                        totalPages = 1;
+                    }
                 } else {
                     currentAgencies = getFallbackAgencies();
                     totalPages = 1;
@@ -462,34 +467,41 @@
             
             currentAgencies.forEach(agency => {
                 const row = document.createElement('tr');
+                const agencyId = agency.agency_id || agency.id;
+                const planType = agency.plan_type || agency.plan || 'basic';
+                const monthlyRevenue = agency.monthly_revenue || agency.monthlyRevenue || 0;
+                const userCount = agency.user_count || agency.users || 0;
+                const performance = agency.performance_score || agency.performance || 0;
+                const lastActive = agency.last_active || agency.lastActive || 'Unknown';
+                
                 row.innerHTML = `
                     <td><input type="checkbox" class="agency-checkbox" value="${agency.id}"></td>
                     <td>
                         <div style="font-weight: 600; color: var(--text-primary);">${agency.name}</div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted);">ID: ${agency.id}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">ID: ${agencyId}</div>
                     </td>
                     <td><span class="status-badge status-${getStatusClass(agency.status)}">${agency.status}</span></td>
-                    <td><span style="text-transform: capitalize;">${agency.plan}</span></td>
-                    <td style="color: var(--accent-gold); font-weight: 600;">$${agency.monthlyRevenue.toLocaleString()}</td>
-                    <td>${agency.users}</td>
+                    <td><span style="text-transform: capitalize;">${planType}</span></td>
+                    <td style="color: var(--accent-gold); font-weight: 600;">$${monthlyRevenue.toLocaleString()}</td>
+                    <td>${userCount}</td>
                     <td>
                         <div style="display: flex; align-items: center; gap: 0.5rem;">
                             <div style="width: 60px; height: 6px; background: var(--bg-elevated); border-radius: 3px; overflow: hidden;">
-                                <div style="width: ${agency.performance}%; height: 100%; background: ${getPerformanceColor(agency.performance)};"></div>
+                                <div style="width: ${performance}%; height: 100%; background: ${getPerformanceColor(performance)};"></div>
                             </div>
-                            <span style="font-size: 0.9rem;">${agency.performance.toFixed(1)}%</span>
+                            <span style="font-size: 0.9rem;">${performance.toFixed(1)}%</span>
                         </div>
                     </td>
-                    <td style="color: var(--text-secondary);">${agency.lastActive}</td>
+                    <td style="color: var(--text-secondary);">${lastActive}</td>
                     <td>
                         <div style="display: flex; gap: 0.3rem;">
-                            <button class="btn" onclick="viewAgencyDetails(${agency.id})" title="View Details" style="padding: 0.5rem;">
+                            <button class="btn" onclick="viewAgencyDetails('${agency.id}')" title="View Details" style="padding: 0.5rem;">
                                 <i data-lucide="eye" style="width: 16px; height: 16px;"></i>
                             </button>
-                            <button class="btn" onclick="editAgency(${agency.id})" title="Edit" style="padding: 0.5rem;">
+                            <button class="btn" onclick="editAgency('${agency.id}')" title="Edit" style="padding: 0.5rem;">
                                 <i data-lucide="edit" style="width: 16px; height: 16px;"></i>
                             </button>
-                            <button class="btn ${agency.status === 'active' ? 'btn-warning' : 'btn-success'}" onclick="toggleAgencyStatus(${agency.id})" title="${agency.status === 'active' ? 'Suspend' : 'Activate'}" style="padding: 0.5rem;">
+                            <button class="btn ${agency.status === 'active' ? 'btn-warning' : 'btn-success'}" onclick="toggleAgencyStatus('${agency.id}')" title="${agency.status === 'active' ? 'Suspend' : 'Activate'}" style="padding: 0.5rem;">
                                 <i data-lucide="${agency.status === 'active' ? 'pause' : 'play'}" style="width: 16px; height: 16px;"></i>
                             </button>
                         </div>
@@ -590,8 +602,8 @@
             document.getElementById('agencySubmitText').textContent = 'Update Agency';
             
             document.getElementById('agencyName').value = agency.name;
-            document.getElementById('agencyEmail').value = agency.email || '';
-            document.getElementById('agencyPlan').value = agency.plan;
+            document.getElementById('agencyEmail').value = agency.contact_email || agency.email || '';
+            document.getElementById('agencyPlan').value = agency.plan_type || agency.plan || 'basic';
             document.getElementById('agencyStatus').value = agency.status;
             
             document.getElementById('agencyModal').style.display = 'flex';
@@ -608,24 +620,32 @@
 
             document.getElementById('agencyDetailsTitle').textContent = agency.name;
             
+            const agencyIdDisplay = agency.agency_id || agency.id;
+            const planType = agency.plan_type || agency.plan || 'basic';
+            const monthlyRevenue = agency.monthly_revenue || agency.monthlyRevenue || 0;
+            const userCount = agency.user_count || agency.users || 0;
+            const performance = agency.performance_score || agency.performance || 0;
+            const lastActive = agency.last_active || agency.lastActive || 'Unknown';
+            
             const detailsHtml = `
                 <div class="grid grid-2" style="gap: 1.5rem;">
                     <div>
                         <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Basic Information</h4>
                         <div style="background: var(--bg-elevated); padding: 1rem; border-radius: 8px;">
-                            <p><strong>Agency ID:</strong> ${agency.id}</p>
+                            <p><strong>Agency ID:</strong> ${agencyIdDisplay}</p>
+                            <p><strong>Contact Email:</strong> ${agency.contact_email || 'N/A'}</p>
                             <p><strong>Status:</strong> <span class="status-badge status-${getStatusClass(agency.status)}">${agency.status}</span></p>
-                            <p><strong>Plan:</strong> ${agency.plan}</p>
-                            <p><strong>Users:</strong> ${agency.users}</p>
-                            <p><strong>Last Active:</strong> ${agency.lastActive}</p>
+                            <p><strong>Plan:</strong> ${planType}</p>
+                            <p><strong>Users:</strong> ${userCount}</p>
+                            <p><strong>Last Active:</strong> ${lastActive}</p>
                         </div>
                     </div>
                     
                     <div>
                         <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Performance Metrics</h4>
                         <div style="background: var(--bg-elevated); padding: 1rem; border-radius: 8px;">
-                            <p><strong>Monthly Revenue:</strong> <span style="color: var(--accent-gold);">$${agency.monthlyRevenue.toLocaleString()}</span></p>
-                            <p><strong>Performance Score:</strong> ${agency.performance.toFixed(1)}%</p>
+                            <p><strong>Monthly Revenue:</strong> <span style="color: var(--accent-gold);">$${monthlyRevenue.toLocaleString()}</span></p>
+                            <p><strong>Performance Score:</strong> ${performance.toFixed(1)}%</p>
                             <p><strong>Growth Rate:</strong> +12.5%</p>
                             <p><strong>Customer Satisfaction:</strong> 4.7/5.0</p>
                         </div>
@@ -635,21 +655,25 @@
                 <div style="margin-top: 1.5rem;">
                     <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Quick Actions</h4>
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                        <button class="btn btn-primary" onclick="loginAsAgency(${agency.id})">
+                        <button class="btn btn-primary" onclick="loginAsAgency('${agency.id}')">
                             <i data-lucide="log-in"></i>
                             Login as Agency
                         </button>
-                        <button class="btn" onclick="viewAgencyReports(${agency.id})">
+                        <button class="btn" onclick="viewAgencyReports('${agency.id}')">
                             <i data-lucide="bar-chart-2"></i>
                             View Reports
                         </button>
-                        <button class="btn" onclick="contactAgency(${agency.id})">
+                        <button class="btn" onclick="contactAgency('${agency.id}')">
                             <i data-lucide="mail"></i>
                             Send Message
                         </button>
-                        <button class="btn ${agency.status === 'active' ? 'btn-warning' : 'btn-success'}" onclick="toggleAgencyStatus(${agency.id})">
+                        <button class="btn ${agency.status === 'active' ? 'btn-warning' : 'btn-success'}" onclick="toggleAgencyStatus('${agency.id}')">
                             <i data-lucide="${agency.status === 'active' ? 'pause' : 'play'}"></i>
                             ${agency.status === 'active' ? 'Suspend' : 'Activate'}
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteAgency('${agency.id}')" style="background: var(--error);">
+                            <i data-lucide="trash-2"></i>
+                            Delete Agency
                         </button>
                     </div>
                 </div>
@@ -665,21 +689,72 @@
         }
 
         // Agency actions
-        function toggleAgencyStatus(agencyId) {
+        async function toggleAgencyStatus(agencyId) {
             const agency = currentAgencies.find(a => a.id === agencyId);
             if (!agency) return;
 
             const newStatus = agency.status === 'active' ? 'suspended' : 'active';
             const confirmMessage = `Are you sure you want to ${newStatus === 'suspended' ? 'suspend' : 'activate'} ${agency.name}?`;
             
-            if (confirm(confirmMessage)) {
-                // Update locally for demo
-                agency.status = newStatus;
-                if (newStatus === 'suspended') {
-                    agency.monthlyRevenue = 0;
-                    agency.users = 0;
+            if (!confirm(confirmMessage)) return;
+
+            try {
+                const response = await fetch(`/api/super-admin/agencies?id=${agencyId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        agency.status = newStatus;
+                        renderAgenciesTable();
+                    } else {
+                        alert(`Failed to ${newStatus === 'suspended' ? 'suspend' : 'activate'} agency: ` + result.error);
+                    }
+                } else {
+                    alert(`Failed to ${newStatus === 'suspended' ? 'suspend' : 'activate'} agency`);
                 }
-                renderAgenciesTable();
+            } catch (error) {
+                console.error('Error updating agency status:', error);
+                alert('Error updating agency status: ' + error.message);
+            }
+        }
+
+        async function deleteAgency(agencyId) {
+            const agency = currentAgencies.find(a => a.id === agencyId);
+            if (!agency) return;
+
+            const confirmMessage = `Are you sure you want to DELETE ${agency.name}? This action cannot be undone.`;
+            
+            if (!confirm(confirmMessage)) return;
+
+            try {
+                const response = await fetch(`/api/super-admin/agencies?id=${agencyId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        closeAgencyDetailsModal();
+                        loadAgencies();
+                    } else {
+                        alert('Failed to delete agency: ' + result.error);
+                    }
+                } else {
+                    alert('Failed to delete agency');
+                }
+            } catch (error) {
+                console.error('Error deleting agency:', error);
+                alert('Error deleting agency: ' + error.message);
             }
         }
 
@@ -786,38 +861,84 @@
         }
 
         // Form submission
-        document.getElementById('agencyForm').addEventListener('submit', (e) => {
+        document.getElementById('agencyForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const formData = {
-                name: document.getElementById('agencyName').value,
-                email: document.getElementById('agencyEmail').value,
-                plan: document.getElementById('agencyPlan').value,
-                status: document.getElementById('agencyStatus').value
-            };
-            
-            if (editingAgencyId) {
-                // Update existing agency
-                const agency = currentAgencies.find(a => a.id === editingAgencyId);
-                if (agency) {
-                    Object.assign(agency, formData);
-                    renderAgenciesTable();
-                }
-            } else {
-                // Add new agency
-                const newAgency = {
-                    id: Math.max(...currentAgencies.map(a => a.id)) + 1,
-                    ...formData,
-                    monthlyRevenue: formData.status === 'trial' ? 0 : 99,
-                    users: 1,
-                    performance: 75.0,
-                    lastActive: 'Just now'
+            const submitButton = document.querySelector('#agencyForm button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            submitButton.innerHTML = '<i data-lucide="loader" style="animation: spin 1s linear infinite;"></i> Saving...';
+            submitButton.disabled = true;
+
+            try {
+                const formData = {
+                    name: document.getElementById('agencyName').value,
+                    contact_email: document.getElementById('agencyEmail').value,
+                    plan_type: document.getElementById('agencyPlan').value,
+                    status: document.getElementById('agencyStatus').value
                 };
-                currentAgencies.unshift(newAgency);
+
+                const token = localStorage.getItem('syncedup_token');
+                if (!token) {
+                    throw new Error('No authentication token found');
+                }
+
+                if (editingAgencyId) {
+                    // Update existing agency
+                    const response = await fetch(`/api/super-admin/agencies?id=${editingAgencyId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const result = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(result.error || 'Failed to update agency');
+                    }
+
+                    // Update the agency in current list
+                    const agencyIndex = currentAgencies.findIndex(a => a.id === editingAgencyId);
+                    if (agencyIndex !== -1) {
+                        currentAgencies[agencyIndex] = result.data;
+                    }
+
+                    alert('Agency updated successfully!');
+                } else {
+                    // Add new agency
+                    const response = await fetch('/api/super-admin/agencies', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const result = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(result.error || 'Failed to create agency');
+                    }
+
+                    // Add the new agency to the list
+                    currentAgencies.unshift(result.data);
+                    alert('Agency created successfully!');
+                }
+
                 renderAgenciesTable();
+                closeAgencyModal();
+                updateOverviewStats();
+
+            } catch (error) {
+                console.error('Form submission error:', error);
+                alert('Error: ' + error.message);
+            } finally {
+                submitButton.innerHTML = originalText;
+                submitButton.disabled = false;
             }
-            
-            closeAgencyModal();
         });
 
         // Handle clicks outside modals to close them
