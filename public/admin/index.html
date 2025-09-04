@@ -476,31 +476,31 @@
                 const [dashboardResponse, analyticsResponse, userStatsResponse, commissionStatsResponse, apiKeysResponse] = await Promise.all([
                     fetch('/api/manager/dashboard', {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token') || 'mock-token'}`,
+                            'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
                             'Content-Type': 'application/json'
                         }
                     }),
                     fetch('/api/admin/analytics?analytics_type=overview', {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token') || 'mock-token'}`,
+                            'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
                             'Content-Type': 'application/json'
                         }
                     }),
                     fetch('/api/admin/user-management', {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token') || 'mock-token'}`,
+                            'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
                             'Content-Type': 'application/json'
                         }
                     }),
                     fetch('/api/admin/commission-settings', {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token') || 'mock-token'}`,
+                            'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
                             'Content-Type': 'application/json'
                         }
                     }),
                     fetch('/api/admin/api-keys', {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token') || 'mock-token'}`,
+                            'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
                             'Content-Type': 'application/json'
                         }
                     })

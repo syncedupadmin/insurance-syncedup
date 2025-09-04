@@ -190,72 +190,8 @@
         let currentUser = null;
         let teamData = [];
         
-        // Mock team data
-        const mockTeamData = [
-            {
-                id: 'AGENT001',
-                name: 'John Smith',
-                email: 'john.smith@agency.com',
-                phone: '(555) 123-4567',
-                hireDate: '2024-01-15',
-                status: 'active',
-                salesThisMonth: 8,
-                premiumThisMonth: 2712,
-                lastActivity: '2025-08-30 14:30'
-            },
-            {
-                id: 'AGENT002',
-                name: 'Jane Doe',
-                email: 'jane.doe@agency.com',
-                phone: '(555) 234-5678',
-                hireDate: '2023-11-20',
-                status: 'active',
-                salesThisMonth: 12,
-                premiumThisMonth: 3845,
-                lastActivity: '2025-08-30 16:15'
-            },
-            {
-                id: 'AGENT003',
-                name: 'Mike Johnson',
-                email: 'mike.johnson@agency.com',
-                phone: '(555) 345-6789',
-                hireDate: '2024-03-10',
-                status: 'active',
-                salesThisMonth: 5,
-                premiumThisMonth: 1680,
-                lastActivity: '2025-08-29 11:45'
-            },
-            {
-                id: 'AGENT004',
-                name: 'Sarah Wilson',
-                email: 'sarah.wilson@agency.com',
-                phone: '(555) 456-7890',
-                hireDate: '2024-07-01',
-                status: 'inactive',
-                salesThisMonth: 0,
-                premiumThisMonth: 0,
-                lastActivity: '2025-08-25 09:20'
-            },
-            {
-                id: 'AGENT005',
-                name: 'David Brown',
-                email: 'david.brown@agency.com',
-                phone: '(555) 567-8901',
-                hireDate: '2023-09-15',
-                status: 'active',
-                salesThisMonth: 15,
-                premiumThisMonth: 4950,
-                lastActivity: '2025-08-30 17:00'
-            }
-        ];
-        
-        const recentActivity = [
-            { time: '5:00 PM', agent: 'David Brown', activity: 'Completed sale', details: 'Health Plan C - $355' },
-            { time: '4:30 PM', agent: 'Jane Doe', activity: 'Lead follow-up', details: 'Called prospect - scheduled appointment' },
-            { time: '2:15 PM', agent: 'John Smith', activity: 'Updated profile', details: 'Changed phone number' },
-            { time: '1:45 PM', agent: 'Mike Johnson', activity: 'Quote sent', details: 'Health Plan A to Bob Wilson' },
-            { time: '11:30 AM', agent: 'Jane Doe', activity: 'Training completed', details: 'Product Knowledge Module 3' }
-        ];
+        // Team data will be loaded from API - no fake data
+        let recentActivity = [];
         
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication
@@ -294,14 +230,14 @@
                 
                 if (response.ok) {
                     const data = await response.json();
-                    teamData = data.agents || mockTeamData;
+                    teamData = data.agents || [];
                     console.log('Team data loaded from API');
                 } else {
                     throw new Error('API not available');
                 }
             } catch (error) {
                 console.log('Using mock data:', error);
-                teamData = mockTeamData;
+                teamData = [];
             }
             
             displayTeamStats();

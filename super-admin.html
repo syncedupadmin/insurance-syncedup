@@ -71,6 +71,43 @@
             </div>
         </div>
 
+        <!-- Demo Login Shortcuts -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2>Demo Account Login Shortcuts</h2>
+                <span style="color: #718096; font-size: 0.9rem;">Quick access for testing different user roles</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                <button class="btn" onclick="loginAsDemo('agent@demo.com', 'agent')" style="background: #48bb78; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    👤 Agent Demo
+                </button>
+                <button class="btn" onclick="loginAsDemo('manager@demo.com', 'manager')" style="background: #ed8936; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    📊 Manager Demo
+                </button>
+                <button class="btn" onclick="loginAsDemo('admin@demo.com', 'admin')" style="background: #667eea; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    ⚙️ Admin Demo
+                </button>
+                <button class="btn" onclick="loginAsDemo('customerservice@demo.com', 'customer_service')" style="background: #9f7aea; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    🎧 Support Demo
+                </button>
+                <button class="btn" onclick="loginAsDemo('superadmin@demo.com', 'super_admin')" style="background: #f56565; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    🔒 Super Admin Demo
+                </button>
+            </div>
+            <p style="color: #718096; font-size: 0.85rem; text-align: center;">All demo accounts use password: <strong>demo123!</strong> and are tied to DEMO001 agency with realistic test data.</p>
+            <div style="text-align: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e2e8f0;">
+                <div style="display: flex; gap: 1rem; justify-content: center; align-items: center; flex-wrap: wrap;">
+                    <button class="btn btn-warning" onclick="setupDemoData()" id="setupDemoBtn">
+                        🚀 Setup Demo Data & Accounts
+                    </button>
+                    <button class="btn btn-danger" onclick="confirmProductionCleanup()" id="cleanupBtn">
+                        🧹 Production Cleanup
+                    </button>
+                </div>
+                <p style="color: #718096; font-size: 0.8rem; margin-top: 0.5rem;">Setup creates demo data | Cleanup removes all non-demo data for production</p>
+            </div>
+        </div>
+
         <!-- Create Agency Form -->
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
@@ -531,6 +568,237 @@
             }
             if (event.target === resetModal) {
                 closeResetModal();
+            }
+        }
+
+        async function loginAsDemo(email, role) {
+            try {
+                // Clear current session
+                localStorage.clear();
+                
+                // Show loading state
+                const buttons = document.querySelectorAll('button[onclick*="loginAsDemo"]');
+                buttons.forEach(btn => {
+                    btn.disabled = true;
+                    btn.innerHTML = '⏳ Logging in...';
+                });
+                
+                // Call demo login endpoint
+                const response = await fetch('/api/super-admin/demo-login', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, role })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    // Store demo session data
+                    localStorage.setItem('token', result.token);
+                    localStorage.setItem('user', JSON.stringify(result.user));
+                    
+                    // Redirect to appropriate dashboard based on role
+                    const dashboardUrls = {
+                        'agent': '/agent.html',
+                        'manager': '/manager.html', 
+                        'admin': '/admin.html',
+                        'customer_service': '/customer-service.html',
+                        'super_admin': '/super-admin.html'
+                    };
+                    
+                    window.location.href = dashboardUrls[role] || '/dashboard.html';
+                } else {
+                    alert(`Demo login failed: ${result.error || 'Unknown error'}`);
+                    // Restore buttons
+                    restoreDemoButtons();
+                }
+                
+            } catch (error) {
+                console.error('Demo login error:', error);
+                alert('Demo login failed. Please try again.');
+                restoreDemoButtons();
+            }
+        }
+        
+        function restoreDemoButtons() {
+            const buttonConfigs = [
+                { selector: 'agent@demo.com', text: '👤 Agent Demo', bg: '#48bb78' },
+                { selector: 'manager@demo.com', text: '📊 Manager Demo', bg: '#ed8936' },
+                { selector: 'admin@demo.com', text: '⚙️ Admin Demo', bg: '#667eea' },
+                { selector: 'customerservice@demo.com', text: '🎧 Support Demo', bg: '#9f7aea' },
+                { selector: 'superadmin@demo.com', text: '🔒 Super Admin Demo', bg: '#f56565' }
+            ];
+            
+            buttonConfigs.forEach(config => {
+                const button = document.querySelector(`button[onclick*="${config.selector}"]`);
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = config.text;
+                    button.style.background = config.bg;
+                }
+            });
+        }
+        
+        async function confirmProductionCleanup() {
+            const confirmation = confirm(
+                '⚠️ PRODUCTION CLEANUP WARNING ⚠️\n\n' +
+                'This will permanently delete ALL non-demo data including:\n' +
+                '• All real user accounts (except @demo.com)\n' +
+                '• All production leads, commissions, and tickets\n' +
+                '• All real agency data (except DEMO001)\n\n' +
+                'This action CANNOT be undone!\n\n' +
+                'Have you completed a database backup?\n\n' +
+                'Click OK only if you are certain you want to proceed.'
+            );
+            
+            if (!confirmation) return;
+            
+            const backupConfirmed = confirm(
+                'FINAL CONFIRMATION:\n\n' +
+                '✅ Database backup completed?\n' +
+                '✅ Ready for production environment?\n' +
+                '✅ Understand this removes all real data?\n\n' +
+                'Type "CLEANUP" in the next dialog to proceed.'
+            );
+            
+            if (!backupConfirmed) return;
+            
+            const typeConfirm = prompt('Type "CLEANUP" to confirm production cleanup:');
+            if (typeConfirm !== 'CLEANUP') {
+                alert('Production cleanup cancelled - confirmation text did not match.');
+                return;
+            }
+            
+            await executeProductionCleanup();
+        }
+        
+        async function executeProductionCleanup() {
+            const cleanupBtn = document.getElementById('cleanupBtn');
+            const originalText = cleanupBtn.innerHTML;
+            
+            try {
+                // Show loading state
+                cleanupBtn.disabled = true;
+                cleanupBtn.innerHTML = '🧹 Cleaning Production...';
+                cleanupBtn.style.background = '#718096';
+                
+                const response = await fetch('/api/super-admin/production-cleanup', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        confirm_cleanup: true,
+                        backup_completed: true
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    cleanupBtn.innerHTML = '✅ Production Ready!';
+                    cleanupBtn.style.background = '#48bb78';
+                    
+                    // Show detailed results
+                    let message = `Production cleanup completed successfully!\n\n`;
+                    message += `🗑️ Demo users preserved: ${result.results.demo_users_preserved}\n`;
+                    message += `🧹 Leads cleaned: ${result.results.leads_cleaned}\n`;
+                    message += `💰 Commissions cleaned: ${result.results.commissions_cleaned}\n`;
+                    message += `🎫 Tickets cleaned: ${result.results.tickets_cleaned}\n`;
+                    message += `📊 Sales cleaned: ${result.results.sales_cleaned}\n`;
+                    message += `👥 Users cleaned: ${result.results.users_cleaned}\n`;
+                    message += `✅ Verification: ${result.results.verification_passed ? 'PASSED' : 'FAILED'}\n\n`;
+                    
+                    if (result.results.errors.length > 0) {
+                        message += `⚠️ Issues:\n${result.results.errors.join('\n')}\n\n`;
+                    }
+                    
+                    message += `Next Steps:\n${result.next_steps.join('\n')}`;
+                    
+                    alert(message);
+                    
+                    // Refresh agencies list
+                    await loadAgencies();
+                    
+                } else {
+                    throw new Error(result.error || 'Cleanup failed');
+                }
+                
+            } catch (error) {
+                console.error('Production cleanup error:', error);
+                cleanupBtn.innerHTML = '❌ Cleanup Failed';
+                cleanupBtn.style.background = '#f56565';
+                alert(`Production cleanup failed: ${error.message}\n\nPlease restore from backup and investigate.`);
+            } finally {
+                // Restore button after 5 seconds
+                setTimeout(() => {
+                    cleanupBtn.disabled = false;
+                    cleanupBtn.innerHTML = originalText;
+                    cleanupBtn.style.background = '#f56565';
+                }, 5000);
+            }
+        }
+
+        async function setupDemoData() {
+            const setupBtn = document.getElementById('setupDemoBtn');
+            const originalText = setupBtn.innerHTML;
+            
+            try {
+                // Show loading state
+                setupBtn.disabled = true;
+                setupBtn.innerHTML = '⏳ Setting up demo data...';
+                setupBtn.style.background = '#718096';
+                
+                const response = await fetch('/api/super-admin/setup-demo-data', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    setupBtn.innerHTML = '✅ Demo Data Setup Complete!';
+                    setupBtn.style.background = '#48bb78';
+                    
+                    // Show detailed results
+                    let message = `Demo setup completed successfully!\n\n`;
+                    message += `📊 Users created: ${result.results.users_created}\n`;
+                    message += `🎯 Leads created: ${result.results.leads_created}\n`;
+                    message += `🎫 Support tickets created: ${result.results.tickets_created}\n`;
+                    message += `💰 Commission records created: ${result.results.commissions_created}\n`;
+                    
+                    if (result.results.errors.length > 0) {
+                        message += `\n⚠️ Warnings:\n${result.results.errors.join('\n')}`;
+                    }
+                    
+                    alert(message);
+                    
+                    // Refresh agencies list to show new demo accounts
+                    await loadAgencies();
+                    
+                } else {
+                    throw new Error(result.error || 'Setup failed');
+                }
+                
+            } catch (error) {
+                console.error('Demo setup error:', error);
+                setupBtn.innerHTML = '❌ Setup Failed';
+                setupBtn.style.background = '#f56565';
+                alert(`Demo setup failed: ${error.message}`);
+            } finally {
+                // Restore button after 3 seconds
+                setTimeout(() => {
+                    setupBtn.disabled = false;
+                    setupBtn.innerHTML = originalText;
+                    setupBtn.style.background = '#ed8936';
+                }, 3000);
             }
         }
 

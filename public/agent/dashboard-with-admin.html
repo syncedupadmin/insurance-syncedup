@@ -731,14 +731,8 @@
         let selectedAgentForSale = null;
         let selectedAgentForPerformance = null;
         
-        // Mock agent data for admin functionality
-        const mockAgents = [
-            { id: 'AGENT001', name: 'John Smith', email: 'john@example.com', active: true },
-            { id: 'AGENT002', name: 'Jane Doe', email: 'jane@example.com', active: true },
-            { id: 'AGENT003', name: 'Mike Johnson', email: 'mike@example.com', active: true },
-            { id: 'AGENT004', name: 'Sarah Wilson', email: 'sarah@example.com', active: false },
-            { id: 'AGENT005', name: 'David Brown', email: 'david@example.com', active: true }
-        ];
+        // Agent data will be loaded from API - no fake data
+        let agentsData = [];
         
         // Check for logged in user on page load
         document.addEventListener('DOMContentLoaded', function() {
@@ -789,7 +783,7 @@
             perfSelect.innerHTML = '<option value="">My Performance</option><option value="ALL">🌟 All Agents Combined</option>';
             
             // Add agents from mock data (in production, this would come from API)
-            mockAgents.filter(agent => agent.active).forEach(agent => {
+            agentsData.filter(agent => agent.active).forEach(agent => {
                 const saleOption = document.createElement('option');
                 saleOption.value = agent.id;
                 saleOption.textContent = `${agent.name} (${agent.id})`;
@@ -809,7 +803,7 @@
             
             const title = document.getElementById('recordSaleTitle');
             if (selectedAgentId) {
-                const agent = mockAgents.find(a => a.id === selectedAgentId);
+                const agent = agentsData.find(a => a.id === selectedAgentId);
                 title.textContent = `Record Sale for ${agent?.name || 'Agent'}`;
             } else {
                 title.textContent = 'Record Sale';
@@ -825,7 +819,7 @@
         // Load admin statistics
         function loadAdminStats() {
             // Mock data - in production this would come from API
-            document.getElementById('totalAgents').textContent = mockAgents.filter(a => a.active).length;
+            document.getElementById('totalAgents').textContent = agentsData.filter(a => a.active).length;
             document.getElementById('totalTeamSales').textContent = '156';
             document.getElementById('totalTeamRevenue').textContent = '$468K';
         }
@@ -900,7 +894,7 @@
             let html = '<h4 style="margin: 1rem 0;">👥 Agent Management</h4>';
             html += '<div style="max-height: 250px; overflow-y: auto;">';
             
-            mockAgents.forEach(agent => {
+            agentsData.forEach(agent => {
                 const statusColor = agent.active ? '#48bb78' : '#f56565';
                 const statusText = agent.active ? 'Active' : 'Inactive';
                 
@@ -926,7 +920,7 @@
 
         // Toggle agent status
         function toggleAgentStatus(agentId) {
-            const agent = mockAgents.find(a => a.id === agentId);
+            const agent = agentsData.find(a => a.id === agentId);
             if (agent) {
                 agent.active = !agent.active;
                 populateAgentDropdowns(); // Refresh dropdowns
@@ -1109,7 +1103,7 @@
             // Determine which agent this sale is for
             const saleAgentId = selectedAgentForSale || currentAgent?.id || 'AGENT001';
             const saleAgentName = selectedAgentForSale ? 
-                mockAgents.find(a => a.id === selectedAgentForSale)?.name || 'Unknown Agent' : 
+                agentsData.find(a => a.id === selectedAgentForSale)?.name || 'Unknown Agent' : 
                 currentAgent?.name || 'Unknown Agent';
             
             const saleData = {
@@ -1177,7 +1171,7 @@
                 displayName = 'All Agents Combined';
             } else if (selectedAgentForPerformance) {
                 agentId = selectedAgentForPerformance;
-                const agent = mockAgents.find(a => a.id === selectedAgentForPerformance);
+                const agent = agentsData.find(a => a.id === selectedAgentForPerformance);
                 displayName = agent ? agent.name : 'Unknown Agent';
             } else {
                 agentId = currentAgent?.id || 'AGENT001';
@@ -1192,7 +1186,7 @@
                 // Adjust data if viewing all agents
                 let multiplier = 1;
                 if (agentId === 'ALL') {
-                    multiplier = mockAgents.filter(a => a.active).length; // Simulate combined data
+                    multiplier = agentsData.filter(a => a.active).length; // Simulate combined data
                 }
                 
                 document.getElementById('totalSales').textContent = (performanceData.totalSales || 12) * multiplier;
@@ -1216,23 +1210,11 @@
                 
             } catch (error) {
                 console.error('Performance API error:', error);
-                // Fallback to mock data if API fails
-                let mockSales = 12;
-                let mockPremium = 28500;
-                let mockCommission = 8550;
-                let mockAvg = 2375;
-                
-                if (agentId === 'ALL') {
-                    const activeAgents = mockAgents.filter(a => a.active).length;
-                    mockSales *= activeAgents;
-                    mockPremium *= activeAgents;
-                    mockCommission *= activeAgents;
-                }
-                
-                document.getElementById('totalSales').textContent = mockSales.toString();
-                document.getElementById('totalPremium').textContent = `$${mockPremium.toLocaleString()}`;
-                document.getElementById('totalCommission').textContent = `$${mockCommission.toLocaleString()}`;
-                document.getElementById('avgSale').textContent = `$${mockAvg.toLocaleString()}`;
+                // Show empty state when API fails - no fake data
+                document.getElementById('totalSales').textContent = '0';
+                document.getElementById('totalPremium').textContent = '$0';
+                document.getElementById('totalCommission').textContent = '$0';
+                document.getElementById('avgSale').textContent = '$0';
                 
                 document.getElementById('performanceDashboard').style.display = 'block';
             }

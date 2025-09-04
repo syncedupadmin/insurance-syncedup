@@ -329,13 +329,8 @@
             }
         ];
         
-        const mockAgentsData = [
-            { id: 'AGENT001', name: 'John Smith' },
-            { id: 'AGENT002', name: 'Jane Doe' },
-            { id: 'AGENT003', name: 'Mike Johnson' },
-            { id: 'AGENT004', name: 'Sarah Wilson' },
-            { id: 'AGENT005', name: 'David Brown' }
-        ];
+        // Agents data will be loaded from API - no fake data
+        let agentsData = [];
         
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication
@@ -381,7 +376,7 @@
                 if (response.ok) {
                     const data = await response.json();
                     goalsData = data.goals || mockGoalsData;
-                    agentsData = data.agents || mockAgentsData;
+                    agentsData = data.agents || [];
                     console.log('Goals data loaded from API');
                 } else {
                     throw new Error('API not available');
@@ -389,7 +384,7 @@
             } catch (error) {
                 console.log('Using mock data:', error);
                 goalsData = mockGoalsData;
-                agentsData = mockAgentsData;
+                agentsData = [];
             }
             
             populateAgentSelects();

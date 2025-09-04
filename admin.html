@@ -106,14 +106,8 @@
     <script>
         let currentUser = null;
         
-        // Mock agent data
-        const agentData = [
-            { id: 'AGENT001', name: 'John Smith', sales: 8, premium: 2712, commission: 813.60, status: 'Active' },
-            { id: 'AGENT002', name: 'Jane Doe', sales: 12, premium: 3845, commission: 1153.50, status: 'Active' },
-            { id: 'AGENT003', name: 'Mike Johnson', sales: 5, premium: 1680, commission: 504.00, status: 'Active' },
-            { id: 'AGENT004', name: 'Sarah Wilson', sales: 0, premium: 0, commission: 0, status: 'Inactive' },
-            { id: 'AGENT005', name: 'David Brown', sales: 15, premium: 4950, commission: 1485.00, status: 'Active' }
-        ];
+        // Agent data will be loaded from API - no fake data
+        let agentData = [];
         
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication
@@ -139,27 +133,37 @@
         
         async function loadDashboardData() {
             try {
-                // Load overall stats
-                const activeAgents = agentData.filter(agent => agent.status === 'Active').length;
-                const totalRevenue = agentData.reduce((sum, agent) => sum + agent.premium, 0);
-                const totalSales = agentData.reduce((sum, agent) => sum + agent.sales, 0);
-                const totalCommissions = agentData.reduce((sum, agent) => sum + agent.commission, 0);
+                // Try to load data from API
+                const response = await fetch('/api/admin/dashboard');
                 
-                document.getElementById('activeAgents').textContent = activeAgents;
-                document.getElementById('mtdRevenue').textContent = `$${totalRevenue.toLocaleString()}`;
-                document.getElementById('policiesSold').textContent = totalSales;
-                document.getElementById('pendingCommissions').textContent = `$${totalCommissions.toLocaleString()}`;
+                if (response.ok) {
+                    const data = await response.json();
+                    agentData = data.agents || [];
+                    
+                    // Calculate stats from real data
+                    const activeAgents = agentData.filter(agent => agent.status === 'Active').length;
+                    const totalRevenue = agentData.reduce((sum, agent) => sum + (agent.premium || 0), 0);
+                    const totalSales = agentData.reduce((sum, agent) => sum + (agent.sales || 0), 0);
+                    const totalCommissions = agentData.reduce((sum, agent) => sum + (agent.commission || 0), 0);
+                    
+                    document.getElementById('activeAgents').textContent = activeAgents;
+                    document.getElementById('mtdRevenue').textContent = `$${totalRevenue.toLocaleString()}`;
+                    document.getElementById('policiesSold').textContent = totalSales;
+                    document.getElementById('pendingCommissions').textContent = `$${totalCommissions.toLocaleString()}`;
+                } else {
+                    throw new Error('API not available');
+                }
                 
                 // Load agent overview table
                 loadAgentOverviewTable();
                 
             } catch (error) {
                 console.error('Failed to load dashboard data:', error);
-                // Use mock data on error
-                document.getElementById('activeAgents').textContent = '4';
-                document.getElementById('mtdRevenue').textContent = '$38,500';
-                document.getElementById('policiesSold').textContent = '40';
-                document.getElementById('pendingCommissions').textContent = '$11,550';
+                // Show empty state on error - no fake data
+                document.getElementById('activeAgents').textContent = '0';
+                document.getElementById('mtdRevenue').textContent = '$0';
+                document.getElementById('policiesSold').textContent = '0';
+                document.getElementById('pendingCommissions').textContent = '$0';
                 
                 loadAgentOverviewTable();
             }
@@ -169,15 +173,22 @@
             const tableBody = document.getElementById('agentOverviewTable');
             tableBody.innerHTML = '';
             
+            if (agentData.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="6" style="text-align: center; color: #666; padding: 2rem;">No agents found</td>`;
+                tableBody.appendChild(row);
+                return;
+            }
+            
             agentData.forEach(agent => {
                 const row = document.createElement('tr');
                 const statusClass = agent.status === 'Active' ? 'status-active' : 'status-inactive';
                 
                 row.innerHTML = `
                     <td><strong>${agent.name}</strong><br><small>${agent.id}</small></td>
-                    <td><strong>${agent.sales}</strong></td>
-                    <td class="premium-amount">$${agent.premium.toLocaleString()}</td>
-                    <td class="commission-amount">$${agent.commission.toLocaleString()}</td>
+                    <td><strong>${agent.sales || 0}</strong></td>
+                    <td class="premium-amount">$${(agent.premium || 0).toLocaleString()}</td>
+                    <td class="commission-amount">$${(agent.commission || 0).toLocaleString()}</td>
                     <td><span class="${statusClass}">${agent.status}</span></td>
                     <td>
                         <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 

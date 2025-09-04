@@ -191,7 +191,7 @@
         document.addEventListener('DOMContentLoaded', loadAgents);
 
         async function loadAgents() {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('authToken');
             try {
                 const response = await fetch('/api/admin/agents', {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -300,7 +300,7 @@
                 return;
             }
             
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('authToken');
             console.log('🔐 Token available:', !!token, token ? 'Length: ' + token.length : 'No token');
             console.log('📤 Sending status toggle request:', action);
             
@@ -358,7 +358,7 @@
                 return;
             }
             
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('authToken');
             console.log('🔐 Token available:', !!token, token ? 'Length: ' + token.length : 'No token');
             
             console.log('📤 Sending password reset request...');
@@ -405,7 +405,7 @@
         document.getElementById('agentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('authToken');
             const agentId = document.getElementById('agentId').value;
             const isEdit = !!agentId;
             
@@ -533,7 +533,7 @@
             const formData = new FormData();
             formData.append('file', file);
             
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('authToken');
             
             try {
                 const response = await fetch('/api/admin/bulk-upload', {

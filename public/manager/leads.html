@@ -649,7 +649,7 @@
                 
             } catch (error) {
                 console.error('Error loading agent performance:', error);
-                displayMockAgentPerformance();
+                displayEmptyAgentPerformance();
             }
         }
         
@@ -694,14 +694,8 @@
             tableBody.innerHTML = rows;
         }
         
-        function displayMockAgentPerformance() {
-            const mockAgents = [
-                { name: 'Sarah Johnson', email: 'sarah@example.com', total_leads: 15, contacted_leads: 12, converted_leads: 4, conversion_rate: 26.7, total_lead_cost: 375, avg_response_time_hours: 2.3 },
-                { name: 'Mike Chen', email: 'mike@example.com', total_leads: 12, contacted_leads: 10, converted_leads: 3, conversion_rate: 25.0, total_lead_cost: 300, avg_response_time_hours: 1.8 },
-                { name: 'Jennifer Lopez', email: 'jen@example.com', total_leads: 18, contacted_leads: 15, converted_leads: 5, conversion_rate: 27.8, total_lead_cost: 450, avg_response_time_hours: 3.1 }
-            ];
-            
-            displayAgentPerformance(mockAgents);
+        function displayEmptyAgentPerformance() {
+            displayAgentPerformance([]);
         }
         
         async function loadSourcePerformance() {

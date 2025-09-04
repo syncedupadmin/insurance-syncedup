@@ -473,27 +473,28 @@
         async function loadRecentQuotes() {
             const tableBody = document.getElementById('recentQuotesTable');
             
-            // Mock data - replace with API call
-            const quotes = [
-                { date: '2025-09-03', customer: 'John Smith', product: 'Health Plan Premium', premium: '$149.99', status: 'Pending' },
-                { date: '2025-09-02', customer: 'Mary Johnson', product: 'Life Insurance Gold', premium: '$87.50', status: 'Accepted' },
-                { date: '2025-09-01', customer: 'Bob Wilson', product: 'Auto Coverage Plus', premium: '$234.00', status: 'Pending' }
-            ];
+            // Quotes will be loaded from API - no fake data
+            const quotes = [];
 
-            const quotesHTML = quotes.map(quote => `
-                <tr>
-                    <td>${quote.date}</td>
-                    <td>${quote.customer}</td>
-                    <td>${quote.product}</td>
-                    <td class="premium-amount">${quote.premium}</td>
-                    <td><span class="status-${quote.status.toLowerCase()}">${quote.status}</span></td>
-                    <td>
-                        <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
-                            <i data-lucide="eye" style="width: 12px; height: 12px;"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+            let quotesHTML;
+            if (quotes.length === 0) {
+                quotesHTML = `<tr><td colspan="6" style="text-align: center; color: #666; padding: 2rem;">No quotes found</td></tr>`;
+            } else {
+                quotesHTML = quotes.map(quote => `
+                    <tr>
+                        <td>${quote.date}</td>
+                        <td>${quote.customer}</td>
+                        <td>${quote.product}</td>
+                        <td class="premium-amount">${quote.premium}</td>
+                        <td><span class="status-${quote.status.toLowerCase()}">${quote.status}</span></td>
+                        <td>
+                            <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                                <i data-lucide="eye" style="width: 12px; height: 12px;"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
 
             tableBody.innerHTML = quotesHTML;
             lucide.createIcons();
@@ -534,10 +535,17 @@
 
         // Export quotes
         function exportQuotes() {
-            const csvContent = `Date,Customer,Product,Premium,Status
-2025-09-03,John Smith,Health Plan Premium,$149.99,Pending
-2025-09-02,Mary Johnson,Life Insurance Gold,$87.50,Accepted
-2025-09-01,Bob Wilson,Auto Coverage Plus,$234.00,Pending`;
+            // Generate CSV from real quotes data (no fake data)
+            if (quotes.length === 0) {
+                alert('No quotes to export');
+                return;
+            }
+            
+            const csvHeader = 'Date,Customer,Product,Premium,Status\n';
+            const csvRows = quotes.map(quote => 
+                `${quote.date},${quote.customer},${quote.product},${quote.premium},${quote.status}`
+            ).join('\n');
+            const csvContent = csvHeader + csvRows;
             
             const blob = new Blob([csvContent], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);

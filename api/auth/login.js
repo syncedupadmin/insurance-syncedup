@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import jwt from 'jsonwebtoken';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -39,8 +40,20 @@ export default async function handler(req, res) {
   // WARNING: NO PASSWORD VERIFICATION - TEMPORARY ONLY
   console.log('WARNING: Password bypass active for user:', email);
 
+  // Generate JWT token for session management
+  const tokenPayload = {
+    userId: user.id,
+    email: user.email,
+    role: user.role,
+    agency_id: user.agency_id,
+    exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hour expiration
+  };
+  
+  const token = jwt.sign(tokenPayload, process.env.JWT_SECRET || 'fallback-secret-key');
+
   // Success - user logged in without password
   return res.status(200).json({
+    token,
     user: {
       id: user.id,
       email: user.email,

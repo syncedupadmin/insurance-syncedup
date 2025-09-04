@@ -496,20 +496,18 @@
                         monthlySales: 12450.00,
                         rank: 3
                     });
-                    updateRecentActivity([
-                        { type: 'sale', client_name: 'John Smith', premium: 149.99, date: '2025-09-01' },
-                        { type: 'quote', client_name: 'Jane Doe', score: 85, date: '2025-08-30' }
-                    ]);
+                    updateRecentActivity([]);
                 }
             } catch (error) {
                 console.error('Error loading dashboard:', error);
-                // Use demo data on error
+                // Show empty state on error - no fake data
                 updateDashboardStats({
-                    commissions: 2150.75,
-                    policiesCount: 8,
-                    monthlySales: 12450.00,
-                    rank: 3
+                    commissions: 0,
+                    policiesCount: 0,
+                    monthlySales: 0,
+                    rank: null
                 });
+                updateRecentActivity([]);
             }
         }
 
@@ -747,26 +745,7 @@
                     displayCommissions(commissions);
                 } else {
                     // Use demo data
-                    displayCommissions([
-                        {
-                            saleId: 'SAL-001',
-                            customerName: 'John Smith',
-                            productName: 'PPO Plan 500',
-                            premium: 149.99,
-                            amount: 45.00,
-                            status: 'paid',
-                            saleDate: '2025-09-01'
-                        },
-                        {
-                            saleId: 'SAL-002',
-                            customerName: 'Jane Doe',
-                            productName: 'HMO Plan 1000',
-                            premium: 119.99,
-                            amount: 33.60,
-                            status: 'pending',
-                            saleDate: '2025-08-30'
-                        }
-                    ]);
+                    displayCommissions([]);
                 }
             } catch (error) {
                 console.error('Error loading commissions:', error);

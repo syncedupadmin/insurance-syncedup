@@ -157,36 +157,8 @@
             { id: 'AGENT005', name: 'David Brown', email: 'david@example.com', active: true }
         ];
         
-        // Mock sales data (WITHOUT commission information for managers)
-        const mockSalesData = [
-            {
-                date: '2025-08-30',
-                agentId: 'AGENT001',
-                agentName: 'John Smith',
-                customer: 'John Doe',
-                product: 'Good Health Distribution Partner',
-                premium: 339.00,
-                status: 'Active'
-            },
-            {
-                date: '2025-08-29',
-                agentId: 'AGENT002',
-                agentName: 'Jane Doe',
-                customer: 'Mary Johnson',
-                product: 'Summit Plan 100',
-                premium: 232.00,
-                status: 'Active'
-            },
-            {
-                date: '2025-08-28',
-                agentId: 'AGENT001',
-                agentName: 'John Smith',
-                customer: 'Bob Wilson',
-                product: 'Sigma Care PLUS 100',
-                premium: 214.00,
-                status: 'Pending'
-            }
-        ];
+        // Sales data will be loaded from API - no fake data
+        let salesData = [];
         
         // Authentication check
         function checkAuth() {

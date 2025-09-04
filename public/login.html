@@ -205,7 +205,7 @@
                             timestamp: Date.now()
                         }));
                         window.location.href = `https://insurance.syncedupsolutions.com/change-password.html?email=${encodeURIComponent(email)}`;
-                    } else if (data.user.email === 'admin@syncedupsolutions.com') {
+                    } else if (data.user.email.toLowerCase() === 'admin@syncedupsolutions.com') {
                         // Super admin user redirects to super admin portal
                         window.location.href = 'https://insurance.syncedupsolutions.com/super-admin/';
                     } else if (data.user.email === 'customerservice@test.com') {

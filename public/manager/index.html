@@ -144,21 +144,9 @@
     <script>
         let currentUser = null;
         
-        // Mock team data (managers see agent data but not commissions)
-        const teamData = [
-            { id: 'AGENT001', name: 'John Smith', sales: 8, premium: 2712, status: 'Active', lastActivity: '2025-08-30' },
-            { id: 'AGENT002', name: 'Jane Doe', sales: 12, premium: 3845, status: 'Active', lastActivity: '2025-08-30' },
-            { id: 'AGENT003', name: 'Mike Johnson', sales: 5, premium: 1680, status: 'Active', lastActivity: '2025-08-29' },
-            { id: 'AGENT004', name: 'Sarah Wilson', sales: 0, premium: 0, status: 'Inactive', lastActivity: '2025-08-25' },
-            { id: 'AGENT005', name: 'David Brown', sales: 15, premium: 4950, status: 'Active', lastActivity: '2025-08-30' }
-        ];
-        
-        const recentActivity = [
-            { time: '2:30 PM', agent: 'John Smith', action: 'Sale Recorded', customer: 'Jane Doe', product: 'Health Plan A', premium: 295 },
-            { time: '1:45 PM', agent: 'Jane Doe', action: 'Quote Generated', customer: 'Bob Wilson', product: 'Health Plan B', premium: 425 },
-            { time: '11:20 AM', agent: 'David Brown', action: 'Sale Recorded', customer: 'Mary Johnson', product: 'Health Plan C', premium: 355 },
-            { time: '10:15 AM', agent: 'Mike Johnson', action: 'Customer Contact', customer: 'Tom Davis', product: 'Health Plan A', premium: 295 }
-        ];
+        // Team data will be loaded from API
+        let teamData = [];
+        let recentActivity = [];
         
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication
@@ -209,12 +197,12 @@
                     const data = await response.json();
                     displayDashboardData(data);
                 } else {
-                    console.log('API not available, using mock data');
-                    displayMockDashboardData();
+                    console.log('API not available, showing empty dashboard');
+                    displayEmptyDashboard();
                 }
             } catch (error) {
                 console.error('Dashboard API error:', error);
-                displayMockDashboardData();
+                displayEmptyDashboard();
             }
         }
         
@@ -245,24 +233,27 @@
             loadRecentActivityTable();
         }
         
-        function displayMockDashboardData() {
-            // Load overall stats (no commission data for managers)
-            const activeAgents = teamData.filter(agent => agent.status === 'Active').length;
-            const totalRevenue = teamData.reduce((sum, agent) => sum + agent.premium, 0);
-            const totalSales = teamData.reduce((sum, agent) => sum + agent.sales, 0);
+        function displayEmptyDashboard() {
+            // Show empty state - no fake data
+            document.getElementById('activeAgents').textContent = '0';
+            document.getElementById('mtdRevenue').textContent = '$0';
+            document.getElementById('policiesSold').textContent = '0';
             
-            document.getElementById('activeAgents').textContent = activeAgents;
-            document.getElementById('mtdRevenue').textContent = `$${totalRevenue.toLocaleString()}`;
-            document.getElementById('policiesSold').textContent = totalSales;
-            
-            // Load team overview table
-            loadTeamOverviewTable();
-            loadRecentActivityTable();
+            // Show empty tables
+            loadEmptyTeamTable();
+            loadEmptyActivityTable();
         }
         
         function loadTeamOverviewTable() {
             const tableBody = document.getElementById('teamOverviewTable');
             tableBody.innerHTML = '';
+            
+            if (teamData.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="6" style="text-align: center; color: #666; padding: 2rem;">No agents found</td>`;
+                tableBody.appendChild(row);
+                return;
+            }
             
             teamData.forEach(agent => {
                 const row = document.createElement('tr');
@@ -293,6 +284,13 @@
             const tableBody = document.getElementById('recentActivityTable');
             tableBody.innerHTML = '';
             
+            if (recentActivity.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="6" style="text-align: center; color: #666; padding: 2rem;">No recent activity found</td>`;
+                tableBody.appendChild(row);
+                return;
+            }
+            
             recentActivity.forEach(activity => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -305,6 +303,22 @@
                 `;
                 tableBody.appendChild(row);
             });
+        }
+        
+        function loadEmptyTeamTable() {
+            const tableBody = document.getElementById('teamOverviewTable');
+            tableBody.innerHTML = '';
+            const row = document.createElement('tr');
+            row.innerHTML = `<td colspan="6" style="text-align: center; color: #666; padding: 2rem;">No agents found</td>`;
+            tableBody.appendChild(row);
+        }
+        
+        function loadEmptyActivityTable() {
+            const tableBody = document.getElementById('recentActivityTable');
+            tableBody.innerHTML = '';
+            const row = document.createElement('tr');
+            row.innerHTML = `<td colspan="6" style="text-align: center; color: #666; padding: 2rem;">No recent activity found</td>`;
+            tableBody.appendChild(row);
         }
         
         function viewAgentPerformance(agentId) {

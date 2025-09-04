@@ -2,6 +2,44 @@ import { createClient } from '@supabase/supabase-js';
 import { requireAuth } from '../_middleware/authCheck.js';
 import { getUserContext } from '../utils/auth-helper.js';
 
+// Helper function to check if user is a demo account
+function isDemoUser(email, agencyId) {
+  return email?.includes('@demo.com') || agencyId === 'DEMO001';
+}
+
+// Helper function to calculate real growth rate
+async function calculateGrowthRate(currentRevenue, startDate, endDate, agencyId) {
+  try {
+    const previousPeriod = getPreviousPeriod(startDate, endDate);
+    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+    
+    const { data: previousSales } = await supabase
+      .from('portal_sales')
+      .select('premium')
+      .eq('agency_id', agencyId)
+      .gte('sale_date', previousPeriod.start)
+      .lte('sale_date', previousPeriod.end);
+    
+    const previousRevenue = previousSales?.reduce((sum, s) => sum + (parseFloat(s.premium) || 0), 0) || 0;
+    
+    if (previousRevenue === 0) return '0.0';
+    return (((currentRevenue - previousRevenue) / previousRevenue) * 100).toFixed(1);
+  } catch (error) {
+    return '0.0';
+  }
+}
+
+function getPreviousPeriod(startDate, endDate) {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const periodLength = end - start;
+  
+  return {
+    start: new Date(start.getTime() - periodLength).toISOString().split('T')[0],
+    end: new Date(start.getTime() - 1).toISOString().split('T')[0]
+  };
+}
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
@@ -21,8 +59,9 @@ async function managerDashboardHandler(req, res) {
   }
 
   try {
-    const { agencyId, role } = getUserContext(req);
+    const { agencyId, role, email } = getUserContext(req);
     const { timeframe = 'month' } = req.query;
+    const isDemo = isDemoUser(email, agencyId);
 
     // Get date range
     const { startDate, endDate } = getDateRange(timeframe);
@@ -97,9 +136,23 @@ async function getAgencyOverview(agencyId, startDate, endDate) {
     const salesCount = salesData.length;
     const avgPremium = salesCount > 0 ? totalSales / salesCount : 0;
     
-    // Mock additional metrics
-    const mockLeads = Math.floor(Math.random() * 200) + 150;
-    const conversionRate = mockLeads > 0 ? (salesCount / mockLeads) * 100 : 0;
+    // Calculate real conversion rate from actual leads data if available
+    let leadsCount = 0;
+    let conversionRate = 0;
+    
+    try {
+      const { data: leadsData, count: leadsCountResult } = await supabase
+        .from('convoso_leads')
+        .select('id', { count: 'exact' })
+        .eq('agency_id', agencyId)
+        .gte('received_at', startDate)
+        .lte('received_at', endDate);
+      
+      leadsCount = leadsCountResult || 0;
+      conversionRate = leadsCount > 0 ? (salesCount / leadsCount) * 100 : 0;
+    } catch (error) {
+      console.log('Leads data not available, using sales-only metrics');
+    }
     
     return {
       total_agents: agents?.length || 0,
@@ -109,9 +162,9 @@ async function getAgencyOverview(agencyId, startDate, endDate) {
       total_sales: totalSales,
       sales_count: salesCount,
       avg_premium: avgPremium,
-      leads_count: mockLeads,
+      leads_count: leadsCount,
       conversion_rate: conversionRate,
-      revenue_growth: (Math.random() * 20 + 5).toFixed(1), // Mock growth %
+      revenue_growth: await calculateGrowthRate(totalSales, startDate, endDate, agencyId),
       customer_count: new Set(salesData.map(s => s.customer_name)).size
     };
 
