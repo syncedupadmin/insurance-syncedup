@@ -285,9 +285,27 @@
         // Demo login handler
         async function handleLogin(email) {
           try {
-            const response = await fetch(`http://localhost:5050/users?email=${encodeURIComponent(email)}`);
-            const users = await response.json();
-            const user = users[0];
+            // Demo users for when API is not available
+            const demoUsers = [
+              {"id":"u-agent-demo","email":"agent@demo.com","name":"Demo Agent","role":"agent","agencyId":"DEMO001","isDemoAccount":true},
+              {"id":"u-manager-demo","email":"manager@demo.com","name":"Demo Manager","role":"manager","agencyId":"DEMO001","isDemoAccount":true},
+              {"id":"u-admin-demo","email":"admin@demo.com","name":"Demo Admin","role":"admin","agencyId":"DEMO001","isDemoAccount":true},
+              {"id":"u-cs-demo","email":"customerservice@demo.com","name":"Demo CS","role":"customerservice","agencyId":"DEMO001","isDemoAccount":true},
+              {"id":"u-sa-demo","email":"superadmin@demo.com","name":"Demo SuperAdmin","role":"superadmin","agencyId":"DEMO001","isDemoAccount":true}
+            ];
+            
+            let user = null;
+            
+            try {
+              // Try API first (works in development)
+              const response = await fetch(`http://localhost:5050/users?email=${encodeURIComponent(email)}`);
+              const users = await response.json();
+              user = users[0];
+            } catch (error) {
+              // Fallback to demo users (works in production)
+              console.log('API not available, using demo login');
+              user = demoUsers.find(u => u.email === email);
+            }
             
             if (!user) {
               const errorDiv = document.getElementById('errorMessage');
@@ -313,7 +331,7 @@
             window.location.href = redirectMap[user.role] || '/agent/';
           } catch (error) {
             const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = "Login failed";
+            errorDiv.textContent = "Login failed: " + error.message;
             errorDiv.classList.remove('hidden');
             setTimeout(() => errorDiv.classList.add('hidden'), 5000);
           }
