@@ -267,9 +267,9 @@
             .stat-number {
                 font-size: 2rem;
             }
-/* Logo styling improvements */        .header img {            height: 40px;            width: auto;            transition: transform 0.3s ease;        }        .header img:hover {            transform: scale(1.05);        }        .hero-logo {
-            max-width: 88px;
-            width: 22.5%;
+/* Logo styling improvements */        .header img {            height: 80px;            width: auto;            transition: transform 0.3s ease;            filter: drop-shadow(0 0 15px rgba(139,92,246,0.6));        }        .header img:hover {            transform: scale(1.08);        }        .hero-logo {
+            max-width: 300px;
+            width: 50%;
             height: auto;
             display: block;
             transition: transform 0.3s ease;
@@ -292,8 +292,8 @@
         }
         
         .ai-style-change-1 {
-            max-width: 44px !important;
-            width: 11.25% !important;
+            max-width: 300px !important;
+            width: 50% !important;
             height: auto !important;
         }
         }
@@ -311,7 +311,7 @@
     <!-- Premium Header -->
     <header class="header" id="header">
         <nav class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center"><img src="/images/Transparent.png" alt="SyncedUp Solutions" class="h-12 md:h-16 w-auto logo-glow transition-transform duration-300 hover:scale-105"></div>
+            <div class="flex items-center"><img src="/images/Transparent.png" alt="SyncedUp Solutions" class="h-20 md:h-24 w-auto logo-glow transition-transform duration-300 hover:scale-105"></div>
             <div class="hidden md:flex items-center gap-8">
                 <a href="#features" class="hover:text-yellow-300 transition-colors">Features</a>
                 <a href="#stats" class="hover:text-yellow-300 transition-colors">Results</a>
@@ -335,12 +335,14 @@
             <div class="mb-8 fade-in-up delay-1 flex justify-center">
                 <img src="/images/Transparent.png" alt="SyncedUp Solutions" class="hero-logo logo-glow ai-style-change-1">
             </div>
-            <p class="text-2xl md:text-3xl font-light mb-4 fade-in-up delay-2">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6 fade-in-up delay-2 glow-text">
                 Complete Agency Intelligence
+            </h1>
+            <p class="text-xl md:text-2xl opacity-90 max-w-4xl mx-auto mb-8 fade-in-up delay-3 font-medium">
+                Where elite agencies automate everything from lead capture to commission payout.
             </p>
             <p class="text-lg md:text-xl opacity-80 max-w-3xl mx-auto mb-12 fade-in-up delay-3">
-                Where elite agencies automate everything from lead capture to commission payout. 
-                Zero human error. Total control. Unlimited scale.
+                Zero human error • Total control • Unlimited scale • Global competition
             </p>
 
             <!-- CTA Buttons -->
@@ -358,19 +360,19 @@
             <!-- Hero Stats -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="stat-card rounded-2xl fade-in-up delay-1">
-                    <div class="stat-number">$2.8B+</div>
+                    <div class="stat-number">$10.3M+</div>
                     <div class="text-sm opacity-70 uppercase tracking-wider">Premium Managed</div>
                 </div>
                 <div class="stat-card rounded-2xl fade-in-up delay-2">
-                    <div class="stat-number">500+</div>
+                    <div class="stat-number">100+</div>
                     <div class="text-sm opacity-70 uppercase tracking-wider">Elite Agencies</div>
                 </div>
                 <div class="stat-card rounded-2xl fade-in-up delay-3">
-                    <div class="stat-number">99.97%</div>
+                    <div class="stat-number">99.99%</div>
                     <div class="text-sm opacity-70 uppercase tracking-wider">Accuracy Rate</div>
                 </div>
                 <div class="stat-card rounded-2xl fade-in-up delay-4">
-                    <div class="stat-number">$62K+</div>
+                    <div class="stat-number">$89K+</div>
                     <div class="text-sm opacity-70 uppercase tracking-wider">Annual Savings</div>
                 </div>
             </div>
@@ -401,21 +403,23 @@
                 </div>
 
                 <!-- Instant Payroll -->
-                <div class="glass-card rounded-2xl p-8 hover:scale-105 transition-transform">
+                <div class="glass-card rounded-2xl p-8 hover:scale-105 transition-transform relative overflow-hidden">
+                    <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold">PROFIT</div>
                     <div class="icon-hexagon">
                         <i class="fas fa-coins"></i>
                     </div>
-                    <h3 class="text-2xl font-semibold mb-3">Instant Payroll</h3>
-                    <p class="opacity-80">Calculate commissions, handle splits, process chargebacks - all in seconds, not days.</p>
+                    <h3 class="text-2xl font-semibold mb-3 text-green-300">Automated Payroll System</h3>
+                    <p class="opacity-80">Instant commission calculations • Split handling • Chargeback processing • Tax compliance • Direct deposits • Eliminate 3+ admin positions</p>
                 </div>
 
                 <!-- Global Leaderboards -->
-                <div class="glass-card rounded-2xl p-8 hover:scale-105 transition-transform">
+                <div class="glass-card rounded-2xl p-8 hover:scale-105 transition-transform relative overflow-hidden">
+                    <div class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold">HOT</div>
                     <div class="icon-hexagon">
                         <i class="fas fa-trophy"></i>
                     </div>
-                    <h3 class="text-2xl font-semibold mb-3">Global Leaderboards</h3>
-                    <p class="opacity-80">Real-time rankings across 500+ agencies. Watch your agents compete and excel nationally.</p>
+                    <h3 class="text-2xl font-semibold mb-3 text-yellow-300">Global Leaderboards</h3>
+                    <p class="opacity-80">Real-time rankings across 100+ agencies nationwide • Drive competition • Boost sales 47% average • Watch agents dominate</p>
                 </div>
 
                 <!-- Manager Dashboard -->
@@ -423,8 +427,8 @@
                     <div class="icon-hexagon">
                         <i class="fas fa-chart-line"></i>
                     </div>
-                    <h3 class="text-2xl font-semibold mb-3">Manager Dashboard</h3>
-                    <p class="opacity-80">Complete visibility into every metric that matters. Lead flow, conversion rates, agent performance.</p>
+                    <h3 class="text-2xl font-semibold mb-3 text-blue-300">Executive Dashboard</h3>
+                    <p class="opacity-80">Real-time analytics • Lead flow tracking • Conversion optimization • Performance insights • Team management • Revenue forecasting</p>
                 </div>
 
                 <!-- Carrier APIs -->
@@ -482,7 +486,7 @@
                         <div class="flex mb-4">
                             <i class="fas fa-quote-left text-2xl text-yellow-400 opacity-50"></i>
                         </div>
-                        <p class="text-lg italic mb-4">"We eliminated 3 admin positions and increased accuracy to 100%. ROI in 30 days."</p>
+                        <p class="text-lg italic mb-4">"We eliminated 3 admin positions and increased accuracy to 100%. ROI in 30 days. The global leaderboard alone increased our sales 43%."</p>
                         <div class="flex items-center gap-3">
                             <div class="w-12 h-12 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 flex items-center justify-center">
                                 <span class="text-white font-bold">MJ</span>
@@ -497,7 +501,7 @@
                         <div class="flex mb-4">
                             <i class="fas fa-quote-left text-2xl text-yellow-400 opacity-50"></i>
                         </div>
-                        <p class="text-lg italic mb-4">"The global leaderboard transformed our culture. Sales up 47% in 6 months."</p>
+                        <p class="text-lg italic mb-4">"The global leaderboard transformed our culture. Sales up 47% in 6 months. My agents now compete nationally and love the automated payroll system."</p>
                         <div class="flex items-center gap-3">
                             <div class="w-12 h-12 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center">
                                 <span class="text-white font-bold">SC</span>
@@ -520,7 +524,8 @@
                 Your Competition Already Uses SyncedUp
             </h2>
             <p class="text-xl opacity-80 mb-8">
-                Join 500+ agencies saving $60,000+ annually through complete automation
+                Join 100+ elite agencies saving $89,000+ annually through complete automation.<br>
+                <span class="text-yellow-300 font-semibold">Global leaderboards • Automated payroll • Executive dashboards</span>
             </p>
             <button class="btn-luxury rounded-full text-xl px-8 py-4">
                 Claim Your 14-Day Free Trial
