@@ -15,7 +15,7 @@
           const norm = normalizeRole(role);
           
           // Accept both database formats: customer-service AND customer_service
-          const allow = new Set(['customer_service', 'customer-service', 'admin', 'super_admin', 'super-admin']);
+          const allow = new Set(['customer_service', 'customer-service', 'manager', 'admin', 'super_admin', 'super-admin']);
 
           if (!allow.has(role) && !allow.has(norm)) {
             alert(`Access denied. Customer service permissions required. Your role: ${role}`);
@@ -287,7 +287,13 @@
             }
 
             // Check if user has customer service permissions
-            if (!['customer-service', 'manager', 'admin', 'super-admin'].includes(user.role)) {
+            // Handle both role formats: customer-service and customer_service
+            const normalizeRole = (r) => String(r || '').toLowerCase().replace(/[\s-]+/g, '_');
+            const userRole = user.role;
+            const normalizedRole = normalizeRole(userRole);
+            const allowedRoles = ['customer-service', 'customer_service', 'manager', 'admin', 'super-admin', 'super_admin'];
+            
+            if (!allowedRoles.includes(userRole) && !allowedRoles.includes(normalizedRole)) {
                 alert('Access denied. Customer service permissions required.');
                 window.location.href = '/login.html';
                 return false;
