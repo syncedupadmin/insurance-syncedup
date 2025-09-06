@@ -4,14 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manager Dashboard - SyncedUp Insurance</title>
-    <meta name="x-build" content="build-20250906-152208">
     <link rel="stylesheet" href="/manager/manager-global.css">
-    <link rel="stylesheet" href="/css/ui-refresh.css">
-    <style id="force-mobile-tabs">
-@media(min-width:681px){.mobile-tabs{display:none!important}}
-@media(max-width:680px){.mobile-tabs{display:flex!important}}
-</style>
-    
     
     <!-- Auth Guard Script - Must be loaded in HEAD before content renders -->
     <script>
@@ -28,108 +21,106 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
-<div class="app">
-  <aside class="sidebar" id="sidebar">
-    <div class="brand">S</div>
-    <nav class="nav" id="manager-nav">
-      <a href="/manager" class="item active">
-        <i data-lucide="layout-dashboard"></i>
-        <span>Dashboard</span>
-      </a>
-      <a href="/manager/leads" class="item">
-        <i data-lucide="user-plus"></i>
-        <span>Leads</span>
-      </a>
-      <a href="/manager/team-management" class="item">
-        <i data-lucide="users"></i>
-        <span>Team Management</span>
-      </a>
-      <a href="/manager/performance" class="item">
-        <i data-lucide="trending-up"></i>
-        <span>Team Performance</span>
-      </a>
-      <a href="/manager/reports" class="item">
-        <i data-lucide="file-text"></i>
-        <span>Reports</span>
-      </a>
-      <a href="/manager/goals" class="item">
-        <i data-lucide="target"></i>
-        <span>Goals</span>
-      </a>
-      <a href="/manager/vendors" class="item">
-        <i data-lucide="building-2"></i>
-        <span>Vendors</span>
-      </a>
-      <a href="/manager/settings" class="item">
-        <i data-lucide="settings"></i>
-        <span>Settings</span>
-      </a>
-      <a href="/leaderboard" class="item">
-        <i data-lucide="trophy"></i>
-        <span>Global Leaderboard</span>
-      </a>
-    </nav>
-  </aside>
+    <!-- Header -->
+    <div class="header">
+        <h1>Manager Dashboard</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
 
-  <div class="main">
-    <header class="topbar">
-      <button id="menuBtn" aria-label="Open Menu">☰</button>
-      <div class="grow"></div>
-      <span id="userDisplay">Loading...</span>
-      <button class="btn" id="logoutBtn" onclick="logout()">
-        <i data-lucide="log-out"></i>
-        Logout
-      </button>
-    </header>
-
-    <main class="content" id="manager-content">
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="/manager" class="nav-link active">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="/manager/leads" class="nav-link">
+            <i data-lucide="user-plus" class="icon"></i>
+            Leads
+        </a>
+        <a href="/manager/team-management" class="nav-link">
+            <i data-lucide="users" class="icon"></i>
+            Team Management
+        </a>
+        <a href="/manager/performance" class="nav-link">
+            <i data-lucide="trending-up" class="icon"></i>
+            Team Performance
+        </a>
+        <a href="/manager/reports" class="nav-link">
+            <i data-lucide="file-text" class="icon"></i>
+            Reports
+        </a>
+        <a href="/manager/goals" class="nav-link">
+            <i data-lucide="target" class="icon"></i>
+            Goals
+        </a>
+        <a href="/manager/vendors" class="nav-link">
+            <i data-lucide="building-2" class="icon"></i>
+            Vendors
+        </a>
+        <a href="/manager/settings" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+        <a href="/leaderboard" class="nav-link">
+            <i data-lucide="trophy" class="icon"></i>
+            Global Leaderboard
+        </a>
+    </div>
+    
+    <div class="container">
         <div class="manager-notice">
             <h3><i data-lucide="shield-check"></i> Manager Portal</h3>
             <p>You have access to agent data and performance metrics for your team.</p>
         </div>
         
-        <div class="kpis">
-            <div class="kpi">
-                <div class="k-value" id="activeAgents">0</div>
-                <div class="k-label">Active Agents</div>
+        <div class="grid">
+            <div class="card">
+                <div class="stat-value" id="activeAgents">0</div>
+                <div class="stat-label">Active Agents</div>
             </div>
-            <div class="kpi">
-                <div class="k-value" id="mtdRevenue">$0</div>
-                <div class="k-label">MTD Premium Volume</div>
+            <div class="card">
+                <div class="stat-value" id="mtdRevenue">$0</div>
+                <div class="stat-label">MTD Premium Volume</div>
             </div>
-            <div class="kpi">
-                <div class="k-value" id="policiesSold">0</div>
-                <div class="k-label">Policies Sold</div>
+            <div class="card">
+                <div class="stat-value" id="policiesSold">0</div>
+                <div class="stat-label">Policies Sold</div>
             </div>
-            <div class="kpi">
-                <div class="k-value" id="avgSaleSize">$0</div>
-                <div class="k-label">Average Sale Size</div>
+            <div class="card">
+                <div class="stat-value" id="avgSaleSize">$0</div>
+                <div class="stat-label">Average Sale Size</div>
             </div>
         </div>
         
-        <div class="actions">
+        <div class="quick-actions">
             <button class="btn" onclick="location.href='/manager/team-management'">
-                <i data-lucide="users"></i>
+                <i data-lucide="users" class="icon"></i>
                 Manage Team
             </button>
             <button class="btn" onclick="location.href='/manager/performance'">
-                <i data-lucide="trending-up"></i>
+                <i data-lucide="trending-up" class="icon"></i>
                 Team Performance
             </button>
             <button class="btn btn-success" onclick="location.href='/manager/reports'">
-                <i data-lucide="file-text"></i>
+                <i data-lucide="file-text" class="icon"></i>
                 Generate Reports
             </button>
             <button class="btn btn-warning" onclick="viewAgentDashboard()">
-                <i data-lucide="eye"></i>
+                <i data-lucide="eye" class="icon"></i>
                 View as Agent
             </button>
         </div>
         
         <!-- Team Overview -->
         <div class="card">
-            <h3><i data-lucide="users"></i> Team Overview (This Month)</h3>
-            <table class="responsive">
+            <h3><i data-lucide="users" class="icon"></i> Team Overview (This Month)</h3>
+            <table>
                 <thead>
                     <tr>
                         <th>Agent</th>
@@ -147,8 +138,8 @@
         </div>
         
         <div class="card">
-            <h3><i data-lucide="activity"></i> Recent Team Activity</h3>
-            <table class="responsive">
+            <h3><i data-lucide="activity" class="icon"></i> Recent Team Activity</h3>
+            <table>
                 <thead>
                     <tr>
                         <th>Time</th>
@@ -164,29 +155,7 @@
                 </tbody>
             </table>
         </div>
-    </main>
-  </div>
-
-  <!-- Optional mobile bottom tabs -->
-  <nav class="mobile-tabs" aria-label="Primary">
-    <a class="t active" href="/manager">
-      <i data-lucide="home"></i>
-      <span>Home</span>
-    </a>
-    <a class="t" href="/manager/leads">
-      <i data-lucide="user-plus"></i>
-      <span>Leads</span>
-    </a>
-    <a class="t" href="/manager/team-management">
-      <i data-lucide="users"></i>
-      <span>Team</span>
-    </a>
-    <a class="t" href="/manager/reports">
-      <i data-lucide="file-text"></i>
-      <span>Reports</span>
-    </a>
-  </nav>
-</div>
+    </div>
     
     <script>
         let currentUser = null;
@@ -337,19 +306,19 @@
                 const statusClass = agent.status === 'Active' ? 'status-active' : 'status-inactive';
                 
                 row.innerHTML = `
-                    <td data-label="Agent"><strong>${agent.name}</strong><br><small>${agent.id}</small></td>
-                    <td data-label="Sales Count"><strong>${agent.sales}</strong></td>
-                    <td data-label="Premium Volume" class="premium-amount">$${agent.premium.toLocaleString()}</td>
-                    <td data-label="Status"><span class="${statusClass}">${agent.status}</span></td>
-                    <td data-label="Last Activity">${new Date(agent.lastActivity).toLocaleDateString()}</td>
-                    <td data-label="Actions">
+                    <td><strong>${agent.name}</strong><br><small>${agent.id}</small></td>
+                    <td><strong>${agent.sales}</strong></td>
+                    <td class="premium-amount">$${agent.premium.toLocaleString()}</td>
+                    <td><span class="${statusClass}">${agent.status}</span></td>
+                    <td>${new Date(agent.lastActivity).toLocaleDateString()}</td>
+                    <td>
                         <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 
                                 onclick="viewAgentPerformance('${agent.id}')">
-                                <i data-lucide="trending-up"></i> View
+                                <i data-lucide="trending-up" class="icon"></i> View
                         </button>
                         <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 
                                 onclick="contactAgent('${agent.id}')">
-                                <i data-lucide="message-circle"></i> Contact
+                                <i data-lucide="message-circle" class="icon"></i> Contact
                         </button>
                     </td>
                 `;
@@ -371,12 +340,12 @@
             recentActivity.forEach(activity => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td data-label="Time">${activity.time}</td>
-                    <td data-label="Agent"><strong>${activity.agent}</strong></td>
-                    <td data-label="Action">${activity.action}</td>
-                    <td data-label="Customer">${activity.customer}</td>
-                    <td data-label="Product">${activity.product}</td>
-                    <td data-label="Premium" class="premium-amount">$${activity.premium.toLocaleString()}</td>
+                    <td>${activity.time}</td>
+                    <td><strong>${activity.agent}</strong></td>
+                    <td>${activity.action}</td>
+                    <td>${activity.customer}</td>
+                    <td>${activity.product}</td>
+                    <td class="premium-amount">$${activity.premium.toLocaleString()}</td>
                 `;
                 tableBody.appendChild(row);
             });
@@ -452,7 +421,7 @@
             window.location.href = '/login';
         }
         
-        // Initialize Lucide icons and mobile drawer
+        // Initialize Lucide icons
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize Lucide icons after page load
             if (typeof lucide !== 'undefined') {
@@ -461,10 +430,5 @@
         });
 
     </script>
-    
-    <!-- Classic Mode Toggle System -->
-    <script src="/js/classic-mode.js"></script>
-    <script src="/assets/session-prod.js"></script>
-    <script src="/js/ui-refresh.js" defer></script>
 </body>
 </html>

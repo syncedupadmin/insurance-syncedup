@@ -1,6 +1,7 @@
 /* Manager Global Styles - Orange Glassmorphism Theme */
 
 /* Fonts */
+/* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'); */
 
 /* Lucide Icons */
 @import url('https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.css');
@@ -61,8 +62,6 @@ body::before {
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.18);
     color: white; 
-    max-width: 1400px;
-    margin: 0 auto;
     padding: 1.5rem 2rem; 
     display: flex; 
     justify-content: space-between; 
@@ -83,8 +82,6 @@ body::before {
 .nav { 
     display: flex; 
     gap: 0; 
-    max-width: 1400px;
-    margin: 0 auto;
     padding: 0 2rem; 
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(10px);
