@@ -1,0 +1,14 @@
+/**
+ * Minimal Auth Guard CSS - No content hiding that causes conflicts
+ * This version doesn't hide content, preventing redirect loops
+ */
+
+/* Optional: Simple loading state without hiding content */
+.auth-loading {
+    opacity: 0.8;
+}
+
+/* Simple fade-in when validated */
+.auth-validated {
+    opacity: 1;
+}

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SyncedUp Insurance</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="50x50" href="/favicons/favicon-50x50.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicons/android-chrome-512x512.png">
+    
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="/assets/global-styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .animated-gradient {
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        .neon-text {
+            text-shadow: 0 0 10px rgba(255,255,255,0.8),
+                         0 0 20px rgba(255,255,255,0.8),
+                         0 0 30px rgba(255,255,255,0.8);
+        }
+        
+        .input-glow:focus {
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1),
+                        0 0 20px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+</head>
+<body class="animated-gradient min-h-screen flex flex-col items-center justify-center p-4">
+    <!-- Floating particles effect -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-10 -left-10 w-40 h-40 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce"></div>
+        <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce animation-delay-2000"></div>
+        <div class="absolute top-1/2 left-1/2 w-40 h-40 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce animation-delay-4000"></div>
+    </div>
+
+    <!-- Logo Section -->
+    <div class="mb-8 text-center z-10">
+        <h1 class="text-5xl font-bold text-white neon-text mb-2">SYNCEDUP</h1>
+        <p class="text-white/80 text-lg">Insurance Intelligence Platform</p>
+    </div>
+
+    <!-- Main Login Container -->
+    <div class="glass-morphism rounded-3xl p-8 w-full max-w-md z-10 transform hover:scale-[1.02] transition-transform duration-300">
+        <!-- Login Form -->
+        <div id="loginForm">
+            <h2 class="text-3xl font-bold text-center mb-2 text-white">Welcome Back</h2>
+            <p class="text-center text-white/70 mb-8">Sign in to continue to your dashboard</p>
+            
+            <!-- CSRF token handled by server-side middleware -->
+            <form id="loginFormElement" class="space-y-6">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-envelope text-white/50"></i>
+                    </div>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        required 
+                        class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:bg-white/20 focus:border-white/40 input-glow outline-none transition-all duration-300"
+                        placeholder="Email address"
+                    >
+                </div>
+                
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-lock text-white/50"></i>
+                    </div>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        required 
+                        class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:bg-white/20 focus:border-white/40 input-glow outline-none transition-all duration-300"
+                        placeholder="Password"
+                    >
+                </div>
+                
+                <button 
+                    type="submit" 
+                    class="w-full bg-white/90 text-purple-700 py-3 rounded-xl font-bold hover:bg-white transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+                >
+                    Sign In
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </form>
+            
+
+            <div class="mt-6 flex justify-between items-center">
+                <button 
+                    onclick="showResetForm()" 
+                    class="text-white/70 hover:text-white text-sm font-medium transition-colors"
+                >
+                    Forgot Password?
+                </button>
+                <a href="https://insurance.syncedupsolutions.com/" class="text-white/70 hover:text-white text-sm font-medium transition-colors">
+                    Back to Home
+                </a>
+            </div>
+
+
+            <!-- Error message -->
+            <div id="errorMessage" class="mt-4 p-3 bg-red-500/20 border border-red-500/50 text-white rounded-xl hidden"></div>
+        </div>
+
+        <!-- Password Reset Form -->
+        <div id="resetForm" class="hidden">
+            <h2 class="text-3xl font-bold text-center mb-2 text-white">Reset Password</h2>
+            <p class="text-center text-white/70 mb-8">We'll send you reset instructions</p>
+            
+            <!-- CSRF token handled by server-side middleware -->
+            <form id="resetFormElement" class="space-y-6">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-envelope text-white/50"></i>
+                    </div>
+                    <input 
+                        type="email" 
+                        id="resetEmail" 
+                        required 
+                        class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:bg-white/20 focus:border-white/40 input-glow outline-none transition-all duration-300"
+                        placeholder="Your email address"
+                    >
+                </div>
+                
+                <button 
+                    type="submit" 
+                    class="w-full bg-white/90 text-purple-700 py-3 rounded-xl font-bold hover:bg-white transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+                >
+                    Send Reset Link
+                    <i class="fas fa-paper-plane ml-2"></i>
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <button 
+                    onclick="showLoginForm()" 
+                    class="text-white/70 hover:text-white text-sm font-medium transition-colors"
+                >
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Login
+                </button>
+            </div>
+
+            <!-- Success/Error message -->
+            <div id="resetMessage" class="mt-4 p-3 rounded-xl hidden"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-8 text-center text-white/60 text-sm z-10">
+        <p>&copy; 2025 SyncedUp Solutions. Empowering Insurance Excellence.</p>
+    </div>
+
+    <!-- Include external auth scripts -->
+    <script src="/login.js"></script>
+    
+    <script>
+        // Initialize Lucide icons with retry mechanism
+        function initializeLucideIcons() {
+            if (typeof lucide !== 'undefined') {
+                try {
+                    lucide.createIcons();
+                    console.log('Lucide icons initialized successfully');
+                } catch (error) {
+                    console.error('Error initializing Lucide icons:', error);
+                }
+            } else {
+                console.warn('Lucide library not loaded, retrying in 500ms...');
+                setTimeout(initializeLucideIcons, 500);
+            }
+        }
+        
+        // Try to initialize icons after a short delay to ensure library is loaded
+        setTimeout(initializeLucideIcons, 100);
+    </script>
+</body>
+</html>

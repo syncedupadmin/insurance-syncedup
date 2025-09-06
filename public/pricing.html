@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing - SyncedUp Insurance Platform</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --obsidian: #0A0A0A;
+            --charcoal: #1A1A1A;
+            --smoke: #2A2A2A;
+            --pearl: #F8F8F8;
+            --platinum: #E5E4E2;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: var(--pearl);
+            background: var(--obsidian);
+        }
+
+        .luxury-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse at top, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+                linear-gradient(180deg, #0A0A0A 0%, #1A1A1A 100%);
+        }
+
+        .header {
+            background: linear-gradient(180deg, rgba(10, 10, 10, 0.98) 0%, rgba(10, 10, 10, 0.9) 100%);
+            backdrop-filter: blur(40px);
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 3rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--platinum);
+            font-weight: 400;
+            font-size: 0.95rem;
+            letter-spacing: 0.05em;
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--primary);
+        }
+
+        .cta-button-nav {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            text-decoration: none;
+            font-weight: 500;
+            border-radius: 50px;
+            transition: all 0.4s;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 3rem;
+        }
+
+        .hero-section {
+            padding: 6rem 0 4rem;
+            text-align: center;
+        }
+
+        .hero-section h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 200;
+            margin-bottom: 1.5rem;
+            color: var(--pearl);
+        }
+
+        .hero-section h1 span {
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-section p {
+            font-size: 1.25rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto 3rem;
+        }
+
+        .billing-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 4rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: var(--primary);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(30px);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 6rem;
+        }
+
+        .pricing-card {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(42, 42, 42, 0.5));
+            padding: 3rem;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .pricing-card.featured {
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .pricing-card.featured::before {
+            content: 'Most Popular';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .pricing-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--pearl);
+        }
+
+        .pricing-price {
+            font-size: 3rem;
+            font-weight: 200;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-period {
+            color: var(--platinum);
+            margin-bottom: 2rem;
+            opacity: 0.7;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .pricing-features li {
+            padding: 0.75rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pricing-features li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-check {
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            font-weight: 500;
+            border-radius: 50px;
+            transition: all 0.4s;
+            display: inline-block;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .enterprise-section {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8), rgba(42, 42, 42, 0.4));
+            padding: 4rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            margin-bottom: 6rem;
+        }
+
+        .enterprise-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .enterprise-feature {
+            padding: 1rem;
+        }
+
+        .faq-section {
+            margin-bottom: 6rem;
+        }
+
+        .faq-grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .faq-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .faq-question {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .guarantee-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            padding: 4rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 6rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .pricing-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="luxury-bg"></div>
+
+    <header class="header">
+        <nav class="nav">
+            <a href="/" class="logo">SyncedUp</a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/#features">Features</a></li>
+                <li><a href="/pricing.html" class="active">Pricing</a></li>
+                <li><a href="/contact.html">Contact</a></li>
+            </ul>
+            <a href="/login.html" class="cta-button-nav">Login</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero-section">
+            <div class="container">
+                <h1>Simple, <span>Transparent</span> Pricing</h1>
+                <p>Choose the perfect plan for your agency. All plans include core features with no setup fees.</p>
+                
+                <div class="billing-toggle">
+                    <span>Monthly</span>
+                    <div class="toggle-switch" onclick="toggleBilling()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <span>Annual <span style="color: #4ade80;">(Save 20%)</span></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="pricing-section">
+            <div class="container">
+                <div class="pricing-grid">
+                    <div class="pricing-card">
+                        <h3>Starter</h3>
+                        <div class="pricing-price" id="starter-price">$299</div>
+                        <div class="pricing-period">per month</div>
+                        <ul class="pricing-features">
+                            <li><span class="feature-check">✓</span> Up to 25 agents</li>
+                            <li><span class="feature-check">✓</span> Basic dashboard & reporting</li>
+                            <li><span class="feature-check">✓</span> Commission tracking</li>
+                            <li><span class="feature-check">✓</span> Email support</li>
+                            <li><span class="feature-check">✓</span> CSV exports</li>
+                            <li><span class="feature-check">✓</span> Mobile access</li>
+                        </ul>
+                        <a href="/login.html" class="btn-primary">Start Free Trial</a>
+                    </div>
+
+                    <div class="pricing-card featured">
+                        <h3>Professional</h3>
+                        <div class="pricing-price" id="pro-price">$599</div>
+                        <div class="pricing-period">per month</div>
+                        <ul class="pricing-features">
+                            <li><span class="feature-check">✓</span> Up to 100 agents</li>
+                            <li><span class="feature-check">✓</span> Advanced analytics & insights</li>
+                            <li><span class="feature-check">✓</span> Bulk agent upload (CSV)</li>
+                            <li><span class="feature-check">✓</span> License tracking & alerts</li>
+                            <li><span class="feature-check">✓</span> Custom commission structures</li>
+                            <li><span class="feature-check">✓</span> Priority support</li>
+                            <li><span class="feature-check">✓</span> Custom branding</li>
+                            <li><span class="feature-check">✓</span> API access</li>
+                        </ul>
+                        <a href="/login.html" class="btn-primary">Start Free Trial</a>
+                    </div>
+
+                    <div class="pricing-card">
+                        <h3>Agency</h3>
+                        <div class="pricing-price" id="agency-price">$999</div>
+                        <div class="pricing-period">per month</div>
+                        <ul class="pricing-features">
+                            <li><span class="feature-check">✓</span> Up to 500 agents</li>
+                            <li><span class="feature-check">✓</span> Everything in Professional</li>
+                            <li><span class="feature-check">✓</span> Multi-location support</li>
+                            <li><span class="feature-check">✓</span> Advanced user roles</li>
+                            <li><span class="feature-check">✓</span> Payroll integration</li>
+                            <li><span class="feature-check">✓</span> White-label options</li>
+                            <li><span class="feature-check">✓</span> Dedicated success manager</li>
+                            <li><span class="feature-check">✓</span> Phone support</li>
+                        </ul>
+                        <a href="/contact.html" class="btn-primary">Contact Sales</a>
+                    </div>
+                </div>
+
+                <div class="enterprise-section">
+                    <h2>Enterprise Solution</h2>
+                    <p>For large agencies, franchises, and insurance organizations with 500+ agents</p>
+                    
+                    <div class="enterprise-features">
+                        <div class="enterprise-feature">
+                            <h4>🏢 Multi-Tenant Architecture</h4>
+                            <p>Complete data isolation between agencies</p>
+                        </div>
+                        <div class="enterprise-feature">
+                            <h4>🔧 Custom Development</h4>
+                            <p>Tailored features for your workflow</p>
+                        </div>
+                        <div class="enterprise-feature">
+                            <h4>🔐 Advanced Security</h4>
+                            <p>SSO, audit logs, compliance reporting</p>
+                        </div>
+                        <div class="enterprise-feature">
+                            <h4>📊 Custom Integrations</h4>
+                            <p>Connect with your existing systems</p>
+                        </div>
+                    </div>
+                    
+                    <a href="/contact.html" class="btn-primary" style="width: auto; padding: 1.2rem 3rem;">Get Custom Quote</a>
+                </div>
+
+                <div class="guarantee-section">
+                    <h2>30-Day Money-Back Guarantee</h2>
+                    <p>Try SyncedUp risk-free. If you're not completely satisfied within 30 days, we'll refund your payment.</p>
+                </div>
+
+                <div class="faq-section">
+                    <div class="section-title" style="text-align: center; margin-bottom: 3rem;">
+                        <h2>Frequently Asked Questions</h2>
+                    </div>
+                    
+                    <div class="faq-grid">
+                        <div class="faq-item">
+                            <div class="faq-question">Is there a setup fee?</div>
+                            <div>No setup fees. You only pay the monthly subscription cost.</div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">Can I change plans anytime?</div>
+                            <div>Yes, you can upgrade or downgrade your plan at any time. Changes take effect at your next billing cycle.</div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">What payment methods do you accept?</div>
+                            <div>We accept all major credit cards, ACH transfers, and can accommodate wire transfers for enterprise accounts.</div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">Is my data secure?</div>
+                            <div>Yes, we use bank-level encryption, regular security audits, and comply with industry standards to keep your data safe.</div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">Do you offer training?</div>
+                            <div>Yes, all plans include onboarding support. Professional and Agency plans include dedicated training sessions.</div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">Can I import my existing agent data?</div>
+                            <div>Yes, we provide data migration assistance and support CSV imports for bulk agent uploads.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer style="background: var(--obsidian); padding: 3rem; text-align: center; border-top: 1px solid rgba(102, 126, 234, 0.2); opacity: 0.7;">
+        <p>© 2024 SyncedUp Insurance Platform. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let isAnnual = false;
+        
+        const prices = {
+            monthly: { starter: 299, pro: 599, agency: 999 },
+            annual: { starter: 239, pro: 479, agency: 799 }
+        };
+        
+        function toggleBilling() {
+            isAnnual = !isAnnual;
+            const toggle = document.querySelector('.toggle-switch');
+            toggle.classList.toggle('active');
+            
+            document.getElementById('starter-price').textContent = `$${prices[isAnnual ? 'annual' : 'monthly'].starter}`;
+            document.getElementById('pro-price').textContent = `$${prices[isAnnual ? 'annual' : 'monthly'].pro}`;
+            document.getElementById('agency-price').textContent = `$${prices[isAnnual ? 'annual' : 'monthly'].agency}`;
+            
+            document.querySelectorAll('.pricing-period').forEach(el => {
+                el.textContent = isAnnual ? 'per month (billed annually)' : 'per month';
+            });
+        }
+    </script>
+</body>
+</html>

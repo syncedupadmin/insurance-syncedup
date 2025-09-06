@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Test - SyncedUp Insurance</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .result {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 1rem;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin-top: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .links {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Authentication Test</h2>
+        
+        <button onclick="testLogin()">Test Login API</button>
+        <button onclick="checkStoredAuth()">Check Stored Auth</button>
+        <button onclick="testAdminAccess()">Test Admin Page Access</button>
+        <button onclick="clearStorage()">Clear Storage</button>
+        
+        <div class="result" id="result">Click a button to test...</div>
+        
+        <div class="links">
+            <a href="/login.html">Login Page</a>
+            <a href="/admin/">Admin Dashboard</a>
+            <a href="/">Main Portal</a>
+        </div>
+    </div>
+
+    <script>
+        const resultDiv = document.getElementById('result');
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            resultDiv.textContent += `[${timestamp}] ${message}\n`;
+            console.log(message);
+        }
+        
+        function clearResult() {
+            resultDiv.textContent = '';
+        }
+
+        async function testLogin() {
+            clearResult();
+            log('Testing login API...');
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: 'admin@syncedup.com', 
+                        password: 'admin123' 
+                    })
+                });
+                
+                log(`Response Status: ${response.status}`);
+                log(`Response OK: ${response.ok}`);
+                
+                const data = await response.json();
+                log(`Response Data: ${JSON.stringify(data, null, 2)}`);
+                
+                if (response.ok && data.success) {
+                    log('✅ Login successful! Storing token...');
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    log('✅ Token stored in localStorage');
+                } else {
+                    log('❌ Login failed: ' + (data.error || 'Unknown error'));
+                }
+                
+            } catch (error) {
+                log('❌ Network error: ' + error.message);
+            }
+        }
+
+        function checkStoredAuth() {
+            clearResult();
+            log('Checking stored authentication...');
+            
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('syncedup_user');
+            
+            if (token) {
+                log('✅ Token found: ' + token.substring(0, 50) + '...');
+                
+                try {
+                    const userData = JSON.parse(user);
+                    log('✅ User data: ' + JSON.stringify(userData, null, 2));
+                } catch (e) {
+                    log('❌ Error parsing user data: ' + e.message);
+                }
+            } else {
+                log('❌ No token found in localStorage');
+            }
+        }
+
+        async function testAdminAccess() {
+            clearResult();
+            log('Testing admin page access...');
+            
+            try {
+                const response = await fetch('/admin/', {
+                    method: 'GET'
+                });
+                
+                log(`Admin page status: ${response.status}`);
+                log(`Admin page OK: ${response.ok}`);
+                
+                if (response.ok) {
+                    log('✅ Admin page accessible');
+                    const text = await response.text();
+                    log(`Page content length: ${text.length} characters`);
+                } else {
+                    log('❌ Admin page not accessible');
+                    const text = await response.text();
+                    log(`Error content: ${text.substring(0, 200)}...`);
+                }
+                
+            } catch (error) {
+                log('❌ Error accessing admin page: ' + error.message);
+            }
+        }
+
+        function clearStorage() {
+            clearResult();
+            localStorage.clear();
+            log('✅ localStorage cleared');
+        }
+    </script>
+</body>
+</html>

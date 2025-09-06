@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Service Dashboard - SyncedUp Insurance</title>
+    <link rel="stylesheet" href="customer-service-global.css">
+    <script src="/auth-check.js" defer></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Customer Service Dashboard</h1>
+        <div class="user-info">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn btn-secondary" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="index.html" class="nav-link active">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="member-search.html" class="nav-link">
+            <i data-lucide="search" class="icon"></i>
+            Member Search
+        </a>
+        <a href="member-profile.html" class="nav-link">
+            <i data-lucide="user-check" class="icon"></i>
+            Member History
+        </a>
+        <a href="settings.html" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Customer Service Welcome Notice -->
+        <div class="cs-notice">
+            <h3><i data-lucide="headphones"></i> Customer Service Portal</h3>
+            <p>Comprehensive member support dashboard. Search members, manage cases, and track interaction history.</p>
+        </div>
+        
+        <!-- Performance Stats -->
+        <div class="grid grid-4">
+            <div class="stat-card">
+                <div class="stat-value" id="dailyCases">0</div>
+                <div class="stat-label">Daily Cases</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="activeCases">0</div>
+                <div class="stat-label">Active Cases</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalMembers">0</div>
+                <div class="stat-label">Total Members</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgResponseTime">0m</div>
+                <div class="stat-label">Avg Response Time</div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button class="btn btn-primary" onclick="location.href='member-search.html'">
+                <i data-lucide="search"></i>
+                Search Member
+            </button>
+            <button class="btn btn-success" onclick="createNewCase()">
+                <i data-lucide="plus-circle"></i>
+                New Case
+            </button>
+            <button class="btn btn-warning" onclick="location.href='interactions.html'">
+                <i data-lucide="clock"></i>
+                View Active Cases
+            </button>
+            <button class="btn btn-secondary" onclick="generateReport()">
+                <i data-lucide="download"></i>
+                Generate Report
+            </button>
+        </div>
+        
+        <!-- Portal Hub Tools -->
+        <div class="grid grid-3">
+            <div class="card">
+                <h3><i data-lucide="user-plus" class="card-icon"></i>FirstEnroll Management</h3>
+                <div class="portal-actions">
+                    <button class="btn btn-primary" onclick="openFirstEnroll()">
+                        <i data-lucide="external-link"></i>
+                        Open FirstEnroll Portal
+                    </button>
+                    <button class="btn btn-secondary" onclick="searchFirstEnrollMember()">
+                        <i data-lucide="search"></i>
+                        Search Members
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3><i data-lucide="shield" class="card-icon"></i>Health Sherpa</h3>
+                <div class="portal-actions">
+                    <button class="btn btn-success" onclick="openHealthSherpa()">
+                        <i data-lucide="external-link"></i>
+                        Open Health Sherpa
+                    </button>
+                    <button class="btn btn-secondary" onclick="checkHealthSherpaEnrollments()">
+                        <i data-lucide="check-circle"></i>
+                        Check Enrollments
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3><i data-lucide="building" class="card-icon"></i>Blue Enrollments</h3>
+                <div class="portal-actions">
+                    <button class="btn btn-info" onclick="openBlueEnrollments()">
+                        <i data-lucide="external-link"></i>
+                        Open Blue Portal
+                    </button>
+                    <button class="btn btn-secondary" onclick="verifyBlueEnrollment()">
+                        <i data-lucide="user-check"></i>
+                        Verify Enrollment
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Provider Search Tools -->
+        <div class="card">
+            <h3><i data-lucide="map-pin" class="card-icon"></i>Provider Search Tools</h3>
+            <div class="grid grid-2">
+                <div class="search-tool">
+                    <h4><i data-lucide="stethoscope"></i>Find Providers</h4>
+                    <div class="search-form">
+                        <input type="text" id="providerZip" placeholder="ZIP Code" class="form-input">
+                        <select id="providerType" class="form-select">
+                            <option value="">Select Provider Type</option>
+                            <option value="primary">Primary Care</option>
+                            <option value="specialist">Specialist</option>
+                            <option value="hospital">Hospital</option>
+                            <option value="pharmacy">Pharmacy</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="searchProviders()">
+                            <i data-lucide="search"></i>
+                            Search
+                        </button>
+                    </div>
+                </div>
+                <div class="search-tool">
+                    <h4><i data-lucide="user-check"></i>Member Verification</h4>
+                    <div class="search-form">
+                        <input type="text" id="memberIdVerify" placeholder="Member ID" class="form-input">
+                        <input type="text" id="memberDobVerify" placeholder="Date of Birth (MM/DD/YYYY)" class="form-input">
+                        <button class="btn btn-success" onclick="verifyMember()">
+                            <i data-lucide="check-circle"></i>
+                            Verify Member
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="providerResults" class="provider-results" style="display: none;">
+                <h4>Search Results</h4>
+                <div id="providerList"></div>
+            </div>
+        </div>
+
+        <!-- Dashboard Content Grid -->
+        <div class="grid">
+            <div class="card">
+                <h3><i data-lucide="clock" class="card-icon"></i>Recent Activity</h3>
+                <div id="recentActivity">
+                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                        <div class="loading"></div>
+                        Loading recent activity...
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3><i data-lucide="trending-up" class="card-icon"></i>Case Statistics</h3>
+                <div id="caseStatistics">
+                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                        <div class="loading"></div>
+                        Loading case statistics...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Priority Cases -->
+        <div class="card">
+            <h3><i data-lucide="alert-triangle" class="card-icon"></i>Priority Cases</h3>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Case ID</th>
+                            <th>Member Name</th>
+                            <th>Issue Type</th>
+                            <th>Priority</th>
+                            <th>Created</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="priorityCasesBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                                <div class="loading"></div>
+                                Loading priority cases...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Today's Assigned Cases -->
+        <div class="card">
+            <h3><i data-lucide="user-check" class="card-icon"></i>Today's Assigned Cases</h3>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Case ID</th>
+                            <th>Member</th>
+                            <th>Contact Info</th>
+                            <th>Issue</th>
+                            <th>Last Update</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="assignedCasesBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                                <div class="loading"></div>
+                                Loading assigned cases...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        // Authentication check
+        function checkAuth() {
+            const token = localStorage.getItem('syncedup_token');
+            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+            
+            if (!token || !user.email) {
+                window.location.href = '/login.html';
+                return false;
+            }
+
+            // Check if user has customer service permissions
+            if (!['customer-service', 'manager', 'admin', 'super-admin'].includes(user.role)) {
+                alert('Access denied. Customer service permissions required.');
+                window.location.href = '/login.html';
+                return false;
+            }
+
+            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
+            currentUser = user;
+            return true;
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            // Load dashboard data
+            await loadDashboardData();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                await loadStats();
+                await loadRecentActivity();
+                await loadCaseStatistics();
+                await loadPriorityCases();
+                await loadAssignedCases();
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                loadFallbackData();
+            }
+        }
+
+        // Load performance stats
+        async function loadStats() {
+            try {
+                const data = await window.__api('/dashboard/cs-stats');
+                if (data && data.stats) {
+                    document.getElementById('dailyCases').textContent = data.stats.dailyCases;
+                    document.getElementById('activeCases').textContent = data.stats.activeCases;
+                    document.getElementById('totalMembers').textContent = data.stats.totalMembers.toLocaleString();
+                    document.getElementById('avgResponseTime').textContent = data.stats.avgResponseTime;
+                } else {
+                    // Fallback data
+                    document.getElementById('dailyCases').textContent = '20';
+                    document.getElementById('activeCases').textContent = '5';
+                    document.getElementById('totalMembers').textContent = '1,000';
+                    document.getElementById('avgResponseTime').textContent = '15m';
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                // Fallback data
+                document.getElementById('dailyCases').textContent = '20';
+                document.getElementById('activeCases').textContent = '5';
+                document.getElementById('totalMembers').textContent = '1,000';
+                document.getElementById('avgResponseTime').textContent = '15m';
+            }
+        }
+
+        // Load recent activity
+        async function loadRecentActivity() {
+            const activityContainer = document.getElementById('recentActivity');
+            
+            try {
+                const data = await window.__api('/dashboard/cs-stats');
+                const activities = data?.recentActivity || [];
+
+                const activityHTML = activities.map(activity => `
+                    <div class="interaction-item">
+                        <div class="interaction-header">
+                            <span class="interaction-type">${activity.member}</span>
+                            <span class="interaction-date">${activity.time}</span>
+                        </div>
+                        <div class="interaction-note">${activity.action}</div>
+                    </div>
+                `).join('');
+
+                activityContainer.innerHTML = activityHTML || '<p style="text-align: center; color: rgba(255,255,255,0.7);">No recent activity</p>';
+            } catch (error) {
+                console.error('Error loading recent activity:', error);
+                activityContainer.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.7);">Unable to load recent activity</p>';
+            }
+        }
+
+        // Load case statistics
+        async function loadCaseStatistics() {
+            const statsContainer = document.getElementById('caseStatistics');
+            
+            try {
+                const data = await window.__api('/dashboard/cs-stats');
+                const caseStats = data?.caseStatistics || {};
+                
+                const stats = `
+                    <div style="display: grid; gap: 1rem;">
+                        <div class="profile-field">
+                            <span class="profile-label">Total Cases Today:</span>
+                            <span class="profile-value">${caseStats.totalCases || 0}</span>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-label">Resolved Cases:</span>
+                            <span class="profile-value">${caseStats.resolvedCases || 0}</span>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-label">Pending Cases:</span>
+                            <span class="profile-value">${caseStats.pendingCases || 0}</span>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-label">Escalated Cases:</span>
+                            <span class="profile-value">${caseStats.escalatedCases || 0}</span>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-label">Resolution Rate:</span>
+                            <span class="profile-value">${caseStats.resolutionRate || '0%'}</span>
+                        </div>
+                    </div>
+                `;
+
+                statsContainer.innerHTML = stats;
+            } catch (error) {
+                console.error('Error loading case statistics:', error);
+                statsContainer.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.7);">Unable to load statistics</p>';
+            }
+        }
+
+        // Load priority cases
+        async function loadPriorityCases() {
+            const tableBody = document.getElementById('priorityCasesBody');
+            
+            try {
+                const data = await window.__api('/dashboard/cs-stats');
+                const cases = data?.priorityCases || [];
+
+                const casesHTML = cases.map(caseItem => `
+                    <tr onclick="viewCase('${caseItem.id}')">
+                        <td>${caseItem.id}</td>
+                        <td>${caseItem.member}</td>
+                        <td>${caseItem.type}</td>
+                        <td><span class="status-badge status-${caseItem.priority?.toLowerCase() || 'medium'}">${caseItem.priority || 'Medium'}</span></td>
+                        <td>${caseItem.created}</td>
+                        <td><span class="status-badge status-${(caseItem.status || 'open').toLowerCase().replace(' ', '')}">${caseItem.status || 'Open'}</span></td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="event.stopPropagation(); viewCase('${caseItem.id}')">View</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                tableBody.innerHTML = casesHTML || '<tr><td colspan="7" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">No priority cases</td></tr>';
+            } catch (error) {
+                console.error('Error loading priority cases:', error);
+                tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">Unable to load priority cases</td></tr>';
+            }
+        }
+
+        // Load assigned cases
+        async function loadAssignedCases() {
+            const tableBody = document.getElementById('assignedCasesBody');
+            
+            try {
+                const data = await window.__api('/dashboard/cs-stats');
+                const cases = data?.assignedCases || [];
+
+                const casesHTML = cases.map(caseItem => `
+                    <tr onclick="viewCase('${caseItem.id}')">
+                        <td>${caseItem.id}</td>
+                        <td>${caseItem.member}</td>
+                        <td>${caseItem.contact || 'N/A'}</td>
+                        <td>${caseItem.issue}</td>
+                        <td>${caseItem.lastUpdate}</td>
+                        <td><span class="status-badge status-${(caseItem.status || 'pending').toLowerCase()}">${caseItem.status || 'Pending'}</span></td>
+                        <td>
+                            <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="event.stopPropagation(); viewCase('${caseItem.id}')">View</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                tableBody.innerHTML = casesHTML || '<tr><td colspan="7" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">No assigned cases today</td></tr>';
+            } catch (error) {
+                console.error('Error loading assigned cases:', error);
+                tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">Unable to load assigned cases</td></tr>';
+            }
+        }
+
+        // Fallback data for when API fails
+        function loadFallbackData() {
+            document.getElementById('dailyCases').textContent = '20';
+            document.getElementById('activeCases').textContent = '5';
+            document.getElementById('totalMembers').textContent = '1,000';
+            document.getElementById('avgResponseTime').textContent = '15m';
+        }
+
+        // Action functions
+        function createNewCase() {
+            alert('New Case creation - This will redirect to case creation form');
+        }
+
+        function generateReport() {
+            alert('Report generation - This will generate and download case reports');
+        }
+
+        function viewCase(caseId) {
+            alert(`View Case ${caseId} - This will redirect to detailed case view`);
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('syncedup_token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+
+        // Portal Hub Functions
+        function openFirstEnroll() {
+            window.open('https://firstenroll.com/agent-portal', '_blank');
+        }
+
+        function searchFirstEnrollMember() {
+            const memberId = prompt('Enter Member ID:');
+            if (memberId) {
+                alert(`Searching FirstEnroll for Member ID: ${memberId}\nThis would typically open a member search interface.`);
+            }
+        }
+
+        function openHealthSherpa() {
+            window.open('https://healthsherpa.com/agent', '_blank');
+        }
+
+        function checkHealthSherpaEnrollments() {
+            alert('Checking Health Sherpa enrollments...\nThis would typically show recent enrollment status and updates.');
+        }
+
+        function openBlueEnrollments() {
+            window.open('https://www.bcbsga.com/provider', '_blank');
+        }
+
+        function verifyBlueEnrollment() {
+            const memberId = prompt('Enter Member ID to verify:');
+            if (memberId) {
+                alert(`Verifying Blue enrollment for Member ID: ${memberId}\nThis would typically check enrollment status with Blue Cross Blue Shield.`);
+            }
+        }
+
+        function searchProviders() {
+            const zip = document.getElementById('providerZip').value;
+            const type = document.getElementById('providerType').value;
+            
+            if (!zip) {
+                alert('Please enter a ZIP code');
+                return;
+            }
+
+            // Mock provider search results
+            const results = [
+                { name: 'Atlanta Medical Center', address: '303 Parkway Dr NE, Atlanta, GA 30312', phone: '(404) 265-4000', type: 'Hospital' },
+                { name: 'Piedmont Atlanta Hospital', address: '1968 Peachtree Rd NW, Atlanta, GA 30309', phone: '(404) 605-5000', type: 'Hospital' },
+                { name: 'Emory University Hospital', address: '1364 Clifton Rd NE, Atlanta, GA 30322', phone: '(404) 712-2000', type: 'Hospital' }
+            ];
+
+            const providerList = document.getElementById('providerList');
+            const providerResults = document.getElementById('providerResults');
+
+            providerList.innerHTML = results.map(provider => `
+                <div class="provider-item">
+                    <h5>${provider.name}</h5>
+                    <p><i data-lucide="map-pin"></i> ${provider.address}</p>
+                    <p><i data-lucide="phone"></i> ${provider.phone}</p>
+                    <span class="provider-type">${provider.type}</span>
+                </div>
+            `).join('');
+
+            providerResults.style.display = 'block';
+            lucide.createIcons();
+        }
+
+        function verifyMember() {
+            const memberId = document.getElementById('memberIdVerify').value;
+            const dob = document.getElementById('memberDobVerify').value;
+            
+            if (!memberId || !dob) {
+                alert('Please enter both Member ID and Date of Birth');
+                return;
+            }
+
+            alert(`Member Verification:\nMember ID: ${memberId}\nDOB: ${dob}\n\nStatus: ACTIVE\nPlan: Blue Choice HMO\nEffective Date: 01/01/2025`);
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
+    <script src="/assets/session-prod.js"></script>
+</body>
+</html>

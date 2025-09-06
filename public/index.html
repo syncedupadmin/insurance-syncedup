@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYNCEDUP - Complete Agency Management Platform</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="/assets/global-styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #8B5CF6 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* Luxury grid pattern overlay */
+        .luxury-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background-image: 
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255, 255, 255, 0.03) 2px, rgba(255, 255, 255, 0.03) 4px),
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.03) 2px, rgba(255, 255, 255, 0.03) 4px);
+            background-size: 100px 100px;
+            animation: luxuryGrid 20s linear infinite;
+            opacity: 0.3;
+            z-index: 1;
+        }
+
+        @keyframes luxuryGrid {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(100px, 100px); }
+        }
+
+        /* Glassmorphism cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        .glass-card-dark {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* Premium icon styling */
+        .icon-hexagon {
+            width: 70px;
+            height: 70px;
+            position: relative;
+            margin: 0 auto 1.5rem;
+        }
+
+        .icon-hexagon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+            border: 1px solid rgba(255,215,0,0.2);
+        }
+
+        .icon-hexagon i {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.8rem;
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            /* Fallback for gradient text */
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            /* Ensure icons are visible even if gradient fails */
+            &::before {
+                color: #FFD700 !important;
+            }
+        }
+
+        /* Neon glow text */
+        .glow-text {
+            text-shadow: 0 0 20px rgba(255,255,255,0.5),
+                         0 0 40px rgba(255,255,255,0.3),
+                         0 0 60px rgba(139,92,246,0.3),
+                         0 0 80px rgba(139,92,246,0.2);
+        }
+
+        .gold-glow {
+            text-shadow: 0 0 20px rgba(255,215,0,0.5),
+                         0 0 40px rgba(255,215,0,0.3);
+        }
+
+        /* Premium header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1.5rem 3rem;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .header.scrolled {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            padding: 1rem 3rem;
+        }
+
+        /* Floating elements */
+        .floating-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.3;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            33% { transform: translateY(-30px) translateX(20px); }
+            66% { transform: translateY(30px) translateX(-20px); }
+        }
+
+        /* Premium buttons */
+        .btn-luxury {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+            color: #764ba2;
+            padding: 1rem 2.5rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-luxury:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(255,255,255,0.3);
+        }
+
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 1rem 2.5rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Feature badges */
+        .feature-badge {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin: 0.25rem;
+            transition: all 0.3s;
+        }
+
+        .feature-badge:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* Stat cards */
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, transparent, rgba(255,215,0,0.3), transparent);
+            opacity: 0;
+            transition: opacity 0.5s;
+            z-index: -1;
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+            animation: shimmer 2s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255,215,0,0.3);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 200;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Animations */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+
+        /* Logo styling improvements */
+        .header img {
+            height: 80px;
+            width: auto;
+            transition: transform 0.3s ease;
+            filter: drop-shadow(0 0 15px rgba(139,92,246,0.6));
+        }
+        
+        .header img:hover {
+            transform: scale(1.08);
+        }
+        
+        .hero-logo {
+            max-width: 300px;
+            width: 50%;
+            height: auto;
+            display: block;
+            transition: transform 0.3s ease;
+            animation: heroFloat 6s ease-in-out infinite;
+        }
+        
+        @keyframes heroFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        
+        .logo-glow {
+            filter: drop-shadow(0 0 20px rgba(139,92,246,0.4))
+                    drop-shadow(0 0 40px rgba(139,92,246,0.2))
+                    drop-shadow(0 4px 20px rgba(0,0,0,0.3));
+        }
+        
+        .hero-logo:hover {
+            transform: translateY(-5px) scale(1.02);
+        }
+        
+        .ai-style-change-1 {
+            max-width: 300px !important;
+            width: 50% !important;
+            height: auto !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem 1.5rem;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Luxury overlay pattern -->
+    <div class="luxury-overlay"></div>
+
+    <!-- Floating orbs -->
+    <div class="floating-orb w-96 h-96 bg-purple-500 -top-48 -left-48"></div>
+    <div class="floating-orb w-64 h-64 bg-pink-500 top-1/2 -right-32" style="animation-delay: 5s;"></div>
+    <div class="floating-orb w-80 h-80 bg-blue-500 -bottom-40 left-1/4" style="animation-delay: 10s;"></div>
+
+    <!-- Premium Header -->
+    <header class="header" id="header">
+        <nav class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center"><img src="/images/Transparent.png" alt="SyncedUp Solutions" class="h-20 md:h-24 w-auto logo-glow transition-transform duration-300 hover:scale-105"></div>
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#features" class="hover:text-yellow-300 transition-colors">Features</a>
+                <a href="#stats" class="hover:text-yellow-300 transition-colors">Results</a>
+                <a href="#testimonials" class="hover:text-yellow-300 transition-colors">Success</a>
+                <a href="/login.html" class="btn-glass rounded-full">Sign In</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center px-4 pt-20">
+        <div class="max-w-6xl w-full text-center relative z-10">
+            <!-- Exclusive Badge -->
+            <div class="inline-block mb-8 fade-in-up">
+                <div class="glass-card-dark px-6 py-2 rounded-full">
+                    <span class="text-yellow-300 font-medium text-sm tracking-wider uppercase">Exclusive Agency Platform</span>
+                </div>
+            </div>
+
+            <!-- Main Heading -->
+            <div class="mb-8 fade-in-up delay-1 flex justify-center">
+                <img src="/images/Transparent.png" alt="SyncedUp Solutions" class="hero-logo logo-glow ai-style-change-1">
+            </div>
+            <h1 class="text-4xl md:text-6xl font-bold mb-6 fade-in-up delay-2 glow-text">
+                Complete Agency Intelligence
+            </h1>
+            <p class="text-xl md:text-2xl opacity-90 max-w-4xl mx-auto mb-8 fade-in-up delay-3 font-medium">
+                Where elite agencies automate everything from lead capture to commission payout.
+            </p>
+            <p class="text-lg md:text-xl opacity-80 max-w-3xl mx-auto mb-12 fade-in-up delay-3">
+                Zero human error • Total control • Unlimited scale • Global competition
+            </p>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16 fade-in-up delay-4">
+                <button class="btn-luxury rounded-full text-lg">
+                    Start Free Trial
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+                <button class="btn-glass rounded-full text-lg">
+                    Watch Demo
+                    <i class="fas fa-play-circle ml-2"></i>
+                </button>
+            </div>
+
+            <!-- Hero Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="stat-card rounded-2xl fade-in-up delay-1">
+                    <div class="stat-number">$10.3M+</div>
+                    <div class="text-sm opacity-70 uppercase tracking-wider">Premium Managed</div>
+                </div>
+                <div class="stat-card rounded-2xl fade-in-up delay-2">
+                    <div class="stat-number">100+</div>
+                    <div class="text-sm opacity-70 uppercase tracking-wider">Elite Agencies</div>
+                </div>
+                <div class="stat-card rounded-2xl fade-in-up delay-3">
+                    <div class="stat-number">99.99%</div>
+                    <div class="text-sm opacity-70 uppercase tracking-wider">Accuracy Rate</div>
+                </div>
+                <div class="stat-card rounded-2xl fade-in-up delay-4">
+                    <div class="stat-number">$89K+</div>
+                    <div class="text-sm opacity-70 uppercase tracking-wider">Annual Savings</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 px-4" id="features">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 glow-text">
+                    Unparalleled Capabilities
+                </h2>
+                <p class="text-xl opacity-80 max-w-2xl mx-auto">
+                    Everything your agency needs to dominate. Nothing it doesn't.
+                </p>
+            </div>
+
+            <!-- Feature Grid with Premium Icons -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Lead to Commission -->
+                <div class="glass-card rounded-2xl p-8 hover:scale-105 transition-transform">
+                    <div class="icon-hexagon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3">Lead to Commission</h3>
+                    <p class="opacity-80">Complete pipeline automation from first contact to final payout. Every step tracked, every dollar accounted.</p>
+                </div>
+
+                <!-- Instant Payroll -->
+                <div class="glass-card rounded-2xl p-8 hover:scale-105 transition-transform relative overflow-hidden">
+                    <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold">PROFIT</div>
+                    <div class="icon-hexagon">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3 text-green-300">Automated Payroll System</h3>
+                    <p class="opacity-80">Instant commission calculations • Split handling • Chargeback processing • Tax compliance • Direct deposits • Eliminate 3+ admin positions</p>
+                </div>
+
+                <!-- Global Leaderboards -->
+                <div class="glass-card rounded-2xl p-8 hover:scale-105 transition-transform relative overflow-hidden">
+                    <div class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold">HOT</div>
+                    <div class="icon-hexagon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3 text-yellow-300">Global Leaderboards</h3>
+                    <p class="opacity-80">Real-time rankings across 100+ agencies nationwide • Drive competition • Boost sales 47% average • Watch agents dominate</p>
+                </div>
+
+                <!-- Manager Dashboard -->
+                <div class="glass-card rounded-2xl p-8 hover:scale-105 transition-transform">
+                    <div class="icon-hexagon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3 text-blue-300">Executive Dashboard</h3>
+                    <p class="opacity-80">Real-time analytics • Lead flow tracking • Conversion optimization • Performance insights • Team management • Revenue forecasting</p>
+                </div>
+
+                <!-- Carrier APIs -->
+                <div class="glass-card rounded-2xl p-8 hover:scale-105 transition-transform">
+                    <div class="icon-hexagon">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3">Carrier APIs</h3>
+                    <p class="opacity-80">Direct integration with major carriers. Submit, track, and manage policies without switching platforms.</p>
+                </div>
+
+                <!-- License Tracking -->
+                <div class="glass-card rounded-2xl p-8 hover:scale-105 transition-transform">
+                    <div class="icon-hexagon">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold mb-3">License Tracking</h3>
+                    <p class="opacity-80">Never miss a renewal. Automated alerts keep your agency compliant and operational.</p>
+                </div>
+            </div>
+
+            <!-- Feature Badges -->
+            <div class="text-center mt-12">
+                <div class="feature-badge">
+                    <i class="fas fa-check mr-2"></i>Zero Setup Fees
+                </div>
+                <div class="feature-badge">
+                    <i class="fas fa-check mr-2"></i>24/7 Support
+                </div>
+                <div class="feature-badge">
+                    <i class="fas fa-check mr-2"></i>99.97% Uptime
+                </div>
+                <div class="feature-badge">
+                    <i class="fas fa-check mr-2"></i>Bank-Level Security
+                </div>
+                <div class="feature-badge">
+                    <i class="fas fa-check mr-2"></i>HIPAA Compliant
+                </div>
+                <div class="feature-badge">
+                    <i class="fas fa-check mr-2"></i>SOC 2 Certified
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonial Section -->
+    <section class="py-20 px-4" id="testimonials">
+        <div class="max-w-6xl mx-auto">
+            <div class="glass-card-dark rounded-3xl p-12">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-bold gold-glow">Industry Leaders Trust SyncedUp</h2>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="glass-card rounded-xl p-6">
+                        <div class="flex mb-4">
+                            <i class="fas fa-quote-left text-2xl text-yellow-400 opacity-50"></i>
+                        </div>
+                        <p class="text-lg italic mb-4">"We eliminated 3 admin positions and increased accuracy to 100%. ROI in 30 days. The global leaderboard alone increased our sales 43%."</p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 flex items-center justify-center">
+                                <span class="text-white font-bold">MJ</span>
+                            </div>
+                            <div>
+                                <div class="font-semibold">Marcus Johnson</div>
+                                <div class="text-sm opacity-70">State Farm Elite Agency</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-xl p-6">
+                        <div class="flex mb-4">
+                            <i class="fas fa-quote-left text-2xl text-yellow-400 opacity-50"></i>
+                        </div>
+                        <p class="text-lg italic mb-4">"The global leaderboard transformed our culture. Sales up 47% in 6 months. My agents now compete nationally and love the automated payroll system."</p>
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center">
+                                <span class="text-white font-bold">SC</span>
+                            </div>
+                            <div>
+                                <div class="font-semibold">Sarah Chen</div>
+                                <div class="text-sm opacity-70">Allstate Top Producer</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="py-20 px-4 text-center">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6 glow-text">
+                Your Competition Already Uses SyncedUp
+            </h2>
+            <p class="text-xl opacity-80 mb-8">
+                Join 100+ elite agencies saving $89,000+ annually through complete automation.<br>
+                <span class="text-yellow-300 font-semibold">Global leaderboards • Automated payroll • Executive dashboards</span>
+            </p>
+            <button class="btn-luxury rounded-full text-xl px-8 py-4">
+                Claim Your 14-Day Free Trial
+                <i class="fas fa-rocket ml-2"></i>
+            </button>
+            <p class="mt-6 opacity-60">No credit card required • Setup in 48 hours • Cancel anytime</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="glass-card-dark py-8 mt-20">
+        <div class="text-center">
+            <p class="opacity-70">&copy; 2025 SyncedUp Solutions • Empowering Insurance Excellence</p>
+        </div>
+    </footer>
+
+    <script>
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+        
+        // Initialize Lucide icons with retry mechanism
+        function initializeLucideIcons() {
+            if (typeof lucide !== 'undefined') {
+                try {
+                    lucide.createIcons();
+                    console.log('Lucide icons initialized successfully');
+                } catch (error) {
+                    console.error('Error initializing Lucide icons:', error);
+                }
+            } else {
+                console.warn('Lucide library not loaded, retrying in 500ms...');
+                setTimeout(initializeLucideIcons, 500);
+            }
+        }
+        
+        // Try to initialize icons after a short delay to ensure library is loaded
+        setTimeout(initializeLucideIcons, 100);
+        
+        // Check if Font Awesome loaded properly
+        setTimeout(() => {
+            const testIcon = document.querySelector('.fas');
+            if (testIcon) {
+                const computedStyle = window.getComputedStyle(testIcon, ':before');
+                if (computedStyle.content === '""' || computedStyle.content === 'none') {
+                    console.warn('Font Awesome icons may not be loading properly');
+                    // Try adding a backup class
+                    document.querySelectorAll('.fas').forEach(icon => {
+                        icon.style.fontSize = '1.8rem';
+                        icon.style.display = 'inline-block';
+                        icon.style.fontFamily = '"Font Awesome 6 Free"';
+                        icon.style.fontWeight = '900';
+                    });
+                } else {
+                    console.log('Font Awesome icons loaded successfully');
+                }
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

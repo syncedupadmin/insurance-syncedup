@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Super Admin Auth</title>
+</head>
+<body>
+    <h1>Super Admin Authentication Test</h1>
+    <div id="output"></div>
+    
+    <button onclick="simulateLogin()">Simulate Login</button>
+    <button onclick="testAuth()">Test Auth Check</button>
+    <button onclick="clearStorage()">Clear Storage</button>
+    
+    <script>
+        function log(message) {
+            document.getElementById('output').innerHTML += '<div>' + message + '</div>';
+        }
+        
+        function simulateLogin() {
+            log('🔄 Simulating login...');
+            
+            // Simulate the data that would be stored after login
+            const mockUserData = {
+                id: "58afcd15-147f-410f-9649-67cfdbbbbe76",
+                email: "admin@syncedupsolutions.com",
+                firstName: "nick",
+                lastName: "stults",
+                role: "super-admin",
+                agency_id: "SYSTEM",
+                mustChangePassword: true,
+                loginCount: 11
+            };
+            
+            const mockToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock.token";
+            
+            localStorage.setItem('syncedup_token', mockToken);
+            localStorage.setItem('syncedup_user', JSON.stringify(mockUserData));
+            
+            log('✅ Mock login data stored');
+            log('   Token: ' + !!localStorage.getItem('syncedup_token'));
+            log('   User role: ' + JSON.parse(localStorage.getItem('syncedup_user')).role);
+        }
+        
+        function testAuth() {
+            log('🔍 Testing authentication logic...');
+            
+            // Use same logic as super admin page
+            const freshToken = localStorage.getItem('syncedup_token');
+            const freshUser = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+            
+            log('   Token present: ' + !!freshToken);
+            log('   User role: ' + freshUser.role);
+            log('   User email: ' + freshUser.email);
+            
+            if (!freshToken || (freshUser.role !== 'super-admin' && freshUser.email !== 'admin@syncedupsolutions.com')) {
+                log('❌ Authentication would fail - would redirect to login');
+            } else {
+                log('✅ Authentication would succeed - would load super admin portal');
+            }
+        }
+        
+        function clearStorage() {
+            localStorage.clear();
+            log('🗑️ localStorage cleared');
+        }
+    </script>
+</body>
+</html>

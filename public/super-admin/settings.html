@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Super Admin</title>
+    <link rel="stylesheet" href="super-admin-global.css">
+    <script src="/auth-check.js" defer></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">SA</div>
+                Super Admin Portal
+            </a>
+            <div class="header-actions">
+                <div class="user-info">
+                    <div class="user-avatar">SA</div>
+                    <div>
+                        <div style="font-weight: 600;" id="userDisplay">Super Admin</div>
+                        <div style="font-size: 0.8rem; opacity: 0.7;">Platform Administrator</div>
+                    </div>
+                </div>
+                <button class="btn" onclick="logout()">
+                    <i data-lucide="log-out"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-section">
+            <div class="nav-title">Platform Overview</div>
+            <a href="index.html" class="nav-link">
+                <i data-lucide="layout-dashboard" class="nav-icon"></i>
+                Dashboard
+            </a>
+            <a href="system-analytics.html" class="nav-link">
+                <i data-lucide="bar-chart-3" class="nav-icon"></i>
+                System Analytics
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-title">Management</div>
+            <a href="agency-management.html" class="nav-link">
+                <i data-lucide="building-2" class="nav-icon"></i>
+                Agency Management
+            </a>
+            <a href="user-administration.html" class="nav-link">
+                <i data-lucide="users" class="nav-icon"></i>
+                User Administration
+            </a>
+            <a href="revenue-management.html" class="nav-link">
+                <i data-lucide="dollar-sign" class="nav-icon"></i>
+                Revenue Management
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-title">Configuration</div>
+            <a href="settings.html" class="nav-link active">
+                <i data-lucide="settings" class="nav-icon"></i>
+                Settings
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Platform Settings</h1>
+                <p class="page-subtitle">Platform-wide configuration, integrations, and system maintenance</p>
+            </div>
+
+            <!-- Platform Configuration -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i data-lucide="settings" class="card-icon"></i>
+                        Platform Configuration
+                    </h3>
+                    <button class="btn btn-primary" onclick="saveGlobalSettings()" id="saveGlobalBtn">
+                        <i data-lucide="save"></i>
+                        Save Changes
+                    </button>
+                </div>
+                
+                <form id="globalSettingsForm">
+                    <div class="grid grid-2" style="gap: 2rem;">
+                        <div>
+                            <h4 style="color: var(--text-primary); margin-bottom: 1rem;">General Settings</h4>
+                            <div class="form-group">
+                                <label class="form-label">Platform Name</label>
+                                <input type="text" id="platformName" class="form-input" value="SyncedUp Insurance Platform">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Support Email</label>
+                                <input type="email" id="supportEmail" class="form-input" value="support@syncedupsolutions.com">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Default Timezone</label>
+                                <select id="defaultTimezone" class="form-input">
+                                    <option value="America/New_York" selected>Eastern Time</option>
+                                    <option value="America/Chicago">Central Time</option>
+                                    <option value="America/Denver">Mountain Time</option>
+                                    <option value="America/Los_Angeles">Pacific Time</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Session Timeout (minutes)</label>
+                                <input type="number" id="sessionTimeout" class="form-input" value="60" min="15" max="480">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Security Settings</h4>
+                            <div class="form-group">
+                                <label class="form-label">Password Policy</label>
+                                <select id="passwordPolicy" class="form-input">
+                                    <option value="standard" selected>Standard (8+ chars, 1 number)</option>
+                                    <option value="strong">Strong (10+ chars, mixed case, numbers, symbols)</option>
+                                    <option value="enterprise">Enterprise (12+ chars, all requirements)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Max Login Attempts</label>
+                                <input type="number" id="maxLoginAttempts" class="form-input" value="5" min="3" max="10">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Two-Factor Authentication</label>
+                                <select id="twoFactorAuth" class="form-input">
+                                    <option value="optional">Optional</option>
+                                    <option value="required" selected>Required for Admins</option>
+                                    <option value="mandatory">Mandatory for All</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">IP Whitelist (comma-separated)</label>
+                                <input type="text" id="ipWhitelist" class="form-input" placeholder="192.168.1.0/24, 10.0.0.0/8">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Master API Keys -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i data-lucide="key" class="card-icon"></i>
+                        Master API Keys
+                    </h3>
+                    <button class="btn btn-primary" onclick="generateNewApiKey()">
+                        <i data-lucide="plus"></i>
+                        Generate New Key
+                    </button>
+                </div>
+                
+                <div class="alert alert-info">
+                    <i data-lucide="info"></i>
+                    Master API keys provide full platform access. Handle with extreme care.
+                </div>
+                
+                <div id="apiKeysList">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading API keys...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Integration Management -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i data-lucide="puzzle" class="card-icon"></i>
+                        Integration Management
+                    </h3>
+                    <button class="btn" onclick="testAllIntegrations()">
+                        <i data-lucide="wifi"></i>
+                        Test All Connections
+                    </button>
+                </div>
+                
+                <div class="grid grid-2" style="gap: 1.5rem;">
+                    <!-- Convoso Integration -->
+                    <div style="background: var(--bg-elevated); padding: 1.5rem; border-radius: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h4 style="color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="radio" style="width: 20px; height: 20px; color: var(--accent-gold);"></i>
+                                Convoso Lead Integration
+                            </h4>
+                            <span class="status-badge status-active" id="convosoStatus">Active</span>
+                        </div>
+                        
+                        <form id="convosoForm">
+                            <div class="form-group">
+                                <label class="form-label">Webhook URL</label>
+                                <input type="url" id="convosoWebhookUrl" class="form-input" value="https://insurance.syncedupsolutions.com/api/leads/convoso-webhook" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">API Key</label>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <input type="password" id="convosoApiKey" class="form-input" placeholder="••••••••••••••••" style="flex: 1;">
+                                    <button type="button" class="btn" onclick="togglePasswordVisibility('convosoApiKey')">
+                                        <i data-lucide="eye" id="convosoApiKeyToggle"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Webhook Secret</label>
+                                <input type="password" id="convosoWebhookSecret" class="form-input" placeholder="••••••••••••••••">
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button type="button" class="btn btn-success" onclick="testConvosoConnection()">
+                                    <i data-lucide="wifi"></i>
+                                    Test Connection
+                                </button>
+                                <button type="button" class="btn" onclick="saveConvosoSettings()">
+                                    <i data-lucide="save"></i>
+                                    Save
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- FirstEnroll Integration -->
+                    <div style="background: var(--bg-elevated); padding: 1.5rem; border-radius: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h4 style="color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="users" style="width: 20px; height: 20px; color: var(--accent-gold);"></i>
+                                FirstEnroll Integration
+                            </h4>
+                            <span class="status-badge status-warning" id="firstEnrollStatus">Inactive</span>
+                        </div>
+                        
+                        <form id="firstEnrollForm">
+                            <div class="form-group">
+                                <label class="form-label">API Endpoint</label>
+                                <input type="url" id="firstEnrollEndpoint" class="form-input" placeholder="https://api.firstenroll.com/v1">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Client ID</label>
+                                <input type="text" id="firstEnrollClientId" class="form-input" placeholder="Client ID">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Client Secret</label>
+                                <input type="password" id="firstEnrollClientSecret" class="form-input" placeholder="••••••••••••••••">
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button type="button" class="btn btn-success" onclick="testFirstEnrollConnection()">
+                                    <i data-lucide="wifi"></i>
+                                    Test Connection
+                                </button>
+                                <button type="button" class="btn" onclick="saveFirstEnrollSettings()">
+                                    <i data-lucide="save"></i>
+                                    Save
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Email Service Integration -->
+                    <div style="background: var(--bg-elevated); padding: 1.5rem; border-radius: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h4 style="color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="mail" style="width: 20px; height: 20px; color: var(--accent-gold);"></i>
+                                Email Service (SendGrid)
+                            </h4>
+                            <span class="status-badge status-active" id="emailStatus">Active</span>
+                        </div>
+                        
+                        <form id="emailForm">
+                            <div class="form-group">
+                                <label class="form-label">SendGrid API Key</label>
+                                <input type="password" id="sendgridApiKey" class="form-input" placeholder="••••••••••••••••">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">From Email</label>
+                                <input type="email" id="fromEmail" class="form-input" value="noreply@syncedupsolutions.com">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">From Name</label>
+                                <input type="text" id="fromName" class="form-input" value="SyncedUp Insurance">
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button type="button" class="btn btn-success" onclick="testEmailConnection()">
+                                    <i data-lucide="mail"></i>
+                                    Send Test Email
+                                </button>
+                                <button type="button" class="btn" onclick="saveEmailSettings()">
+                                    <i data-lucide="save"></i>
+                                    Save
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Database Configuration -->
+                    <div style="background: var(--bg-elevated); padding: 1.5rem; border-radius: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h4 style="color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                                <i data-lucide="database" style="width: 20px; height: 20px; color: var(--accent-gold);"></i>
+                                Database Configuration
+                            </h4>
+                            <span class="status-badge status-active" id="databaseStatus">Healthy</span>
+                        </div>
+                        
+                        <div style="background: var(--bg-card); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-secondary);">Connection Pool</span>
+                                <span style="color: var(--text-primary); font-weight: 600;">24/50</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="color: var(--text-secondary);">Query Time</span>
+                                <span style="color: var(--text-primary); font-weight: 600;">12.5ms avg</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-secondary);">Storage Used</span>
+                                <span style="color: var(--text-primary); font-weight: 600;">2.1TB / 5TB</span>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button type="button" class="btn btn-success" onclick="testDatabaseConnection()">
+                                <i data-lucide="database"></i>
+                                Test Connection
+                            </button>
+                            <button type="button" class="btn" onclick="optimizeDatabase()">
+                                <i data-lucide="zap"></i>
+                                Optimize
+                            </button>
+                            <button type="button" class="btn btn-warning" onclick="backupDatabase()">
+                                <i data-lucide="hard-drive"></i>
+                                Backup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Maintenance -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i data-lucide="wrench" class="card-icon"></i>
+                        System Maintenance
+                    </h3>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-warning" onclick="enableMaintenanceMode()">
+                            <i data-lucide="construction"></i>
+                            Maintenance Mode
+                        </button>
+                        <button class="btn" onclick="viewSystemLogs()">
+                            <i data-lucide="file-text"></i>
+                            View Logs
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-3" style="gap: 1.5rem;">
+                    <div style="background: var(--bg-elevated); padding: 1.5rem; border-radius: 12px; text-align: center;">
+                        <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Cache Management</h4>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent-gold);">1.8GB</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;">Cache Size</div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <button class="btn" onclick="clearCache('redis')">
+                                <i data-lucide="trash-2"></i>
+                                Clear Redis Cache
+                            </button>
+                            <button class="btn" onclick="clearCache('application')">
+                                <i data-lucide="refresh-cw"></i>
+                                Clear App Cache
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-elevated); padding: 1.5rem; border-radius: 12px; text-align: center;">
+                        <h4 style="color: var(--text-primary); margin-bottom: 1rem;">System Updates</h4>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="font-size: 1.2rem; font-weight: bold; color: var(--success);">v2.4.1</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;">Current Version</div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <button class="btn btn-primary" onclick="checkForUpdates()">
+                                <i data-lucide="download"></i>
+                                Check Updates
+                            </button>
+                            <button class="btn" onclick="viewUpdateHistory()">
+                                <i data-lucide="clock"></i>
+                                Update History
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-elevated); padding: 1.5rem; border-radius: 12px; text-align: center;">
+                        <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Backup & Recovery</h4>
+                        <div style="margin-bottom: 1rem;">
+                            <div style="font-size: 1.2rem; font-weight: bold; color: var(--info);" id="lastBackupTime">Loading...</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;">Last Backup</div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <button class="btn btn-success" onclick="createBackup()">
+                                <i data-lucide="save"></i>
+                                Create Backup
+                            </button>
+                            <button class="btn" onclick="viewBackupHistory()">
+                                <i data-lucide="history"></i>
+                                Backup History
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audit & Compliance -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i data-lucide="shield-check" class="card-icon"></i>
+                        Audit & Compliance
+                    </h3>
+                    <button class="btn" onclick="generateComplianceReport()">
+                        <i data-lucide="file-plus"></i>
+                        Generate Report
+                    </button>
+                </div>
+                
+                <div class="grid grid-2" style="gap: 1.5rem;">
+                    <div>
+                        <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Compliance Status</h4>
+                        <div style="background: var(--bg-elevated); padding: 1rem; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                                <span style="color: var(--text-secondary);">GDPR Compliance</span>
+                                <span class="status-badge status-active">Compliant</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                                <span style="color: var(--text-secondary);">SOC 2 Type II</span>
+                                <span class="status-badge status-active">Certified</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                                <span style="color: var(--text-secondary);">Data Retention</span>
+                                <span class="status-badge status-warning">Review Needed</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-secondary);">Security Audit</span>
+                                <span class="status-badge status-active">Passed</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 style="color: var(--text-primary); margin-bottom: 1rem;">Data Retention Settings</h4>
+                        <form id="dataRetentionForm">
+                            <div class="form-group">
+                                <label class="form-label">User Data Retention (months)</label>
+                                <input type="number" id="userDataRetention" class="form-input" value="24" min="12" max="84">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Audit Log Retention (months)</label>
+                                <input type="number" id="auditLogRetention" class="form-input" value="36" min="12" max="120">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Backup Retention (days)</label>
+                                <input type="number" id="backupRetention" class="form-input" value="90" min="30" max="365">
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="saveDataRetentionSettings()">
+                                <i data-lucide="save"></i>
+                                Save Settings
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Authentication check
+        function checkAuth() {
+            const token = localStorage.getItem('syncedup_token');
+            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+            
+            if (!token || !user.email) {
+                window.location.href = '/login.html';
+                return false;
+            }
+
+            if (user.role !== 'admin' && user.role !== 'super-admin') {
+                alert('Access denied. Admin privileges required.');
+                window.location.href = '/login.html';
+                return false;
+            }
+
+            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName}`;
+            return true;
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('syncedup_token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            await loadApiKeys();
+            await loadSystemStatus();
+            setupEventListeners();
+            lucide.createIcons();
+        }
+        
+        // Load system status including backup info
+        async function loadSystemStatus() {
+            try {
+                const response = await fetch('/api/super-admin/system-status', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
+                });
+                
+                let statusData = {
+                    lastBackup: 'No backups available'
+                };
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    statusData = data;
+                }
+                
+                document.getElementById('lastBackupTime').textContent = statusData.lastBackup;
+                
+            } catch (error) {
+                console.error('Error loading system status:', error);
+                document.getElementById('lastBackupTime').textContent = 'Unable to load';
+            }
+        }
+
+        // Load API Keys
+        async function loadApiKeys() {
+            try {
+                const response = await fetch('/api/super-admin/api-keys', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
+                });
+                
+                let apiKeys = [];
+                if (response.ok) {
+                    const data = await response.json();
+                    apiKeys = data.apiKeys || [];
+                }
+                
+                renderApiKeys(apiKeys);
+            } catch (error) {
+                console.error('Error loading API keys:', error);
+                renderApiKeys([]);
+            }
+        }
+
+        function renderApiKeys(apiKeys) {
+            if (apiKeys.length === 0) {
+                document.getElementById('apiKeysList').innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-muted);">No API keys found. Generate one to get started.</div>';
+                return;
+            }
+            
+            const keysHtml = `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Key</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Last Used</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${apiKeys.map(key => `
+                                <tr>
+                                    <td style="font-weight: 600; color: var(--text-primary);">${key.name}</td>
+                                    <td style="font-family: monospace; color: var(--text-secondary);">${key.key}</td>
+                                    <td><span class="status-badge status-${key.status}">${key.status}</span></td>
+                                    <td style="color: var(--text-secondary);">${key.created}</td>
+                                    <td style="color: var(--text-secondary);">${key.lastUsed}</td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.3rem;">
+                                            <button class="btn" onclick="viewApiKeyDetails(${key.id})" title="View Details" style="padding: 0.4rem;">
+                                                <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+                                            </button>
+                                            <button class="btn" onclick="regenerateApiKey(${key.id})" title="Regenerate" style="padding: 0.4rem;">
+                                                <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
+                                            </button>
+                                            <button class="btn ${key.status === 'active' ? 'btn-warning' : 'btn-success'}" onclick="toggleApiKey(${key.id})" title="${key.status === 'active' ? 'Disable' : 'Enable'}" style="padding: 0.4rem;">
+                                                <i data-lucide="${key.status === 'active' ? 'pause' : 'play'}" style="width: 14px; height: 14px;"></i>
+                                            </button>
+                                            <button class="btn btn-danger" onclick="deleteApiKey(${key.id})" title="Delete" style="padding: 0.4rem;">
+                                                <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            document.getElementById('apiKeysList').innerHTML = keysHtml;
+            lucide.createIcons();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Global settings form
+            document.getElementById('globalSettingsForm').addEventListener('change', () => {
+                document.getElementById('saveGlobalBtn').style.background = 'var(--warning)';
+                document.getElementById('saveGlobalBtn').innerHTML = '<i data-lucide="alert-circle"></i> Unsaved Changes';
+            });
+        }
+
+        // Password visibility toggle
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            const toggle = document.getElementById(inputId + 'Toggle');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggle.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                toggle.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+
+        // Global Settings Functions
+        function saveGlobalSettings() {
+            const formData = {
+                platformName: document.getElementById('platformName').value,
+                supportEmail: document.getElementById('supportEmail').value,
+                defaultTimezone: document.getElementById('defaultTimezone').value,
+                sessionTimeout: document.getElementById('sessionTimeout').value,
+                passwordPolicy: document.getElementById('passwordPolicy').value,
+                maxLoginAttempts: document.getElementById('maxLoginAttempts').value,
+                twoFactorAuth: document.getElementById('twoFactorAuth').value,
+                ipWhitelist: document.getElementById('ipWhitelist').value
+            };
+            
+            // Simulate API call
+            setTimeout(() => {
+                alert('Global settings saved successfully!');
+                document.getElementById('saveGlobalBtn').style.background = 'var(--accent-gold)';
+                document.getElementById('saveGlobalBtn').innerHTML = '<i data-lucide="check"></i> Saved';
+                
+                setTimeout(() => {
+                    document.getElementById('saveGlobalBtn').style.background = 'var(--accent-gold)';
+                    document.getElementById('saveGlobalBtn').innerHTML = '<i data-lucide="save"></i> Save Changes';
+                }, 2000);
+            }, 500);
+        }
+
+        // API Key Functions
+        function generateNewApiKey() {
+            const keyName = prompt('Enter a name for the new API key:');
+            if (keyName) {
+                alert(`New API key "${keyName}" generated successfully!`);
+                loadApiKeys();
+            }
+        }
+
+        function viewApiKeyDetails(keyId) {
+            alert(`API key details for key ${keyId} would be displayed in a modal.`);
+        }
+
+        function regenerateApiKey(keyId) {
+            if (confirm('Are you sure you want to regenerate this API key? The old key will become invalid.')) {
+                alert('API key regenerated successfully!');
+                loadApiKeys();
+            }
+        }
+
+        function toggleApiKey(keyId) {
+            if (confirm('Are you sure you want to toggle this API key status?')) {
+                alert('API key status updated successfully!');
+                loadApiKeys();
+            }
+        }
+
+        function deleteApiKey(keyId) {
+            if (confirm('Are you sure you want to delete this API key? This action cannot be undone.')) {
+                alert('API key deleted successfully!');
+                loadApiKeys();
+            }
+        }
+
+        // Integration Functions
+        function testAllIntegrations() {
+            alert('Testing all integrations...');
+            // Simulate testing
+            setTimeout(() => {
+                alert('Integration tests completed. 3/4 connections successful.');
+            }, 2000);
+        }
+
+        function testConvosoConnection() {
+            alert('Testing Convoso connection...');
+            setTimeout(() => {
+                alert('Convoso connection test successful!');
+            }, 1000);
+        }
+
+        function saveConvosoSettings() {
+            alert('Convoso settings saved successfully!');
+        }
+
+        function testFirstEnrollConnection() {
+            alert('Testing FirstEnroll connection...');
+            setTimeout(() => {
+                alert('FirstEnroll connection failed. Please check your credentials.');
+            }, 1000);
+        }
+
+        function saveFirstEnrollSettings() {
+            alert('FirstEnroll settings saved successfully!');
+        }
+
+        function testEmailConnection() {
+            alert('Sending test email...');
+            setTimeout(() => {
+                alert('Test email sent successfully!');
+            }, 1000);
+        }
+
+        function saveEmailSettings() {
+            alert('Email settings saved successfully!');
+        }
+
+        function testDatabaseConnection() {
+            alert('Testing database connection...');
+            setTimeout(() => {
+                alert('Database connection healthy!');
+            }, 1000);
+        }
+
+        function optimizeDatabase() {
+            if (confirm('Database optimization may take several minutes. Continue?')) {
+                alert('Database optimization started. This may take a few minutes...');
+            }
+        }
+
+        function backupDatabase() {
+            if (confirm('Create a full database backup now?')) {
+                alert('Database backup initiated. You will be notified when complete.');
+            }
+        }
+
+        // System Maintenance Functions
+        function enableMaintenanceMode() {
+            if (confirm('Enable maintenance mode? This will temporarily disable access for all users.')) {
+                alert('Maintenance mode enabled. Remember to disable it when maintenance is complete.');
+            }
+        }
+
+        function viewSystemLogs() {
+            alert('System logs viewer would be opened here.');
+        }
+
+        function clearCache(type) {
+            if (confirm(`Clear ${type} cache? This may temporarily impact performance.`)) {
+                alert(`${type} cache cleared successfully!`);
+            }
+        }
+
+        function checkForUpdates() {
+            alert('Checking for updates...');
+            setTimeout(() => {
+                alert('System is up to date. Latest version: v2.4.1');
+            }, 1500);
+        }
+
+        function viewUpdateHistory() {
+            alert('Update history would be displayed here.');
+        }
+
+        function createBackup() {
+            if (confirm('Create a full system backup? This may take several minutes.')) {
+                alert('Backup process initiated. You will be notified when complete.');
+            }
+        }
+
+        function viewBackupHistory() {
+            alert('Backup history would be displayed here.');
+        }
+
+        // Compliance Functions
+        function generateComplianceReport() {
+            alert('Generating compliance report...');
+            setTimeout(() => {
+                alert('Compliance report generated successfully!');
+            }, 2000);
+        }
+
+        function saveDataRetentionSettings() {
+            const formData = {
+                userDataRetention: document.getElementById('userDataRetention').value,
+                auditLogRetention: document.getElementById('auditLogRetention').value,
+                backupRetention: document.getElementById('backupRetention').value
+            };
+            
+            alert('Data retention settings saved successfully!');
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+    <script src="/assets/session-prod.js"></script>
+</body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales - SyncedUp Insurance</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; }
+        .nav { display: flex; gap: 2rem; padding: 0 2rem; background: white; border-bottom: 1px solid #e2e8f0; }
+        .nav a { padding: 1rem; text-decoration: none; color: #2d3748; }
+        .nav a.active { color: #667eea; border-bottom: 2px solid #667eea; }
+        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+        .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; }
+        .form-group input, .form-group select { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        
+        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: 500; transition: all 0.3s ease; }
+        .btn-primary { background: linear-gradient(45deg, #667eea, #764ba2); color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        
+        .success-message { background: #d4edda; color: #155724; padding: 1rem; border-radius: 6px; margin-bottom: 1rem; display: none; }
+        .error-message { background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 6px; margin-bottom: 1rem; display: none; }
+        
+        .calculation-display { background: #e7f3ff; padding: 1rem; border-radius: 6px; margin: 1rem 0; }
+        .calculation-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+        .calculation-total { font-weight: bold; font-size: 1.1rem; color: #667eea; border-top: 1px solid #ccc; padding-top: 0.5rem; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Sales Management</h1>
+    </div>
+    <nav class="nav">
+        <a href="/agent/">Dashboard</a>
+        <a href="/agent/quotes.html">Quotes</a>
+        <a href="/agent/sales.html" class="active">Sales</a>
+        <a href="/agent/commissions.html">Commissions</a>
+        <a href="/agent/customers.html">Customers</a>
+    </nav>
+    <div class="container">
+        <!-- Success/Error Messages -->
+        <div id="successMessage" class="success-message"></div>
+        <div id="errorMessage" class="error-message"></div>
+        
+        <!-- Record New Sale Form -->
+        <div class="card">
+            <h2>Record New Sale</h2>
+            <form id="recordSaleForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="customerName">Customer Name *</label>
+                        <input type="text" id="customerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customerEmail">Customer Email *</label>
+                        <input type="email" id="customerEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productId">Product *</label>
+                        <select id="productId" required>
+                            <option value="">Select Product</option>
+                            <option value="PROD001">Auto Insurance Premium</option>
+                            <option value="PROD002">Home Insurance Standard</option>
+                            <option value="PROD003">Life Insurance Basic</option>
+                            <option value="PROD004">Business Insurance</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="productName">Product Name *</label>
+                        <input type="text" id="productName" required readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="addonId">Add-on (Optional)</label>
+                        <select id="addonId">
+                            <option value="">No Add-on</option>
+                            <option value="ADDON001">Extended Coverage</option>
+                            <option value="ADDON002">Premium Support</option>
+                            <option value="ADDON003">Roadside Assistance</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="addonName">Add-on Name</label>
+                        <input type="text" id="addonName" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="basePremium">Base Premium ($) *</label>
+                        <input type="number" id="basePremium" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="addonPremium">Add-on Premium ($)</label>
+                        <input type="number" id="addonPremium" step="0.01" value="0">
+                    </div>
+                </div>
+                
+                <!-- Premium Calculation Display -->
+                <div class="calculation-display">
+                    <div class="calculation-row">
+                        <span>Base Premium:</span>
+                        <span id="displayBasePremium">$0.00</span>
+                    </div>
+                    <div class="calculation-row">
+                        <span>Add-on Premium:</span>
+                        <span id="displayAddonPremium">$0.00</span>
+                    </div>
+                    <div class="calculation-row calculation-total">
+                        <span>Total Premium:</span>
+                        <span id="displayTotalPremium">$0.00</span>
+                    </div>
+                    <div class="calculation-row calculation-total">
+                        <span>Commission (30%):</span>
+                        <span id="displayCommission">$0.00</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Record Sale</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset Form</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
+
+    <script>
+        // Product and add-on data
+        const productData = {
+            'PROD001': { name: 'Auto Insurance Premium', baseRate: 1200 },
+            'PROD002': { name: 'Home Insurance Standard', baseRate: 800 },
+            'PROD003': { name: 'Life Insurance Basic', baseRate: 2400 },
+            'PROD004': { name: 'Business Insurance', baseRate: 1800 }
+        };
+
+        const addonData = {
+            'ADDON001': { name: 'Extended Coverage', cost: 200 },
+            'ADDON002': { name: 'Premium Support', cost: 150 },
+            'ADDON003': { name: 'Roadside Assistance', cost: 100 }
+        };
+
+        // Authentication check
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('syncedup_token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            // Verify token and check role
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                if (!['agent', 'admin', 'super-admin'].includes(payload.role)) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+            } catch (error) {
+                console.error('Invalid token:', error);
+                localStorage.removeItem('authToken');
+                window.location.href = '/login.html';
+                return;
+            }
+
+            // Initialize form handlers
+            initializeFormHandlers();
+        });
+
+        function initializeFormHandlers() {
+            // Product selection handler
+            document.getElementById('productId').addEventListener('change', function() {
+                const productId = this.value;
+                const productNameField = document.getElementById('productName');
+                const basePremiumField = document.getElementById('basePremium');
+                
+                if (productId && productData[productId]) {
+                    productNameField.value = productData[productId].name;
+                    basePremiumField.value = productData[productId].baseRate;
+                } else {
+                    productNameField.value = '';
+                    basePremiumField.value = '';
+                }
+                updateCalculations();
+            });
+
+            // Add-on selection handler
+            document.getElementById('addonId').addEventListener('change', function() {
+                const addonId = this.value;
+                const addonNameField = document.getElementById('addonName');
+                const addonPremiumField = document.getElementById('addonPremium');
+                
+                if (addonId && addonData[addonId]) {
+                    addonNameField.value = addonData[addonId].name;
+                    addonPremiumField.value = addonData[addonId].cost;
+                } else {
+                    addonNameField.value = '';
+                    addonPremiumField.value = 0;
+                }
+                updateCalculations();
+            });
+
+            // Premium calculation handlers
+            document.getElementById('basePremium').addEventListener('input', updateCalculations);
+            document.getElementById('addonPremium').addEventListener('input', updateCalculations);
+
+            // Form submission handler
+            document.getElementById('recordSaleForm').addEventListener('submit', handleRecordSale);
+        }
+
+        function updateCalculations() {
+            const basePremium = parseFloat(document.getElementById('basePremium').value) || 0;
+            const addonPremium = parseFloat(document.getElementById('addonPremium').value) || 0;
+            const totalPremium = basePremium + addonPremium;
+            const commission = totalPremium * 0.30; // 30% commission rate
+
+            document.getElementById('displayBasePremium').textContent = '$' + basePremium.toFixed(2);
+            document.getElementById('displayAddonPremium').textContent = '$' + addonPremium.toFixed(2);
+            document.getElementById('displayTotalPremium').textContent = '$' + totalPremium.toFixed(2);
+            document.getElementById('displayCommission').textContent = '$' + commission.toFixed(2);
+        }
+
+        // Record Sale function
+        async function recordSale(agentId, customerName, customerEmail, productId, productName, addonId, addonName, totalPremium, commissionAmount) {
+            try {
+                const sale = {
+                    id: `S-${Date.now()}`,
+                    agentId,
+                    customer: customerName,
+                    customerEmail,
+                    product: productName,
+                    productId,
+                    addonId: addonId || null,
+                    addonName: addonName || null,
+                    amount: totalPremium,
+                    commission: commissionAmount,
+                    createdAt: new Date().toISOString()
+                };
+
+                const response = await __api('/sales', {
+                    method: 'POST',
+                    body: JSON.stringify(sale)
+                });
+
+                if (response.ok) {
+                    return { success: true, message: 'Sale recorded successfully!' };
+                } else {
+                    throw new Error('Failed to record sale');
+                }
+            } catch (error) {
+                console.error('Error recording sale:', error);
+                throw error;
+            }
+        }
+
+        async function handleRecordSale(event) {
+            event.preventDefault();
+
+            // Get agent ID from session
+            const user = JSON.parse(sessionStorage.getItem('syncedup:user') || '{}');
+            const agentId = user.id;
+
+            // Get form data
+            const customerName = document.getElementById('customerName').value;
+            const customerEmail = document.getElementById('customerEmail').value;
+            const productId = document.getElementById('productId').value;
+            const productName = document.getElementById('productName').value;
+            const addonId = document.getElementById('addonId').value;
+            const addonName = document.getElementById('addonName').value;
+            
+            const basePremium = parseFloat(document.getElementById('basePremium').value) || 0;
+            const addonPremium = parseFloat(document.getElementById('addonPremium').value) || 0;
+            const totalPremium = basePremium + addonPremium;
+            const commissionAmount = totalPremium * 0.30;
+
+            // Validate required fields
+            if (!customerName || !customerEmail || !productId || !productName || totalPremium <= 0) {
+                showError('Please fill in all required fields and ensure premium is greater than 0.');
+                return;
+            }
+
+            try {
+                // Show loading state
+                const submitBtn = event.target.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Recording Sale...';
+                submitBtn.disabled = true;
+
+                // Record the sale
+                const result = await recordSale(
+                    agentId,
+                    customerName,
+                    customerEmail,
+                    productId,
+                    productName,
+                    addonId || null,
+                    addonName || null,
+                    totalPremium,
+                    commissionAmount
+                );
+
+                if (result.success) {
+                    showSuccess(`Sale recorded successfully! ${result.message}`);
+                    resetForm();
+                } else {
+                    showError('Failed to record sale. Please try again.');
+                }
+
+            } catch (error) {
+                showError('Error recording sale: ' + error.message);
+            } finally {
+                // Restore button state
+                const submitBtn = event.target.querySelector('button[type="submit"]');
+                submitBtn.textContent = 'Record Sale';
+                submitBtn.disabled = false;
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('recordSaleForm').reset();
+            document.getElementById('productName').value = '';
+            document.getElementById('addonName').value = '';
+            updateCalculations();
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            const errorDiv = document.getElementById('errorMessage');
+            
+            errorDiv.style.display = 'none';
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
+            
+            successDiv.style.display = 'none';
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Initialize calculations on page load
+        updateCalculations();
+    </script>
+    <script src="/assets/session-prod.js"></script>
+</body>
+</html>

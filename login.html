@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SyncedUp Insurance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/global-styles.css">
+    <style>
+        .neon-text {
+            text-shadow: 0 0 10px rgba(255,255,255,0.8),
+                         0 0 20px rgba(255,255,255,0.8),
+                         0 0 30px rgba(255,255,255,0.8);
+        }
+        
+        .input-glow:focus {
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1),
+                        0 0 20px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+    <!-- Luxury overlay pattern -->
+    <div class="luxury-overlay"></div>
+
+    <!-- Floating orbs -->
+    <div class="floating-orb w-96 h-96 bg-purple-500 -top-48 -left-48"></div>
+    <div class="floating-orb w-64 h-64 bg-pink-500 top-1/2 -right-32" style="animation-delay: 5s;"></div>
+    <div class="floating-orb w-80 h-80 bg-blue-500 -bottom-40 left-1/4" style="animation-delay: 10s;"></div>
+
+    <!-- Logo Section -->
+    <div class="mb-8 text-center z-10">
+        <h1 class="text-5xl font-bold text-white neon-text mb-2">SYNCEDUP</h1>
+        <p class="text-white/80 text-lg">Insurance Intelligence Platform</p>
+    </div>
+
+    <!-- Main Login Container -->
+    <div class="glass-card rounded-3xl p-8 w-full max-w-md z-10 transform hover:scale-[1.02] transition-transform duration-300">
+        <!-- Login Form -->
+        <div id="loginForm">
+            <h2 class="text-3xl font-bold text-center mb-2 text-white">Welcome Back</h2>
+            <p class="text-center text-white/70 mb-8">Sign in to continue to your dashboard</p>
+            
+            <!-- Test Accounts Dropdown -->
+            <div class="mb-4 p-3 bg-blue-500/20 border border-blue-500/30 rounded-xl">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-white/90 text-sm font-medium">
+                        <i class="fas fa-flask mr-2"></i>Quick Test Login
+                    </span>
+                    <button 
+                        type="button"
+                        onclick="toggleTestAccounts()"
+                        class="text-white/70 hover:text-white text-xs"
+                    >
+                        <i id="testToggleIcon" class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                <div id="testAccountsContainer" class="hidden">
+                    <select 
+                        id="testAccountSelect" 
+                        onchange="fillTestCredentials()"
+                        class="w-full p-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:bg-white/20 focus:border-white/40 outline-none"
+                    >
+                        <option value="">Select a test account...</option>
+                        <option value="test-admin@test.com">Admin - Test Admin User</option>
+                        <option value="test-manager@test.com">Manager - Test Manager User</option>
+                        <option value="test-agent@test.com">Agent - Test Agent User</option>
+                        <option value="test-cs@test.com">Customer Service - Test CS User</option>
+                        <option value="test-super@test.com">Super Admin - Test Super Admin</option>
+                    </select>
+                </div>
+            </div>
+
+            <form id="loginFormElement" class="space-y-6">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-envelope text-white/50"></i>
+                    </div>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        required 
+                        class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:bg-white/20 focus:border-white/40 input-glow outline-none transition-all duration-300"
+                        placeholder="Email address"
+                    >
+                </div>
+                
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-lock text-white/50"></i>
+                    </div>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        required 
+                        class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:bg-white/20 focus:border-white/40 input-glow outline-none transition-all duration-300"
+                        placeholder="Password"
+                    >
+                </div>
+                
+                <button 
+                    type="submit" 
+                    class="w-full bg-white/90 text-purple-700 py-3 rounded-xl font-bold hover:bg-white transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+                >
+                    Sign In
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </form>
+            
+            <div class="mt-6 flex justify-between items-center">
+                <button 
+                    onclick="showResetForm()" 
+                    class="text-white/70 hover:text-white text-sm font-medium transition-colors"
+                >
+                    Forgot Password?
+                </button>
+                <a href="/" class="text-white/70 hover:text-white text-sm font-medium transition-colors">
+                    Back to Home
+                </a>
+            </div>
+
+            <!-- Error message -->
+            <div id="errorMessage" class="mt-4 p-3 bg-red-500/20 border border-red-500/50 text-white rounded-xl hidden"></div>
+        </div>
+
+        <!-- Password Reset Form -->
+        <div id="resetForm" class="hidden">
+            <h2 class="text-3xl font-bold text-center mb-2 text-white">Reset Password</h2>
+            <p class="text-center text-white/70 mb-8">We'll send you reset instructions</p>
+            
+            <form id="resetFormElement" class="space-y-6">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-envelope text-white/50"></i>
+                    </div>
+                    <input 
+                        type="email" 
+                        id="resetEmail" 
+                        required 
+                        class="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:bg-white/20 focus:border-white/40 input-glow outline-none transition-all duration-300"
+                        placeholder="Your email address"
+                    >
+                </div>
+                
+                <button 
+                    type="submit" 
+                    class="w-full bg-white/90 text-purple-700 py-3 rounded-xl font-bold hover:bg-white transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+                >
+                    Send Reset Link
+                    <i class="fas fa-paper-plane ml-2"></i>
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <button 
+                    onclick="showLoginForm()" 
+                    class="text-white/70 hover:text-white text-sm font-medium transition-colors"
+                >
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Login
+                </button>
+            </div>
+
+            <!-- Success/Error message -->
+            <div id="resetMessage" class="mt-4 p-3 rounded-xl hidden"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-8 text-center text-white/60 text-sm z-10">
+        <p>&copy; 2025 SyncedUp Solutions. Empowering Insurance Excellence.</p>
+    </div>
+
+    <script>
+        // Test accounts functionality
+        function toggleTestAccounts() {
+            const container = document.getElementById('testAccountsContainer');
+            const icon = document.getElementById('testToggleIcon');
+            
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                icon.className = 'fas fa-chevron-up';
+            } else {
+                container.classList.add('hidden');
+                icon.className = 'fas fa-chevron-down';
+            }
+        }
+
+        function fillTestCredentials() {
+            const select = document.getElementById('testAccountSelect');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            
+            if (select.value) {
+                emailInput.value = select.value;
+                passwordInput.value = 'TestPass123!';
+                
+                // Add visual feedback
+                emailInput.focus();
+                setTimeout(() => passwordInput.focus(), 100);
+            }
+        }
+
+        // Form switching with smooth transitions
+        function showResetForm() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('resetForm').classList.remove('hidden');
+        }
+
+        function showLoginForm() {
+            document.getElementById('resetForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('resetMessage').classList.add('hidden');
+        }
+
+        // Login form handler
+        document.getElementById('loginFormElement').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('errorMessage');
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    console.log('Login successful:', data);
+                    console.log('User role:', data.user.role);
+                    console.log('Must change password:', data.user.mustChangePassword);
+                    
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    console.log('Token and user stored in localStorage');
+                    
+                    // Redirect based on role
+                    if (data.user.mustChangePassword) {
+                        console.log('Redirecting to change password page');
+                        window.location.href = '/change-password.html';
+                    } else if (data.user.role === 'super-admin') {
+                        window.location.href = '/super-admin.html';
+                    } else if (data.user.role === 'admin') {
+                        window.location.href = '/admin.html';
+                    } else if (data.user.role === 'manager') {
+                        window.location.href = '/manager.html';
+                    } else if (data.user.role === 'agent') {
+                        window.location.href = '/agent.html';
+                    } else if (data.user.role === 'customer_service') {
+                        window.location.href = '/customer-service.html';
+                    } else {
+                        window.location.href = '/dashboard.html';
+                    }
+                } else {
+                    console.error('Login failed:', data);
+                    errorDiv.textContent = data.error || 'Invalid credentials';
+                    errorDiv.classList.remove('hidden');
+                    setTimeout(() => errorDiv.classList.add('hidden'), 5000);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                errorDiv.textContent = 'Connection error. Please try again.';
+                errorDiv.classList.remove('hidden');
+            }
+        });
+
+        // Reset form handler
+        document.getElementById('resetFormElement').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('resetEmail').value;
+            const messageDiv = document.getElementById('resetMessage');
+            
+            try {
+                const response = await fetch('/api/auth/request-reset', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    messageDiv.textContent = 'Reset instructions sent to your email!';
+                    messageDiv.className = 'mt-4 p-3 bg-green-500/20 border border-green-500/50 text-white rounded-xl';
+                    document.getElementById('resetFormElement').reset();
+                } else {
+                    messageDiv.textContent = data.error || 'Email not found';
+                    messageDiv.className = 'mt-4 p-3 bg-red-500/20 border border-red-500/50 text-white rounded-xl';
+                }
+                messageDiv.classList.remove('hidden');
+            } catch (error) {
+                messageDiv.textContent = 'Connection error. Please try again.';
+                messageDiv.className = 'mt-4 p-3 bg-red-500/20 border border-red-500/50 text-white rounded-xl';
+                messageDiv.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

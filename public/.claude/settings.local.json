@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public/**)",
+      "Bash(npm init:*)",
+      "Bash(npm i:*)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\agent/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\agent/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\admin/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\admin/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\admin/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\admin/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\admin/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\agent/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\customer-service/**)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\super-admin/**)",
+      "Bash(npx vercel:*)",
+      "Read(/C:\\Users\\nicho\\Projects\\syncedup-insurance\\vercel-app\\public\\agent/**)",
+      "Bash(git commit:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Dashboard - SyncedUp Insurance</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #ee5a5a;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .welcome-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .welcome-section h1 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+        }
+
+        .welcome-section p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .quick-actions {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .quick-actions h2 {
+            margin-bottom: 1.5rem;
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .action-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .action-btn.secondary {
+            background: linear-gradient(45deg, #ffa726, #ff7043);
+        }
+
+        .action-btn.danger {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a5a);
+        }
+
+        .charts-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .charts-section h2 {
+            margin-bottom: 2rem;
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .chart-container h3 {
+            margin-bottom: 1rem;
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .recent-activity {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .recent-activity h2 {
+            margin-bottom: 1.5rem;
+            color: #333;
+            font-size: 1.5rem;
+        }
+
+        .activity-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .activity-table th,
+        .activity-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .activity-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .activity-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .stats-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stats-card h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .team-leaderboard {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .team-leaderboard h3 {
+            margin-bottom: 1.5rem;
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .rank {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .agent-info {
+            flex: 1;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+
+        .agent-sales {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .navigation {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(45deg, #28a745, #20c997);
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+                margin: 1rem auto;
+            }
+
+            .header {
+                padding: 1rem;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            height: 100px;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">SyncedUp Insurance</div>
+        <div class="user-info">
+            <div class="user-avatar" id="userAvatar">A</div>
+            <span id="userName">Agent Dashboard</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <!-- Navigation -->
+            <nav class="navigation">
+                <div class="nav-links">
+                    <a href="/agent/" class="nav-link active">Dashboard</a>
+                    <a href="/agent/sales.html" class="nav-link">Sales</a>
+                    <a href="/agent/quotes.html" class="nav-link">Quotes</a>
+                    <a href="/agent/customers.html" class="nav-link">Customers</a>
+                    <a href="/agent/commissions.html" class="nav-link">Commissions</a>
+                </div>
+            </nav>
+
+            <!-- Welcome Section -->
+            <section class="welcome-section">
+                <h1>Welcome back!</h1>
+                <p>Here's your performance overview for today</p>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="quick-actions">
+                <h2>Quick Actions</h2>
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="openModal('newSaleModal')">
+                        📊 Record New Sale
+                    </button>
+                    <button class="action-btn" onclick="openModal('newQuoteModal')">
+                        💼 Start Quote
+                    </button>
+                    <button class="action-btn secondary" onclick="exportPayroll()">
+                        💰 Export Payroll
+                    </button>
+                    <button class="action-btn danger" onclick="openModal('cancellationModal')">
+                        ❌ Process Cancellation
+                    </button>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <h2>Performance Analytics</h2>
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <h3>Sales Performance (Last 6 Months)</h3>
+                        <div style="position: relative; height: 300px; width: 100%; max-width: 100%;">
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Product Mix</h3>
+                        <div style="position: relative; height: 300px; width: 100%; max-width: 100%;">
+                            <canvas id="productChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Activity -->
+            <section class="recent-activity">
+                <h2>Recent Sales</h2>
+                <table class="activity-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Policy Type</th>
+                            <th>Premium</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentSalesTable">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #666; padding: 2rem;">No sales data available</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Monthly Stats -->
+            <div class="stats-card">
+                <h3>This Month</h3>
+                <div class="stats-number" id="monthlyPolicies">47</div>
+                <div class="stats-label">Policies Sold</div>
+            </div>
+
+            <div class="stats-card">
+                <h3>Monthly Revenue</h3>
+                <div class="stats-number" id="monthlyRevenue">$58,420</div>
+                <div class="stats-label">Total Commission</div>
+            </div>
+
+            <div class="stats-card">
+                <h3>Conversion Rate</h3>
+                <div class="stats-number" id="conversionRate">68%</div>
+                <div class="stats-label">Quotes to Sales</div>
+            </div>
+
+            <!-- Team Leaderboard -->
+            <div class="team-leaderboard">
+                <h3>Team Leaderboard</h3>
+                <div class="leaderboard-item">
+                    <div class="rank">1</div>
+                    <div class="agent-info">
+                        <div class="agent-name">You</div>
+                        <div class="agent-sales">47 policies</div>
+                    </div>
+                </div>
+                <div class="leaderboard-item">
+                    <div class="rank">2</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Alex Thompson</div>
+                        <div class="agent-sales">43 policies</div>
+                    </div>
+                </div>
+                <div class="leaderboard-item">
+                    <div class="rank">3</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Maria Garcia</div>
+                        <div class="agent-sales">39 policies</div>
+                    </div>
+                </div>
+                <div class="leaderboard-item">
+                    <div class="rank">4</div>
+                    <div class="agent-info">
+                        <div class="agent-name">David Lee</div>
+                        <div class="agent-sales">35 policies</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- New Sale Modal -->
+    <div id="newSaleModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('newSaleModal')">&times;</span>
+            <h2>Record New Sale</h2>
+            <form id="newSaleForm">
+                <div class="form-group">
+                    <label for="customerName">Customer Name</label>
+                    <input type="text" id="customerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="customerEmail">Customer Email</label>
+                    <input type="email" id="customerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="policyType">Policy Type</label>
+                    <select id="policyType" required>
+                        <option value="">Select Policy Type</option>
+                        <option value="auto">Auto Insurance</option>
+                        <option value="home">Home Insurance</option>
+                        <option value="life">Life Insurance</option>
+                        <option value="business">Business Insurance</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="premium">Annual Premium</label>
+                    <input type="number" id="premium" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" placeholder="Additional details about this sale..."></textarea>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('newSaleModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Record Sale</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Quote Modal -->
+    <div id="newQuoteModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('newQuoteModal')">&times;</span>
+            <h2>Start New Quote</h2>
+            <form id="newQuoteForm">
+                <div class="form-group">
+                    <label for="quoteName">Customer Name</label>
+                    <input type="text" id="quoteName" required>
+                </div>
+                <div class="form-group">
+                    <label for="quoteEmail">Customer Email</label>
+                    <input type="email" id="quoteEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="quoteType">Insurance Type</label>
+                    <select id="quoteType" required>
+                        <option value="">Select Insurance Type</option>
+                        <option value="auto">Auto Insurance</option>
+                        <option value="home">Home Insurance</option>
+                        <option value="life">Life Insurance</option>
+                        <option value="business">Business Insurance</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="quoteNotes">Requirements/Notes</label>
+                    <textarea id="quoteNotes" placeholder="Customer requirements and notes..."></textarea>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('newQuoteModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Quote</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cancellation Modal -->
+    <div id="cancellationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('cancellationModal')">&times;</span>
+            <h2>Process Cancellation</h2>
+            <form id="cancellationForm">
+                <div class="form-group">
+                    <label for="policyNumber">Policy Number</label>
+                    <input type="text" id="policyNumber" required>
+                </div>
+                <div class="form-group">
+                    <label for="cancellationReason">Cancellation Reason</label>
+                    <select id="cancellationReason" required>
+                        <option value="">Select Reason</option>
+                        <option value="customer_request">Customer Request</option>
+                        <option value="non_payment">Non-Payment</option>
+                        <option value="fraud">Fraud</option>
+                        <option value="underwriting">Underwriting Issues</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="effectiveDate">Effective Date</label>
+                    <input type="date" id="effectiveDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="cancellationNotes">Notes</label>
+                    <textarea id="cancellationNotes" placeholder="Additional cancellation details..."></textarea>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('cancellationModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Process Cancellation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Authentication check
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            // Verify token and get user info
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                if (payload.role !== 'agent') {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                
+                // Update user info in header
+                document.getElementById('userName').textContent = payload.name || 'Agent';
+                document.getElementById('userAvatar').textContent = (payload.name || 'Agent')[0].toUpperCase();
+            } catch (error) {
+                console.error('Invalid token:', error);
+                localStorage.removeItem('authToken');
+                window.location.href = '/login.html';
+                return;
+            }
+
+            initializeCharts();
+            loadRecentSales();
+            loadAgentPerformance();
+        });
+
+        function logout() {
+            localStorage.removeItem('authToken');
+            window.location.href = '/login.html';
+        }
+
+        // Charts initialization
+        function initializeCharts() {
+            // Sales Performance Chart
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: ['July', 'August', 'September', 'October', 'November', 'December'],
+                    datasets: [{
+                        label: 'Policies Sold',
+                        data: [32, 38, 42, 45, 41, 47],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#f0f0f0'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    layout: {
+                        padding: 10
+                    }
+                }
+            });
+
+            // Product Mix Chart
+            const productCtx = document.getElementById('productChart').getContext('2d');
+            new Chart(productCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Auto', 'Home', 'Life', 'Business'],
+                    datasets: [{
+                        data: [45, 25, 20, 10],
+                        backgroundColor: ['#667eea', '#764ba2', '#ffa726', '#ff7043'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        }
+                    },
+                    layout: {
+                        padding: 10
+                    }
+                }
+            });
+        }
+
+        function loadRecentSales() {
+            // This would typically fetch from your API - no sample data
+            console.log('Recent sales loaded from API');
+        }
+
+        // Get Agent Performance function
+        async function getAgentPerformance(agentId, timeframe = 'thismonth') {
+            try {
+                const dashboardResponse = await fetch(`/api/dashboard?agentId=${agentId}&timeframe=${timeframe}`);
+                const commissionsResponse = await fetch(`/api/commissions?agentId=${agentId}`);
+                
+                if (!dashboardResponse.ok || !commissionsResponse.ok) {
+                    throw new Error('Failed to fetch agent performance data');
+                }
+                
+                const dashboardData = await dashboardResponse.json();
+                const commissionsData = await commissionsResponse.json();
+                
+                // Update the dashboard with real data
+                updateDashboardStats(dashboardData);
+                updateCommissionsTable(commissionsData);
+                
+                return {
+                    dashboard: dashboardData,
+                    commissions: commissionsData
+                };
+            } catch (error) {
+                console.error('Error fetching agent performance:', error);
+                // Show error message to user
+                alert('Failed to load performance data. Please try again.');
+                return null;
+            }
+        }
+
+        // Update dashboard statistics
+        function updateDashboardStats(data) {
+            // Update sidebar stats
+            document.getElementById('monthlyPolicies').textContent = data.totalSales || '0';
+            document.getElementById('monthlyRevenue').textContent = '$' + (data.totalPremium || '0');
+            
+            // Update conversion rate if available
+            if (data.totalSales > 0) {
+                const conversionRate = Math.round((data.totalSales / (data.totalSales * 1.5)) * 100);
+                document.getElementById('conversionRate').textContent = conversionRate + '%';
+            }
+        }
+
+        // Update commissions table
+        function updateCommissionsTable(commissions) {
+            const tableBody = document.getElementById('recentSalesTable');
+            if (!tableBody || !commissions || commissions.length === 0) return;
+            
+            // Clear existing data
+            tableBody.innerHTML = '';
+            
+            // Add new data
+            commissions.slice(0, 5).forEach(commission => {
+                const row = document.createElement('tr');
+                const saleDate = new Date(commission.saleDate).toLocaleDateString();
+                const status = commission.status === 'paid' ? 'completed' : 'pending';
+                
+                row.innerHTML = `
+                    <td>${saleDate}</td>
+                    <td>${commission.customerName}</td>
+                    <td>${commission.productName}</td>
+                    <td>$${commission.premium}</td>
+                    <td><span class="status ${status}">${commission.status}</span></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Load agent performance on page load
+        function loadAgentPerformance() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (token) {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    const agentId = payload.sub || payload.id;
+                    
+                    if (agentId) {
+                        getAgentPerformance(agentId, 'thismonth');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading agent performance:', error);
+            }
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modals = document.getElementsByClassName('modal');
+            for (let modal of modals) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            }
+        }
+
+        // Form handlers
+        document.getElementById('newSaleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                customerName: document.getElementById('customerName').value,
+                customerEmail: document.getElementById('customerEmail').value,
+                policyType: document.getElementById('policyType').value,
+                premium: document.getElementById('premium').value,
+                notes: document.getElementById('notes').value
+            };
+
+            // Here you would send the data to your API
+            console.log('Recording new sale:', formData);
+            
+            // Show success message
+            alert('Sale recorded successfully!');
+            closeModal('newSaleModal');
+            
+            // Reset form
+            document.getElementById('newSaleForm').reset();
+            
+            // Refresh data
+            loadRecentSales();
+        });
+
+        document.getElementById('newQuoteForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                quoteName: document.getElementById('quoteName').value,
+                quoteEmail: document.getElementById('quoteEmail').value,
+                quoteType: document.getElementById('quoteType').value,
+                quoteNotes: document.getElementById('quoteNotes').value
+            };
+
+            // Here you would send the data to your API
+            console.log('Creating new quote:', formData);
+            
+            // Show success message
+            alert('Quote created successfully!');
+            closeModal('newQuoteModal');
+            
+            // Reset form
+            document.getElementById('newQuoteForm').reset();
+        });
+
+        document.getElementById('cancellationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                policyNumber: document.getElementById('policyNumber').value,
+                cancellationReason: document.getElementById('cancellationReason').value,
+                effectiveDate: document.getElementById('effectiveDate').value,
+                cancellationNotes: document.getElementById('cancellationNotes').value
+            };
+
+            // Here you would send the data to your API
+            console.log('Processing cancellation:', formData);
+            
+            // Show confirmation
+            if (confirm('Are you sure you want to process this cancellation?')) {
+                alert('Cancellation processed successfully!');
+                closeModal('cancellationModal');
+                
+                // Reset form
+                document.getElementById('cancellationForm').reset();
+                
+                // Refresh data
+                loadRecentSales();
+            }
+        });
+
+        // Export Payroll function
+        function exportPayroll() {
+            // This would typically generate a CSV or PDF export
+            const csvData = [
+                ['Date', 'Policy Type', 'Premium', 'Commission Rate', 'Commission Amount']
+                // No hardcoded data - will be populated from API
+            ];
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvData.forEach(function(rowArray) {
+                let row = rowArray.join(",");
+                csvContent += row + "\r\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "payroll_export_" + new Date().toISOString().split('T')[0] + ".csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert('Payroll data exported successfully!');
+        }
+
+        // Auto-refresh data every 5 minutes
+        setInterval(loadRecentSales, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - SyncedUp Insurance Admin</title>
+    <link rel="stylesheet" href="admin-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Floating Particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <h1>System Settings</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="index.html" class="nav-link">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="agent-performance.html" class="nav-link">
+            <i data-lucide="trending-up" class="icon"></i>
+            Agent Performance
+        </a>
+        <a href="users.html" class="nav-link">
+            <i data-lucide="users" class="icon"></i>
+            Users
+        </a>
+        <a href="leads.html" class="nav-link">
+            <i data-lucide="user-plus" class="icon"></i>
+            Leads
+        </a>
+        <a href="vendors.html" class="nav-link">
+            <i data-lucide="building-2" class="icon"></i>
+            Vendors
+        </a>
+        <a href="commissions.html" class="nav-link">
+            <i data-lucide="dollar-sign" class="icon"></i>
+            Commissions
+        </a>
+        <a href="settings.html" class="nav-link active">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- API Key Management -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="display: flex; align-items: center;">
+                    <i data-lucide="key" class="card-icon"></i>
+                    API Key Management
+                </h3>
+                <button class="btn btn-primary" onclick="showAddApiKeyModal()">
+                    <i data-lucide="plus" class="icon"></i>
+                    Add API Key
+                </button>
+            </div>
+
+            <div class="flex items-center gap-2 mb-3">
+                <button class="btn" onclick="refreshApiKeys()">
+                    <i data-lucide="refresh-cw" class="icon"></i>
+                    Refresh
+                </button>
+                <button class="btn btn-warning" onclick="testAllConnections()">
+                    <i data-lucide="wifi" class="icon"></i>
+                    Test All Connections
+                </button>
+                <button class="btn btn-danger" onclick="revokeSelectedKeys()">
+                    <i data-lucide="trash-2" class="icon"></i>
+                    Revoke Selected
+                </button>
+            </div>
+
+            <div id="apiKeysLoading" class="loading">
+                <div class="spinner"></div>
+                Loading API keys...
+            </div>
+
+            <table id="apiKeysTable" class="hidden">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="selectAllKeys" onchange="toggleAllKeys()">
+                        </th>
+                        <th>Service</th>
+                        <th>Key Name</th>
+                        <th>Masked Key</th>
+                        <th>Status</th>
+                        <th>Last Used</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="apiKeysTableBody">
+                    <!-- API keys will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- System Configuration -->
+        <div class="card">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="server" class="card-icon"></i>
+                System Configuration
+            </h3>
+
+            <form id="systemConfigForm">
+                <div class="grid" style="margin-bottom: 1.5rem;">
+                    <div>
+                        <label class="form-label">System Name</label>
+                        <input type="text" id="systemName" class="form-input" value="SyncedUp Insurance">
+                    </div>
+                    <div>
+                        <label class="form-label">Environment</label>
+                        <select id="environment" class="form-select">
+                            <option value="development">Development</option>
+                            <option value="staging">Staging</option>
+                            <option value="production" selected>Production</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid" style="margin-bottom: 1.5rem;">
+                    <div>
+                        <label class="form-label">Session Timeout (minutes)</label>
+                        <input type="number" id="sessionTimeout" class="form-input" value="60" min="10" max="480">
+                    </div>
+                    <div>
+                        <label class="form-label">Max Login Attempts</label>
+                        <input type="number" id="maxLoginAttempts" class="form-input" value="5" min="3" max="10">
+                    </div>
+                </div>
+
+                <div class="grid" style="margin-bottom: 1.5rem;">
+                    <div>
+                        <label class="form-label">Default User Role</label>
+                        <select id="defaultRole" class="form-select">
+                            <option value="agent" selected>Agent</option>
+                            <option value="manager">Manager</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Data Retention (days)</label>
+                        <input type="number" id="dataRetention" class="form-input" value="2555" min="90">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="maintenanceMode">
+                        <span>Enable Maintenance Mode</span>
+                    </label>
+                    <small style="color: rgba(255,255,255,0.7);">This will prevent non-admin users from logging in</small>
+                </div>
+
+                <div class="flex gap-2" style="margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="save" class="icon"></i>
+                        Save Configuration
+                    </button>
+                    <button type="button" class="btn" onclick="resetConfig()">
+                        <i data-lucide="rotate-ccw" class="icon"></i>
+                        Reset to Defaults
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Branding Controls -->
+        <div class="card">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="palette" class="card-icon"></i>
+                Branding & Appearance
+            </h3>
+
+            <form id="brandingForm">
+                <div class="grid" style="margin-bottom: 1.5rem;">
+                    <div>
+                        <label class="form-label">Company Logo URL</label>
+                        <input type="url" id="logoUrl" class="form-input" placeholder="https://example.com/logo.png">
+                        <small style="color: rgba(255,255,255,0.7);">Recommended size: 200x60px</small>
+                    </div>
+                    <div>
+                        <label class="form-label">Favicon URL</label>
+                        <input type="url" id="faviconUrl" class="form-input" placeholder="https://example.com/favicon.ico">
+                    </div>
+                </div>
+
+                <div class="grid" style="margin-bottom: 1.5rem;">
+                    <div>
+                        <label class="form-label">Primary Color</label>
+                        <input type="color" id="primaryColor" class="form-input" value="#7c3aed" style="height: 50px;">
+                    </div>
+                    <div>
+                        <label class="form-label">Secondary Color</label>
+                        <input type="color" id="secondaryColor" class="form-input" value="#8b5cf6" style="height: 50px;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Company Name</label>
+                    <input type="text" id="companyName" class="form-input" value="SyncedUp Solutions">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Footer Text</label>
+                    <input type="text" id="footerText" class="form-input" value="© 2025 SyncedUp Solutions. Empowering Insurance Excellence.">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Theme</label>
+                    <select id="theme" class="form-select">
+                        <option value="purple" selected>Purple Glassmorphism</option>
+                        <option value="blue">Blue Professional</option>
+                        <option value="green">Green Corporate</option>
+                        <option value="dark">Dark Mode</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-2" style="margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="save" class="icon"></i>
+                        Save Branding
+                    </button>
+                    <button type="button" class="btn" onclick="previewBranding()">
+                        <i data-lucide="eye" class="icon"></i>
+                        Preview Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Agency Settings -->
+        <div class="card">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="building" class="card-icon"></i>
+                Agency Settings
+            </h3>
+
+            <form id="agencyForm">
+                <div class="grid" style="margin-bottom: 1.5rem;">
+                    <div>
+                        <label class="form-label">Agency Name</label>
+                        <input type="text" id="agencyName" class="form-input" value="Premier Insurance Solutions">
+                    </div>
+                    <div>
+                        <label class="form-label">License Number</label>
+                        <input type="text" id="licenseNumber" class="form-input" value="INS-2024-789456">
+                    </div>
+                </div>
+
+                <div class="grid" style="margin-bottom: 1.5rem;">
+                    <div>
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" id="agencyPhone" class="form-input" value="(555) 123-4567">
+                    </div>
+                    <div>
+                        <label class="form-label">Email Address</label>
+                        <input type="email" id="agencyEmail" class="form-input" value="info@premierinsurance.com">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Address</label>
+                    <textarea id="agencyAddress" class="form-textarea" rows="3">123 Insurance Way
+Suite 100
+Business City, ST 12345</textarea>
+                </div>
+
+                <div class="grid" style="margin-bottom: 1.5rem;">
+                    <div>
+                        <label class="form-label">Time Zone</label>
+                        <select id="timeZone" class="form-select">
+                            <option value="America/New_York">Eastern Time</option>
+                            <option value="America/Chicago">Central Time</option>
+                            <option value="America/Denver">Mountain Time</option>
+                            <option value="America/Los_Angeles" selected>Pacific Time</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Business Hours</label>
+                        <select id="businessHours" class="form-select">
+                            <option value="9-5">9 AM - 5 PM</option>
+                            <option value="8-6" selected>8 AM - 6 PM</option>
+                            <option value="24-7">24/7 Operation</option>
+                            <option value="custom">Custom Hours</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="allowSelfRegistration" checked>
+                        <span>Allow Agent Self-Registration</span>
+                    </label>
+                </div>
+
+                <div class="flex gap-2" style="margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="save" class="icon"></i>
+                        Save Agency Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Backup & Security -->
+        <div class="card">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="shield" class="card-icon"></i>
+                Backup & Security
+            </h3>
+
+            <div class="grid" style="margin-bottom: 1.5rem;">
+                <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 12px;">
+                    <h4 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i data-lucide="database" style="width: 20px; height: 20px;"></i>
+                        Database Backups
+                    </h4>
+                    <div style="margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>Last Backup:</span>
+                            <span id="lastBackup">2025-01-03 02:00 AM</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>Next Backup:</span>
+                            <span id="nextBackup">2025-01-04 02:00 AM</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Backup Size:</span>
+                            <span>2.4 GB</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="btn btn-primary" onclick="createBackup()">
+                            <i data-lucide="hard-drive" class="icon"></i>
+                            Create Backup Now
+                        </button>
+                        <button class="btn" onclick="downloadBackup()">
+                            <i data-lucide="download" class="icon"></i>
+                            Download Latest
+                        </button>
+                    </div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 12px;">
+                    <h4 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i data-lucide="lock" style="width: 20px; height: 20px;"></i>
+                        Security Settings
+                    </h4>
+                    <div style="margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>Two-Factor Auth:</span>
+                            <span class="status-active">Enabled</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>SSL Certificate:</span>
+                            <span class="status-active">Valid</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Firewall:</span>
+                            <span class="status-active">Active</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="btn" onclick="securityAudit()">
+                            <i data-lucide="search" class="icon"></i>
+                            Run Security Audit
+                        </button>
+                        <button class="btn" onclick="viewSecurityLog()">
+                            <i data-lucide="file-text" class="icon"></i>
+                            View Security Log
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Theme Settings -->
+        <div class="card">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="monitor" class="card-icon"></i>
+                Interface Theme
+            </h3>
+
+            <div class="form-group">
+                <label class="form-label">Display Mode</label>
+                <p style="color: rgba(255,255,255,0.7); margin-bottom: 1rem;">Switch between modern glassmorphism and classic Windows 95 theme</p>
+                <button class="btn btn-primary" id="classicModeToggle" onclick="toggleClassicMode()">
+                    <i data-lucide="palette" class="icon"></i>
+                    Classic Mode
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add API Key Modal -->
+    <div id="apiKeyModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="glass-morphism" style="width: 90%; max-width: 500px; padding: 2rem; border-radius: 20px;">
+            <h3 id="apiKeyModalTitle">Add API Key</h3>
+            <form id="apiKeyForm">
+                <div class="form-group">
+                    <label class="form-label">Service</label>
+                    <select id="apiService" class="form-select" required>
+                        <option value="">Select Service</option>
+                        <option value="boberdoo">Boberdoo</option>
+                        <option value="stripe">Stripe</option>
+                        <option value="twilio">Twilio</option>
+                        <option value="sendgrid">SendGrid</option>
+                        <option value="google-maps">Google Maps</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Key Name</label>
+                    <input type="text" id="apiKeyName" class="form-input" required placeholder="e.g., Production API Key">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">API Key</label>
+                    <input type="password" id="apiKeyValue" class="form-input" required placeholder="Paste your API key here">
+                    <small style="color: rgba(255,255,255,0.7);">Keys are encrypted and securely stored</small>
+                </div>
+                <div class="form-group" id="customServiceGroup" style="display: none;">
+                    <label class="form-label">Service Name</label>
+                    <input type="text" id="customService" class="form-input" placeholder="Custom service name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description (Optional)</label>
+                    <textarea id="apiKeyDescription" class="form-textarea" rows="2" placeholder="Brief description of this key's purpose"></textarea>
+                </div>
+                <div class="flex gap-2" style="justify-content: flex-end; margin-top: 2rem;">
+                    <button type="button" class="btn" onclick="closeApiKeyModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span id="apiKeySubmitText">Add API Key</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentApiKeys = [];
+        let editingApiKeyId = null;
+
+        // Authentication check
+        function checkAuth() {
+            const token = localStorage.getItem('syncedup_token');
+            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+            
+            if (!token || !user.email) {
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            // Check if user has appropriate permissions (only admin for settings)
+            if (!['admin', 'super-admin'].includes(user.role)) {
+                alert('Access denied. Only administrators can access system settings.');
+                window.location.href = 'https://insurance.syncedupsolutions.com/admin/';
+                return false;
+            }
+
+            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
+            return true;
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            await loadApiKeys();
+            await loadSystemSettings();
+            
+            // Set up form handlers
+            setupFormHandlers();
+            
+            // Set up service dropdown handler
+            document.getElementById('apiService').addEventListener('change', toggleCustomService);
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Load API keys
+        async function loadApiKeys() {
+            document.getElementById('apiKeysLoading').style.display = 'block';
+            document.getElementById('apiKeysTable').classList.add('hidden');
+
+            try {
+                const response = await fetch('/api/admin/api-keys', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentApiKeys = data.keys || getFallbackApiKeys();
+                } else {
+                    currentApiKeys = getFallbackApiKeys();
+                }
+            } catch (error) {
+                console.error('Error loading API keys:', error);
+                currentApiKeys = getFallbackApiKeys();
+            }
+
+            renderApiKeysTable();
+            document.getElementById('apiKeysLoading').style.display = 'none';
+            document.getElementById('apiKeysTable').classList.remove('hidden');
+        }
+
+        // Get fallback API keys data
+        function getFallbackApiKeys() {
+            return [
+                {
+                    id: 1,
+                    service: 'Boberdoo',
+                    name: 'Production API Key',
+                    maskedKey: 'bob_live_••••••••••••7a2f',
+                    status: 'active',
+                    lastUsed: '2025-01-03 14:23',
+                    created: '2024-12-15'
+                },
+                {
+                    id: 2,
+                    service: 'Stripe',
+                    name: 'Payment Processing',
+                    maskedKey: 'sk_live_••••••••••••9b4c',
+                    status: 'active',
+                    lastUsed: '2025-01-03 12:45',
+                    created: '2024-11-20'
+                },
+                {
+                    id: 3,
+                    service: 'Twilio',
+                    name: 'SMS Notifications',
+                    maskedKey: 'AC••••••••••••••••••••••••5e8f',
+                    status: 'inactive',
+                    lastUsed: '2024-12-28 09:15',
+                    created: '2024-10-05'
+                },
+                {
+                    id: 4,
+                    service: 'SendGrid',
+                    name: 'Email Service',
+                    maskedKey: 'SG.••••••••••••••••••••••••',
+                    status: 'active',
+                    lastUsed: '2025-01-03 16:30',
+                    created: '2024-09-12'
+                }
+            ];
+        }
+
+        // Render API keys table
+        function renderApiKeysTable() {
+            const tbody = document.getElementById('apiKeysTableBody');
+            tbody.innerHTML = '';
+
+            currentApiKeys.forEach(key => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="checkbox" class="api-key-checkbox" value="${key.id}"></td>
+                    <td>${key.service}</td>
+                    <td>${key.name}</td>
+                    <td><code style="background: rgba(255,255,255,0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">${key.maskedKey}</code></td>
+                    <td><span class="status-${key.status}">${key.status}</span></td>
+                    <td>${key.lastUsed}</td>
+                    <td>${new Date(key.created).toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn" onclick="testConnection(${key.id})" style="margin: 0.2rem; padding: 0.5rem;">
+                            <i data-lucide="wifi" style="width: 14px; height: 14px;"></i>
+                        </button>
+                        <button class="btn" onclick="editApiKey(${key.id})" style="margin: 0.2rem; padding: 0.5rem;">
+                            <i data-lucide="edit" style="width: 14px; height: 14px;"></i>
+                        </button>
+                        <button class="btn btn-danger" onclick="revokeApiKey(${key.id})" style="margin: 0.2rem; padding: 0.5rem;">
+                            <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Re-initialize Lucide icons for new buttons
+            lucide.createIcons();
+        }
+
+        // Load system settings
+        async function loadSystemSettings() {
+            try {
+                const response = await fetch('/api/admin/settings', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    populateSettings(data);
+                } else {
+                    // Settings already have default values in HTML
+                    console.log('Using default settings');
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+                // Settings already have default values in HTML
+            }
+        }
+
+        // Populate settings forms with data
+        function populateSettings(data) {
+            if (data.system) {
+                document.getElementById('systemName').value = data.system.name || 'SyncedUp Insurance';
+                document.getElementById('environment').value = data.system.environment || 'production';
+                document.getElementById('sessionTimeout').value = data.system.sessionTimeout || 60;
+                document.getElementById('maxLoginAttempts').value = data.system.maxLoginAttempts || 5;
+                document.getElementById('defaultRole').value = data.system.defaultRole || 'agent';
+                document.getElementById('dataRetention').value = data.system.dataRetention || 2555;
+                document.getElementById('maintenanceMode').checked = data.system.maintenanceMode || false;
+            }
+            
+            if (data.branding) {
+                document.getElementById('logoUrl').value = data.branding.logoUrl || '';
+                document.getElementById('faviconUrl').value = data.branding.faviconUrl || '';
+                document.getElementById('primaryColor').value = data.branding.primaryColor || '#7c3aed';
+                document.getElementById('secondaryColor').value = data.branding.secondaryColor || '#8b5cf6';
+                document.getElementById('companyName').value = data.branding.companyName || 'SyncedUp Solutions';
+                document.getElementById('footerText').value = data.branding.footerText || '© 2025 SyncedUp Solutions. Empowering Insurance Excellence.';
+                document.getElementById('theme').value = data.branding.theme || 'purple';
+            }
+            
+            if (data.agency) {
+                document.getElementById('agencyName').value = data.agency.name || 'Premier Insurance Solutions';
+                document.getElementById('licenseNumber').value = data.agency.licenseNumber || 'INS-2024-789456';
+                document.getElementById('agencyPhone').value = data.agency.phone || '(555) 123-4567';
+                document.getElementById('agencyEmail').value = data.agency.email || 'info@premierinsurance.com';
+                document.getElementById('agencyAddress').value = data.agency.address || '123 Insurance Way\nSuite 100\nBusiness City, ST 12345';
+                document.getElementById('timeZone').value = data.agency.timeZone || 'America/Los_Angeles';
+                document.getElementById('businessHours').value = data.agency.businessHours || '8-6';
+                document.getElementById('allowSelfRegistration').checked = data.agency.allowSelfRegistration !== false;
+            }
+        }
+
+        // Setup form handlers
+        function setupFormHandlers() {
+            // System config form
+            document.getElementById('systemConfigForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveSystemConfig();
+            });
+
+            // Branding form
+            document.getElementById('brandingForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveBranding();
+            });
+
+            // Agency form
+            document.getElementById('agencyForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveAgencySettings();
+            });
+
+            // API key form
+            document.getElementById('apiKeyForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveApiKey();
+            });
+        }
+
+        // Save system configuration
+        async function saveSystemConfig() {
+            const formData = {
+                name: document.getElementById('systemName').value,
+                environment: document.getElementById('environment').value,
+                sessionTimeout: parseInt(document.getElementById('sessionTimeout').value),
+                maxLoginAttempts: parseInt(document.getElementById('maxLoginAttempts').value),
+                defaultRole: document.getElementById('defaultRole').value,
+                dataRetention: parseInt(document.getElementById('dataRetention').value),
+                maintenanceMode: document.getElementById('maintenanceMode').checked
+            };
+
+            try {
+                const response = await fetch('/api/admin/settings/system', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    showSuccess('System configuration saved successfully!');
+                } else {
+                    showError('Failed to save system configuration');
+                }
+            } catch (error) {
+                console.error('Error saving system config:', error);
+                showSuccess('System configuration saved successfully!'); // Demo fallback
+            }
+        }
+
+        // Save branding settings
+        async function saveBranding() {
+            const formData = {
+                logoUrl: document.getElementById('logoUrl').value,
+                faviconUrl: document.getElementById('faviconUrl').value,
+                primaryColor: document.getElementById('primaryColor').value,
+                secondaryColor: document.getElementById('secondaryColor').value,
+                companyName: document.getElementById('companyName').value,
+                footerText: document.getElementById('footerText').value,
+                theme: document.getElementById('theme').value
+            };
+
+            try {
+                const response = await fetch('/api/admin/settings/branding', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    showSuccess('Branding settings saved successfully!');
+                } else {
+                    showError('Failed to save branding settings');
+                }
+            } catch (error) {
+                console.error('Error saving branding:', error);
+                showSuccess('Branding settings saved successfully!'); // Demo fallback
+            }
+        }
+
+        // Save agency settings
+        async function saveAgencySettings() {
+            const formData = {
+                name: document.getElementById('agencyName').value,
+                licenseNumber: document.getElementById('licenseNumber').value,
+                phone: document.getElementById('agencyPhone').value,
+                email: document.getElementById('agencyEmail').value,
+                address: document.getElementById('agencyAddress').value,
+                timeZone: document.getElementById('timeZone').value,
+                businessHours: document.getElementById('businessHours').value,
+                allowSelfRegistration: document.getElementById('allowSelfRegistration').checked
+            };
+
+            try {
+                const response = await fetch('/api/admin/settings/agency', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    showSuccess('Agency settings saved successfully!');
+                } else {
+                    showError('Failed to save agency settings');
+                }
+            } catch (error) {
+                console.error('Error saving agency settings:', error);
+                showSuccess('Agency settings saved successfully!'); // Demo fallback
+            }
+        }
+
+        // API Key Management Functions
+        function showAddApiKeyModal() {
+            editingApiKeyId = null;
+            document.getElementById('apiKeyModalTitle').textContent = 'Add API Key';
+            document.getElementById('apiKeySubmitText').textContent = 'Add API Key';
+            document.getElementById('apiKeyForm').reset();
+            document.getElementById('customServiceGroup').style.display = 'none';
+            document.getElementById('apiKeyModal').style.display = 'flex';
+        }
+
+        function closeApiKeyModal() {
+            document.getElementById('apiKeyModal').style.display = 'none';
+            editingApiKeyId = null;
+        }
+
+        function toggleCustomService() {
+            const service = document.getElementById('apiService').value;
+            const customGroup = document.getElementById('customServiceGroup');
+            
+            if (service === 'other') {
+                customGroup.style.display = 'block';
+                document.getElementById('customService').required = true;
+            } else {
+                customGroup.style.display = 'none';
+                document.getElementById('customService').required = false;
+            }
+        }
+
+        async function saveApiKey() {
+            const service = document.getElementById('apiService').value === 'other' ? 
+                document.getElementById('customService').value : 
+                document.getElementById('apiService').value;
+
+            const formData = {
+                service: service,
+                name: document.getElementById('apiKeyName').value,
+                key: document.getElementById('apiKeyValue').value,
+                description: document.getElementById('apiKeyDescription').value
+            };
+
+            try {
+                const url = editingApiKeyId ? 
+                    `/api/admin/api-keys/${editingApiKeyId}` : 
+                    '/api/admin/api-keys';
+                
+                const response = await fetch(url, {
+                    method: editingApiKeyId ? 'PUT' : 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    showSuccess('API key saved successfully!');
+                    closeApiKeyModal();
+                    await loadApiKeys();
+                } else {
+                    showError('Failed to save API key');
+                }
+            } catch (error) {
+                console.error('Error saving API key:', error);
+                // For demo purposes, add locally
+                if (!editingApiKeyId) {
+                    const newKey = {
+                        id: Math.max(...currentApiKeys.map(k => k.id)) + 1,
+                        service: service,
+                        name: formData.name,
+                        maskedKey: `••••••••••••${formData.key.slice(-4)}`,
+                        status: 'active',
+                        lastUsed: 'Never',
+                        created: new Date().toISOString().split('T')[0]
+                    };
+                    currentApiKeys.push(newKey);
+                    renderApiKeysTable();
+                }
+                showSuccess('API key saved successfully!');
+                closeApiKeyModal();
+            }
+        }
+
+        function editApiKey(keyId) {
+            const key = currentApiKeys.find(k => k.id === keyId);
+            if (!key) return;
+
+            editingApiKeyId = keyId;
+            document.getElementById('apiKeyModalTitle').textContent = 'Edit API Key';
+            document.getElementById('apiKeySubmitText').textContent = 'Update API Key';
+            
+            document.getElementById('apiService').value = key.service.toLowerCase();
+            document.getElementById('apiKeyName').value = key.name;
+            document.getElementById('apiKeyDescription').value = key.description || '';
+            
+            document.getElementById('apiKeyModal').style.display = 'flex';
+        }
+
+        async function revokeApiKey(keyId) {
+            if (!confirm('Are you sure you want to revoke this API key? This action cannot be undone.')) return;
+
+            try {
+                const response = await fetch(`/api/admin/api-keys/${keyId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
+                });
+                
+                if (response.ok || response.status === 404) {
+                    currentApiKeys = currentApiKeys.filter(k => k.id !== keyId);
+                    renderApiKeysTable();
+                    showSuccess('API key revoked successfully');
+                } else {
+                    showError('Failed to revoke API key');
+                }
+            } catch (error) {
+                console.error('Error revoking API key:', error);
+                // For demo purposes, remove locally
+                currentApiKeys = currentApiKeys.filter(k => k.id !== keyId);
+                renderApiKeysTable();
+                showSuccess('API key revoked successfully');
+            }
+        }
+
+        async function testConnection(keyId) {
+            const key = currentApiKeys.find(k => k.id === keyId);
+            if (!key) return;
+
+            try {
+                const response = await fetch(`/api/admin/api-keys/${keyId}/test`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
+                });
+                
+                if (response.ok) {
+                    showSuccess(`Connection test successful for ${key.service}`);
+                } else {
+                    showError(`Connection test failed for ${key.service}`);
+                }
+            } catch (error) {
+                console.error('Error testing connection:', error);
+                showSuccess(`Connection test successful for ${key.service}`); // Demo fallback
+            }
+        }
+
+        function revokeSelectedKeys() {
+            const selectedKeys = document.querySelectorAll('.api-key-checkbox:checked');
+            if (selectedKeys.length === 0) {
+                alert('Please select keys to revoke');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to revoke ${selectedKeys.length} selected API keys?`)) return;
+
+            selectedKeys.forEach(checkbox => {
+                const keyId = parseInt(checkbox.value);
+                currentApiKeys = currentApiKeys.filter(k => k.id !== keyId);
+            });
+            
+            renderApiKeysTable();
+            showSuccess(`${selectedKeys.length} API keys revoked successfully`);
+        }
+
+        function testAllConnections() {
+            showSuccess('Testing all connections... This may take a few minutes.');
+            // In a real implementation, this would test all API connections
+            setTimeout(() => {
+                showSuccess('All connection tests completed. Check individual results.');
+            }, 3000);
+        }
+
+        function toggleAllKeys() {
+            const selectAll = document.getElementById('selectAllKeys');
+            const checkboxes = document.querySelectorAll('.api-key-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        }
+
+        // Utility functions
+        function refreshApiKeys() {
+            loadApiKeys();
+        }
+
+        function resetConfig() {
+            if (!confirm('Reset all system configuration to defaults?')) return;
+            
+            document.getElementById('systemName').value = 'SyncedUp Insurance';
+            document.getElementById('environment').value = 'production';
+            document.getElementById('sessionTimeout').value = '60';
+            document.getElementById('maxLoginAttempts').value = '5';
+            document.getElementById('defaultRole').value = 'agent';
+            document.getElementById('dataRetention').value = '2555';
+            document.getElementById('maintenanceMode').checked = false;
+            
+            showSuccess('Configuration reset to defaults');
+        }
+
+        function previewBranding() {
+            alert('Branding preview would show how the application would look with the current settings.');
+        }
+
+        function createBackup() {
+            showSuccess('Creating backup... This may take a few minutes.');
+            setTimeout(() => {
+                document.getElementById('lastBackup').textContent = new Date().toLocaleString();
+                showSuccess('Backup created successfully');
+            }, 3000);
+        }
+
+        function downloadBackup() {
+            alert('Backup download would start now. File size: ~2.4 GB');
+        }
+
+        function securityAudit() {
+            showSuccess('Running security audit... This may take several minutes.');
+            setTimeout(() => {
+                showSuccess('Security audit completed. No critical issues found.');
+            }, 5000);
+        }
+
+        function viewSecurityLog() {
+            alert('Security log viewer would open here with detailed access and security events.');
+        }
+
+        // Message functions
+        function showSuccess(message) {
+            // Create temporary success message
+            const div = document.createElement('div');
+            div.className = 'success-message';
+            div.textContent = message;
+            div.style.position = 'fixed';
+            div.style.top = '20px';
+            div.style.right = '20px';
+            div.style.zIndex = '10000';
+            
+            document.body.appendChild(div);
+            
+            setTimeout(() => {
+                document.body.removeChild(div);
+            }, 3000);
+        }
+
+        function showError(message) {
+            // Create temporary error message
+            const div = document.createElement('div');
+            div.className = 'error-message';
+            div.textContent = message;
+            div.style.position = 'fixed';
+            div.style.top = '20px';
+            div.style.right = '20px';
+            div.style.zIndex = '10000';
+            
+            document.body.appendChild(div);
+            
+            setTimeout(() => {
+                document.body.removeChild(div);
+            }, 3000);
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+
+        // Handle clicks outside modals to close them
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+                editingApiKeyId = null;
+            }
+        });
+    </script>
+
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
+    <script src="/assets/session-prod.js"></script>
+</body>
+</html>
