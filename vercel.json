@@ -1,17 +1,17 @@
 {
-  "routes": [
-    { "src": "^/api/(.*)", "dest": "/api/$1" },
-    { "src": "^/manager$", "dest": "/manager/index.html" },
-    { "src": "^/admin$", "dest": "/admin/index.html" },
-    { "src": "^/agent$", "dest": "/agent/dashboard.html" },
-    { "src": "^/customer-service$", "dest": "/customer-service/index.html" },
-    { "src": "^/manager/(.*)$", "dest": "/manager/$1.html" },
-    { "src": "^/agent/(.*)$", "dest": "/agent/$1.html" }
-  ],
   "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/", "destination": "/index.html" },
     { "source": "/login", "destination": "/login.html" },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/super-admin", "destination": "/super-admin.html" },
+    { "source": "/super-admin-portal", "destination": "/super-admin-portal.html" },
     { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/manager", "destination": "/manager/index.html" },
+    { "source": "/manager/(.*)", "destination": "/manager/$1.html" },
+    { "source": "/agent", "destination": "/agent/index.html" },
+    { "source": "/agent/(.*)", "destination": "/agent/$1.html" },
+    { "source": "/customer-service", "destination": "/customer-service/index.html" },
     { "source": "/leaderboard", "destination": "/leaderboard.html" },
     { "source": "/global-leaderboard", "destination": "/leaderboard/index.html" }
   ],
