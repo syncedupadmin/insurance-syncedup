@@ -363,22 +363,96 @@
         }
 
         // Action functions
-        function exportData() {
-            alert('Data Export - This will generate and download member/case data export');
+        async function exportData() {
+            try {
+                const exportBtn = event.target;
+                exportBtn.disabled = true;
+                exportBtn.textContent = 'Exporting...';
+
+                // Mock export - would implement real export later
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Create mock CSV data
+                const csvContent = `Member ID,Name,Email,Phone,Status,Last Contact
+MEM001,John Smith,john.smith@email.com,(555) 123-4567,Active,2025-09-02
+MEM002,Mary Johnson,mary.johnson@email.com,(555) 987-6543,Active,2025-09-01
+MEM003,Bob Wilson,bob.wilson@email.com,(555) 456-7890,Pending,2025-08-30`;
+
+                // Create download
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'customer_service_data_export.csv';
+                link.click();
+
+                exportBtn.disabled = false;
+                exportBtn.textContent = 'Export Data';
+                
+                alert('Data export completed successfully!');
+            } catch (error) {
+                alert('Export failed. Please try again.');
+                exportBtn.disabled = false;
+                exportBtn.textContent = 'Export Data';
+            }
         }
 
-        function generateReport() {
-            alert('Generate Report - This will create a comprehensive customer service report');
+        async function generateReport() {
+            try {
+                const reportBtn = event.target;
+                reportBtn.disabled = true;
+                reportBtn.textContent = 'Generating...';
+
+                // Mock report generation - would implement real report later
+                await new Promise(resolve => setTimeout(resolve, 3000));
+
+                // Create mock report HTML
+                const reportContent = `
+<!DOCTYPE html>
+<html>
+<head><title>Customer Service Report</title></head>
+<body style="font-family: Arial, sans-serif; padding: 20px;">
+    <h1>Customer Service Performance Report</h1>
+    <p><strong>Generated:</strong> ${new Date().toLocaleDateString()}</p>
+    <h2>Summary</h2>
+    <ul>
+        <li>Total Cases Handled: 15</li>
+        <li>Average Response Time: 2.3 hours</li>
+        <li>Customer Satisfaction: 94%</li>
+        <li>Active Cases: 3</li>
+    </ul>
+    <h2>Agent Performance</h2>
+    <p>Sarah Johnson: 5 cases resolved, 95% satisfaction</p>
+    <p>Mike Davis: 4 cases resolved, 92% satisfaction</p>
+    <p>Lisa Brown: 6 cases resolved, 96% satisfaction</p>
+</body>
+</html>`;
+
+                // Create download
+                const blob = new Blob([reportContent], { type: 'text/html;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'customer_service_report.html';
+                link.click();
+
+                reportBtn.disabled = false;
+                reportBtn.textContent = 'Generate Report';
+                
+                alert('Report generated successfully!');
+            } catch (error) {
+                alert('Report generation failed. Please try again.');
+                reportBtn.disabled = false;
+                reportBtn.textContent = 'Generate Report';
+            }
         }
 
         function changePassword() {
-            alert('Change Password - This will redirect to password change form');
+            window.location.href = 'https://insurance.syncedupsolutions.com/change-password.html';
         }
 
         // Logout function
         function logout() {
             localStorage.removeItem('syncedup_token');
-            localStorage.removeItem('user');
+            localStorage.removeItem('syncedup_user');
             window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
         }
 

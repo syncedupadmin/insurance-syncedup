@@ -12,6 +12,7 @@
     { "source": "/agent", "destination": "/agent/index.html" },
     { "source": "/agent/(.*)", "destination": "/agent/$1.html" },
     { "source": "/customer-service", "destination": "/customer-service/index.html" },
+    { "source": "/customer-service/(.*)", "destination": "/customer-service/$1.html" },
     { "source": "/leaderboard", "destination": "/leaderboard.html" },
     { "source": "/global-leaderboard", "destination": "/leaderboard/index.html" }
   ],

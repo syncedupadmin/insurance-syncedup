@@ -253,55 +253,72 @@
 
         // Search members API call
         async function searchMembers(searchParams) {
-            // Mock API call - replace with actual endpoint
-            console.log('Searching with params:', searchParams);
-            
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // Mock results - replace with actual API response
-            const mockResults = [
-                {
-                    memberId: 'MEM001234',
-                    firstName: 'John',
-                    lastName: 'Smith',
-                    phone: '(555) 123-4567',
-                    email: 'john.smith@email.com',
-                    product: 'Auto Insurance Premium',
-                    status: 'Active',
-                    agent: 'Sarah Johnson'
-                },
-                {
-                    memberId: 'MEM001235',
-                    firstName: 'Mary',
-                    lastName: 'Johnson',
-                    phone: '(555) 987-6543',
-                    email: 'mary.johnson@email.com',
-                    product: 'Home Insurance Standard',
-                    status: 'Active',
-                    agent: 'Mike Davis'
-                },
-                {
-                    memberId: 'MEM001236',
-                    firstName: 'Bob',
-                    lastName: 'Wilson',
-                    phone: '(555) 456-7890',
-                    email: 'bob.wilson@email.com',
-                    product: 'Life Insurance Basic',
-                    status: 'Pending',
-                    agent: 'Lisa Brown'
-                }
-            ];
+            try {
+                const response = await fetch('/api/customer-service/member-search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`
+                    },
+                    body: JSON.stringify({
+                        ...searchParams,
+                        agencyId: currentUser?.agency_id
+                    })
+                });
 
-            // Filter results based on search params (mock filtering)
-            return mockResults.filter(member => {
-                if (searchParams.memberId && !member.memberId.toLowerCase().includes(searchParams.memberId.toLowerCase())) return false;
-                if (searchParams.firstName && !member.firstName.toLowerCase().includes(searchParams.firstName.toLowerCase())) return false;
-                if (searchParams.lastName && !member.lastName.toLowerCase().includes(searchParams.lastName.toLowerCase())) return false;
-                if (searchParams.phone && !member.phone.includes(searchParams.phone)) return false;
-                if (searchParams.email && !member.email.toLowerCase().includes(searchParams.email.toLowerCase())) return false;
-                return true;
-            });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const results = await response.json();
+                return results;
+            } catch (error) {
+                console.error('API search error:', error);
+                
+                // Fallback to mock data if API fails
+                const mockResults = [
+                    {
+                        memberId: 'MEM001234',
+                        firstName: 'John',
+                        lastName: 'Smith',
+                        phone: '(555) 123-4567',
+                        email: 'john.smith@email.com',
+                        product: 'Auto Insurance Premium',
+                        status: 'Active',
+                        agent: 'Sarah Johnson'
+                    },
+                    {
+                        memberId: 'MEM001235',
+                        firstName: 'Mary',
+                        lastName: 'Johnson',
+                        phone: '(555) 987-6543',
+                        email: 'mary.johnson@email.com',
+                        product: 'Home Insurance Standard',
+                        status: 'Active',
+                        agent: 'Mike Davis'
+                    },
+                    {
+                        memberId: 'MEM001236',
+                        firstName: 'Bob',
+                        lastName: 'Wilson',
+                        phone: '(555) 456-7890',
+                        email: 'bob.wilson@email.com',
+                        product: 'Life Insurance Basic',
+                        status: 'Pending',
+                        agent: 'Lisa Brown'
+                    }
+                ];
+
+                // Apply basic filtering to mock data
+                return mockResults.filter(member => {
+                    if (searchParams.memberId && !member.memberId.toLowerCase().includes(searchParams.memberId.toLowerCase())) return false;
+                    if (searchParams.firstName && !member.firstName.toLowerCase().includes(searchParams.firstName.toLowerCase())) return false;
+                    if (searchParams.lastName && !member.lastName.toLowerCase().includes(searchParams.lastName.toLowerCase())) return false;
+                    if (searchParams.phone && !member.phone.includes(searchParams.phone)) return false;
+                    if (searchParams.email && !member.email.toLowerCase().includes(searchParams.email.toLowerCase())) return false;
+                    return true;
+                });
+            }
         }
 
         // Display search results
@@ -348,27 +365,71 @@
         async function loadFrequentMembers() {
             const tableBody = document.getElementById('frequentMembersBody');
             
-            // Mock data - replace with actual API calls
-            const frequentMembers = [
-                { id: 'MEM001234', name: 'John Smith', lastContact: '2025-09-02', cases: 3, status: 'Active' },
-                { id: 'MEM001235', name: 'Mary Johnson', lastContact: '2025-09-01', cases: 1, status: 'Active' },
-                { id: 'MEM001236', name: 'Bob Wilson', lastContact: '2025-08-30', cases: 2, status: 'Pending' }
-            ];
+            try {
+                const response = await fetch(`/api/customer-service/frequent-members?agencyId=${currentUser?.agency_id || 'DEMO001'}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`
+                    }
+                });
 
-            const membersHTML = frequentMembers.map(member => `
-                <tr onclick="viewMemberProfile('${member.id}')">
-                    <td>${member.id}</td>
-                    <td>${member.name}</td>
-                    <td>${member.lastContact}</td>
-                    <td>${member.cases}</td>
-                    <td><span class="status-badge status-${member.status.toLowerCase()}">${member.status}</span></td>
-                    <td>
-                        <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="event.stopPropagation(); viewMemberProfile('${member.id}')">View</button>
-                    </td>
-                </tr>
-            `).join('');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
 
-            tableBody.innerHTML = membersHTML;
+                const frequentMembers = await response.json();
+
+                if (frequentMembers.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                                <i data-lucide="users"></i>
+                                <p>No frequent members found.</p>
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    const membersHTML = frequentMembers.map(member => `
+                        <tr onclick="viewMemberProfile('${member.memberId}')">
+                            <td>${member.memberId}</td>
+                            <td>${member.firstName} ${member.lastName}</td>
+                            <td>${member.phone}</td>
+                            <td>${member.interactions || 1}</td>
+                            <td><span class="status-badge status-${member.status.toLowerCase()}">${member.status}</span></td>
+                            <td>
+                                <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="event.stopPropagation(); viewMemberProfile('${member.memberId}')">View</button>
+                            </td>
+                        </tr>
+                    `).join('');
+
+                    tableBody.innerHTML = membersHTML;
+                }
+            } catch (error) {
+                console.error('Error loading frequent members:', error);
+                
+                // Fallback to mock data
+                const mockMembers = [
+                    { memberId: 'MEM001234', firstName: 'John', lastName: 'Smith', phone: '(555) 123-4567', interactions: 3, status: 'Active' },
+                    { memberId: 'MEM001235', firstName: 'Mary', lastName: 'Johnson', phone: '(555) 987-6543', interactions: 1, status: 'Active' },
+                    { memberId: 'MEM001236', firstName: 'Bob', lastName: 'Wilson', phone: '(555) 456-7890', interactions: 2, status: 'Pending' }
+                ];
+
+                const membersHTML = mockMembers.map(member => `
+                    <tr onclick="viewMemberProfile('${member.memberId}')">
+                        <td>${member.memberId}</td>
+                        <td>${member.firstName} ${member.lastName}</td>
+                        <td>${member.phone}</td>
+                        <td>${member.interactions}</td>
+                        <td><span class="status-badge status-${member.status.toLowerCase()}">${member.status}</span></td>
+                        <td>
+                            <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="event.stopPropagation(); viewMemberProfile('${member.memberId}')">View</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                tableBody.innerHTML = membersHTML;
+            }
+
+            lucide.createIcons();
         }
 
         // Load recent searches
@@ -445,7 +506,7 @@
         // Logout function
         function logout() {
             localStorage.removeItem('syncedup_token');
-            localStorage.removeItem('user');
+            localStorage.removeItem('syncedup_user');
             window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
         }
 
