@@ -78,3 +78,29 @@ th{color:var(--muted);font-weight:600;font-size:13px}
 #userDisplay{color:var(--muted);font-size:13px}
 /* Lucide icons */
 [data-lucide]{stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+}
+
+/* Keyboard focus ring only when tabbing */
+html.kbd :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 10px; }
+
+/* Avoid mobile bottom bar overlap; respect safe areas */
+.content { padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+.mobile-tabs { padding-bottom: env(safe-area-inset-bottom); }
+
+/* Prevent accidental hover-expand layout jitter on wide screens */
+@media (hover: hover) and (pointer: fine) {
+  .sidebar:hover { width: 72px; } /* disable hover expand, click toggles via JS */
+}
+
+/* Responsive tables: collapse gracefully on small screens */
+@media (max-width: 680px) {
+  table.responsive { display: block; width: 100%; border: 0; }
+  table.responsive thead { display: none; }
+  table.responsive tr { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px; background: var(--card); border-radius: 12px; margin-bottom: 10px; }
+  table.responsive td { display: flex; gap: 8px; }
+  table.responsive td::before { content: attr(data-label); color: var(--muted); min-width: 40%; }
+}

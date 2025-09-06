@@ -7,7 +7,7 @@
     "build": "npx tailwindcss -i ./styles/tailwind.css -o ./public/css/main.css --minify",
     "build:watch": "npx tailwindcss -i ./styles/tailwind.css -o ./public/css/main.css --watch",
     "start": "echo 'Static site - no server needed'",
-    "dev": "http-server public -p 3000 -o",
+    "dev": "http-server ./public -p 3000 -c-1 --cors",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

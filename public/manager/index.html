@@ -124,7 +124,7 @@
         <!-- Team Overview -->
         <div class="card">
             <h3><i data-lucide="users"></i> Team Overview (This Month)</h3>
-            <table>
+            <table class="responsive">
                 <thead>
                     <tr>
                         <th>Agent</th>
@@ -143,7 +143,7 @@
         
         <div class="card">
             <h3><i data-lucide="activity"></i> Recent Team Activity</h3>
-            <table>
+            <table class="responsive">
                 <thead>
                     <tr>
                         <th>Time</th>
@@ -309,12 +309,12 @@
                 const statusClass = agent.status === 'Active' ? 'status-active' : 'status-inactive';
                 
                 row.innerHTML = `
-                    <td><strong>${agent.name}</strong><br><small>${agent.id}</small></td>
-                    <td><strong>${agent.sales}</strong></td>
-                    <td class="premium-amount">$${agent.premium.toLocaleString()}</td>
-                    <td><span class="${statusClass}">${agent.status}</span></td>
-                    <td>${new Date(agent.lastActivity).toLocaleDateString()}</td>
-                    <td>
+                    <td data-label="Agent"><strong>${agent.name}</strong><br><small>${agent.id}</small></td>
+                    <td data-label="Sales Count"><strong>${agent.sales}</strong></td>
+                    <td data-label="Premium Volume" class="premium-amount">$${agent.premium.toLocaleString()}</td>
+                    <td data-label="Status"><span class="${statusClass}">${agent.status}</span></td>
+                    <td data-label="Last Activity">${new Date(agent.lastActivity).toLocaleDateString()}</td>
+                    <td data-label="Actions">
                         <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 
                                 onclick="viewAgentPerformance('${agent.id}')">
                                 <i data-lucide="trending-up"></i> View
@@ -343,12 +343,12 @@
             recentActivity.forEach(activity => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${activity.time}</td>
-                    <td><strong>${activity.agent}</strong></td>
-                    <td>${activity.action}</td>
-                    <td>${activity.customer}</td>
-                    <td>${activity.product}</td>
-                    <td class="premium-amount">$${activity.premium.toLocaleString()}</td>
+                    <td data-label="Time">${activity.time}</td>
+                    <td data-label="Agent"><strong>${activity.agent}</strong></td>
+                    <td data-label="Action">${activity.action}</td>
+                    <td data-label="Customer">${activity.customer}</td>
+                    <td data-label="Product">${activity.product}</td>
+                    <td data-label="Premium" class="premium-amount">$${activity.premium.toLocaleString()}</td>
                 `;
                 tableBody.appendChild(row);
             });
@@ -432,56 +432,11 @@
             }
         });
 
-        // Mobile drawer and overflow menu functionality
-        (function(){
-          var btn = document.getElementById('menuBtn');
-          var sidebar = document.getElementById('sidebar');
-          if(btn && sidebar){ 
-            btn.addEventListener('click', function(){ 
-              sidebar.classList.toggle('expanded'); 
-            }); 
-          }
-
-          // Optional: tabs overflow "More"
-          var tabs = document.querySelector('.tabs');
-          var more = document.querySelector('.more');
-          var menu = more ? more.querySelector('.menu') : null;
-          function rebalance(){
-            if(!tabs || !more || !menu) return;
-            // Move items back first
-            var overflowItems = menu.querySelectorAll('[data-el]');
-            overflowItems.forEach(function(li){
-              var el = document.getElementById(li.getAttribute('data-el'));
-              if(el) tabs.insertBefore(el, more);
-              li.remove();
-            });
-            var avail = tabs.clientWidth - more.offsetWidth - 16;
-            var used = 0; var candidates = [];
-            var tabEls = Array.prototype.slice.call(tabs.querySelectorAll('.tab'));
-            tabEls.forEach(function(t){
-              used += t.offsetWidth + 8;
-              if(used > avail){ candidates.push(t); }
-            });
-            if(!candidates.length){ more.style.display='none'; return; }
-            more.style.display='block'; menu.innerHTML='';
-            candidates.forEach(function(t){
-              var id = t.id || ('tab_'+Math.random().toString(36).slice(2));
-              t.id = id;
-              var item = document.createElement('button');
-              item.className='tab'; item.textContent=t.textContent;
-              item.setAttribute('data-el', id);
-              item.addEventListener('click', function(){ t.click(); });
-              menu.appendChild(item);
-              t.remove();
-            });
-          }
-          window.addEventListener('resize', rebalance); rebalance();
-          if(more){ more.addEventListener('click', function(){ more.classList.toggle('open'); }); }
-        })();
     </script>
     
     <!-- Classic Mode Toggle System -->
     <script src="/js/classic-mode.js"></script>
     <script src="/assets/session-prod.js"></script>
+    <script src="/js/ui-refresh.js" defer></script>
 </body>
 </html>
