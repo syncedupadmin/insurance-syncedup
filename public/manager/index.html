@@ -224,31 +224,43 @@
             setInterval(refreshDashboardData, 5 * 60 * 1000);
         }
         
-        async function loadManagerDashboard() {
+        async function loadManagerDashboard(){
+            const url = '/api/manager/dashboard?timeframe=month';
             try {
-                // Try to fetch real data from manager dashboard API
-                const response = await fetch('/api/manager/dashboard?timeframe=month', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
-                    }
-                });
-                
-                const data = await response.json().catch(() => ({ ok: false, reason: 'parse-error', ...emptyKPIsClient() }));
-                
-                if (response.ok && data.ok !== false) {
-                    displayDashboardData(data);
+                const headers = { 'Accept':'application/json' };
+                const token = (typeof localStorage !== 'undefined' && localStorage.getItem('authToken')) || '';
+                if (token) headers['Authorization'] = 'Bearer ' + token;
+
+                const resp = await fetch(url, { method:'GET', credentials:'include', headers });
+                const text = await resp.text();
+                let data;
+                try { data = JSON.parse(text); }
+                catch { console.error('Dashboard API: non-JSON'); data = { ok:false, kpis: emptyKPIsForAPI() }; }
+
+                if (data && data.ok !== false) {
+                    // Convert new API structure to existing structure for compatibility
+                    const compatData = {
+                        quick_stats: { 
+                            active_agents: data.kpis?.activeAgents || 0,
+                            total_sales_mtd: data.kpis?.policies || 0
+                        },
+                        agency_overview: { 
+                            total_sales: data.kpis?.mtdPremium || 0
+                        },
+                        team_performance: data.team_performance || { top_performers: [] },
+                        recent_activity: data.recent_activity || []
+                    };
+                    displayDashboardData(compatData);
                 } else {
-                    // API returned graceful error or empty data
-                    console.log('Dashboard API:', data.reason || 'not available');
+                    console.log('Dashboard API:', data?.reason || 'not available');
                     displayEmptyDashboard();
                 }
-            } catch (error) {
-                console.log('Dashboard temporarily unavailable');
+            } catch (err){
+                console.error('Dashboard temporarily unavailable', err);
                 displayEmptyDashboard();
             }
         }
+        function emptyKPIsForAPI(){ return { activeAgents:0, mtdPremium:0, policies:0, avgSale:0 }; }
 
         function emptyKPIsClient() {
             return {

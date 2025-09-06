@@ -13,10 +13,12 @@
           if (!raw) { location.replace('/login'); return; }
           const { role } = JSON.parse(raw);
           const norm = normalizeRole(role);
-          const allow = new Set(['customer_service', 'admin', 'super_admin']);
+          
+          // Accept both database formats: customer-service AND customer_service
+          const allow = new Set(['customer_service', 'customer-service', 'admin', 'super_admin', 'super-admin']);
 
-          if (!allow.has(norm)) {
-            alert('Access denied. Customer service permissions required.');
+          if (!allow.has(role) && !allow.has(norm)) {
+            alert(`Access denied. Customer service permissions required. Your role: ${role}`);
             location.replace('/login');
             return;
           }

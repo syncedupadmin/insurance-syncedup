@@ -104,11 +104,14 @@ export default async function handler(req, res) {
       return res.status(401).end(JSON.stringify({ error: 'invalid_credentials', reason: 'wrong_password' }));
     }
 
-    // Normalize role to underscore style expected by front end
-    const dbRole = normalizeRole(userRow.role);
-    const allowed = new Set(['super_admin','admin','manager','agent','customer_service']);
-    if (!allowed.has(dbRole)) {
-      console.log(`Login attempt failed - invalid role: ${dbRole} for user: ${email}`);
+    // Handle both database formats and normalize to underscore style
+    const rawRole = String(userRow.role || '');
+    const dbRole = normalizeRole(rawRole);
+    
+    // Allow both original database format and normalized format
+    const allowed = new Set(['super_admin','admin','manager','agent','customer_service','super-admin','customer-service']);
+    if (!allowed.has(rawRole) && !allowed.has(dbRole)) {
+      console.log(`Login attempt failed - invalid role: ${rawRole}/${dbRole} for user: ${email}`);
       return bad(res, 403, 'Invalid role');
     }
     

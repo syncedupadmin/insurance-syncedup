@@ -123,3 +123,19 @@ body {
   .drawer-mask { display:none; position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:25; }
   .drawer-mask.show { display:block; }
 }
+
+/* Force our theme over legacy gradient and ensure readable type */
+body { background: var(--bg) !important; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important; }
+
+/* Make buttons and tiles crisp on first paint */
+.kpi, .card { will-change: transform; }
+
+/* Larger hit target for the menu, and safe mobile drawer overlay */
+#menuBtn { min-width:44px; min-height:44px; touch-action: manipulation; }
+.sidebar { z-index: 30; }
+@media (max-width:680px){
+  .sidebar { position: fixed; left: -240px; top: 0; bottom: 0; }
+  .sidebar.expanded { left: 0; }
+  .drawer-mask { display:none; position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:25; }
+  .drawer-mask.show { display:block; }
+}
