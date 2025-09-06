@@ -235,17 +235,28 @@
                     }
                 });
                 
-                if (response.ok) {
-                    const data = await response.json();
+                const data = await response.json().catch(() => ({ ok: false, reason: 'parse-error', ...emptyKPIsClient() }));
+                
+                if (response.ok && data.ok !== false) {
                     displayDashboardData(data);
                 } else {
-                    console.log('API not available, showing empty dashboard');
+                    // API returned graceful error or empty data
+                    console.log('Dashboard API:', data.reason || 'not available');
                     displayEmptyDashboard();
                 }
             } catch (error) {
-                console.error('Dashboard API error:', error);
+                console.log('Dashboard temporarily unavailable');
                 displayEmptyDashboard();
             }
+        }
+
+        function emptyKPIsClient() {
+            return {
+                quick_stats: { active_agents: 0, total_sales_mtd: 0 },
+                agency_overview: { total_sales: 0 },
+                team_performance: { top_performers: [] },
+                recent_activity: []
+            };
         }
         
         function displayDashboardData(data) {

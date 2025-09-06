@@ -36,10 +36,22 @@ function getPreviousPeriod(startDate, endDate) {
   };
 }
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
-);
+// Helper function for empty KPIs
+function emptyKPIs() {
+  return {
+    quick_stats: {
+      active_agents: 0,
+      total_sales_mtd: 0
+    },
+    agency_overview: {
+      total_sales: 0
+    },
+    team_performance: {
+      top_performers: []
+    },
+    recent_activity: []
+  };
+}
 
 async function managerDashboardHandler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -49,12 +61,28 @@ async function managerDashboardHandler(req, res) {
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
-  
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
 
   try {
+    const timeframe = req.query.timeframe || 'month';
+    
+    // Check environment variables safely
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
+    
+    if (!supabaseUrl || !supabaseKey) {
+      console.log('Manager Dashboard: Environment variables missing, returning empty data');
+      return res.status(200).json({ 
+        ok: false, 
+        reason: 'env-missing', 
+        ...emptyKPIs() 
+      });
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    
+    if (req.method !== 'GET') {
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
     const { agencyId, role, email } = getUserContext(req);
     const { timeframe = 'month' } = req.query;
 
@@ -96,10 +124,11 @@ async function managerDashboardHandler(req, res) {
     });
 
   } catch (error) {
-    console.error('Manager dashboard API error:', error);
-    return res.status(500).json({ 
-      error: 'Failed to load dashboard', 
-      details: error.message 
+    console.error('Manager dashboard API error:', error?.stack || error);
+    return res.status(200).json({ 
+      ok: false, 
+      reason: 'exception', 
+      ...emptyKPIs() 
     });
   }
 }

@@ -10,6 +10,11 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY; // needs RLS bypass for password_hash read
 const AUTH_SECRET = process.env.AUTH_SECRET; // for JWT signing
 
+// Normalize role helper
+const normalizeRole = (r) => String(r || '')
+  .toLowerCase()
+  .replace(/[\s-]+/g, '_');
+
 function failIfMissingEnv() {
   const missing = [];
   if (!SUPABASE_URL) missing.push('SUPABASE_URL');
@@ -100,32 +105,31 @@ export default async function handler(req, res) {
     }
 
     // Normalize role to underscore style expected by front end
-    const role = String(userRow.role || '').toLowerCase().replace(/[\s-]+/g, '_');
+    const dbRole = normalizeRole(userRow.role);
     const allowed = new Set(['super_admin','admin','manager','agent','customer_service']);
-    if (!allowed.has(role)) {
-      console.log(`Login attempt failed - invalid role: ${role} for user: ${email}`);
+    if (!allowed.has(dbRole)) {
+      console.log(`Login attempt failed - invalid role: ${dbRole} for user: ${email}`);
       return bad(res, 403, 'Invalid role');
     }
     
     const displayName = userRow.full_name || userRow.name || userRow.email;
 
-    const user = {
+    const safeUser = {
       id: userRow.id,
       email: userRow.email,
       name: displayName,
-      role,
+      role: dbRole,
       agency_id: userRow.agency_id,
-      is_active: true,
-      must_change_password: false // set real flag if you have it
+      is_active: !!userRow.is_active
     };
 
     const token = signJWT(
-      { sub: user.id, role: user.role, agency_id: user.agency_id },
+      { sub: safeUser.id, email: safeUser.email, role: dbRole, agency_id: safeUser.agency_id },
       AUTH_SECRET,
       8 * 60 * 60
     );
 
-    return ok(res, { token, user });
+    return ok(res, { token, user: safeUser });
   } catch (err) {
     const code = err?.statusCode || 500;
     return bad(res, code, err?.message || 'Unexpected error');

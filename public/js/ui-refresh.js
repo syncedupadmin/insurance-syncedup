@@ -1,16 +1,34 @@
 (function () {
   var sidebar = document.getElementById('sidebar');
   var btn = document.getElementById('menuBtn');
-  if (btn && sidebar) {
-    // Desktop: click to pin; Mobile: toggle drawer
-    btn.addEventListener('click', function () {
-      sidebar.classList.toggle('expanded');
-      try { localStorage.setItem('ui.sidebar.expanded', sidebar.classList.contains('expanded') ? '1' : '0'); } catch {}
-    });
-    try {
-      if (localStorage.getItem('ui.sidebar.expanded') === '1') sidebar.classList.add('expanded');
-    } catch {}
+
+  // add mask for mobile
+  var mask = document.querySelector('.drawer-mask');
+  if(!mask){
+    mask = document.createElement('div');
+    mask.className = 'drawer-mask';
+    document.body.appendChild(mask);
   }
+
+  function toggle() {
+    if (btn && sidebar) {
+      var isExpanded = sidebar.classList.toggle('expanded');
+      mask.classList.toggle('show', isExpanded);
+      try { 
+        localStorage.setItem('ui.sidebar.expanded', isExpanded ? '1' : '0'); 
+      } catch {}
+    }
+  }
+
+  if (btn) btn.addEventListener('click', toggle);
+  if (mask) mask.addEventListener('click', toggle);
+
+  // Restore sidebar state on desktop
+  try {
+    if (window.innerWidth > 680 && localStorage.getItem('ui.sidebar.expanded') === '1') {
+      sidebar.classList.add('expanded');
+    }
+  } catch {}
 
   // Optional: tabs overflow "More"
   var tabs = document.querySelector('.tabs');

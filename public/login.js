@@ -7,13 +7,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const showError = (m) => { if (errBox) { errBox.textContent = m; errBox.style.display = 'block'; } };
 
-  const normalizeRole = r => String(r || '').toLowerCase().replace(/[\s-]+/g, '_');
+  // keep the same normalize helper as backend
+  const normalizeRole = (r) => String(r || '')
+    .toLowerCase()
+    .replace(/[\s-]+/g, '_');
 
   const targetFor = {
     super_admin: '/super-admin',
     admin: '/admin',
-    manager: '/manager',          // or '/dashboard' if that's your canon
-    agent: '/agent',              // or '/dashboard'
+    manager: '/manager',
+    agent: '/agent',
     customer_service: '/customer-service'
   };
 
@@ -34,11 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return showError(data?.error || 'Login failed');
     }
 
-    // store and redirect
-    localStorage.setItem('syncedup_token', data.token || '');
-    localStorage.setItem('syncedup_user', JSON.stringify(data.user || {}));
+    // ...after successful fetch of /api/auth/login
+    const { token, user } = data;
+    localStorage.setItem('syncedup_token', token);
+    localStorage.setItem('syncedup_user', JSON.stringify(user));
 
-    const role = normalizeRole(data.user.role);
+    const role = normalizeRole(user.role);
     location.replace(targetFor[role] || '/dashboard');
   }
 
