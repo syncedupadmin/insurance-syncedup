@@ -100,7 +100,13 @@ export default async function handler(req, res) {
     }
 
     // Normalize role to underscore style expected by front end
-    const role = String(userRow.role || '').toLowerCase().replace('-', '_');
+    const role = String(userRow.role || '').toLowerCase().replace(/[\s-]+/g, '_');
+    const allowed = new Set(['super_admin','admin','manager','agent','customer_service']);
+    if (!allowed.has(role)) {
+      console.log(`Login attempt failed - invalid role: ${role} for user: ${email}`);
+      return bad(res, 403, 'Invalid role');
+    }
+    
     const displayName = userRow.full_name || userRow.name || userRow.email;
 
     const user = {

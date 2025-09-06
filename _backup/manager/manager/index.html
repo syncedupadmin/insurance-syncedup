@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manager Dashboard - SyncedUp Insurance</title>
-    <link rel="stylesheet" href="/css/ui-refresh.css">
     <link rel="stylesheet" href="/manager/manager-global.css">
     
     
@@ -23,82 +22,80 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
-<div class="app">
-  <aside class="sidebar" id="sidebar">
-    <div class="brand">S</div>
-    <nav class="nav" id="manager-nav">
-      <a href="/manager" class="item active">
-        <i data-lucide="layout-dashboard"></i>
-        <span>Dashboard</span>
-      </a>
-      <a href="/manager/leads" class="item">
-        <i data-lucide="user-plus"></i>
-        <span>Leads</span>
-      </a>
-      <a href="/manager/team-management" class="item">
-        <i data-lucide="users"></i>
-        <span>Team Management</span>
-      </a>
-      <a href="/manager/performance" class="item">
-        <i data-lucide="trending-up"></i>
-        <span>Team Performance</span>
-      </a>
-      <a href="/manager/reports" class="item">
-        <i data-lucide="file-text"></i>
-        <span>Reports</span>
-      </a>
-      <a href="/manager/goals" class="item">
-        <i data-lucide="target"></i>
-        <span>Goals</span>
-      </a>
-      <a href="/manager/vendors" class="item">
-        <i data-lucide="building-2"></i>
-        <span>Vendors</span>
-      </a>
-      <a href="/manager/settings" class="item">
-        <i data-lucide="settings"></i>
-        <span>Settings</span>
-      </a>
-      <a href="/leaderboard" class="item">
-        <i data-lucide="trophy"></i>
-        <span>Global Leaderboard</span>
-      </a>
-    </nav>
-  </aside>
+    <!-- Header -->
+    <div class="header">
+        <h1>Manager Dashboard</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
 
-  <div class="main">
-    <header class="topbar">
-      <button id="menuBtn" aria-label="Open Menu">☰</button>
-      <div class="grow"></div>
-      <span id="userDisplay">Loading...</span>
-      <button class="btn" id="logoutBtn" onclick="logout()">
-        <i data-lucide="log-out"></i>
-        Logout
-      </button>
-    </header>
-
-    <main class="content" id="manager-content">
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="/manager" class="nav-link active">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="/manager/leads" class="nav-link">
+            <i data-lucide="user-plus" class="icon"></i>
+            Leads
+        </a>
+        <a href="/manager/team-management" class="nav-link">
+            <i data-lucide="users" class="icon"></i>
+            Team Management
+        </a>
+        <a href="/manager/performance" class="nav-link">
+            <i data-lucide="trending-up" class="icon"></i>
+            Team Performance
+        </a>
+        <a href="/manager/reports" class="nav-link">
+            <i data-lucide="file-text" class="icon"></i>
+            Reports
+        </a>
+        <a href="/manager/goals" class="nav-link">
+            <i data-lucide="target" class="icon"></i>
+            Goals
+        </a>
+        <a href="/manager/vendors" class="nav-link">
+            <i data-lucide="building-2" class="icon"></i>
+            Vendors
+        </a>
+        <a href="/manager/settings" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+        <a href="/leaderboard" class="nav-link">
+            <i data-lucide="trophy" class="icon"></i>
+            Global Leaderboard
+        </a>
+    </div>
+    
+    <div class="container">
         <div class="manager-notice">
             <h3><i data-lucide="shield-check"></i> Manager Portal</h3>
             <p>You have access to agent data and performance metrics for your team.</p>
         </div>
         
-        <div class="kpis">
-            <div class="kpi">
-                <div class="k-value" id="activeAgents">0</div>
-                <div class="k-label">Active Agents</div>
+        <div class="grid">
+            <div class="card">
+                <div class="stat-value" id="activeAgents">0</div>
+                <div class="stat-label">Active Agents</div>
             </div>
-            <div class="kpi">
-                <div class="k-value" id="mtdRevenue">$0</div>
-                <div class="k-label">MTD Premium Volume</div>
+            <div class="card">
+                <div class="stat-value" id="mtdRevenue">$0</div>
+                <div class="stat-label">MTD Premium Volume</div>
             </div>
-            <div class="kpi">
-                <div class="k-value" id="policiesSold">0</div>
-                <div class="k-label">Policies Sold</div>
+            <div class="card">
+                <div class="stat-value" id="policiesSold">0</div>
+                <div class="stat-label">Policies Sold</div>
             </div>
-            <div class="kpi">
-                <div class="k-value" id="avgSaleSize">$0</div>
-                <div class="k-label">Average Sale Size</div>
+            <div class="card">
+                <div class="stat-value" id="avgSaleSize">$0</div>
+                <div class="stat-label">Average Sale Size</div>
             </div>
         </div>
         

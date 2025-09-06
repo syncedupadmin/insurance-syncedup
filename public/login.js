@@ -7,18 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const showError = (m) => { if (errBox) { errBox.textContent = m; errBox.style.display = 'block'; } };
 
-  // normalize role variants once
-  const normalizeRole = r => (r || '')
-    .toLowerCase()
-    .replace(/[\s-]+/g, '_');
+  const normalizeRole = r => String(r || '').toLowerCase().replace(/[\s-]+/g, '_');
 
-  // mapping to CLEAN URLs (no .html)
   const targetFor = {
     super_admin: '/super-admin',
     admin: '/admin',
-    manager: '/manager',
-    agent: '/agent',
-    customer_service: '/customer-service', // Beautiful blue customer service portal
+    manager: '/manager',          // or '/dashboard' if that's your canon
+    agent: '/agent',              // or '/dashboard'
+    customer_service: '/customer-service'
   };
 
   async function doLogin(e) {
@@ -43,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('syncedup_user', JSON.stringify(data.user || {}));
 
     const role = normalizeRole(data.user.role);
-    window.location.href = targetFor[role] || '/dashboard';
+    location.replace(targetFor[role] || '/dashboard');
   }
 
   form?.addEventListener('submit', doLogin);

@@ -12,7 +12,9 @@
       "Bash(npm run build:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "Bash(npx vercel:*)"
+      "Bash(npx vercel:*)",
+      "WebFetch(domain:insurance-syncedup-4vkajgix8-nicks-projects-f40381ea.vercel.app)",
+      "WebFetch(domain:insurance-syncedup-cow8evcuf-nicks-projects-f40381ea.vercel.app)"
     ],
     "deny": [],
     "ask": []

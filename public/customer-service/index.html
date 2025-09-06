@@ -4,16 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Service Dashboard - SyncedUp Insurance</title>
-    <link rel="stylesheet" href="customer-service-global.css">
+    <link rel="stylesheet" href="/customer-service/customer-service-global.css">
     <script>
-        (function () {
-          const token = localStorage.getItem('syncedup_token');
-          const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
-          const role = normalize(u.role || '');
-          const allowed = ['customer_service','agent','manager','admin','super_admin'];
-          if (!token || !role || !allowed.includes(role)) { window.location.href = '/login'; return; }
-        })();
+      // Unified auth guard for all portals
+      const u = JSON.parse(localStorage.getItem('syncedup_user') || 'null');
+      if (!u) {
+        location.replace('/login');
+        throw new Error('No session');
+      }
+      const role = String(u.role || '')
+        .toLowerCase()
+        .replace(/[\s-]+/g, '_'); // "customer-service" -> "customer_service"
+      const allowed = new Set(['customer_service', 'admin', 'super_admin', 'manager']);
+
+      if (!allowed.has(role)) {
+        alert('Access denied. Customer service permissions required.');
+        location.replace('/login');
+        throw new Error('Insufficient role');
+      }
+
+      // OPTIONAL: if you dim/blur UI while unauthenticated, remove that now
+      document.documentElement.classList.remove('unauth'); 
     </script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
