@@ -7,7 +7,7 @@
     "build": "npx tailwindcss -i ./styles/tailwind.css -o ./public/css/main.css --minify",
     "build:watch": "npx tailwindcss -i ./styles/tailwind.css -o ./public/css/main.css --watch",
     "start": "echo 'Static site - no server needed'",
-    "dev": "echo 'Development server not configured'",
+    "dev": "http-server public -p 3000 -o",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -37,6 +37,7 @@
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.10",
     "@types/bcryptjs": "^2.4.6",
-    "@types/jsonwebtoken": "^9.0.10"
+    "@types/jsonwebtoken": "^9.0.10",
+    "http-server": "^14.1.1"
   }
 }

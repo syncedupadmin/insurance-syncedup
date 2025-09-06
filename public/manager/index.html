@@ -102,16 +102,16 @@
             </div>
         </div>
         
-        <div class="quick-actions">
-            <button class="btn" onclick="location.href='team-management.html'">
+        <div class="actions">
+            <button class="btn" onclick="location.href='/manager/team-management'">
                 <i data-lucide="users"></i>
                 Manage Team
             </button>
-            <button class="btn" onclick="location.href='performance.html'">
+            <button class="btn" onclick="location.href='/manager/performance'">
                 <i data-lucide="trending-up"></i>
                 Team Performance
             </button>
-            <button class="btn btn-success" onclick="location.href='reports.html'">
+            <button class="btn btn-success" onclick="location.href='/manager/reports'">
                 <i data-lucide="file-text"></i>
                 Generate Reports
             </button>
@@ -159,7 +159,29 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </main>
+  </div>
+
+  <!-- Optional mobile bottom tabs -->
+  <nav class="mobile-tabs" aria-label="Primary">
+    <a class="t active" href="/manager">
+      <i data-lucide="home"></i>
+      <span>Home</span>
+    </a>
+    <a class="t" href="/manager/leads">
+      <i data-lucide="user-plus"></i>
+      <span>Leads</span>
+    </a>
+    <a class="t" href="/manager/team-management">
+      <i data-lucide="users"></i>
+      <span>Team</span>
+    </a>
+    <a class="t" href="/manager/reports">
+      <i data-lucide="file-text"></i>
+      <span>Reports</span>
+    </a>
+  </nav>
+</div>
     
     <script>
         let currentUser = null;
@@ -178,18 +200,18 @@
                 if (!['manager', 'admin', 'super-admin'].includes(currentUser.role)) {
                     // Redirect based on actual role
                     if (currentUser.role === 'agent') {
-                        window.location.href = 'https://insurance.syncedupsolutions.com/agent/';
+                        window.location.href = '/agent/';
                     } else if (currentUser.role === 'customer-service') {
-                        window.location.href = 'https://insurance.syncedupsolutions.com/customer-service/';
+                        window.location.href = '/customer-service/';
                     } else {
-                        window.location.href = '/login.html';
+                        window.location.href = '/login';
                     }
                     return;
                 }
                 
                 initializeDashboard();
             } else {
-                window.location.href = '/login.html';
+                window.location.href = '/login';
             }
         });
         
@@ -349,7 +371,7 @@
         }
         
         function viewAgentPerformance(agentId) {
-            window.location.href = `https://insurance.syncedupsolutions.com/manager/performance.html?agent=${agentId}`;
+            window.location.href = `/manager/performance?agent=${agentId}`;
         }
         
         function contactAgent(agentId) {
@@ -359,7 +381,7 @@
         
         function viewAgentDashboard() {
             // Allow manager to view the agent interface (useful for training/support)
-            window.open('https://insurance.syncedupsolutions.com/agent/', '_blank');
+            window.open('/agent/', '_blank');
         }
         
         function updateRecentActivityFromAPI(apiActivity) {
@@ -399,16 +421,63 @@
         
         function logout() {
             localStorage.clear();
-            window.location.href = '/login.html';
+            window.location.href = '/login';
         }
         
-        // Initialize Lucide icons
+        // Initialize Lucide icons and mobile drawer
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize Lucide icons after page load
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
             }
         });
+
+        // Mobile drawer and overflow menu functionality
+        (function(){
+          var btn = document.getElementById('menuBtn');
+          var sidebar = document.getElementById('sidebar');
+          if(btn && sidebar){ 
+            btn.addEventListener('click', function(){ 
+              sidebar.classList.toggle('expanded'); 
+            }); 
+          }
+
+          // Optional: tabs overflow "More"
+          var tabs = document.querySelector('.tabs');
+          var more = document.querySelector('.more');
+          var menu = more ? more.querySelector('.menu') : null;
+          function rebalance(){
+            if(!tabs || !more || !menu) return;
+            // Move items back first
+            var overflowItems = menu.querySelectorAll('[data-el]');
+            overflowItems.forEach(function(li){
+              var el = document.getElementById(li.getAttribute('data-el'));
+              if(el) tabs.insertBefore(el, more);
+              li.remove();
+            });
+            var avail = tabs.clientWidth - more.offsetWidth - 16;
+            var used = 0; var candidates = [];
+            var tabEls = Array.prototype.slice.call(tabs.querySelectorAll('.tab'));
+            tabEls.forEach(function(t){
+              used += t.offsetWidth + 8;
+              if(used > avail){ candidates.push(t); }
+            });
+            if(!candidates.length){ more.style.display='none'; return; }
+            more.style.display='block'; menu.innerHTML='';
+            candidates.forEach(function(t){
+              var id = t.id || ('tab_'+Math.random().toString(36).slice(2));
+              t.id = id;
+              var item = document.createElement('button');
+              item.className='tab'; item.textContent=t.textContent;
+              item.setAttribute('data-el', id);
+              item.addEventListener('click', function(){ t.click(); });
+              menu.appendChild(item);
+              t.remove();
+            });
+          }
+          window.addEventListener('resize', rebalance); rebalance();
+          if(more){ more.addEventListener('click', function(){ more.classList.toggle('open'); }); }
+        })();
     </script>
     
     <!-- Classic Mode Toggle System -->
