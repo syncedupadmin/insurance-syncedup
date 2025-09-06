@@ -1,208 +1,127 @@
+// api/auth/login.js
+// Production login: Supabase only. No fallbacks. No fairy dust.
+
+import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
 import { createClient } from '@supabase/supabase-js';
-import jwt from 'jsonwebtoken';
-import cookie from 'cookie';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-change-in-production';
-const JWT_EXPIRES_IN = '1h';
+// Required env vars in Vercel project settings
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY; // needs RLS bypass for password_hash read
+const AUTH_SECRET = process.env.AUTH_SECRET; // for JWT signing
 
-// Simple in-memory rate limiting for serverless (not persistent across invocations)
-const loginAttempts = new Map();
-
-function checkRateLimit(req) {
-  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown';
-  const now = Date.now();
-  const windowMs = 1 * 60 * 1000; // 1 minute
-  const maxAttempts = 5;
-  
-  if (!loginAttempts.has(ip)) {
-    loginAttempts.set(ip, []);
+function failIfMissingEnv() {
+  const missing = [];
+  if (!SUPABASE_URL) missing.push('SUPABASE_URL');
+  if (!SUPABASE_SERVICE_ROLE_KEY) missing.push('SUPABASE_SERVICE_ROLE_KEY');
+  if (!AUTH_SECRET) missing.push('AUTH_SECRET');
+  if (missing.length) {
+    const msg = `Missing required env: ${missing.join(', ')}`;
+    const err = new Error(msg);
+    err.statusCode = 500;
+    throw err;
   }
-  
-  const attempts = loginAttempts.get(ip);
-  // Remove old attempts outside the window
-  const recentAttempts = attempts.filter(time => now - time < windowMs);
-  
-  if (recentAttempts.length >= maxAttempts) {
-    return false; // Rate limited
-  }
-  
-  recentAttempts.push(now);
-  loginAttempts.set(ip, recentAttempts);
-  return true; // OK to proceed
 }
 
-function getRedirectUrl(role) {
-  switch (role) {
-    case 'super-admin': return '/super-admin/';
-    case 'admin': return '/admin/';
-    case 'manager': return '/manager/';
-    case 'agent': return '/agent/';
-    case 'customer-service': return '/customer-service/';
-    default: return '/admin/';
-  }
+function base64url(buf) {
+  return Buffer.from(buf).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
+function signJWT(payload, secret, expSeconds = 8 * 60 * 60) {
+  const header = { alg: 'HS256', typ: 'JWT' };
+  const now = Math.floor(Date.now() / 1000);
+  const body = { iat: now, exp: now + expSeconds, ...payload };
+  const h = base64url(JSON.stringify(header));
+  const b = base64url(JSON.stringify(body));
+  const data = `${h}.${b}`;
+  const sig = crypto.createHmac('sha256', secret).update(data).digest();
+  return `${data}.${base64url(sig)}`;
+}
+
+function ok(res, json) {
+  res.setHeader('Content-Type', 'application/json');
+  res.status(200).end(JSON.stringify(json));
+}
+function bad(res, code, msg) {
+  res.setHeader('Content-Type', 'application/json');
+  res.status(code).end(JSON.stringify({ error: msg }));
 }
 
 export default async function handler(req, res) {
-  // Apply rate limiting
-  if (!checkRateLimit(req)) {
-    return res.status(429).json({
-      error: 'Too many login attempts. Please try again later.'
-    });
-  }
-
-  // CORS headers
-  const origin = req.headers.origin || '*';
-  res.setHeader('Access-Control-Allow-Origin', origin);
-  res.setHeader('Vary', 'Origin');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-CSRF-Token');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-
-  const { email, password } = req.body || {};
-  if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
-  if (typeof email !== 'string' || typeof password !== 'string') {
-    return res.status(400).json({ error: 'Invalid input format' });
-  }
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) return res.status(400).json({ error: 'Invalid email format' });
+  if (req.method !== 'POST') return bad(res, 405, 'Method Not Allowed');
 
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_KEY
+    failIfMissingEnv();
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
+
+    const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
+    const email = String(body.email || '').toLowerCase().trim();
+    const password = String(body.password || '').trim();
+    if (!email || !password) return bad(res, 400, 'Email and password are required');
+
+    // Fetch exact user from portal_users; email_norm or email
+    // We select password_hash for server-side bcrypt check. Requires service role or a secure RPC.
+    const { data: users, error } = await supabase
+      .from('portal_users')
+      .select('id, email, email_norm, full_name, name, role, agency_id, is_active, password_hash')
+      .or(`email.eq.${email},email_norm.eq.${email}`)
+      .limit(1);
+
+    if (error) {
+      console.error('Database error during login:', error);
+      return bad(res, 500, 'Database error');
+    }
+    
+    const userRow = users?.[0];
+    if (!userRow) {
+      console.log(`Login attempt failed - no user found for email: ${email}`);
+      res.setHeader('Content-Type', 'application/json');
+      return res.status(401).end(JSON.stringify({ error: 'invalid_credentials', reason: 'no_user' }));
+    }
+    
+    if (userRow.is_active === false) {
+      console.log(`Login attempt failed - inactive user: ${email}`);
+      res.setHeader('Content-Type', 'application/json');
+      return res.status(401).end(JSON.stringify({ error: 'invalid_credentials', reason: 'inactive_user' }));
+    }
+
+    const hash = userRow.password_hash;
+    if (!hash || hash.length < 20) {
+      console.log(`Login attempt failed - no valid password hash for user: ${email}`);
+      res.setHeader('Content-Type', 'application/json');
+      return res.status(401).end(JSON.stringify({ error: 'invalid_credentials', reason: 'no_user' }));
+    }
+
+    const okPass = await bcrypt.compare(password, hash);
+    if (!okPass) {
+      console.log(`Login attempt failed - wrong password for user: ${email}`);
+      res.setHeader('Content-Type', 'application/json');
+      return res.status(401).end(JSON.stringify({ error: 'invalid_credentials', reason: 'wrong_password' }));
+    }
+
+    // Normalize role to underscore style expected by front end
+    const role = String(userRow.role || '').toLowerCase().replace('-', '_');
+    const displayName = userRow.full_name || userRow.name || userRow.email;
+
+    const user = {
+      id: userRow.id,
+      email: userRow.email,
+      name: displayName,
+      role,
+      agency_id: userRow.agency_id,
+      is_active: true,
+      must_change_password: false // set real flag if you have it
+    };
+
+    const token = signJWT(
+      { sub: user.id, role: user.role, agency_id: user.agency_id },
+      AUTH_SECRET,
+      8 * 60 * 60
     );
 
-    // Query portal_users table first, then users table as fallback
-    let { data: userData, error: userError } = await supabase
-      .from('portal_users')
-      .select('id,email,name,role,agency_id,must_change_password,active,login_count,password_hash')
-      .eq('email', email.toLowerCase())
-      .single();
-    
-    // If not found in portal_users, try users table
-    if (userError || !userData) {
-      const { data: usersData, error: usersError } = await supabase
-        .from('users')
-        .select('id,email,name,role,agency_id,must_change_password,is_active,login_count,password_hash')
-        .eq('email', email.toLowerCase())
-        .single();
-      
-      if (!usersError && usersData) {
-        userData = usersData;
-        userError = null;
-      }
-    }
-
-    let user;
-    if (userError || !userData) {
-      // Fallback for demo users
-      const demoUsers = {
-        'admin@syncedupsolutions.com': { 
-          id: 'super-admin-main', 
-          email: 'admin@syncedupsolutions.com', 
-          name: 'Super Administrator', 
-          role: 'super-admin', 
-          agency_id: 'SYSTEM', 
-          is_active: true, 
-          active: true,
-          must_change_password: false, 
-          login_count: 0 
-        }
-      };
-      
-      user = demoUsers[email.toLowerCase()];
-      if (!user) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-      }
-    } else {
-      user = userData;
-      // Normalize the active field (portal_users uses 'active', users uses 'is_active')
-      user.is_active = user.is_active || user.active;
-    }
-
-    // Special override for admin@syncedupsolutions.com
-    if (email.toLowerCase() === 'admin@syncedupsolutions.com') {
-      user.role = 'super-admin';
-      user.agency_id = user.agency_id || 'SYSTEM';
-    }
-
-    if (!user.is_active) return res.status(401).json({ error: 'Invalid credentials' });
-
-    // Password verification
-    let isValidPassword = false;
-    
-    if (email.toLowerCase() === 'admin@syncedupsolutions.com') {
-      const validPasswords = ['TestPassword123!', 'superadmin123', 'Admin123!'];
-      isValidPassword = validPasswords.includes(password);
-    } else if (user.password_hash) {
-      // Try bcrypt verification for hashed passwords
-      try {
-        const bcrypt = await import('bcrypt');
-        isValidPassword = await bcrypt.compare(password, user.password_hash);
-      } catch (bcryptError) {
-        console.log('Bcrypt verification failed, trying plain text');
-        isValidPassword = password === user.password_hash;
-      }
-    } else {
-      // Fallback for test accounts with TestPass123!
-      const testPasswords = ['TestPass123!', 'demo123', 'password', 'demo', '123456'];
-      isValidPassword = testPasswords.includes(password);
-    }
-    
-    if (!isValidPassword) return res.status(401).json({ error: 'Invalid credentials' });
-
-    // Create JWT
-    const tokenPayload = {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-      agency_id: user.agency_id,
-      iat: Math.floor(Date.now() / 1000)
-    };
-
-    const token = jwt.sign(tokenPayload, JWT_SECRET, {
-      expiresIn: JWT_EXPIRES_IN,
-      issuer: 'syncedup-auth',
-      audience: 'syncedup-app'
-    });
-
-    // Response user data
-    const userData_response = {
-      id: user.id,
-      email: user.email,
-      firstName: user.name?.split(' ')[0] || 'User',
-      lastName: user.name?.split(' ').slice(1).join(' ') || '',
-      role: user.role === 'super_admin' ? 'super-admin' : user.role,
-      agency_id: user.agency_id,
-      mustChangePassword: user.must_change_password || false,
-      loginCount: (user.login_count || 0) + 1
-    };
-
-    // Set HTTP-only cookie with the JWT
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60, // 1 hour in seconds
-      path: '/'
-    };
-
-    // Manually serialize cookie instead of using cookie.serialize
-    const cookieString = `auth-token=${token}; HttpOnly; ${cookieOptions.secure ? 'Secure; ' : ''}SameSite=${cookieOptions.sameSite}; Max-Age=${cookieOptions.maxAge}; Path=${cookieOptions.path}`;
-    res.setHeader('Set-Cookie', cookieString);
-
-    return res.status(200).json({
-      success: true,
-      user: userData_response,
-      token: token, // Include token for frontend
-      redirectUrl: getRedirectUrl(userData_response.role),
-      expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString()
-    });
-  } catch (error) {
-    console.error('Login error:', error);
-    return res.status(500).json({ error: 'Internal server error', details: error.message });
+    return ok(res, { token, user });
+  } catch (err) {
+    const code = err?.statusCode || 500;
+    return bad(res, code, err?.message || 'Unexpected error');
   }
 }

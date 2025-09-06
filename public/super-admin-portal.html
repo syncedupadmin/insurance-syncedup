@@ -1118,13 +1118,18 @@
         let websocket = null;
         let refreshInterval = null;
         let currentPage = 'dashboard';
-        const token = localStorage.getItem('token');
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const token = localStorage.getItem('syncedup_token');
+        const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
 
         // Check authentication
-        if (!token || user.role !== 'super-admin') {
-            window.location.href = '/login.html';
-        }
+        (function() {
+          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
+          const role = normalize(user.role || '');
+          const allowed = ['super_admin'];
+
+          if (!token || !role) { window.location.href = '/login'; return; }
+          if (!allowed.includes(role)) { window.location.href = '/login'; return; }
+        })();
 
         // Initialize on load
         document.addEventListener('DOMContentLoaded', function() {

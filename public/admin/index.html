@@ -16,7 +16,16 @@
     
     
     <!-- Auth Guard Script - Must be loaded in HEAD before content renders -->
-    <script src="/auth-check.js" defer></script>
+    <script>
+        (function () {
+          const token = localStorage.getItem('syncedup_token');
+          const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
+          const role = normalize(u.role || '');
+          const allowed = ['admin','super_admin'];
+          if (!token || !role || !allowed.includes(role)) { window.location.href = '/login'; return; }
+        })();
+    </script>
     
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
@@ -355,7 +364,7 @@
         <a href="/admin/settings.html">
             <i data-lucide="settings" class="icon"></i>Settings
         </a>
-        <a href="/leaderboard/index.html">
+        <a href="/leaderboard">
             <i data-lucide="trophy" class="icon"></i>Global Leaderboard
         </a>
     </nav>

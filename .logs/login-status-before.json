@@ -1,0 +1,3 @@
+Testing login status before changes:
+{"error":"invalid_credentials","reason":"wrong_password"}
+{"error":"invalid_credentials","reason":"wrong_password"}

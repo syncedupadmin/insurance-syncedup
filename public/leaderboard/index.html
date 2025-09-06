@@ -8,7 +8,16 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
     <!-- Auth Guard Script -->
-    <script src="/auth-check.js" defer></script>
+    <script>
+        (function () {
+          const token = localStorage.getItem('syncedup_token');
+          const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
+          const role = normalize(u.role || '');
+          const allowed = ['agent','manager','admin','super_admin','customer_service'];
+          if (!token || !role || !allowed.includes(role)) { window.location.href = '/login'; return; }
+        })();
+    </script>
 </head>
 <body>
     <!-- Header -->

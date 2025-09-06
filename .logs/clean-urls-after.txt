@@ -1,0 +1,12 @@
+Testing clean URLs after deploy:
+/ -> HTTP 200 (PASS)
+/login -> HTTP 200 (PASS)
+/dashboard -> HTTP 200 (PASS)
+/admin -> HTTP 200 (PASS)
+/super-admin -> HTTP 200 (PASS)
+/super-admin-portal -> HTTP 200 (PASS)
+/leaderboard -> HTTP 200 (PASS)
+Testing .html redirects:
+/admin.html -> HTTP 308 (should be 301/308 redirect)
+/login.html -> HTTP 308 (should be 301/308 redirect)
+/dashboard.html -> HTTP 308 (should be 301/308 redirect)

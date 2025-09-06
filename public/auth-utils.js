@@ -33,13 +33,13 @@ async function logout() {
     } catch (error) {
         console.error('Logout error:', error);
     }
-    window.location.href = '/login.html';
+    window.location.href = '/login';
 }
 
 // Check authentication and redirect if not authenticated
 function checkAuth(requiredRole = null) {
     if (!isAuthenticated()) {
-        window.location.href = '/login.html';
+        window.location.href = '/login';
         return false;
     }
     
@@ -50,7 +50,7 @@ function checkAuth(requiredRole = null) {
                 alert('Admin access required');
                 window.location.href = '/';
             } else {
-                window.location.href = '/login.html';
+                window.location.href = '/login';
             }
             return false;
         }

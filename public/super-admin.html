@@ -564,12 +564,16 @@
     </div>
 
     <script>
-        const token = localStorage.getItem('token');
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        
-        if (!token || (user.role !== 'super_admin' && user.role !== 'super-admin')) {
-            window.location.href = '/login.html';
-        }
+        (function() {
+          const token = localStorage.getItem('syncedup_token');
+          const user  = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
+          const role = normalize(user.role || '');
+          const allowed = ['super_admin'];
+
+          if (!token || !role) { window.location.href = '/login'; return; }
+          if (!allowed.includes(role)) { window.location.href = '/login'; return; }
+        })();
 
         let agencies = [];
         let currentEditingAgency = null;
@@ -1203,8 +1207,8 @@
                 const result = await response.json();
                 
                 if (response.ok && result.success) {
-                    localStorage.setItem('token', result.token);
-                    localStorage.setItem('user', JSON.stringify(result.user));
+                    localStorage.setItem('syncedup_token', result.token);
+                    localStorage.setItem('syncedup_user', JSON.stringify(result.user));
                     
                     const dashboardUrls = {
                         'agent': '/agent.html',
@@ -1214,7 +1218,7 @@
                         'super_admin': '/super-admin.html'
                     };
                     
-                    window.location.href = dashboardUrls[role] || '/dashboard.html';
+                    window.location.href = dashboardUrls[role] || '/dashboard';
                 } else {
                     alert(`Demo login failed: ${result.error || 'Unknown error'}`);
                     restoreDemoButtons();
@@ -1247,12 +1251,12 @@
         }
 
         function goToNewPortal() {
-            window.location.href = '/super-admin-portal.html';
+            window.location.href = '/super-admin-portal';
         }
 
         function logout() {
             localStorage.clear();
-            window.location.href = '/login.html';
+            window.location.href = '/login';
         }
     </script>
 </body>

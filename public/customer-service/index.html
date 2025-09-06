@@ -5,7 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Service Dashboard - SyncedUp Insurance</title>
     <link rel="stylesheet" href="customer-service-global.css">
-    <script src="/auth-check.js" defer></script>
+    <script>
+        (function () {
+          const token = localStorage.getItem('syncedup_token');
+          const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
+          const role = normalize(u.role || '');
+          const allowed = ['customer_service','agent','manager','admin','super_admin'];
+          if (!token || !role || !allowed.includes(role)) { window.location.href = '/login'; return; }
+        })();
+    </script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>

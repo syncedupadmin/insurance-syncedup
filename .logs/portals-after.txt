@@ -1,0 +1,10 @@
+Testing clean URLs after deploy:
+/ -> HTTP 200 (PASS)
+/login -> HTTP 200 (PASS)
+/dashboard -> HTTP 200 (PASS)
+/admin -> HTTP 200 (PASS)
+/manager -> HTTP 200 (PASS)
+/agent -> HTTP 200 (PASS)
+/customer-service -> HTTP 200 (PASS)
+/super-admin -> HTTP 200 (PASS)
+/global-leaderboard -> HTTP 200 (PASS)

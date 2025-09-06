@@ -1,0 +1,4 @@
+Testing login status after deploy (before seeding):
+{"error":"invalid_credentials","reason":"wrong_password"}
+{"error":"invalid_credentials","reason":"wrong_password"}
+{"error":"invalid_credentials","reason":"wrong_password"}

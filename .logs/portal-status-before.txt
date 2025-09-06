@@ -1,0 +1,7 @@
+Testing portal URLs before deploy:
+/login.html -> HTTP 200 (PASS)
+/dashboard.html -> HTTP 200 (PASS)
+/admin.html -> HTTP 200 (PASS)
+/super-admin.html -> HTTP 200 (PASS)
+/super-admin-portal.html -> HTTP 200 (PASS)
+/leaderboard.html -> HTTP 200 (PASS)
