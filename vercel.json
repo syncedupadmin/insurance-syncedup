@@ -13,7 +13,7 @@
     { "source": "/manager/goals", "destination": "/manager/goals.html" },
     { "source": "/manager/vendors", "destination": "/manager/vendors.html" },
     { "source": "/manager/settings", "destination": "/manager/settings.html" },
-    { "source": "/agent", "destination": "/agent/dashboard.html" },
+    { "source": "/agent", "destination": "/agent/index.html" },
     { "source": "/agent/quotes", "destination": "/agent/quotes.html" },
     { "source": "/agent/commissions", "destination": "/agent/commissions.html" },
     { "source": "/agent/customers", "destination": "/agent/customers.html" },
