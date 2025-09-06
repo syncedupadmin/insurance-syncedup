@@ -16,7 +16,14 @@
       "WebFetch(domain:insurance-syncedup-4vkajgix8-nicks-projects-f40381ea.vercel.app)",
       "WebFetch(domain:insurance-syncedup-cow8evcuf-nicks-projects-f40381ea.vercel.app)",
       "WebFetch(domain:insurance-syncedup-chz5ckcdc-nicks-projects-f40381ea.vercel.app)",
-      "WebFetch(domain:insurance.syncedupsolutions.com)"
+      "WebFetch(domain:insurance.syncedupsolutions.com)",
+      "Read(//c/Users/nicho/Projects/syncedup-insurance/**)",
+      "Bash(powershell:*)",
+      "Bash(git fetch:*)",
+      "Bash(git switch:*)",
+      "Bash(for file in ./public/admin/admin-global.css ./public/agent/agent-global.css ./public/assets/global-styles.css ./public/customer-service/customer-service-global.css ./public/leaderboard/leaderboard-global.css ./public/manager/manager-global.css)",
+      "Bash(do sed -i '/fonts\\.googleapis\\.com/d' \"$file\")",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []
