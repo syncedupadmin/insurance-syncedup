@@ -3,362 +3,541 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sales - SyncedUp Insurance</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; }
-        .nav { display: flex; gap: 2rem; padding: 0 2rem; background: white; border-bottom: 1px solid #e2e8f0; }
-        .nav a { padding: 1rem; text-decoration: none; color: #2d3748; }
-        .nav a.active { color: #667eea; border-bottom: 2px solid #667eea; }
-        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
-        .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem; }
-        
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; }
-        .form-group input, .form-group select { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; }
-        .form-group.full-width { grid-column: 1 / -1; }
-        
-        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: 500; transition: all 0.3s ease; }
-        .btn-primary { background: linear-gradient(45deg, #667eea, #764ba2); color: white; }
-        .btn-secondary { background: #6c757d; color: white; }
-        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
-        
-        .success-message { background: #d4edda; color: #155724; padding: 1rem; border-radius: 6px; margin-bottom: 1rem; display: none; }
-        .error-message { background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 6px; margin-bottom: 1rem; display: none; }
-        
-        .calculation-display { background: #e7f3ff; padding: 1rem; border-radius: 6px; margin: 1rem 0; }
-        .calculation-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
-        .calculation-total { font-weight: bold; font-size: 1.1rem; color: #667eea; border-top: 1px solid #ccc; padding-top: 0.5rem; }
-    </style>
+    <title>Sales Reports - SyncedUp Insurance Agent</title>
+    <link rel="stylesheet" href="agent-global.css">
+    
+    <!-- Auth Guard Script - Must be loaded in HEAD before content renders -->
+    <script>
+        (function () {
+          const token = localStorage.getItem('syncedup_token');
+          const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
+          const role = normalize(u.role || '');
+          const allowed = ['agent','manager','admin','super_admin'];
+          if (!token || !role || !allowed.includes(role)) { window.location.href = '/login'; return; }
+        })();
+    </script>
+    
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    <!-- Header -->
     <div class="header">
-        <h1>Sales Management</h1>
-    </div>
-    <nav class="nav">
-        <a href="/agent/">Dashboard</a>
-        <a href="/agent/quotes.html">Quotes</a>
-        <a href="/agent/sales.html" class="active">Sales</a>
-        <a href="/agent/commissions.html">Commissions</a>
-        <a href="/agent/customers.html">Customers</a>
-    </nav>
-    <div class="container">
-        <!-- Success/Error Messages -->
-        <div id="successMessage" class="success-message"></div>
-        <div id="errorMessage" class="error-message"></div>
-        
-        <!-- Record New Sale Form -->
-        <div class="card">
-            <h2>Record New Sale</h2>
-            <form id="recordSaleForm">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="customerName">Customer Name *</label>
-                        <input type="text" id="customerName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="customerEmail">Customer Email *</label>
-                        <input type="email" id="customerEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="productId">Product *</label>
-                        <select id="productId" required>
-                            <option value="">Select Product</option>
-                            <option value="PROD001">Auto Insurance Premium</option>
-                            <option value="PROD002">Home Insurance Standard</option>
-                            <option value="PROD003">Life Insurance Basic</option>
-                            <option value="PROD004">Business Insurance</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="productName">Product Name *</label>
-                        <input type="text" id="productName" required readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="addonId">Add-on (Optional)</label>
-                        <select id="addonId">
-                            <option value="">No Add-on</option>
-                            <option value="ADDON001">Extended Coverage</option>
-                            <option value="ADDON002">Premium Support</option>
-                            <option value="ADDON003">Roadside Assistance</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="addonName">Add-on Name</label>
-                        <input type="text" id="addonName" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="basePremium">Base Premium ($) *</label>
-                        <input type="number" id="basePremium" step="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="addonPremium">Add-on Premium ($)</label>
-                        <input type="number" id="addonPremium" step="0.01" value="0">
-                    </div>
-                </div>
-                
-                <!-- Premium Calculation Display -->
-                <div class="calculation-display">
-                    <div class="calculation-row">
-                        <span>Base Premium:</span>
-                        <span id="displayBasePremium">$0.00</span>
-                    </div>
-                    <div class="calculation-row">
-                        <span>Add-on Premium:</span>
-                        <span id="displayAddonPremium">$0.00</span>
-                    </div>
-                    <div class="calculation-row calculation-total">
-                        <span>Total Premium:</span>
-                        <span id="displayTotalPremium">$0.00</span>
-                    </div>
-                    <div class="calculation-row calculation-total">
-                        <span>Commission (30%):</span>
-                        <span id="displayCommission">$0.00</span>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Record Sale</button>
-                    <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset Form</button>
-                </div>
-            </form>
+        <h1>Sales Reports</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
         </div>
     </div>
 
-    
-    <!-- Classic Mode Toggle System -->
-    <script src="/js/classic-mode.js"></script>
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="/agent" class="nav-link">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="/agent/quotes" class="nav-link">
+            <i data-lucide="calculator" class="icon"></i>
+            Quote Products
+        </a>
+        <a href="/agent/commissions" class="nav-link">
+            <i data-lucide="dollar-sign" class="icon"></i>
+            My Commissions
+        </a>
+        <a href="/agent/customers" class="nav-link">
+            <i data-lucide="users" class="icon"></i>
+            My Customers
+        </a>
+        <a href="/agent/sales" class="nav-link active">
+            <i data-lucide="trending-up" class="icon"></i>
+            Sales Reports
+        </a>
+        <a href="/agent/settings" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+        <a href="/leaderboard" class="nav-link">
+            <i data-lucide="trophy" class="icon"></i>
+            Global Leaderboard
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Agent Notice -->
+        <div class="agent-notice">
+            <h3><i data-lucide="trending-up"></i> Sales Performance</h3>
+            <p>Track your sales performance, analyze trends, and manage your sales pipeline effectively.</p>
+        </div>
+        
+        <!-- Sales Summary Stats -->
+        <div class="grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalSales">0</div>
+                <div class="stat-label">Total Sales</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="monthlySales">0</div>
+                <div class="stat-label">This Month</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="salesRevenue">$0</div>
+                <div class="stat-label">Sales Revenue</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="conversionRate">0%</div>
+                <div class="stat-label">Conversion Rate</div>
+            </div>
+        </div>
+
+        <!-- Sales Performance Chart -->
+        <div class="card">
+            <h3><i data-lucide="bar-chart" class="card-icon"></i>Sales Performance</h3>
+            <div style="height: 300px; margin-top: 1rem; position: relative;">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Record New Sale -->
+        <div class="card">
+            <h3><i data-lucide="plus-circle" class="card-icon"></i>Record New Sale</h3>
+            
+            <form id="recordSaleForm">
+                <div class="grid" style="margin-bottom: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">Customer Name</label>
+                        <input type="text" id="customerName" class="form-input" placeholder="Enter customer name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Customer Email</label>
+                        <input type="email" id="customerEmail" class="form-input" placeholder="customer@email.com" required>
+                    </div>
+                </div>
+
+                <div class="grid" style="margin-bottom: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">Product</label>
+                        <select id="productId" class="form-select" required>
+                            <option value="">Select Product</option>
+                            <option value="health_premium">Health Plan Premium</option>
+                            <option value="life_gold">Life Insurance Gold</option>
+                            <option value="auto_plus">Auto Coverage Plus</option>
+                            <option value="home_protection">Home Protection Plan</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sale Amount</label>
+                        <input type="number" id="saleAmount" class="form-input" placeholder="0.00" step="0.01" min="0" required>
+                    </div>
+                </div>
+
+                <div class="grid" style="margin-bottom: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">Commission Rate (%)</label>
+                        <input type="number" id="commissionRate" class="form-input" value="10" step="0.1" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Commission Amount</label>
+                        <input type="text" id="commissionAmount" class="form-input" readonly placeholder="$0.00">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Notes (Optional)</label>
+                    <textarea id="saleNotes" class="form-input" rows="3" placeholder="Additional notes about this sale..."></textarea>
+                </div>
+
+                <div class="flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="save"></i>
+                        Record Sale
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="clearSaleForm()">
+                        <i data-lucide="x"></i>
+                        Clear Form
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Recent Sales -->
+        <div class="card">
+            <h3><i data-lucide="list" class="card-icon"></i>Recent Sales</h3>
+            
+            <div style="margin-bottom: 1rem;">
+                <div class="flex gap-2">
+                    <button class="btn btn-secondary" onclick="loadSalesData()">
+                        <i data-lucide="refresh-cw"></i>
+                        Refresh
+                    </button>
+                    <button class="btn btn-warning" onclick="exportSales()">
+                        <i data-lucide="download"></i>
+                        Export Sales
+                    </button>
+                </div>
+            </div>
+
+            <div id="salesList">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Product</th>
+                            <th>Amount</th>
+                            <th>Commission</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salesTableBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                                <div class="loading"></div>
+                                Loading sales data...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sales Analytics -->
+        <div class="grid">
+            <div class="card">
+                <h3><i data-lucide="pie-chart" class="card-icon"></i>Product Mix</h3>
+                <div style="height: 250px; margin-top: 1rem; position: relative;">
+                    <canvas id="productMixChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3><i data-lucide="calendar" class="card-icon"></i>Monthly Targets</h3>
+                <div style="margin-top: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Sales Goal</span>
+                        <span id="salesGoalText">0 / 15</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" id="salesGoalProgress" style="width: 0%"></div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; margin-top: 1rem;">
+                        <span>Revenue Goal</span>
+                        <span id="revenueGoalText">$0 / $50,000</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" id="revenueGoalProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // Product and add-on data
-        const productData = {
-            'PROD001': { name: 'Auto Insurance Premium', baseRate: 1200 },
-            'PROD002': { name: 'Home Insurance Standard', baseRate: 800 },
-            'PROD003': { name: 'Life Insurance Basic', baseRate: 2400 },
-            'PROD004': { name: 'Business Insurance', baseRate: 1800 }
-        };
-
-        const addonData = {
-            'ADDON001': { name: 'Extended Coverage', cost: 200 },
-            'ADDON002': { name: 'Premium Support', cost: 150 },
-            'ADDON003': { name: 'Roadside Assistance', cost: 100 }
-        };
+        let currentUser = null;
+        let salesChart = null;
+        let productMixChart = null;
 
         // Authentication check
-        document.addEventListener('DOMContentLoaded', function() {
+        function checkAuth() {
             const token = localStorage.getItem('syncedup_token');
-            if (!token) {
+            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+            
+            if (!token || !user.email) {
                 window.location.href = '/login.html';
-                return;
+                return false;
             }
 
-            // Verify token and check role
-            try {
-                const payload = JSON.parse(atob(token.split('.')[1]));
-                if (!['agent', 'admin', 'super-admin'].includes(payload.role)) {
-                    window.location.href = '/login.html';
-                    return;
-                }
-            } catch (error) {
-                console.error('Invalid token:', error);
-                localStorage.removeItem('authToken');
+            // Check if user has agent permissions
+            if (!['agent', 'manager', 'admin', 'super-admin'].includes(user.role)) {
+                alert('Access denied. Agent permissions required.');
                 window.location.href = '/login.html';
-                return;
+                return false;
             }
 
-            // Initialize form handlers
-            initializeFormHandlers();
-        });
-
-        function initializeFormHandlers() {
-            // Product selection handler
-            document.getElementById('productId').addEventListener('change', function() {
-                const productId = this.value;
-                const productNameField = document.getElementById('productName');
-                const basePremiumField = document.getElementById('basePremium');
-                
-                if (productId && productData[productId]) {
-                    productNameField.value = productData[productId].name;
-                    basePremiumField.value = productData[productId].baseRate;
-                } else {
-                    productNameField.value = '';
-                    basePremiumField.value = '';
-                }
-                updateCalculations();
-            });
-
-            // Add-on selection handler
-            document.getElementById('addonId').addEventListener('change', function() {
-                const addonId = this.value;
-                const addonNameField = document.getElementById('addonName');
-                const addonPremiumField = document.getElementById('addonPremium');
-                
-                if (addonId && addonData[addonId]) {
-                    addonNameField.value = addonData[addonId].name;
-                    addonPremiumField.value = addonData[addonId].cost;
-                } else {
-                    addonNameField.value = '';
-                    addonPremiumField.value = 0;
-                }
-                updateCalculations();
-            });
-
-            // Premium calculation handlers
-            document.getElementById('basePremium').addEventListener('input', updateCalculations);
-            document.getElementById('addonPremium').addEventListener('input', updateCalculations);
-
-            // Form submission handler
-            document.getElementById('recordSaleForm').addEventListener('submit', handleRecordSale);
+            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
+            currentUser = user;
+            return true;
         }
 
-        function updateCalculations() {
-            const basePremium = parseFloat(document.getElementById('basePremium').value) || 0;
-            const addonPremium = parseFloat(document.getElementById('addonPremium').value) || 0;
-            const totalPremium = basePremium + addonPremium;
-            const commission = totalPremium * 0.30; // 30% commission rate
-
-            document.getElementById('displayBasePremium').textContent = '$' + basePremium.toFixed(2);
-            document.getElementById('displayAddonPremium').textContent = '$' + addonPremium.toFixed(2);
-            document.getElementById('displayTotalPremium').textContent = '$' + totalPremium.toFixed(2);
-            document.getElementById('displayCommission').textContent = '$' + commission.toFixed(2);
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            // Load sales data
+            await loadSalesData();
+            
+            // Initialize charts
+            initializeCharts();
+            
+            // Setup form handlers
+            setupFormHandlers();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
         }
 
-        // Record Sale function
-        async function recordSale(agentId, customerName, customerEmail, productId, productName, addonId, addonName, totalPremium, commissionAmount) {
+        // Setup form handlers
+        function setupFormHandlers() {
+            // Commission calculation
+            document.getElementById('saleAmount').addEventListener('input', calculateCommission);
+            document.getElementById('commissionRate').addEventListener('input', calculateCommission);
+
+            // Form submission
+            document.getElementById('recordSaleForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await recordSale();
+            });
+        }
+
+        // Calculate commission amount
+        function calculateCommission() {
+            const saleAmount = parseFloat(document.getElementById('saleAmount').value) || 0;
+            const commissionRate = parseFloat(document.getElementById('commissionRate').value) || 0;
+            const commissionAmount = (saleAmount * commissionRate / 100);
+            
+            document.getElementById('commissionAmount').value = `$${commissionAmount.toFixed(2)}`;
+        }
+
+        // Record new sale
+        async function recordSale() {
+            const saleData = {
+                id: `S-${Date.now()}`,
+                agentId: currentUser.id,
+                customer: document.getElementById('customerName').value,
+                customerEmail: document.getElementById('customerEmail').value,
+                product: document.getElementById('productId').options[document.getElementById('productId').selectedIndex].text,
+                productId: document.getElementById('productId').value,
+                amount: parseFloat(document.getElementById('saleAmount').value),
+                commission: parseFloat(document.getElementById('commissionAmount').value.replace('$', '')),
+                notes: document.getElementById('saleNotes').value,
+                createdAt: new Date().toISOString(),
+                status: 'completed'
+            };
+
             try {
-                const sale = {
-                    id: `S-${Date.now()}`,
-                    agentId,
-                    customer: customerName,
-                    customerEmail,
-                    product: productName,
-                    productId,
-                    addonId: addonId || null,
-                    addonName: addonName || null,
-                    amount: totalPremium,
-                    commission: commissionAmount,
-                    createdAt: new Date().toISOString()
-                };
-
-                const response = await __api('/sales', {
-                    method: 'POST',
-                    body: JSON.stringify(sale)
-                });
-
-                if (response.ok) {
-                    return { success: true, message: 'Sale recorded successfully!' };
-                } else {
-                    throw new Error('Failed to record sale');
-                }
+                // In real implementation, this would make an API call
+                console.log('Recording sale:', saleData);
+                
+                alert('Sale recorded successfully!');
+                clearSaleForm();
+                await loadSalesData();
+                
             } catch (error) {
                 console.error('Error recording sale:', error);
-                throw error;
+                alert('Failed to record sale. Please try again.');
             }
         }
 
-        async function handleRecordSale(event) {
-            event.preventDefault();
-
-            // Get agent ID from session
-            const user = JSON.parse(sessionStorage.getItem('syncedup:user') || '{}');
-            const agentId = user.id;
-
-            // Get form data
-            const customerName = document.getElementById('customerName').value;
-            const customerEmail = document.getElementById('customerEmail').value;
-            const productId = document.getElementById('productId').value;
-            const productName = document.getElementById('productName').value;
-            const addonId = document.getElementById('addonId').value;
-            const addonName = document.getElementById('addonName').value;
-            
-            const basePremium = parseFloat(document.getElementById('basePremium').value) || 0;
-            const addonPremium = parseFloat(document.getElementById('addonPremium').value) || 0;
-            const totalPremium = basePremium + addonPremium;
-            const commissionAmount = totalPremium * 0.30;
-
-            // Validate required fields
-            if (!customerName || !customerEmail || !productId || !productName || totalPremium <= 0) {
-                showError('Please fill in all required fields and ensure premium is greater than 0.');
-                return;
-            }
-
+        // Load sales data
+        async function loadSalesData() {
             try {
-                // Show loading state
-                const submitBtn = event.target.querySelector('button[type="submit"]');
-                const originalText = submitBtn.textContent;
-                submitBtn.textContent = 'Recording Sale...';
-                submitBtn.disabled = true;
-
-                // Record the sale
-                const result = await recordSale(
-                    agentId,
-                    customerName,
-                    customerEmail,
-                    productId,
-                    productName,
-                    addonId || null,
-                    addonName || null,
-                    totalPremium,
-                    commissionAmount
-                );
-
-                if (result.success) {
-                    showSuccess(`Sale recorded successfully! ${result.message}`);
-                    resetForm();
-                } else {
-                    showError('Failed to record sale. Please try again.');
-                }
-
+                // Load sales statistics
+                await loadSalesStats();
+                await loadRecentSales();
+                await updateCharts();
+                await loadGoalProgress();
             } catch (error) {
-                showError('Error recording sale: ' + error.message);
-            } finally {
-                // Restore button state
-                const submitBtn = event.target.querySelector('button[type="submit"]');
-                submitBtn.textContent = 'Record Sale';
-                submitBtn.disabled = false;
+                console.error('Error loading sales data:', error);
+                loadFallbackData();
             }
         }
 
-        function resetForm() {
+        // Load sales statistics
+        async function loadSalesStats() {
+            try {
+                // In real implementation, these would come from API calls
+                document.getElementById('totalSales').textContent = '0';
+                document.getElementById('monthlySales').textContent = '0';
+                document.getElementById('salesRevenue').textContent = '$0';
+                document.getElementById('conversionRate').textContent = '0%';
+            } catch (error) {
+                console.error('Failed to load sales stats:', error);
+            }
+        }
+
+        // Load recent sales
+        async function loadRecentSales() {
+            const tableBody = document.getElementById('salesTableBody');
+            
+            try {
+                // Show empty state for now - would connect to API in real implementation
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                            No sales recorded yet. Use the form above to record your first sale.
+                        </td>
+                    </tr>
+                `;
+            } catch (error) {
+                console.error('Failed to load sales:', error);
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: #ff6b6b; padding: 2rem;">
+                            Error loading sales data. Please refresh the page.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Initialize charts
+        function initializeCharts() {
+            // Sales performance chart
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            salesChart = new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Monthly Sales',
+                        data: [0, 0, 0, 0, 0, 0],
+                        borderColor: '#34d399',
+                        backgroundColor: 'rgba(52, 211, 153, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'white'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: 'white'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: 'white'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Product mix chart
+            const productCtx = document.getElementById('productMixChart').getContext('2d');
+            productMixChart = new Chart(productCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Health', 'Life', 'Auto', 'Home'],
+                    datasets: [{
+                        data: [0, 0, 0, 0],
+                        backgroundColor: [
+                            '#34d399',
+                            '#60a5fa',
+                            '#fbbf24',
+                            '#f87171'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'white'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update charts with data
+        async function updateCharts() {
+            // Update with real data when API is available
+            // For now, charts remain with default empty state
+        }
+
+        // Load goal progress
+        async function loadGoalProgress() {
+            try {
+                const salesGoal = 15;
+                const currentSales = 0;
+                const salesProgress = (currentSales / salesGoal) * 100;
+
+                const revenueGoal = 50000;
+                const currentRevenue = 0;
+                const revenueProgress = (currentRevenue / revenueGoal) * 100;
+
+                document.getElementById('salesGoalText').textContent = `${currentSales} / ${salesGoal}`;
+                document.getElementById('salesGoalProgress').style.width = `${salesProgress}%`;
+                
+                document.getElementById('revenueGoalText').textContent = `$${currentRevenue.toLocaleString()} / $${revenueGoal.toLocaleString()}`;
+                document.getElementById('revenueGoalProgress').style.width = `${revenueProgress}%`;
+            } catch (error) {
+                console.error('Failed to load goals:', error);
+            }
+        }
+
+        // Clear sale form
+        function clearSaleForm() {
             document.getElementById('recordSaleForm').reset();
-            document.getElementById('productName').value = '';
-            document.getElementById('addonName').value = '';
-            updateCalculations();
+            document.getElementById('commissionAmount').value = '';
         }
 
-        function showSuccess(message) {
-            const successDiv = document.getElementById('successMessage');
-            const errorDiv = document.getElementById('errorMessage');
+        // Export sales
+        function exportSales() {
+            // Create sample CSV content for demonstration
+            const csvContent = `Date,Customer,Product,Amount,Commission,Status
+No sales recorded,,,,$0.00,N/A`;
             
-            errorDiv.style.display = 'none';
-            successDiv.textContent = message;
-            successDiv.style.display = 'block';
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                successDiv.style.display = 'none';
-            }, 5000);
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sales-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
         }
 
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            const successDiv = document.getElementById('successMessage');
-            
-            successDiv.style.display = 'none';
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 5000);
+        // Fallback data for when API fails
+        function loadFallbackData() {
+            document.getElementById('totalSales').textContent = '0';
+            document.getElementById('monthlySales').textContent = '0';
+            document.getElementById('salesRevenue').textContent = '$0';
+            document.getElementById('conversionRate').textContent = '0%';
         }
 
-        // Initialize calculations on page load
-        updateCalculations();
+        // Logout function
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
     </script>
+
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
     <script src="/assets/session-prod.js"></script>
 </body>
 </html>

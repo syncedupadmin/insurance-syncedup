@@ -3,36 +3,325 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customers - SyncedUp Insurance</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; }
-        .nav { display: flex; gap: 2rem; padding: 0 2rem; background: white; border-bottom: 1px solid #e2e8f0; }
-        .nav a { padding: 1rem; text-decoration: none; color: #2d3748; }
-        .nav a.active { color: #667eea; border-bottom: 2px solid #667eea; }
-        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
-        .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    </style>
+    <title>My Customers - SyncedUp Insurance Agent</title>
+    <link rel="stylesheet" href="agent-global.css">
+    
+    <!-- Auth Guard Script - Must be loaded in HEAD before content renders -->
+    <script>
+        (function () {
+          const token = localStorage.getItem('syncedup_token');
+          const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
+          const role = normalize(u.role || '');
+          const allowed = ['agent','manager','admin','super_admin'];
+          if (!token || !role || !allowed.includes(role)) { window.location.href = '/login'; return; }
+        })();
+    </script>
+    
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
+    <!-- Header -->
     <div class="header">
-        <h1>Customers</h1>
-    </div>
-    <nav class="nav">
-        <a href="/agent/">Dashboard</a>
-        <a href="/agent/quotes.html" >Quotes</a>
-        <a href="/agent/sales.html" >Sales</a>
-        <a href="/agent/commissions.html" >Commissions</a>
-        <a href="/agent/customers.html" class="active">Customers</a>
-    </nav>
-    <div class="container">
-        <div class="card">
-            <h2>Customers Management</h2>
-            <p>This feature will be connected to the backend API.</p>
+        <h1>My Customers</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
         </div>
     </div>
-    
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="/agent" class="nav-link">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="/agent/quotes" class="nav-link">
+            <i data-lucide="calculator" class="icon"></i>
+            Quote Products
+        </a>
+        <a href="/agent/commissions" class="nav-link">
+            <i data-lucide="dollar-sign" class="icon"></i>
+            My Commissions
+        </a>
+        <a href="/agent/customers" class="nav-link active">
+            <i data-lucide="users" class="icon"></i>
+            My Customers
+        </a>
+        <a href="/agent/sales" class="nav-link">
+            <i data-lucide="trending-up" class="icon"></i>
+            Sales Reports
+        </a>
+        <a href="/agent/settings" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+        <a href="/leaderboard" class="nav-link">
+            <i data-lucide="trophy" class="icon"></i>
+            Global Leaderboard
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Agent Notice -->
+        <div class="agent-notice">
+            <h3><i data-lucide="users"></i> Customer Management</h3>
+            <p>View and manage all your customers, track their policies, and stay connected with their insurance needs.</p>
+        </div>
+        
+        <!-- Customer Summary Stats -->
+        <div class="grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalCustomers">0</div>
+                <div class="stat-label">Total Customers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="activeCustomers">0</div>
+                <div class="stat-label">Active Policies</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="prospectCustomers">0</div>
+                <div class="stat-label">Prospects</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="customerValue">$0</div>
+                <div class="stat-label">Total Customer Value</div>
+            </div>
+        </div>
+
+        <!-- Customer Search & Filters -->
+        <div class="card">
+            <h3><i data-lucide="search" class="card-icon"></i>Find Customers</h3>
+            
+            <div class="grid" style="margin-bottom: 1rem;">
+                <div class="form-group">
+                    <label class="form-label">Search</label>
+                    <input type="text" id="customerSearch" class="form-input" placeholder="Search by name, email, or phone...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select id="statusFilter" class="form-select">
+                        <option value="all">All Customers</option>
+                        <option value="active">Active Policies</option>
+                        <option value="prospect">Prospects</option>
+                        <option value="expired">Expired Policies</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex gap-2">
+                <button class="btn btn-primary" onclick="searchCustomers()">
+                    <i data-lucide="search"></i>
+                    Search
+                </button>
+                <button class="btn btn-success" onclick="addNewCustomer()">
+                    <i data-lucide="user-plus"></i>
+                    Add New Customer
+                </button>
+                <button class="btn btn-secondary" onclick="exportCustomers()">
+                    <i data-lucide="download"></i>
+                    Export List
+                </button>
+            </div>
+        </div>
+
+        <!-- Customer List -->
+        <div class="card">
+            <h3><i data-lucide="list" class="card-icon"></i>Customer List</h3>
+            
+            <div id="customersList">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Customer Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Policies</th>
+                            <th>Total Premium</th>
+                            <th>Last Contact</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customersTableBody">
+                        <tr>
+                            <td colspan="8" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                                <div class="loading"></div>
+                                Loading customers...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card">
+            <h3><i data-lucide="activity" class="card-icon"></i>Recent Customer Activity</h3>
+            <div id="recentActivity">
+                <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                    <div class="loading"></div>
+                    Loading recent activity...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        // Authentication check
+        function checkAuth() {
+            const token = localStorage.getItem('syncedup_token');
+            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+            
+            if (!token || !user.email) {
+                window.location.href = '/login.html';
+                return false;
+            }
+
+            // Check if user has agent permissions
+            if (!['agent', 'manager', 'admin', 'super-admin'].includes(user.role)) {
+                alert('Access denied. Agent permissions required.');
+                window.location.href = '/login.html';
+                return false;
+            }
+
+            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
+            currentUser = user;
+            return true;
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            // Load customer data
+            await loadCustomerData();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Load customer data
+        async function loadCustomerData() {
+            try {
+                const user = JSON.parse(sessionStorage.getItem('syncedup:user') || '{}');
+                
+                // Load customer stats
+                await loadCustomerStats();
+                await loadCustomersList();
+                await loadRecentActivity();
+            } catch (error) {
+                console.error('Error loading customer data:', error);
+                loadFallbackData();
+            }
+        }
+
+        // Load customer statistics
+        async function loadCustomerStats() {
+            try {
+                // In a real implementation, these would come from API calls
+                document.getElementById('totalCustomers').textContent = '0';
+                document.getElementById('activeCustomers').textContent = '0';
+                document.getElementById('prospectCustomers').textContent = '0';
+                document.getElementById('customerValue').textContent = '$0';
+            } catch (error) {
+                console.error('Failed to load customer stats:', error);
+            }
+        }
+
+        // Load customers list
+        async function loadCustomersList() {
+            const tableBody = document.getElementById('customersTableBody');
+            
+            try {
+                // Show empty state for now - would connect to API in real implementation
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                            No customers found. Start by generating quotes to build your customer base.
+                        </td>
+                    </tr>
+                `;
+            } catch (error) {
+                console.error('Failed to load customers:', error);
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: #ff6b6b; padding: 2rem;">
+                            Error loading customers. Please refresh the page.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Load recent activity
+        async function loadRecentActivity() {
+            const activityContainer = document.getElementById('recentActivity');
+            
+            // Show empty state - would connect to API in real implementation
+            activityContainer.innerHTML = `
+                <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                    No recent customer activity found
+                </div>
+            `;
+        }
+
+        // Search customers
+        function searchCustomers() {
+            const searchTerm = document.getElementById('customerSearch').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            // In real implementation, this would filter the customer list
+            console.log('Searching for:', searchTerm, 'with status:', statusFilter);
+            alert('Customer search functionality will be implemented with backend integration');
+        }
+
+        // Add new customer
+        function addNewCustomer() {
+            alert('Add new customer functionality will be implemented. For now, customers are created when generating quotes.');
+        }
+
+        // Export customers
+        function exportCustomers() {
+            // Create sample CSV content for demonstration
+            const csvContent = `Customer Name,Email,Phone,Policies,Total Premium,Status
+No customers available,,,0,$0.00,N/A`;
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `customers-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Fallback data for when API fails
+        function loadFallbackData() {
+            document.getElementById('totalCustomers').textContent = '0';
+            document.getElementById('activeCustomers').textContent = '0';
+            document.getElementById('prospectCustomers').textContent = '0';
+            document.getElementById('customerValue').textContent = '$0';
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+
     <!-- Classic Mode Toggle System -->
     <script src="/js/classic-mode.js"></script>
     <script src="/assets/session-prod.js"></script>
