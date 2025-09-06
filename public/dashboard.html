@@ -1,9 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading Dashboard - SyncedUp Insurance</title>
+    <link rel="stylesheet" href="/assets/global-styles.css">
     <script>
         const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-        if (user.role === 'admin' || user.role === 'super-admin' || user.role === 'manager') {
+        if (user.role === 'admin' || user.role === 'super-admin') {
             window.location.href = '/admin/index.html';
         } else {
             window.location.href = '/agent/index.html';
@@ -11,6 +15,18 @@
     </script>
 </head>
 <body>
-    <p>Loading dashboard...</p>
+    <!-- Luxury overlay pattern -->
+    <div class="luxury-overlay"></div>
+
+    <!-- Floating orbs -->
+    <div class="floating-orb w-96 h-96 bg-purple-500 -top-48 -left-48"></div>
+    <div class="floating-orb w-64 h-64 bg-pink-500 top-1/2 -right-32" style="animation-delay: 5s;"></div>
+
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="glass-card rounded-2xl p-8 text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+            <p class="text-white text-lg">Loading your dashboard...</p>
+        </div>
+    </div>
 </body>
 </html>

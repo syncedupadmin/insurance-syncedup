@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function portalForRole(role) {
     switch (role) {
-      case 'super-admin': return '/super-admin/';
+      case 'super-admin':
+      case 'super_admin': return '/super-admin/';
       case 'admin': return '/admin/';
       case 'manager': return '/manager/';
       case 'agent': return '/agent/';

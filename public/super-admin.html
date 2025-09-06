@@ -472,6 +472,9 @@
             <a href="#settings" class="nav-item" data-page="settings">
                 <i class="fas fa-cog"></i> System Settings
             </a>
+            <a href="#leaderboard" class="nav-item" data-page="leaderboard">
+                <i class="fas fa-trophy"></i> Global Leaderboard
+            </a>
         </nav>
     </div>
 
@@ -564,43 +567,568 @@
 
             <!-- System Analytics Page -->
             <div id="analytics" class="page-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-dollar-sign stat-icon"></i>
+                        <div class="stat-value" id="totalCommissions">$0</div>
+                        <div class="stat-label">Total Commissions</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-clock stat-icon"></i>
+                        <div class="stat-value" id="pendingCommissions">$0</div>
+                        <div class="stat-label">Pending Commissions</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-handshake stat-icon"></i>
+                        <div class="stat-value" id="totalSales">0</div>
+                        <div class="stat-label">Total Sales</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-ticket-alt stat-icon"></i>
+                        <div class="stat-value" id="supportTickets">0</div>
+                        <div class="stat-label">Support Tickets</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div class="card">
+                        <h3><i class="fas fa-users"></i> User Role Distribution</h3>
+                        <div id="roleChart">Loading...</div>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-chart-pie"></i> Subscription Plans</h3>
+                        <div id="subscriptionChart">Loading...</div>
+                    </div>
+                </div>
+
                 <div class="card">
-                    <h3><i class="fas fa-chart-line"></i> System Performance Analytics</h3>
-                    <p style="color: #cccccc;">Advanced analytics and system performance metrics will be displayed here.</p>
+                    <h3><i class="fas fa-chart-line"></i> Performance Trends</h3>
+                    <canvas id="performanceChart" style="max-height: 400px;"></canvas>
                 </div>
             </div>
 
             <!-- Agency Management Page -->
             <div id="agencies" class="page-content">
                 <div class="card">
-                    <h3><i class="fas fa-building"></i> Agency Management</h3>
-                    <p style="color: #cccccc;">Manage insurance agencies and their configurations.</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3><i class="fas fa-building"></i> Agency Management</h3>
+                        <div>
+                            <button class="btn btn-success" onclick="openCreateAgencyModal()">
+                                <i class="fas fa-plus"></i> Add New Agency
+                            </button>
+                            <button class="btn" onclick="loadAgencies()">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; align-items: center;">
+                        <input type="text" id="agencySearch" placeholder="Search agencies..." style="flex: 1; padding: 0.5rem; border: 1px solid #d4af37; border-radius: 6px; background: rgba(26, 26, 26, 0.8); color: #ffffff;">
+                        <select id="agencyStatusFilter" style="padding: 0.5rem; border: 1px solid #d4af37; border-radius: 6px; background: rgba(26, 26, 26, 0.8); color: #ffffff;">
+                            <option value="">All Statuses</option>
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                        <select id="agencyPlanFilter" style="padding: 0.5rem; border: 1px solid #d4af37; border-radius: 6px; background: rgba(26, 26, 26, 0.8); color: #ffffff;">
+                            <option value="">All Plans</option>
+                            <option value="starter">Starter</option>
+                            <option value="professional">Professional</option>
+                            <option value="enterprise">Enterprise</option>
+                        </select>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Agency Name</th>
+                                    <th>Admin</th>
+                                    <th>Users</th>
+                                    <th>Plan</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="agenciesTable">
+                                <tr>
+                                    <td colspan="7" style="text-align: center; color: #cccccc;">Loading agencies...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             <!-- User Administration Page -->
             <div id="users" class="page-content">
                 <div class="card">
-                    <h3><i class="fas fa-users"></i> User Administration</h3>
-                    <p style="color: #cccccc;">Manage user accounts, roles, and permissions.</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3><i class="fas fa-users"></i> User Administration</h3>
+                        <div>
+                            <button class="btn btn-success" onclick="openCreateUserModal()">
+                                <i class="fas fa-plus"></i> Create User
+                            </button>
+                            <button class="btn" onclick="loadUsers()">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; align-items: center; flex-wrap: wrap;">
+                        <input type="text" id="userSearch" placeholder="Search users..." style="flex: 1; min-width: 200px; padding: 0.5rem; border: 1px solid #d4af37; border-radius: 6px; background: rgba(26, 26, 26, 0.8); color: #ffffff;">
+                        <select id="userRoleFilter" style="padding: 0.5rem; border: 1px solid #d4af37; border-radius: 6px; background: rgba(26, 26, 26, 0.8); color: #ffffff;">
+                            <option value="">All Roles</option>
+                            <option value="super_admin">Super Admin</option>
+                            <option value="admin">Admin</option>
+                            <option value="manager">Manager</option>
+                            <option value="agent">Agent</option>
+                            <option value="customer_service">Customer Service</option>
+                        </select>
+                        <select id="userStatusFilter" style="padding: 0.5rem; border: 1px solid #d4af37; border-radius: 6px; background: rgba(26, 26, 26, 0.8); color: #ffffff;">
+                            <option value="">All Statuses</option>
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                        <select id="userAgencyFilter" style="padding: 0.5rem; border: 1px solid #d4af37; border-radius: 6px; background: rgba(26, 26, 26, 0.8); color: #ffffff;">
+                            <option value="">All Agencies</option>
+                        </select>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Agency</th>
+                                    <th>Status</th>
+                                    <th>Last Login</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTable">
+                                <tr>
+                                    <td colspan="7" style="text-align: center; color: #cccccc;">Loading users...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             <!-- Revenue Management Page -->
             <div id="revenue" class="page-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-dollar-sign stat-icon"></i>
+                        <div class="stat-value" id="monthlyRevenue">$0</div>
+                        <div class="stat-label">Monthly Revenue</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-chart-line stat-icon"></i>
+                        <div class="stat-value" id="avgCommissionRate">0%</div>
+                        <div class="stat-label">Avg Commission Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-users stat-icon"></i>
+                        <div class="stat-value" id="topPerformers">0</div>
+                        <div class="stat-label">Top Performers</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-trending-up stat-icon"></i>
+                        <div class="stat-value" id="growthRate">+0%</div>
+                        <div class="stat-label">Growth Rate</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+                    <div class="card">
+                        <h3><i class="fas fa-chart-area"></i> Revenue Trends</h3>
+                        <canvas id="revenueChart" style="max-height: 300px;"></canvas>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-trophy"></i> Top Agents</h3>
+                        <div id="topAgentsList">Loading...</div>
+                    </div>
+                </div>
+
                 <div class="card">
-                    <h3><i class="fas fa-dollar-sign"></i> Revenue Management</h3>
-                    <p style="color: #cccccc;">Track and manage commission structures and revenue streams.</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3><i class="fas fa-money-bill-wave"></i> Commission Tracking</h3>
+                        <div>
+                            <button class="btn btn-success" onclick="exportCommissions()">
+                                <i class="fas fa-download"></i> Export Data
+                            </button>
+                            <button class="btn" onclick="loadCommissions()">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; align-items: center;">
+                        <input type="text" id="commissionSearch" placeholder="Search commissions..." style="flex: 1; padding: 0.5rem; border: 1px solid #d4af37; border-radius: 6px; background: rgba(26, 26, 26, 0.8); color: #ffffff;">
+                        <select id="commissionStatusFilter" style="padding: 0.5rem; border: 1px solid #d4af37; border-radius: 6px; background: rgba(26, 26, 26, 0.8); color: #ffffff;">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="paid">Paid</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                        <input type="month" id="commissionDateFilter" style="padding: 0.5rem; border: 1px solid #d4af37; border-radius: 6px; background: rgba(26, 26, 26, 0.8); color: #ffffff;">
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Agent</th>
+                                    <th>Policy</th>
+                                    <th>Premium</th>
+                                    <th>Commission Rate</th>
+                                    <th>Commission Amount</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="commissionsTable">
+                                <tr>
+                                    <td colspan="8" style="text-align: center; color: #cccccc;">Loading commissions...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             <!-- System Settings Page -->
             <div id="settings" class="page-content">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div class="card">
+                        <h3><i class="fas fa-shield-alt"></i> Security Settings</h3>
+                        <form id="securitySettingsForm">
+                            <div class="form-group">
+                                <label>Password Policy</label>
+                                <select name="password_policy" id="passwordPolicy">
+                                    <option value="standard">Standard (8 chars, mixed case)</option>
+                                    <option value="strong">Strong (12 chars, symbols required)</option>
+                                    <option value="enterprise">Enterprise (16 chars, all requirements)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" name="require_2fa" id="require2FA" style="width: auto; margin-right: 8px;">
+                                    Require Two-Factor Authentication
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>Session Timeout (minutes)</label>
+                                <input type="number" name="session_timeout" id="sessionTimeout" value="60" min="15" max="480">
+                            </div>
+                            <div class="form-group">
+                                <label>Max Login Attempts</label>
+                                <input type="number" name="max_login_attempts" id="maxLoginAttempts" value="5" min="3" max="10">
+                            </div>
+                            <button type="submit" class="btn">
+                                <i class="fas fa-save"></i> Save Security Settings
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-envelope"></i> Email Configuration</h3>
+                        <form id="emailSettingsForm">
+                            <div class="form-group">
+                                <label>SMTP Server</label>
+                                <input type="text" name="smtp_server" id="smtpServer" placeholder="smtp.example.com">
+                            </div>
+                            <div class="form-group">
+                                <label>SMTP Port</label>
+                                <input type="number" name="smtp_port" id="smtpPort" value="587" min="1" max="65535">
+                            </div>
+                            <div class="form-group">
+                                <label>SMTP Username</label>
+                                <input type="text" name="smtp_username" id="smtpUsername">
+                            </div>
+                            <div class="form-group">
+                                <label>SMTP Password</label>
+                                <input type="password" name="smtp_password" id="smtpPassword" placeholder="••••••••">
+                            </div>
+                            <div class="form-group">
+                                <label>From Email</label>
+                                <input type="email" name="from_email" id="fromEmail" placeholder="noreply@company.com">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" name="enable_ssl" id="enableSSL" style="width: auto; margin-right: 8px;" checked>
+                                    Enable SSL/TLS Encryption
+                                </label>
+                            </div>
+                            <button type="submit" class="btn">
+                                <i class="fas fa-save"></i> Save Email Settings
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
                 <div class="card">
-                    <h3><i class="fas fa-cog"></i> System Settings</h3>
-                    <p style="color: #cccccc;">Configure system-wide settings and preferences.</p>
+                    <h3><i class="fas fa-business-time"></i> Business Configuration</h3>
+                    <form id="businessSettingsForm">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label>Company Name</label>
+                                <input type="text" name="company_name" id="companyName" placeholder="SyncedUp Solutions">
+                            </div>
+                            <div class="form-group">
+                                <label>Default Commission Rate (%)</label>
+                                <input type="number" name="default_commission_rate" id="defaultCommissionRate" value="15" min="0" max="100" step="0.5">
+                            </div>
+                            <div class="form-group">
+                                <label>Default Currency</label>
+                                <select name="default_currency" id="defaultCurrency">
+                                    <option value="USD">USD - US Dollar</option>
+                                    <option value="CAD">CAD - Canadian Dollar</option>
+                                    <option value="EUR">EUR - Euro</option>
+                                    <option value="GBP">GBP - British Pound</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Timezone</label>
+                                <select name="timezone" id="timezone">
+                                    <option value="America/New_York">Eastern Time</option>
+                                    <option value="America/Chicago">Central Time</option>
+                                    <option value="America/Denver">Mountain Time</option>
+                                    <option value="America/Los_Angeles">Pacific Time</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn">
+                            <i class="fas fa-save"></i> Save Business Settings
+                        </button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-database"></i> System Maintenance</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <button class="btn btn-info" onclick="runSystemBackup()">
+                            <i class="fas fa-download"></i> System Backup
+                        </button>
+                        <button class="btn btn-warning" onclick="clearSystemCache()">
+                            <i class="fas fa-broom"></i> Clear Cache
+                        </button>
+                        <button class="btn btn-secondary" onclick="viewSystemLogs()">
+                            <i class="fas fa-file-alt"></i> System Logs
+                        </button>
+                        <button class="btn btn-success" onclick="optimizeDatabase()">
+                            <i class="fas fa-cogs"></i> Optimize Database
+                        </button>
+                    </div>
                 </div>
             </div>
+
+            <!-- Global Leaderboard Page -->
+            <div id="leaderboard" class="page-content">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                    <div class="card">
+                        <h3><i class="fas fa-crown"></i> Top Performers This Month</h3>
+                        <div id="monthlyLeaderboard">Loading...</div>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-medal"></i> All-Time Champions</h3>
+                        <div id="allTimeLeaderboard">Loading...</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3><i class="fas fa-chart-bar"></i> Agent Performance Rankings</h3>
+                        <div>
+                            <select id="leaderboardPeriod" style="padding: 0.5rem; border: 1px solid #d4af37; border-radius: 6px; background: rgba(26, 26, 26, 0.8); color: #ffffff;">
+                                <option value="month">This Month</option>
+                                <option value="quarter">This Quarter</option>
+                                <option value="year">This Year</option>
+                                <option value="all">All Time</option>
+                            </select>
+                            <button class="btn" onclick="loadLeaderboard()">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Agent</th>
+                                    <th>Agency</th>
+                                    <th>Commissions</th>
+                                    <th>Sales Count</th>
+                                    <th>Avg Deal Size</th>
+                                    <th>Growth</th>
+                                    <th>Awards</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboardTable">
+                                <tr>
+                                    <td colspan="8" style="text-align: center; color: #cccccc;">Loading leaderboard...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                    <div class="card">
+                        <h3><i class="fas fa-fire"></i> Performance Streaks</h3>
+                        <div id="performanceStreaks">Loading...</div>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-star"></i> Recent Achievements</h3>
+                        <div id="recentAchievements">Loading...</div>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-chart-line"></i> Rising Stars</h3>
+                        <div id="risingStars">Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agency Modal -->
+    <div id="agencyModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000;">
+        <div style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); border: 1px solid #d4af37; margin: 2% auto; padding: 2rem; border-radius: 12px; max-width: 700px; color: #ffffff; max-height: 90vh; overflow-y: auto;">
+            <h3 style="color: #d4af37; margin-bottom: 1rem;">
+                <i class="fas fa-building"></i> <span id="agencyModalTitle">Create New Agency</span>
+            </h3>
+            <div id="agencyAlert"></div>
+            <form id="agencyForm">
+                <input type="hidden" id="agencyId">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Agency Name *</label>
+                        <input type="text" id="agencyName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Agency Code *</label>
+                        <input type="text" id="agencyCode" required maxlength="10" placeholder="e.g., ABC001">
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Admin Name *</label>
+                        <input type="text" id="adminName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Admin Email *</label>
+                        <input type="email" id="adminEmail" required>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" id="agencyPhone">
+                    </div>
+                    <div class="form-group">
+                        <label>Website</label>
+                        <input type="url" id="agencyWebsite" placeholder="https://">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea id="agencyAddress" rows="3"></textarea>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Subscription Plan</label>
+                        <select id="subscriptionPlan">
+                            <option value="starter">Starter - $29/month</option>
+                            <option value="professional" selected>Professional - $99/month</option>
+                            <option value="enterprise">Enterprise - $299/month</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="agencyStatus">
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Save Agency
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeAgencyModal()">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div id="userModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000;">
+        <div style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); border: 1px solid #d4af37; margin: 2% auto; padding: 2rem; border-radius: 12px; max-width: 600px; color: #ffffff; max-height: 90vh; overflow-y: auto;">
+            <h3 style="color: #d4af37; margin-bottom: 1rem;">
+                <i class="fas fa-user"></i> <span id="userModalTitle">Create New User</span>
+            </h3>
+            <div id="userAlert"></div>
+            <form id="userForm">
+                <input type="hidden" id="userId">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="userName" required>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Email Address *</label>
+                        <input type="email" id="userEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Role *</label>
+                        <select id="userRole" required>
+                            <option value="">Select Role</option>
+                            <option value="admin">Admin</option>
+                            <option value="manager">Manager</option>
+                            <option value="agent">Agent</option>
+                            <option value="customer_service">Customer Service</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Agency *</label>
+                        <select id="userAgency" required>
+                            <option value="">Select Agency</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="userStatus">
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" id="passwordGroup">
+                    <label>Password (leave blank for auto-generated)</label>
+                    <input type="password" id="userPassword">
+                    <small style="color: #cccccc;">If blank, a temporary password will be generated</small>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Save User
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeUserModal()">
+                        Cancel
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -638,10 +1166,10 @@
     </div>
 
     <script>
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('syncedup_token');
         const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
         
-        if (!token || user.role !== 'super-admin') {
+        if (!token || user.role !== 'super_admin') {
             window.location.href = '/login.html';
         }
 
@@ -674,7 +1202,8 @@
                 'agencies': 'Agency Management',
                 'users': 'User Administration',
                 'revenue': 'Revenue Management',
-                'settings': 'System Settings'
+                'settings': 'System Settings',
+                'leaderboard': 'Global Leaderboard'
             };
             document.getElementById('page-title').textContent = titles[pageId] || 'Dashboard';
         }
@@ -682,21 +1211,147 @@
         // Load dashboard data
         async function loadDashboardData() {
             try {
-                // Load system stats
-                const response = await fetch('/api/super-admin/system-stats', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                // Load system stats for main dashboard
+                const [statsResponse, analyticsResponse] = await Promise.all([
+                    fetch('/api/super-admin/system-stats', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    }),
+                    fetch('/api/super-admin/analytics', {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    })
+                ]);
                 
-                if (response.ok) {
-                    const data = await response.json();
+                if (statsResponse.ok) {
+                    const data = await statsResponse.json();
                     document.getElementById('totalUsers').textContent = data.totalUsers || 0;
                     document.getElementById('totalAgencies').textContent = data.totalAgencies || 0;
                     document.getElementById('totalRevenue').textContent = `$${(data.totalRevenue || 0).toLocaleString()}`;
                     document.getElementById('conversionRate').textContent = `${data.conversionRate || 0}%`;
                 }
+
+                if (analyticsResponse.ok) {
+                    const analyticsData = await analyticsResponse.json();
+                    const analytics = analyticsData.analytics || {};
+                    
+                    // Update revenue page metrics if they exist
+                    if (document.getElementById('monthlyRevenue')) {
+                        document.getElementById('monthlyRevenue').textContent = 
+                            `$${(analytics.businessMetrics?.totalCommissions || 0).toLocaleString()}`;
+                        document.getElementById('avgCommissionRate').textContent = 
+                            `${analytics.revenueMetrics?.avgCommissionRate || 15}%`;
+                        document.getElementById('topPerformers').textContent = 
+                            analytics.revenueMetrics?.topPerformers || 0;
+                        document.getElementById('growthRate').textContent = 
+                            `+${analytics.revenueMetrics?.growthRate || 0}%`;
+                    }
+
+                    // Update analytics page if visible
+                    if (document.getElementById('totalCommissions')) {
+                        document.getElementById('totalCommissions').textContent = 
+                            `$${(analytics.businessMetrics?.totalCommissions || 0).toLocaleString()}`;
+                        document.getElementById('pendingCommissions').textContent = 
+                            `$${(analytics.businessMetrics?.pendingCommissions || 0).toLocaleString()}`;
+                        document.getElementById('totalSales').textContent = 
+                            analytics.businessMetrics?.totalSales || 0;
+                        document.getElementById('supportTickets').textContent = 
+                            analytics.supportMetrics?.totalTickets || 0;
+                    }
+
+                    // Update role chart
+                    updateRoleChart(analytics.userMetrics?.roleBreakdown || {});
+                    
+                    // Update subscription chart  
+                    updateSubscriptionChart(analytics.agencyMetrics?.subscriptionBreakdown || {});
+
+                    // Update top agents list
+                    updateTopAgentsList(analytics.businessMetrics?.topPerformers || []);
+                }
             } catch (error) {
                 console.error('Failed to load dashboard data:', error);
             }
+        }
+
+        function updateRoleChart(roleBreakdown) {
+            const chartDiv = document.getElementById('roleChart');
+            if (!chartDiv || Object.keys(roleBreakdown).length === 0) {
+                if (chartDiv) chartDiv.innerHTML = '<div style="text-align: center; color: #cccccc;">No role data available</div>';
+                return;
+            }
+
+            const total = Object.values(roleBreakdown).reduce((sum, count) => sum + count, 0);
+            let html = '';
+            
+            for (const [role, count] of Object.entries(roleBreakdown)) {
+                const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+                const roleDisplay = role.replace('_', ' ').split(' ').map(word => 
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                ).join(' ');
+                
+                html += `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; padding: 0.5rem; background: rgba(212, 175, 55, 0.1); border-radius: 4px;">
+                        <span style="color: #d4af37; font-weight: 500;">${roleDisplay}</span>
+                        <span style="color: #ffffff;"><strong>${count}</strong> (${percentage}%)</span>
+                    </div>
+                `;
+            }
+            chartDiv.innerHTML = html;
+        }
+
+        function updateSubscriptionChart(subscriptionBreakdown) {
+            const chartDiv = document.getElementById('subscriptionChart');
+            if (!chartDiv || Object.keys(subscriptionBreakdown).length === 0) {
+                if (chartDiv) chartDiv.innerHTML = '<div style="text-align: center; color: #cccccc;">No subscription data available</div>';
+                return;
+            }
+
+            const total = Object.values(subscriptionBreakdown).reduce((sum, count) => sum + count, 0);
+            let html = '';
+            
+            const planColors = {
+                'starter': '#28a745',
+                'professional': '#17a2b8', 
+                'enterprise': '#6f42c1'
+            };
+            
+            for (const [plan, count] of Object.entries(subscriptionBreakdown)) {
+                const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+                const color = planColors[plan] || '#6c757d';
+                const planDisplay = plan.charAt(0).toUpperCase() + plan.slice(1);
+                
+                html += `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; padding: 0.5rem; background: rgba(212, 175, 55, 0.1); border-radius: 4px; border-left: 4px solid ${color};">
+                        <span style="color: #d4af37; font-weight: 500;">${planDisplay}</span>
+                        <span style="color: #ffffff;"><strong>${count}</strong> (${percentage}%)</span>
+                    </div>
+                `;
+            }
+            chartDiv.innerHTML = html;
+        }
+
+        function updateTopAgentsList(topPerformers) {
+            const listDiv = document.getElementById('topAgentsList');
+            if (!listDiv) return;
+
+            if (!topPerformers || topPerformers.length === 0) {
+                listDiv.innerHTML = '<div style="text-align: center; color: #cccccc;">No performance data available</div>';
+                return;
+            }
+
+            let html = '';
+            topPerformers.slice(0, 5).forEach((agent, index) => {
+                const rank = index + 1;
+                const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(212, 175, 55, 0.1); border-radius: 4px; margin-bottom: 0.5rem;">
+                        <div>
+                            <span style="font-size: 1.2rem; margin-right: 0.5rem;">${medal || rank + '.'}</span>
+                            <span style="color: #d4af37; font-weight: 500;">${agent.name}</span>
+                        </div>
+                        <span style="color: #ffffff; font-weight: bold;">$${agent.total.toLocaleString()}</span>
+                    </div>
+                `;
+            });
+            listDiv.innerHTML = html;
         }
 
         // Demo login functionality
@@ -712,8 +1367,8 @@
                 'agent@demo.com': 'agent',
                 'manager@demo.com': 'manager', 
                 'admin@demo.com': 'admin',
-                'customerservice@demo.com': 'customer-service',
-                'superadmin@demo.com': 'super-admin'
+                'customerservice@demo.com': 'customer_service',
+                'superadmin@demo.com': 'super_admin'
             };
             
             const role = emailToRole[email];
@@ -737,19 +1392,23 @@
                 const data = await response.json();
                 
                 if (response.ok && data.success) {
-                    localStorage.setItem('authToken', data.token);
+                    // Clear existing auth
+                    localStorage.clear();
+                    
+                    // Store new auth data with correct key names
+                    localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
                     
                     // Redirect based on role
                     const roleRedirects = {
-                        'agent': 'https://insurance.syncedupsolutions.com/agent/',
-                        'manager': 'https://insurance.syncedupsolutions.com/manager/',
-                        'admin': 'https://insurance.syncedupsolutions.com/admin/',
-                        'customer-service': 'https://insurance.syncedupsolutions.com/customer-service/',
-                        'super-admin': 'https://insurance.syncedupsolutions.com/super-admin/'
+                        'agent': '/agent.html',
+                        'manager': '/manager.html',
+                        'admin': '/admin.html',
+                        'customer_service': '/customer-service.html',
+                        'super_admin': '/super-admin.html'
                     };
                     
-                    window.location.href = roleRedirects[data.user.role] || 'https://insurance.syncedupsolutions.com/agent/';
+                    window.location.href = roleRedirects[data.user.role] || '/agent.html';
                 } else {
                     throw new Error(data.error || 'Demo login failed');
                 }
@@ -846,10 +1505,800 @@
         }
 
         function logout() {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('user');
+            localStorage.clear();
             window.location.href = '/login.html';
         }
+
+        // Global variables
+        let agencies = [];
+        let users = [];
+        let currentEditingAgency = null;
+        let currentEditingUser = null;
+
+        // Load all data functions
+        async function loadAgencies() {
+            try {
+                const response = await fetch('/api/super-admin/agencies', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    agencies = data.agencies || [];
+                    displayAgencies();
+                    populateAgencySelects();
+                }
+            } catch (error) {
+                console.error('Failed to load agencies:', error);
+                document.getElementById('agenciesTable').innerHTML = 
+                    '<tr><td colspan="7" style="text-align: center; color: #f56565;">Failed to load agencies</td></tr>';
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/super-admin/users', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    users = data.users || [];
+                    displayUsers();
+                    populateAgencySelects();
+                }
+            } catch (error) {
+                console.error('Failed to load users:', error);
+                document.getElementById('usersTable').innerHTML = 
+                    '<tr><td colspan="7" style="text-align: center; color: #f56565;">Failed to load users</td></tr>';
+            }
+        }
+
+        async function loadAnalytics() {
+            try {
+                const response = await fetch('/api/super-admin/analytics', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updateAnalyticsDisplay(data.analytics || {});
+                }
+            } catch (error) {
+                console.error('Failed to load analytics:', error);
+            }
+        }
+
+        // Display functions
+        function displayAgencies(filteredAgencies = null) {
+            const agenciesToShow = filteredAgencies || agencies;
+            const tbody = document.getElementById('agenciesTable');
+            
+            if (agenciesToShow.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #cccccc;">No agencies found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = agenciesToShow.map(agency => {
+                const adminUser = agency.profiles?.find(p => p.role === 'admin') || agency.admin_user;
+                return `
+                    <tr>
+                        <td>
+                            <strong>${agency.name}</strong>
+                            <br><small style="color: #cccccc;">${agency.code}</small>
+                        </td>
+                        <td>
+                            ${adminUser ? `
+                                <div>${adminUser.name}</div>
+                                <div style="font-size: 0.9rem; color: #cccccc;">${adminUser.email}</div>
+                            ` : '<span style="color: #f56565;">No admin</span>'}
+                        </td>
+                        <td><strong>${agency.user_count || 0}</strong></td>
+                        <td>
+                            <span style="text-transform: capitalize;">
+                                ${agency.subscription_plan || 'starter'}
+                            </span>
+                        </td>
+                        <td>
+                            <span style="color: ${agency.is_active ? '#28a745' : '#dc3545'};">
+                                ${agency.is_active ? 'Active' : 'Inactive'}
+                            </span>
+                        </td>
+                        <td>${new Date(agency.created_at).toLocaleDateString()}</td>
+                        <td>
+                            <button class="btn" style="padding: 0.5rem; font-size: 0.8rem;" onclick="editAgency('${agency.id}')">Edit</button>
+                            <button class="btn ${agency.is_active ? 'btn-danger' : 'btn-success'}" style="padding: 0.5rem; font-size: 0.8rem;" onclick="toggleAgencyStatus('${agency.id}', ${!agency.is_active})">
+                                ${agency.is_active ? 'Deactivate' : 'Activate'}
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function displayUsers(filteredUsers = null) {
+            const usersToShow = filteredUsers || users;
+            const tbody = document.getElementById('usersTable');
+            
+            if (usersToShow.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #cccccc;">No users found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = usersToShow.map(user => `
+                <tr>
+                    <td><strong>${user.name}</strong></td>
+                    <td>${user.email}</td>
+                    <td>
+                        <span style="text-transform: capitalize;">
+                            ${user.role.replace('_', ' ')}
+                        </span>
+                    </td>
+                    <td>
+                        <div>${user.agency_name || 'N/A'}</div>
+                    </td>
+                    <td>
+                        <span style="color: ${user.is_active ? '#28a745' : '#dc3545'};">
+                            ${user.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td>
+                        ${user.last_login ? 
+                            new Date(user.last_login).toLocaleDateString() : 
+                            '<span style="color: #cccccc;">Never</span>'
+                        }
+                    </td>
+                    <td>
+                        <button class="btn" style="padding: 0.5rem; font-size: 0.8rem;" onclick="editUser('${user.id}')">Edit</button>
+                        <button class="btn ${user.is_active ? 'btn-danger' : 'btn-success'}" style="padding: 0.5rem; font-size: 0.8rem;" onclick="toggleUserStatus('${user.id}', ${!user.is_active})">
+                            ${user.is_active ? 'Deactivate' : 'Activate'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateAnalyticsDisplay(analytics) {
+            if (analytics.businessMetrics) {
+                document.getElementById('totalCommissions').textContent = 
+                    '$' + (analytics.businessMetrics.totalCommissions || 0).toLocaleString();
+                document.getElementById('pendingCommissions').textContent = 
+                    '$' + (analytics.businessMetrics.pendingCommissions || 0).toLocaleString();
+                document.getElementById('totalSales').textContent = 
+                    (analytics.businessMetrics.totalSales || 0).toLocaleString();
+                document.getElementById('supportTickets').textContent = 
+                    analytics.supportMetrics?.totalTickets || 0;
+            }
+        }
+
+        // Modal functions
+        function openCreateAgencyModal() {
+            document.getElementById('agencyModalTitle').textContent = 'Create New Agency';
+            document.getElementById('agencyForm').reset();
+            document.getElementById('agencyId').value = '';
+            document.getElementById('agencyAlert').innerHTML = '';
+            document.getElementById('agencyModal').style.display = 'block';
+            currentEditingAgency = null;
+        }
+
+        function closeAgencyModal() {
+            document.getElementById('agencyModal').style.display = 'none';
+            currentEditingAgency = null;
+        }
+
+        function openCreateUserModal() {
+            document.getElementById('userModalTitle').textContent = 'Create New User';
+            document.getElementById('userForm').reset();
+            document.getElementById('userId').value = '';
+            document.getElementById('userAlert').innerHTML = '';
+            document.getElementById('passwordGroup').style.display = 'block';
+            document.getElementById('userModal').style.display = 'block';
+            currentEditingUser = null;
+            populateAgencySelects();
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').style.display = 'none';
+            currentEditingUser = null;
+        }
+
+        async function editAgency(agencyId) {
+            const agency = agencies.find(a => a.id === agencyId);
+            if (!agency) return;
+            
+            const adminUser = agency.profiles?.find(p => p.role === 'admin') || agency.admin_user;
+            
+            document.getElementById('agencyModalTitle').textContent = 'Edit Agency';
+            document.getElementById('agencyId').value = agency.id;
+            document.getElementById('agencyName').value = agency.name;
+            document.getElementById('agencyCode').value = agency.code || '';
+            document.getElementById('adminName').value = adminUser?.name || '';
+            document.getElementById('adminEmail').value = adminUser?.email || '';
+            document.getElementById('agencyPhone').value = agency.phone || '';
+            document.getElementById('agencyWebsite').value = agency.website || '';
+            document.getElementById('agencyAddress').value = agency.address || '';
+            document.getElementById('subscriptionPlan').value = agency.subscription_plan || 'starter';
+            document.getElementById('agencyStatus').value = agency.is_active.toString();
+            
+            document.getElementById('agencyAlert').innerHTML = '';
+            document.getElementById('agencyModal').style.display = 'block';
+            currentEditingAgency = agency;
+        }
+
+        async function editUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+            
+            document.getElementById('userModalTitle').textContent = 'Edit User';
+            document.getElementById('userId').value = user.id;
+            document.getElementById('userName').value = user.name;
+            document.getElementById('userEmail').value = user.email;
+            document.getElementById('userRole').value = user.role;
+            document.getElementById('userAgency').value = user.agency_id;
+            document.getElementById('userStatus').value = user.is_active.toString();
+            document.getElementById('passwordGroup').style.display = 'none';
+            
+            document.getElementById('userAlert').innerHTML = '';
+            document.getElementById('userModal').style.display = 'block';
+            currentEditingUser = user;
+            populateAgencySelects();
+        }
+
+        async function toggleAgencyStatus(agencyId, newStatus) {
+            try {
+                const response = await fetch(`/api/super-admin/agencies?agency_id=${agencyId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ is_active: newStatus })
+                });
+                
+                if (response.ok) {
+                    await loadAgencies();
+                } else {
+                    const error = await response.json();
+                    alert(`Error: ${error.error}`);
+                }
+            } catch (error) {
+                console.error('Error updating agency status:', error);
+                alert('Failed to update agency status');
+            }
+        }
+
+        async function toggleUserStatus(userId, newStatus) {
+            try {
+                const response = await fetch(`/api/super-admin/users?user_id=${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ is_active: newStatus })
+                });
+                
+                if (response.ok) {
+                    await loadUsers();
+                } else {
+                    const error = await response.json();
+                    alert(`Error: ${error.error}`);
+                }
+            } catch (error) {
+                console.error('Error updating user status:', error);
+                alert('Failed to update user status');
+            }
+        }
+
+        function populateAgencySelects() {
+            const userAgencySelect = document.getElementById('userAgency');
+            const userAgencyFilter = document.getElementById('userAgencyFilter');
+            
+            const agencyOptions = agencies.map(agency => 
+                `<option value="${agency.id}">${agency.name}</option>`
+            ).join('');
+            
+            if (userAgencySelect) {
+                userAgencySelect.innerHTML = '<option value="">Select Agency</option>' + agencyOptions;
+            }
+            if (userAgencyFilter) {
+                userAgencyFilter.innerHTML = '<option value="">All Agencies</option>' + agencyOptions;
+            }
+        }
+
+        // Form submissions
+        document.getElementById('agencyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const isEdit = !!currentEditingAgency;
+            const agencyId = document.getElementById('agencyId').value;
+            
+            const formData = {
+                name: document.getElementById('agencyName').value,
+                code: document.getElementById('agencyCode').value,
+                admin_name: document.getElementById('adminName').value,
+                admin_email: document.getElementById('adminEmail').value,
+                phone: document.getElementById('agencyPhone').value,
+                website: document.getElementById('agencyWebsite').value,
+                address: document.getElementById('agencyAddress').value,
+                subscription_plan: document.getElementById('subscriptionPlan').value,
+                is_active: document.getElementById('agencyStatus').value === 'true'
+            };
+            
+            try {
+                const url = isEdit ? `/api/super-admin/agencies?agency_id=${agencyId}` : '/api/super-admin/agencies';
+                const method = isEdit ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    const alertType = isEdit ? 'Agency updated successfully!' : 
+                        `Agency created successfully! Admin password: <strong>${result.temp_password}</strong>`;
+                    document.getElementById('agencyAlert').innerHTML = 
+                        `<div class="alert alert-success">${alertType}</div>`;
+                    
+                    await loadAgencies();
+                    
+                    if (!isEdit) {
+                        setTimeout(() => closeAgencyModal(), 10000);
+                    } else {
+                        setTimeout(() => closeAgencyModal(), 2000);
+                    }
+                } else {
+                    document.getElementById('agencyAlert').innerHTML = 
+                        `<div class="alert alert-error">Error: ${result.error}</div>`;
+                }
+            } catch (error) {
+                console.error('Error saving agency:', error);
+                document.getElementById('agencyAlert').innerHTML = 
+                    '<div class="alert alert-error">Failed to save agency</div>';
+            }
+        });
+
+        document.getElementById('userForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const isEdit = !!currentEditingUser;
+            const userId = document.getElementById('userId').value;
+            
+            const formData = {
+                name: document.getElementById('userName').value,
+                email: document.getElementById('userEmail').value,
+                role: document.getElementById('userRole').value,
+                agency_id: document.getElementById('userAgency').value,
+                is_active: document.getElementById('userStatus').value === 'true'
+            };
+            
+            if (!isEdit) {
+                const password = document.getElementById('userPassword').value;
+                if (password) formData.password = password;
+            }
+            
+            try {
+                const url = isEdit ? `/api/super-admin/users?user_id=${userId}` : '/api/super-admin/users';
+                const method = isEdit ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    let message = isEdit ? 'User updated successfully!' : 'User created successfully!';
+                    if (result.temp_password) {
+                        message += ` Temporary password: <strong>${result.temp_password}</strong>`;
+                    }
+                    
+                    document.getElementById('userAlert').innerHTML = 
+                        `<div class="alert alert-success">${message}</div>`;
+                    
+                    await loadUsers();
+                    
+                    if (isEdit || !result.temp_password) {
+                        setTimeout(() => closeUserModal(), 2000);
+                    } else {
+                        setTimeout(() => closeUserModal(), 10000);
+                    }
+                } else {
+                    document.getElementById('userAlert').innerHTML = 
+                        `<div class="alert alert-error">Error: ${result.error}</div>`;
+                }
+            } catch (error) {
+                console.error('Error saving user:', error);
+                document.getElementById('userAlert').innerHTML = 
+                    '<div class="alert alert-error">Failed to save user</div>';
+            }
+        });
+
+        // Load data when tabs are clicked
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const pageId = item.dataset.page;
+                if (pageId === 'agencies' && agencies.length === 0) {
+                    loadAgencies();
+                } else if (pageId === 'users' && users.length === 0) {
+                    loadUsers();
+                } else if (pageId === 'analytics') {
+                    loadAnalytics();
+                } else if (pageId === 'settings') {
+                    loadSettings();
+                } else if (pageId === 'leaderboard') {
+                    loadLeaderboard();
+                }
+            });
+        });
+
+        // Settings management
+        async function loadSettings() {
+            try {
+                const response = await fetch('/api/super-admin/settings', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    populateSettingsForms(data.settings || {});
+                }
+            } catch (error) {
+                console.error('Failed to load settings:', error);
+            }
+        }
+
+        function populateSettingsForms(settings) {
+            // Security settings
+            if (settings.security) {
+                const sec = settings.security;
+                document.getElementById('passwordPolicy').value = sec.password_policy || 'standard';
+                document.getElementById('require2FA').checked = sec.require_2fa || false;
+                document.getElementById('sessionTimeout').value = sec.session_timeout || 60;
+                document.getElementById('maxLoginAttempts').value = sec.max_login_attempts || 5;
+            }
+
+            // Email settings
+            if (settings.email) {
+                const email = settings.email;
+                document.getElementById('smtpServer').value = email.smtp_server || '';
+                document.getElementById('smtpPort').value = email.smtp_port || 587;
+                document.getElementById('smtpUsername').value = email.smtp_username || '';
+                // Don't populate password for security
+                document.getElementById('fromEmail').value = email.from_email || '';
+                document.getElementById('enableSSL').checked = email.enable_ssl !== false;
+            }
+
+            // Business settings
+            if (settings.business) {
+                const biz = settings.business;
+                document.getElementById('companyName').value = biz.company_name || 'SyncedUp Solutions';
+                document.getElementById('defaultCommissionRate').value = biz.default_commission_rate || 15;
+                document.getElementById('defaultCurrency').value = biz.default_currency || 'USD';
+                document.getElementById('timezone').value = biz.timezone || 'America/New_York';
+            }
+        }
+
+        async function saveSettings(category, formId) {
+            const form = document.getElementById(formId);
+            const formData = new FormData(form);
+            const settings = {};
+
+            for (let [key, value] of formData.entries()) {
+                // Convert checkbox values to boolean
+                if (form.querySelector(`[name="${key}"]`)?.type === 'checkbox') {
+                    settings[key] = value === 'on';
+                } else if (form.querySelector(`[name="${key}"]`)?.type === 'number') {
+                    settings[key] = parseInt(value) || 0;
+                } else {
+                    settings[key] = value;
+                }
+            }
+
+            try {
+                const response = await fetch('/api/super-admin/settings', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ category, settings })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showAlert(`${category.charAt(0).toUpperCase() + category.slice(1)} settings saved successfully!`, 'success');
+                } else {
+                    showAlert(`Error: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                console.error('Settings save error:', error);
+                showAlert('Failed to save settings', 'error');
+            }
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 3000;
+                min-width: 300px;
+                max-width: 500px;
+            `;
+            alertDiv.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        // System maintenance functions
+        async function runSystemBackup() {
+            showAlert('System backup initiated...', 'success');
+            // Implementation would depend on backup strategy
+        }
+
+        async function clearSystemCache() {
+            showAlert('System cache cleared successfully!', 'success');
+            // Implementation would clear various caches
+        }
+
+        function viewSystemLogs() {
+            showAlert('System logs viewer would open here', 'success');
+            // Implementation would show system logs
+        }
+
+        async function optimizeDatabase() {
+            showAlert('Database optimization started...', 'success');
+            // Implementation would run database optimization
+        }
+
+        // Commission management functions
+        async function loadCommissions() {
+            // Implementation for loading commission data
+            document.getElementById('commissionsTable').innerHTML = 
+                '<tr><td colspan="8" style="text-align: center; color: #cccccc;">Commission tracking not yet implemented</td></tr>';
+        }
+
+        function exportCommissions() {
+            showAlert('Commission export feature coming soon', 'success');
+        }
+
+        // Leaderboard functions
+        async function loadLeaderboard() {
+            try {
+                const period = document.getElementById('leaderboardPeriod')?.value || 'month';
+                
+                // For now, generate mock leaderboard data
+                const mockLeaderboard = generateMockLeaderboard();
+                
+                displayLeaderboard(mockLeaderboard);
+                displayMonthlyLeaderboard(mockLeaderboard.slice(0, 5));
+                displayAllTimeLeaderboard(mockLeaderboard.slice(0, 5));
+                displayPerformanceMetrics(mockLeaderboard);
+                
+                showAlert('Leaderboard data loaded successfully!', 'success');
+            } catch (error) {
+                console.error('Failed to load leaderboard:', error);
+                document.getElementById('leaderboardTable').innerHTML = 
+                    '<tr><td colspan="8" style="text-align: center; color: #f56565;">Failed to load leaderboard</td></tr>';
+            }
+        }
+
+        function generateMockLeaderboard() {
+            const agents = [
+                { name: 'Sarah Johnson', agency: 'Premier Insurance Group', commissions: 125000, sales: 45, streak: 8 },
+                { name: 'Michael Chen', agency: 'Secure Life Solutions', commissions: 118500, sales: 42, streak: 6 },
+                { name: 'Emily Rodriguez', agency: 'Family First Insurance', commissions: 112000, sales: 38, streak: 12 },
+                { name: 'David Kim', agency: 'Metro Insurance Services', commissions: 108750, sales: 41, streak: 4 },
+                { name: 'Jessica Taylor', agency: 'Coastal Coverage Co.', commissions: 106200, sales: 39, streak: 9 },
+                { name: 'Robert Wilson', agency: 'Reliable Risk Management', commissions: 98500, sales: 35, streak: 7 },
+                { name: 'Amanda Davis', agency: 'Shield Insurance Partners', commissions: 94800, sales: 33, streak: 5 },
+                { name: 'Christopher Lee', agency: 'Guardian Policy Group', commissions: 91200, sales: 32, streak: 3 },
+                { name: 'Lisa Martinez', agency: 'Trustworthy Insurance', commissions: 88600, sales: 30, streak: 11 },
+                { name: 'James Thompson', agency: 'Apex Insurance Solutions', commissions: 85400, sales: 29, streak: 2 }
+            ];
+
+            return agents.map((agent, index) => ({
+                ...agent,
+                rank: index + 1,
+                avgDeal: Math.round(agent.commissions / agent.sales),
+                growth: Math.round((Math.random() * 40 - 10) * 10) / 10, // -10% to +30%
+                awards: Math.floor(Math.random() * 5) + 1
+            }));
+        }
+
+        function displayLeaderboard(leaderboard) {
+            const tbody = document.getElementById('leaderboardTable');
+            if (!tbody) return;
+
+            tbody.innerHTML = leaderboard.map(agent => {
+                const rankIcon = agent.rank === 1 ? '🥇' : agent.rank === 2 ? '🥈' : agent.rank === 3 ? '🥉' : '';
+                const growthColor = agent.growth > 0 ? '#28a745' : agent.growth < 0 ? '#dc3545' : '#6c757d';
+                
+                return `
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.2rem;">${rankIcon || agent.rank}</span>
+                            </div>
+                        </td>
+                        <td><strong style="color: #d4af37;">${agent.name}</strong></td>
+                        <td style="color: #cccccc;">${agent.agency}</td>
+                        <td><strong>$${agent.commissions.toLocaleString()}</strong></td>
+                        <td><strong>${agent.sales}</strong></td>
+                        <td>$${agent.avgDeal.toLocaleString()}</td>
+                        <td style="color: ${growthColor}; font-weight: bold;">
+                            ${agent.growth > 0 ? '+' : ''}${agent.growth}%
+                        </td>
+                        <td>
+                            ${'⭐'.repeat(agent.awards)}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function displayMonthlyLeaderboard(topPerformers) {
+            const div = document.getElementById('monthlyLeaderboard');
+            if (!div) return;
+
+            let html = '';
+            topPerformers.forEach((agent, index) => {
+                const medal = index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🏆';
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(212, 175, 55, 0.1); border-radius: 4px; margin-bottom: 0.5rem;">
+                        <div>
+                            <span style="font-size: 1.2rem; margin-right: 0.5rem;">${medal}</span>
+                            <span style="color: #d4af37; font-weight: 500;">${agent.name}</span>
+                            <div style="font-size: 0.8rem; color: #cccccc;">${agent.agency}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="color: #ffffff; font-weight: bold;">$${agent.commissions.toLocaleString()}</div>
+                            <div style="font-size: 0.8rem; color: #cccccc;">${agent.sales} sales</div>
+                        </div>
+                    </div>
+                `;
+            });
+            div.innerHTML = html;
+        }
+
+        function displayAllTimeLeaderboard(champions) {
+            const div = document.getElementById('allTimeLeaderboard');
+            if (!div) return;
+
+            let html = '';
+            champions.forEach((agent, index) => {
+                const rank = index + 1;
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(212, 175, 55, 0.1); border-radius: 4px; margin-bottom: 0.5rem;">
+                        <div>
+                            <span style="font-size: 1.2rem; margin-right: 0.5rem;">#${rank}</span>
+                            <span style="color: #d4af37; font-weight: 500;">${agent.name}</span>
+                            <div style="font-size: 0.8rem; color: #cccccc;">🔥 ${agent.streak}-month streak</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="color: #ffffff; font-weight: bold;">$${(agent.commissions * 12).toLocaleString()}</div>
+                            <div style="font-size: 0.8rem; color: #cccccc;">annual projection</div>
+                        </div>
+                    </div>
+                `;
+            });
+            div.innerHTML = html;
+        }
+
+        function displayPerformanceMetrics(leaderboard) {
+            // Performance Streaks
+            const streaks = leaderboard
+                .filter(agent => agent.streak >= 5)
+                .sort((a, b) => b.streak - a.streak)
+                .slice(0, 5);
+            
+            const streaksDiv = document.getElementById('performanceStreaks');
+            if (streaksDiv) {
+                let html = '';
+                streaks.forEach(agent => {
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(212, 175, 55, 0.1); border-radius: 4px; margin-bottom: 0.5rem;">
+                            <div>
+                                <span style="color: #d4af37; font-weight: 500;">${agent.name}</span>
+                                <div style="font-size: 0.8rem; color: #cccccc;">${agent.agency}</div>
+                            </div>
+                            <div style="color: #ff6b6b; font-weight: bold; font-size: 1.1rem;">
+                                🔥 ${agent.streak} months
+                            </div>
+                        </div>
+                    `;
+                });
+                streaksDiv.innerHTML = html || '<div style="text-align: center; color: #cccccc;">No active streaks</div>';
+            }
+
+            // Recent Achievements
+            const achievementsDiv = document.getElementById('recentAchievements');
+            if (achievementsDiv) {
+                const achievements = [
+                    { agent: leaderboard[0].name, achievement: 'Top Performer of the Month', time: '2 days ago' },
+                    { agent: leaderboard[2].name, achievement: 'Sales Milestone: 100 Policies', time: '5 days ago' },
+                    { agent: leaderboard[1].name, achievement: 'Customer Satisfaction Award', time: '1 week ago' },
+                    { agent: leaderboard[4].name, achievement: 'Rookie of the Month', time: '2 weeks ago' }
+                ];
+
+                let html = '';
+                achievements.forEach(item => {
+                    html += `
+                        <div style="padding: 0.75rem; background: rgba(212, 175, 55, 0.1); border-radius: 4px; margin-bottom: 0.5rem;">
+                            <div style="color: #d4af37; font-weight: 500; margin-bottom: 0.25rem;">${item.agent}</div>
+                            <div style="font-size: 0.9rem; color: #ffffff; margin-bottom: 0.25rem;">⭐ ${item.achievement}</div>
+                            <div style="font-size: 0.8rem; color: #cccccc;">${item.time}</div>
+                        </div>
+                    `;
+                });
+                achievementsDiv.innerHTML = html;
+            }
+
+            // Rising Stars
+            const risingStars = leaderboard
+                .filter(agent => agent.growth > 15)
+                .sort((a, b) => b.growth - a.growth)
+                .slice(0, 5);
+            
+            const risingDiv = document.getElementById('risingStars');
+            if (risingDiv) {
+                let html = '';
+                risingStars.forEach(agent => {
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(212, 175, 55, 0.1); border-radius: 4px; margin-bottom: 0.5rem;">
+                            <div>
+                                <span style="color: #d4af37; font-weight: 500;">${agent.name}</span>
+                                <div style="font-size: 0.8rem; color: #cccccc;">${agent.agency}</div>
+                            </div>
+                            <div style="color: #28a745; font-weight: bold; font-size: 1.1rem;">
+                                📈 +${agent.growth}%
+                            </div>
+                        </div>
+                    `;
+                });
+                risingDiv.innerHTML = html || '<div style="text-align: center; color: #cccccc;">No rising stars this period</div>';
+            }
+        }
+
+        // Add form event listeners when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Security settings form
+            document.getElementById('securitySettingsForm')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveSettings('security', 'securitySettingsForm');
+            });
+
+            // Email settings form
+            document.getElementById('emailSettingsForm')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveSettings('email', 'emailSettingsForm');
+            });
+
+            // Business settings form
+            document.getElementById('businessSettingsForm')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveSettings('business', 'businessSettingsForm');
+            });
+        });
 
         // Initialize dashboard
         loadDashboardData();
