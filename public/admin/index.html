@@ -43,7 +43,7 @@
         
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background: linear-gradient(-45deg, #4c1d95, #5b21b6, #6d28d9, #7c3aed, #8b5cf6, #a855f7, #c084fc, #ddd6fe);
+            background: linear-gradient(-45deg, #000000, #1a1a1a, #2d2d2d, #404040, #1a1a1a, #000000, #2d2d2d, #1a1a1a);
             background-size: 400% 400%;
             animation: gradient 15s ease infinite;
             min-height: 100vh;
@@ -59,30 +59,30 @@
             width: 100%;
             height: 100%;
             background: 
-                radial-gradient(circle at 20% 50%, rgba(124, 58, 237, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.25) 0%, transparent 50%),
-                radial-gradient(circle at 40% 80%, rgba(168, 85, 247, 0.2) 0%, transparent 50%);
+                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
             pointer-events: none;
             z-index: -1;
         }
         
         .glass-morphism {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
         
         .header { 
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             color: white; 
             padding: 1.5rem 2rem; 
             display: flex; 
             justify-content: space-between; 
             align-items: center;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             position: relative;
             z-index: 10;
         }
@@ -104,12 +104,12 @@
             display: flex; 
             gap: 0; 
             padding: 0 2rem; 
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-top: none;
             overflow-x: auto;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             position: relative;
             z-index: 9;
         }
@@ -131,8 +131,8 @@
         
         .nav a.active { 
             color: white; 
-            border-bottom: 3px solid #f093fb;
-            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 3px solid #ffffff;
+            background: rgba(255, 255, 255, 0.15);
         }
         
         .container { 
@@ -149,19 +149,19 @@
         }
         
         .card { 
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             padding: 2rem; 
             border-radius: 20px; 
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
             position: relative;
         }
         
         .card:hover {
             transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
         }
         
         .stat-value { 
@@ -181,22 +181,22 @@
         
         .btn { 
             padding: 0.75rem 1.5rem; 
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
             color: white; 
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 12px; 
             cursor: pointer; 
             margin: 0.5rem; 
             font-weight: 500;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         
         .btn:hover { 
-            background: rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.2);
             transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
         
         .btn-success { 
@@ -229,16 +229,16 @@
             width: 100%; 
             border-collapse: collapse; 
             margin-top: 1rem; 
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 12px;
             overflow: hidden;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
         
         th { 
-            background: rgba(255, 255, 255, 0.2); 
+            background: rgba(255, 255, 255, 0.1); 
             padding: 1rem 0.75rem; 
             text-align: left; 
             font-weight: 600;
@@ -253,7 +253,7 @@
         }
         
         tr:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
         }
         
         h3 { 
@@ -399,19 +399,19 @@
             </div>
         </div>
         <div class="quick-actions">
-            <button class="btn" onclick="location.href='/admin/agent-performance.html'">
+            <button class="btn" onclick="location.href='/admin/agent-performance'">
                 <i data-lucide="trending-up" class="icon"></i>Agent Performance
             </button>
-            <button class="btn" onclick="location.href='/admin/users.html'">
+            <button class="btn" onclick="location.href='/admin/users'">
                 <i data-lucide="users" class="icon"></i>Manage Users
             </button>
             <button class="btn" onclick="location.href='/admin/convoso-leads'">
                 <i data-lucide="users" class="icon"></i>Lead Management
             </button>
-            <button class="btn btn-success" onclick="location.href='/admin/commissions.html'">
+            <button class="btn btn-success" onclick="location.href='/admin/commissions'">
                 <i data-lucide="dollar-sign" class="icon"></i>Commissions
             </button>
-            <button class="btn btn-warning" onclick="location.href='/admin/settings.html'">
+            <button class="btn btn-warning" onclick="location.href='/admin/settings'">
                 <i data-lucide="settings" class="icon"></i>Settings
             </button>
         </div>
@@ -486,13 +486,13 @@
                 
                 // Only manager and admin can access admin portal
                 if (!['manager', 'admin', 'super-admin'].includes(currentUser.role)) {
-                    window.location.href = '/login.html';
+                    window.location.href = '/login';
                     return;
                 }
                 
                 loadDashboardData();
             } else {
-                window.location.href = '/login.html';
+                window.location.href = '/login';
             }
         });
         
@@ -502,31 +502,31 @@
                 const [dashboardResponse, analyticsResponse, userStatsResponse, commissionStatsResponse, apiKeysResponse] = await Promise.all([
                     fetch('/api/manager/dashboard', {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                            'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                             'Content-Type': 'application/json'
                         }
                     }),
                     fetch('/api/admin/analytics?analytics_type=overview', {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                            'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                             'Content-Type': 'application/json'
                         }
                     }),
                     fetch('/api/admin/user-management', {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                            'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                             'Content-Type': 'application/json'
                         }
                     }),
                     fetch('/api/admin/commission-settings', {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                            'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                             'Content-Type': 'application/json'
                         }
                     }),
                     fetch('/api/admin/api-keys', {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                            'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                             'Content-Type': 'application/json'
                         }
                     })
@@ -590,7 +590,7 @@
                     <td class=\"conversion-rate\">${agent.conversion_rate.toFixed(1)}%</td>
                     <td>
                         <button class=\"btn\" style=\"padding: 0.25rem 0.5rem; font-size: 0.8rem;\" 
-                                onclick=\"location.href='/admin/agent-performance.html?agent=${agent.agent_id}'\">
+                                onclick=\"location.href='/admin/agent-performance?agent=${agent.agent_id}'\">
                                 <i data-lucide=\"trending-up\" style=\"width: 14px; height: 14px; margin-right: 4px;\"></i>View
                         </button>
                     </td>
@@ -775,7 +775,7 @@
             
             if (dashboardData.upcoming_goals.length > 3) {
                 goalsHTML += `<div style=\"text-align: center; margin-top: 1rem;\">
-                    <button class=\"btn\" onclick=\"location.href='/admin/goals.html'\">View All Goals</button>
+                    <button class=\"btn\" onclick=\"location.href='/admin/goals'\">View All Goals</button>
                 </div>`;
             }
             
@@ -807,7 +807,7 @@
                     </div>
                 </div>
                 <div style="text-align: center; margin-top: 1rem;">
-                    <button class="btn" onclick="location.href='/admin/commission-management.html'">Manage Commissions</button>
+                    <button class="btn" onclick="location.href='/admin/commission-management'">Manage Commissions</button>
                 </div>
             `;
             
@@ -843,7 +843,7 @@
                     </div>
                 </div>
                 <div style="text-align: center; margin-top: 1rem;">
-                    <button class="btn" onclick="location.href='/admin/user-management.html'">Manage Users</button>
+                    <button class="btn" onclick="location.href='/admin/user-management'">Manage Users</button>
                 </div>
             `;
             
@@ -879,7 +879,7 @@
                     </div>
                 </div>
                 <div style="text-align: center; margin-top: 1rem;">
-                    <button class="btn" onclick="location.href='/admin/settings.html'">System Settings</button>
+                    <button class="btn" onclick="location.href='/admin/settings'">System Settings</button>
                 </div>
             `;
             
@@ -911,7 +911,7 @@
                     </div>
                 </div>
                 <div style="text-align: center; margin-top: 1rem;">
-                    <button class="btn" onclick="location.href='/admin/api-keys.html'">Manage API Keys</button>
+                    <button class="btn" onclick="location.href='/admin/api-keys'">Manage API Keys</button>
                 </div>
             `;
             
@@ -1000,27 +1000,27 @@
         }
         
         function viewAgentPerformance(agentId) {
-            window.location.href = `/admin/agent-performance.html?agent=${agentId}&timeframe=month`;
+            window.location.href = `/admin/agent-performance?agent=${agentId}&timeframe=month`;
         }
         
         function setGoalForAgent(agentId, agentName) {
-            window.location.href = `/admin/goals.html?agent=${agentId}&name=${encodeURIComponent(agentName)}`;
+            window.location.href = `/admin/goals?agent=${agentId}&name=${encodeURIComponent(agentName)}`;
         }
         
         function manageUserAccount(userId) {
-            window.location.href = `/admin/user-management.html?user=${userId}`;
+            window.location.href = `/admin/user-management?user=${userId}`;
         }
         
         function manageCommissions() {
-            window.location.href = 'https://insurance.syncedupsolutions.com/admin/commissions.html';
+            window.location.href = '/admin/commissions';
         }
         
         function viewAnalytics() {
-            window.location.href = 'https://insurance.syncedupsolutions.com/admin/agent-performance.html';
+            window.location.href = '/admin/agent-performance';
         }
         
         function manageApiKeys() {
-            window.location.href = 'https://insurance.syncedupsolutions.com/admin/settings.html';
+            window.location.href = '/admin/settings';
         }
         
         function getTimeAgo(date) {
@@ -1034,7 +1034,7 @@
         
         function logout() {
             localStorage.clear();
-            window.location.href = '/login.html';
+            window.location.href = '/login';
         }
         
         // Enhanced glassmorphism styling for admin dashboard
