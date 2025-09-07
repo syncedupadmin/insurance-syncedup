@@ -1123,17 +1123,16 @@
             
             const formData = {
                 name: document.getElementById('agencyName').value,
-                admin_name: document.getElementById('adminName').value,
-                admin_email: document.getElementById('adminEmail').value,
-                phone: document.getElementById('agencyPhone').value,
-                website: document.getElementById('agencyWebsite').value,
+                contact_email: document.getElementById('adminEmail').value,
+                phone_number: document.getElementById('agencyPhone').value,
                 address: document.getElementById('agencyAddress').value,
-                subscription_plan: document.getElementById('subscriptionPlan').value,
-                is_active: document.getElementById('agencyStatus').value === 'true'
+                plan_type: document.getElementById('subscriptionPlan').value.replace('-', ''),
+                status: document.getElementById('agencyStatus').value === 'true' ? 'active' : 'inactive'
             };
             
             try {
-                const url = isEdit ? `/api/super-admin/agencies?agency_id=${agencyId}` : '/api/super-admin/agencies';
+                // Use the create-agency endpoint for new agencies, agencies endpoint for updates
+                const url = isEdit ? `/api/super-admin/agencies?agency_id=${agencyId}` : '/api/super-admin/create-agency';
                 const method = isEdit ? 'PUT' : 'POST';
                 
                 const response = await fetch(url, {
@@ -1148,27 +1147,39 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    const alertType = isEdit ? 'Agency updated successfully!' : `Agency created successfully! Admin password: <strong>${result.temp_password}</strong>`;
-                    document.getElementById('modalAlert').innerHTML = 
-                        `<div class="alert alert-success">${alertType}</div>`;
+                    if (isEdit) {
+                        document.getElementById('modalAlert').innerHTML = 
+                            '<div class="alert alert-success">Agency updated successfully!</div>';
+                        setTimeout(() => closeModal(), 2000);
+                    } else {
+                        // Show detailed success message for new agency
+                        const users = result.data?.users || [];
+                        const userList = users.map(u => `<li>${u.name} (${u.role}): ${u.email}</li>`).join('');
+                        
+                        document.getElementById('modalAlert').innerHTML = 
+                            `<div class="alert alert-success">
+                                <h4>Agency created successfully!</h4>
+                                <p><strong>Agency:</strong> ${result.data?.agency?.name}</p>
+                                <p><strong>Agency Code:</strong> ${result.data?.agency?.code}</p>
+                                <p><strong>Default Password:</strong> <code>${result.data?.default_password}</code></p>
+                                <p><strong>Created Users:</strong></p>
+                                <ul>${userList}</ul>
+                                <p><small>All users must change their password on first login.</small></p>
+                            </div>`;
+                        setTimeout(() => closeModal(), 15000);
+                    }
                     
                     await loadAgencies();
                     
-                    if (!isEdit) {
-                        setTimeout(() => closeModal(), 10000);
-                    } else {
-                        setTimeout(() => closeModal(), 2000);
-                    }
-                    
                 } else {
                     document.getElementById('modalAlert').innerHTML = 
-                        `<div class="alert alert-error">Error: ${result.error}</div>`;
+                        `<div class="alert alert-error">Error: ${result.error || 'Unknown error occurred'}</div>`;
                 }
                 
             } catch (error) {
                 console.error('Error saving agency:', error);
                 document.getElementById('modalAlert').innerHTML = 
-                    '<div class="alert alert-error">Failed to save agency</div>';
+                    '<div class="alert alert-error">Failed to save agency. Please try again.</div>';
             }
         });
 

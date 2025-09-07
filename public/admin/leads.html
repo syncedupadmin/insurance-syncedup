@@ -927,7 +927,7 @@
             const notes = document.getElementById('updateNotes').value;
             
             try {
-                const response = await __api(`/leads/${currentLeadId}`, {
+                const response = await // API not configured(`/leads/${currentLeadId}`, {
                     method: 'PATCH',
                     body: JSON.stringify({
                         status: newStatus,

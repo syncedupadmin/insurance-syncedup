@@ -1,4 +1,4 @@
-const { createClient } = require('@supabase/supabase-js');
+import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -348,26 +348,26 @@ async function getConversionFunnel() {
     const funnelSteps = [
       {
         step: 'Visitors',
-        count: Math.floor((totalUsers || 0) * 1.5), // Assume more visitors than registered users
+        count: Math.floor((totalVisitors || 0) * 1.5), // Assume more visitors than registered users
         percentage: 100,
         conversion_rate: 100
       },
       {
         step: 'Registrations',
-        count: totalUsers || 0,
-        percentage: totalUsers > 0 ? ((totalUsers / (totalUsers * 1.5)) * 100).toFixed(1) : 0,
-        conversion_rate: totalUsers > 0 ? ((totalUsers / (totalUsers * 1.5)) * 100).toFixed(1) : 0
+        count: totalVisitors || 0,
+        percentage: totalVisitors > 0 ? ((totalVisitors / (totalVisitors * 1.5)) * 100).toFixed(1) : 0,
+        conversion_rate: totalVisitors > 0 ? ((totalVisitors / (totalVisitors * 1.5)) * 100).toFixed(1) : 0
       },
       {
         step: 'Active Users',
         count: activeUsers || 0,
-        percentage: totalUsers > 0 ? ((activeUsers / totalUsers) * 100).toFixed(1) : 0,
+        percentage: totalVisitors > 0 ? ((activeUsers / totalVisitors) * 100).toFixed(1) : 0,
         conversion_rate: registeredUsers > 0 ? ((activeUsers / registeredUsers) * 100).toFixed(1) : 0
       },
       {
         step: 'Users with Sales',
         count: usersWithSales,
-        percentage: totalUsers > 0 ? ((usersWithSales / totalUsers) * 100).toFixed(1) : 0,
+        percentage: totalVisitors > 0 ? ((usersWithSales / totalVisitors) * 100).toFixed(1) : 0,
         conversion_rate: activeUsers > 0 ? ((usersWithSales / activeUsers) * 100).toFixed(1) : 0
       }
     ];

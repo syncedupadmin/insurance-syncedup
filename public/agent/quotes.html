@@ -399,7 +399,7 @@
                     validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
                 };
                 
-                const response = await __api('/quotes', {
+                const response = await // API not configured('/quotes', {
                     method: 'POST',
                     body: JSON.stringify(quote)
                 });
@@ -497,7 +497,7 @@
             
             try {
                 const user = JSON.parse(sessionStorage.getItem('syncedup:user') || '{}');
-                const quotes = await __api(`/quotes?agentId=${user.id}&_limit=10&_sort=createdAt&_order=desc`);
+                const quotes = await // API not configured(`/quotes?agentId=${user.id}&_limit=10&_sort=createdAt&_order=desc`);
 
                 let quotesHTML;
                 if (quotes.length === 0) {
@@ -530,7 +530,7 @@
         // View quote details
         async function viewQuote(quoteId) {
             try {
-                const quote = await __api(`/quotes/${quoteId}`);
+                const quote = await // API not configured(`/quotes/${quoteId}`);
                 displayQuoteResults(quote);
             } catch (error) {
                 console.error('Failed to load quote:', error);
@@ -544,7 +544,7 @@
             
             try {
                 const user = JSON.parse(sessionStorage.getItem('syncedup:user') || '{}');
-                const quote = await __api(`/quotes/${quoteId}`);
+                const quote = await // API not configured(`/quotes/${quoteId}`);
                 
                 const sale = {
                     id: `S-${Date.now()}`,
@@ -557,7 +557,7 @@
                     createdAt: new Date().toISOString()
                 };
                 
-                const response = await __api('/sales', {
+                const response = await // API not configured('/sales', {
                     method: 'POST',
                     body: JSON.stringify(sale)
                 });
