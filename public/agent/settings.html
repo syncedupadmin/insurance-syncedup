@@ -564,6 +564,22 @@ Bob Wilson,bob@email.com,(555) 345-6789,${timestamp},$234.00,Prospect`;
             }, 1000);
         }
 
+        function toggleClassicMode() {
+            const isClassic = localStorage.getItem('classicMode') === 'true';
+            localStorage.setItem('classicMode', (!isClassic).toString());
+            updateClassicModeButton();
+            
+            if (!isClassic) {
+                localStorage.setItem('professionalMode', 'false');
+                updateProfessionalModeButton();
+                showSuccess('Classic Mode enabled! Page will reload to apply changes.');
+            } else {
+                showSuccess('Classic Mode disabled! Page will reload to apply changes.');
+            }
+            
+            setTimeout(() => { window.location.reload(); }, 1000);
+        }
+
         function updateProfessionalModeButton() {
             const isProfessional = localStorage.getItem('professionalMode') === 'true';
             const button = document.getElementById('professionalModeToggle');
