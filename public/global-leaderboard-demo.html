@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Global Leaderboard Demo - SyncedUp</title>
-    <link rel="stylesheet" href="/css/glassmorphism-landing.css">
+    <link rel="stylesheet" href="/css/pro.css">
     <style>
         /* Demo-specific styles */
         .demo-hero {
@@ -176,13 +176,13 @@
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
     
-    <!-- Minimal SVG icon sprites -->
+    <!-- SVG Sprite -->
     <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
-        <symbol id="ic-trophy" viewBox="0 0 24 24"><path fill="currentColor" d="M7 4h10v2h3v3a5 5 0 0 1-5 5h-1v2h3v2H7v-2h3v-2H9a5 5 0 0 1-5-5V6h3V4Zm-1 4v1a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V8h-12Z"/></symbol>
-        <symbol id="ic-chart" viewBox="0 0 24 24"><path fill="currentColor" d="M3 3h2v18H3V3Zm16 8h2v10h-2V11Zm-8 4h2v6h-2v-6Zm4-10h2v16h-2V5Zm-8 8h2v8H7v-8Z"/></symbol>
-        <symbol id="ic-bolt" viewBox="0 0 24 24"><path fill="currentColor" d="M13 2L3 14h7l-1 8 10-12h-7l1-8Z"/></symbol>
-        <symbol id="ic-target" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2Zm0 4a6 6 0 1 0 6 6h-2a4 4 0 1 1-4-4V6Z"/></symbol>
-        <symbol id="ic-fire" viewBox="0 0 24 24"><path fill="currentColor" d="M12 23a7.5 7.5 0 0 1-5.138-12.963C8.204 8.774 11.5 6.5 11 1.5c6 4 9 8 3 14 1 0 2.5-.5 2.5-2.5 0 3.5-2.5 8.5-4.5 8.5z"/></symbol>
+        <symbol id="i-trophy" viewBox="0 0 24 24"><path fill="currentColor" d="M7 4h10v2h3v3a5 5 0 0 1-5 5h-1v2h3v2H7v-2h3v-2H9a5 5 0 0 1-5-5V6h3V4Zm-1 4v1a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V8h-12Z"/></symbol>
+        <symbol id="i-chart" viewBox="0 0 24 24"><path fill="currentColor" d="M3 3h2v18H3V3Zm16 8h2v10h-2V11Zm-8 4h2v6h-2v-6Zm4-10h2v16h-2V5Zm-8 8h2v8H7v-8Z"/></symbol>
+        <symbol id="i-bolt" viewBox="0 0 24 24"><path fill="currentColor" d="M13 2L3 14h7l-1 8 10-12h-7l1-8Z"/></symbol>
+        <symbol id="i-target" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2Zm0 4a6 6 0 1 0 6 6h-2a4 4 0 1 1-4-4V6Z"/></symbol>
+        <symbol id="i-phone" viewBox="0 0 24 24"><path fill="currentColor" d="M6.6 10.8c1.2 2.4 3.2 4.4 5.6 5.6l1.9-1.9a1 1 0 0 1 1-.26c1.1.37 2.3.57 3.5.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.6 21 3 13.4 3 4a1 1 0 0 1 1-1h3.2a1 1 0 0 1 1 1c0 1.2.2 2.4.57 3.5a1 1 0 0 1-.26 1L6.6 10.8Z"/></symbol>
     </svg>
     
     <!-- Floating Orbs -->
@@ -212,80 +212,57 @@
         </div>
     </section>
 
-    <section style="padding: 0 20px;">
-        <div class="leaderboard-container">
-            <div class="leaderboard-header">
-                <div class="leaderboard-title">National Sales Leaderboard</div>
-                <div class="live-indicator">
-                    <div class="live-dot"></div>
-                    Live Updates
-                </div>
+    <div class="container" style="margin-top:24px">
+        <div class="card" style="padding:20px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <h3 class="section-title" style="margin:0;font-size:1.4rem">National Sales Leaderboard</h3>
+                <span class="badge-live"><span style="width:8px;height:8px;border-radius:50%;background:#22c55e"></span> Live</span>
             </div>
-            
-            <table class="leaderboard-table" id="leaderboard">
+
+            <table class="table">
                 <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Agent</th>
-                        <th>Agency</th>
-                        <th>Monthly Sales</th>
-                        <th>Trend</th>
-                    </tr>
+                    <tr><th>Rank</th><th>Agent</th><th>Agency</th><th>Monthly Sales</th><th>Trend</th></tr>
                 </thead>
-                <tbody id="leaderboard-body">
-                    <tr class="leaderboard-row">
-                        <td class="rank rank-1">1</td>
-                        <td class="agent-info">
-                            <div class="agent-avatar">MR</div>
-                            <span>Michael Rodriguez</span>
-                        </td>
+                <tbody>
+                    <tr class="row">
+                        <td class="rank">1</td>
+                        <td class="agent"><span class="avatar">MR</span> Michael Rodriguez</td>
                         <td>Elite Insurance Partners</td>
-                        <td class="sales-amount">$247,500</td>
-                        <td class="trend-up">↗ +12%</td>
+                        <td class="kpi">$247,500</td>
+                        <td style="color:var(--ok)">↗ +12%</td>
                     </tr>
-                    <tr class="leaderboard-row">
-                        <td class="rank rank-2">2</td>
-                        <td class="agent-info">
-                            <div class="agent-avatar">SL</div>
-                            <span>Sarah Lee</span>
-                        </td>
+                    <tr class="row">
+                        <td class="rank">2</td>
+                        <td class="agent"><span class="avatar">SL</span> Sarah Lee</td>
                         <td>Premier Coverage LLC</td>
-                        <td class="sales-amount">$234,800</td>
-                        <td class="trend-up">↗ +8%</td>
+                        <td class="kpi">$234,800</td>
+                        <td style="color:var(--ok)">↗ +8%</td>
                     </tr>
-                    <tr class="leaderboard-row">
-                        <td class="rank rank-3">3</td>
-                        <td class="agent-info">
-                            <div class="agent-avatar">DJ</div>
-                            <span>David Johnson</span>
-                        </td>
+                    <tr class="row">
+                        <td class="rank">3</td>
+                        <td class="agent"><span class="avatar">DJ</span> David Johnson</td>
                         <td>Apex Insurance Group</td>
-                        <td class="sales-amount">$218,600</td>
-                        <td class="trend-up">↗ +15%</td>
+                        <td class="kpi">$218,600</td>
+                        <td style="color:var(--ok)">↗ +15%</td>
                     </tr>
-                    <tr class="leaderboard-row">
+                    <tr class="row">
                         <td class="rank">4</td>
-                        <td class="agent-info">
-                            <div class="agent-avatar">AC</div>
-                            <span>Amanda Chen</span>
-                        </td>
+                        <td class="agent"><span class="avatar">AC</span> Amanda Chen</td>
                         <td>Metro Insurance Solutions</td>
-                        <td class="sales-amount">$205,400</td>
-                        <td class="trend-up">↗ +6%</td>
+                        <td class="kpi">$205,400</td>
+                        <td style="color:var(--ok)">↗ +6%</td>
                     </tr>
-                    <tr class="leaderboard-row">
+                    <tr class="row">
                         <td class="rank">5</td>
-                        <td class="agent-info">
-                            <div class="agent-avatar">RW</div>
-                            <span>Robert Wilson</span>
-                        </td>
+                        <td class="agent"><span class="avatar">RW</span> Robert Wilson</td>
                         <td>Nationwide Partners</td>
-                        <td class="sales-amount">$198,200</td>
-                        <td class="trend-down">↘ -2%</td>
+                        <td class="kpi">$198,200</td>
+                        <td style="color:var(--bad)">↘ -2%</td>
                     </tr>
                 </tbody>
             </table>
         </div>
+    </div>
 
         <div class="demo-stats">
             <div class="glass-card">

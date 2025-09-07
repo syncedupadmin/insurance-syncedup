@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pricing - SyncedUp Insurance Platform</title>
-    <link rel="stylesheet" href="/css/glassmorphism-landing.css">
+    <link rel="stylesheet" href="/css/pro.css">
     <style>
         /* Pricing-specific styles */
         .pricing-hero {
@@ -241,65 +241,54 @@
     </nav>
 
     <main id="main">
-        <section class="pricing-hero">
+        <section class="pricing">
             <div class="container">
-                <h1 style="font-size: 3rem; margin-bottom: 1rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Simple, Transparent Pricing</h1>
-                <p style="font-size: 1.2rem; color: rgba(255,255,255,0.8); margin-bottom: 3rem;">No surprises. No hidden fees. Just results.</p>
+                <h2 class="section-title">Simple, Transparent Pricing</h2>
+                <p class="section-sub">No setup fees. No surprises.</p>
             </div>
         </section>
 
-    <section style="padding: 3rem 0;">
-        <div class="pricing-grid">
-            <div class="pricing-card">
-                <div class="plan-name">Starter</div>
-                <div class="plan-price">$299</div>
-                <div class="plan-period">per month</div>
-                <ul class="plan-features">
-                    <li>Up to 10 agents</li>
-                    <li>Basic Global Leaderboard</li>
-                    <li>Commission tracking</li>
-                    <li>Standard reporting</li>
-                    <li>Email support</li>
-                    <li>Basic integrations</li>
-                </ul>
-                <a href="/trial" class="plan-button secondary">Start Free Trial</a>
-            </div>
+        <div class="container">
+            <div class="pricing-grid" style="margin-top:24px">
+                <article class="card plan">
+                    <h3>Starter</h3>
+                    <div class="price">$299</div>
+                    <div class="meta">per month</div>
+                    <ul>
+                        <li><span class="dot"></span> Up to 10 agents</li>
+                        <li><span class="dot"></span> Global Leaderboard (Core)</li>
+                        <li><span class="dot"></span> Commission tracking</li>
+                    </ul>
+                    <a class="btn" href="/trial">Start Free Trial</a>
+                </article>
 
-            <div class="pricing-card popular">
-                <div class="plan-name">Growth</div>
-                <div class="plan-price">$799</div>
-                <div class="plan-period">per month</div>
-                <ul class="plan-features">
-                    <li>Up to 50 agents</li>
-                    <li>Advanced Global Leaderboard with cross-agency tiers</li>
-                    <li>Advanced commission automation</li>
-                    <li>Real-time analytics</li>
-                    <li>Convoso integration</li>
-                    <li>Priority support</li>
-                    <li>Custom reporting</li>
-                    <li>API access</li>
-                </ul>
-                <a href="/trial" class="plan-button">Start Free Trial</a>
-            </div>
+                <article class="card plan" style="border:1.5px solid rgba(158,197,255,.35)">
+                    <h3>Growth</h3>
+                    <div class="price">$799</div>
+                    <div class="meta">per month</div>
+                    <ul>
+                        <li><span class="dot"></span> Up to 50 agents</li>
+                        <li><span class="dot"></span> Global Leaderboard (Advanced)</li>
+                        <li><span class="dot"></span> Real-time analytics</li>
+                        <li><span class="dot"></span> Convoso integration</li>
+                        <li><span class="dot"></span> Priority support</li>
+                    </ul>
+                    <a class="btn btn-primary" href="/trial">Start Free Trial</a>
+                </article>
 
-            <div class="pricing-card">
-                <div class="plan-name">Enterprise</div>
-                <div class="plan-price">Custom</div>
-                <div class="plan-period">contact us</div>
-                <ul class="plan-features">
-                    <li>Unlimited agents</li>
-                    <li>White-label solution</li>
-                    <li>Custom integrations</li>
-                    <li>Dedicated success manager</li>
-                    <li>SLA guarantees</li>
-                    <li>Advanced security</li>
-                    <li>Custom training</li>
-                    <li>24/7 phone support</li>
-                </ul>
-                <a href="/demo" class="plan-button">Contact Sales</a>
+                <article class="card plan">
+                    <h3>Enterprise</h3>
+                    <div class="price">Custom</div>
+                    <div class="meta">contact us</div>
+                    <ul>
+                        <li><span class="dot"></span> Unlimited agents</li>
+                        <li><span class="dot"></span> White-label + custom integrations</li>
+                        <li><span class="dot"></span> Dedicated success manager</li>
+                    </ul>
+                    <a class="btn" href="/demo">Contact Sales</a>
+                </article>
             </div>
         </div>
-    </section>
 
     <section class="roi-calculator-section">
         <h2 style="font-size: 2.5rem; margin-bottom: 1rem; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">ROI Calculator</h2>
