@@ -234,19 +234,13 @@
         // Load performance stats
         async function loadStats() {
             try {
-                // Use fallback data since API endpoints are not available
-                console.log('Loading fallback stats data...');
+                // API endpoints not configured - show clean zero state
+                console.log('API endpoints not configured, showing empty state...');
                 
-                // Simulate realistic agent performance data
-                const totalCommissions = Math.floor(Math.random() * 5000) + 2000;
-                const monthlySales = Math.floor(Math.random() * 25) + 10;
-                const totalCustomers = Math.floor(Math.random() * 50) + 20;
-                const conversionRate = Math.floor(Math.random() * 30) + 15; // 15-45% conversion rate
-                
-                document.getElementById('monthlyCommissions').textContent = `$${totalCommissions.toLocaleString()}`;
-                document.getElementById('monthlySales').textContent = monthlySales.toString();
-                document.getElementById('totalCustomers').textContent = totalCustomers.toString();
-                document.getElementById('conversionRate').textContent = `${conversionRate}%`;
+                document.getElementById('monthlyCommissions').textContent = '$0';
+                document.getElementById('monthlySales').textContent = '0';
+                document.getElementById('totalCustomers').textContent = '0';
+                document.getElementById('conversionRate').textContent = '0%';
             } catch (error) {
                 console.error('Failed to load stats:', error);
                 document.getElementById('monthlyCommissions').textContent = '$0';
@@ -273,16 +267,12 @@
             const tableBody = document.getElementById('quotesTableBody');
             
             try {
-                // Generate sample quotes data
-                const quotes = [
-                    { id: 1, customer: 'John Smith', product: 'Auto Insurance', amount: 1200, status: 'pending', createdAt: new Date() },
-                    { id: 2, customer: 'Sarah Johnson', product: 'Home Insurance', amount: 800, status: 'approved', createdAt: new Date() },
-                    { id: 3, customer: 'Mike Davis', product: 'Life Insurance', amount: 2400, status: 'pending', createdAt: new Date() }
-                ];
+                // No API configured - show empty quotes
+                const quotes = [];
 
                 let quotesHTML;
                 if (quotes.length === 0) {
-                    quotesHTML = `<tr><td colspan="6" style="text-align: center; color: #666; padding: 2rem;">No quotes found</td></tr>`;
+                    quotesHTML = `<tr><td colspan="6" style="text-align: center; color: rgba(255,255,255,0.6); padding: 2rem;">No quotes data available</td></tr>`;
                 } else {
                     quotesHTML = quotes.map(quote => `
                         <tr>
@@ -309,11 +299,10 @@
         async function loadGoalProgress() {
             try {
                 const user = JSON.parse(sessionStorage.getItem('syncedup:user') || '{}');
-                const [goals, sales, commissions] = await Promise.all([
-                    Promise.resolve([{type: 'monthly-sales', target: 30}]),
-                    Promise.resolve(Array(Math.floor(Math.random() * 25) + 10).fill({})),
-                    Promise.resolve(Array(Math.floor(Math.random() * 8) + 3).fill({amount: Math.floor(Math.random() * 800) + 200}))
-                ]);
+                // No API configured - show empty goals
+                const goals = [];
+                const sales = [];
+                const commissions = [];
 
                 const salesGoal = goals.find(g => g.type === 'monthly-sales')?.target || 30;
                 const currentSales = sales.length;

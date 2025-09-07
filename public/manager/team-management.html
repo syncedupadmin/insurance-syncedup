@@ -223,7 +223,8 @@
         async function loadTeamManagement() {
             showLoadingState();
             try {
-                const agents = await __api('/agents');
+                // No API configured - show empty team
+                const agents = [];
                 teamData = agents.map(agent => ({
                     ...agent,
                     hireDate: agent.hireDate || new Date().toISOString(),
@@ -403,10 +404,9 @@
                     premiumThisMonth: 0
                 };
                 
-                const response = await __api('/agents', {
-                    method: 'POST',
-                    body: JSON.stringify(agent)
-                });
+                // No API configured - cannot add agents
+                console.log('API not configured - cannot add agent:', agent);
+                throw new Error('API endpoints not configured');
                 
                 if (response.ok) {
                     teamData.unshift(agent);

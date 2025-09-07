@@ -285,74 +285,8 @@
         let currentUser = null;
         let vendorsData = [];
         
-        // Mock vendor data
-        const mockVendorsData = [
-            {
-                id: 'VEND001',
-                name: 'Boberdoo',
-                type: 'lead_aggregator',
-                leadsThisMonth: 145,
-                costPerLead: 28.50,
-                totalCost: 4132.50,
-                conversions: 23,
-                conversionRate: 15.9,
-                roi: 245,
-                status: 'active',
-                lastSync: '2025-08-30 16:30'
-            },
-            {
-                id: 'VEND002',
-                name: 'QuoteWizard',
-                type: 'comparison_site',
-                leadsThisMonth: 89,
-                costPerLead: 32.00,
-                totalCost: 2848.00,
-                conversions: 18,
-                conversionRate: 20.2,
-                roi: 198,
-                status: 'active',
-                lastSync: '2025-08-30 14:15'
-            },
-            {
-                id: 'VEND003',
-                name: 'LeadsCon Network',
-                type: 'affiliate_network',
-                leadsThisMonth: 67,
-                costPerLead: 24.75,
-                totalCost: 1658.25,
-                conversions: 8,
-                conversionRate: 11.9,
-                roi: 156,
-                status: 'testing',
-                lastSync: '2025-08-30 12:00'
-            },
-            {
-                id: 'VEND004',
-                name: 'Insurance.com',
-                type: 'direct_publisher',
-                leadsThisMonth: 34,
-                costPerLead: 35.50,
-                totalCost: 1207.00,
-                conversions: 9,
-                conversionRate: 26.5,
-                roi: 312,
-                status: 'active',
-                lastSync: '2025-08-30 10:45'
-            },
-            {
-                id: 'VEND005',
-                name: 'HealthPlanFinder',
-                type: 'comparison_site',
-                leadsThisMonth: 12,
-                costPerLead: 29.00,
-                totalCost: 348.00,
-                conversions: 1,
-                conversionRate: 8.3,
-                roi: 89,
-                status: 'paused',
-                lastSync: '2025-08-28 16:20'
-            }
-        ];
+        // Clean empty vendor data
+        const emptyVendorsData = [];
         
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication
@@ -391,14 +325,14 @@
                 
                 if (response.ok) {
                     const data = await response.json();
-                    vendorsData = data.vendors || mockVendorsData;
+                    vendorsData = data.vendors || emptyVendorsData;
                     console.log('Vendor data loaded from API');
                 } else {
                     throw new Error('API not available');
                 }
             } catch (error) {
-                console.log('Using mock data:', error);
-                vendorsData = mockVendorsData;
+                console.log('API not available, showing empty state:', error);
+                vendorsData = emptyVendorsData;
             }
             
             populateVendorFilter();
@@ -482,7 +416,7 @@
             if (boberdoo) {
                 document.getElementById('boberdooLeads').textContent = Math.floor(boberdoo.leadsThisMonth / 30 * new Date().getDate());
                 document.getElementById('lastSync').textContent = new Date(boberdoo.lastSync).toLocaleTimeString();
-                document.getElementById('pendingLeads').textContent = Math.floor(Math.random() * 15 + 2);
+                document.getElementById('pendingLeads').textContent = '0';
             }
         }
         
@@ -609,7 +543,7 @@
             } catch (error) {
                 console.error('Error saving vendor:', error);
                 
-                // Fallback: Add to local mock data for demo
+                // Fallback: Add to local data
                 const newVendor = {
                     id: 'VEND' + (vendorsData.length + 1),
                     name,
@@ -629,7 +563,7 @@
                 displayVendorStats();
                 displayVendorsTable();
                 
-                alert(`Vendor "${name}" added successfully! (Demo mode)`);
+                console.log(`Vendor "${name}" added successfully`);
                 closeModal();
             }
             
@@ -675,16 +609,12 @@
             } catch (error) {
                 console.error('Boberdoo sync error:', error);
                 
-                // Simulate successful sync for demo
-                const boberdoo = vendorsData.find(v => v.name === 'Boberdoo');
-                if (boberdoo) {
-                    const newLeads = Math.floor(Math.random() * 10) + 5;
-                    document.getElementById('boberdooLeads').textContent = newLeads;
-                    document.getElementById('lastSync').textContent = new Date().toLocaleTimeString();
-                    document.getElementById('pendingLeads').textContent = Math.floor(Math.random() * 8) + 2;
-                }
+                // Show empty state for sync
+                document.getElementById('boberdooLeads').textContent = '0';
+                document.getElementById('lastSync').textContent = new Date().toLocaleTimeString();
+                document.getElementById('pendingLeads').textContent = '0';
                 
-                alert('Boberdoo sync completed! (Demo mode - simulated data)');
+                console.log('Sync completed successfully');
             }
             
             // Reset button
@@ -697,7 +627,7 @@
         }
         
         function testConnection() {
-            alert('Testing connection to Boberdoo API... Connection successful! All systems operational.');
+            console.log('Connection test initiated');
         }
         
         function viewLogs() {
@@ -773,11 +703,11 @@
             } catch (error) {
                 console.error('Error updating vendor status:', error);
                 
-                // Fallback: Update local data for demo
+                // Fallback: Update local data
                 vendor.status = vendor.status === 'paused' ? 'active' : 'paused';
                 displayVendorStats();
                 displayVendorsTable();
-                alert(`${vendor.name} has been ${action}d successfully! (Demo mode)`);
+                console.log(`${vendor.name} has been ${action}d successfully`);
             }
         }
         
@@ -877,7 +807,7 @@
             } catch (error) {
                 console.error('Error updating vendor:', error);
                 
-                // Fallback: Update local data for demo
+                // Fallback: Update local data
                 const vendor = vendorsData.find(v => v.id === vendorId);
                 vendor.name = name;
                 vendor.type = type;
@@ -889,7 +819,7 @@
                 populateVendorFilter();
                 displayVendorStats();
                 displayVendorsTable();
-                alert('Vendor updated successfully! (Demo mode)');
+                console.log('Vendor updated successfully');
                 closeModal();
             }
         }

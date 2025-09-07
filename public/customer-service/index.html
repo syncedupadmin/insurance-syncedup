@@ -332,26 +332,19 @@
         // Load performance stats
         async function loadStats() {
             try {
-                const data = await window.__api('/dashboard/cs-stats');
-                if (data && data.stats) {
-                    document.getElementById('dailyCases').textContent = data.stats.dailyCases;
-                    document.getElementById('activeCases').textContent = data.stats.activeCases;
-                    document.getElementById('totalMembers').textContent = data.stats.totalMembers.toLocaleString();
-                    document.getElementById('avgResponseTime').textContent = data.stats.avgResponseTime;
-                } else {
-                    // Fallback data
-                    document.getElementById('dailyCases').textContent = '20';
-                    document.getElementById('activeCases').textContent = '5';
-                    document.getElementById('totalMembers').textContent = '1,000';
-                    document.getElementById('avgResponseTime').textContent = '15m';
-                }
+                // API endpoints not configured - show clean zero state
+                console.log('API endpoints not configured, showing empty state...');
+                
+                document.getElementById('dailyCases').textContent = '0';
+                document.getElementById('activeCases').textContent = '0';
+                document.getElementById('totalMembers').textContent = '0';
+                document.getElementById('avgResponseTime').textContent = '0m';
             } catch (error) {
                 console.error('Error loading stats:', error);
-                // Fallback data
-                document.getElementById('dailyCases').textContent = '20';
-                document.getElementById('activeCases').textContent = '5';
-                document.getElementById('totalMembers').textContent = '1,000';
-                document.getElementById('avgResponseTime').textContent = '15m';
+                document.getElementById('dailyCases').textContent = '0';
+                document.getElementById('activeCases').textContent = '0';
+                document.getElementById('totalMembers').textContent = '0';
+                document.getElementById('avgResponseTime').textContent = '0m';
             }
         }
 
@@ -360,23 +353,12 @@
             const activityContainer = document.getElementById('recentActivity');
             
             try {
-                const data = await window.__api('/dashboard/cs-stats');
-                const activities = data?.recentActivity || [];
-
-                const activityHTML = activities.map(activity => `
-                    <div class="interaction-item">
-                        <div class="interaction-header">
-                            <span class="interaction-type">${activity.member}</span>
-                            <span class="interaction-date">${activity.time}</span>
-                        </div>
-                        <div class="interaction-note">${activity.action}</div>
-                    </div>
-                `).join('');
-
-                activityContainer.innerHTML = activityHTML || '<p style="text-align: center; color: rgba(255,255,255,0.7);">No recent activity</p>';
+                // No API configured - show empty state
+                console.log('API endpoints not configured, showing empty activity state...');
+                activityContainer.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.7);">No recent activity data available</p>';
             } catch (error) {
                 console.error('Error loading recent activity:', error);
-                activityContainer.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.7);">Unable to load recent activity</p>';
+                activityContainer.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.7);">No recent activity data available</p>';
             }
         }
 
@@ -385,30 +367,30 @@
             const statsContainer = document.getElementById('caseStatistics');
             
             try {
-                const data = await window.__api('/dashboard/cs-stats');
-                const caseStats = data?.caseStatistics || {};
+                // No API configured - show clean zero state
+                console.log('API endpoints not configured, showing empty stats state...');
                 
                 const stats = `
                     <div style="display: grid; gap: 1rem;">
                         <div class="profile-field">
                             <span class="profile-label">Total Cases Today:</span>
-                            <span class="profile-value">${caseStats.totalCases || 0}</span>
+                            <span class="profile-value">0</span>
                         </div>
                         <div class="profile-field">
                             <span class="profile-label">Resolved Cases:</span>
-                            <span class="profile-value">${caseStats.resolvedCases || 0}</span>
+                            <span class="profile-value">0</span>
                         </div>
                         <div class="profile-field">
                             <span class="profile-label">Pending Cases:</span>
-                            <span class="profile-value">${caseStats.pendingCases || 0}</span>
+                            <span class="profile-value">0</span>
                         </div>
                         <div class="profile-field">
                             <span class="profile-label">Escalated Cases:</span>
-                            <span class="profile-value">${caseStats.escalatedCases || 0}</span>
+                            <span class="profile-value">0</span>
                         </div>
                         <div class="profile-field">
                             <span class="profile-label">Resolution Rate:</span>
-                            <span class="profile-value">${caseStats.resolutionRate || '0%'}</span>
+                            <span class="profile-value">0%</span>
                         </div>
                     </div>
                 `;
@@ -416,7 +398,7 @@
                 statsContainer.innerHTML = stats;
             } catch (error) {
                 console.error('Error loading case statistics:', error);
-                statsContainer.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.7);">Unable to load statistics</p>';
+                statsContainer.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.7);">No case statistics data available</p>';
             }
         }
 
@@ -425,8 +407,8 @@
             const tableBody = document.getElementById('priorityCasesBody');
             
             try {
-                const data = await window.__api('/dashboard/cs-stats');
-                const cases = data?.priorityCases || [];
+                // No API configured - show empty cases
+                const cases = [];
 
                 const casesHTML = cases.map(caseItem => `
                     <tr onclick="viewCase('${caseItem.id}')">
@@ -454,8 +436,8 @@
             const tableBody = document.getElementById('assignedCasesBody');
             
             try {
-                const data = await window.__api('/dashboard/cs-stats');
-                const cases = data?.assignedCases || [];
+                // No API configured - show empty assigned cases
+                const cases = [];
 
                 const casesHTML = cases.map(caseItem => `
                     <tr onclick="viewCase('${caseItem.id}')">
