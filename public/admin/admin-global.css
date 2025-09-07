@@ -1,4 +1,4 @@
-/* Admin Global Styles - Black Glassmorphism Theme */
+/* Admin Global Styles - Purple Glassmorphism Theme */
 
 /* Fonts */
 
@@ -19,7 +19,7 @@
 /* Body Styling */
 body { 
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-    background: linear-gradient(-45deg, #000000, #1a1a1a, #2d2d2d, #404040, #1a1a1a, #000000, #2d2d2d, #1a1a1a);
+    background: linear-gradient(-45deg, #4c1d95, #5b21b6, #6d28d9, #7c3aed, #8b5cf6, #a855f7, #c084fc, #ddd6fe);
     background-size: 400% 400%;
     animation: gradient 15s ease infinite;
     min-height: 100vh;
@@ -37,32 +37,32 @@ body::before {
     width: 100%;
     height: 100%;
     background: 
-        radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+        radial-gradient(circle at 20% 50%, rgba(124, 58, 237, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.25) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(168, 85, 247, 0.2) 0%, transparent 50%);
     pointer-events: none;
     z-index: -1;
 }
 
 /* Glass Morphism Base */
 .glass-morphism {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
 }
 
 /* Header Styling */
 .header { 
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     color: white; 
     padding: 1.5rem 2rem; 
     display: flex; 
     justify-content: space-between; 
     align-items: center;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     position: relative;
     z-index: 10;
 }
@@ -79,12 +79,12 @@ body::before {
     display: flex; 
     gap: 0; 
     padding: 0 2rem; 
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     border-top: none;
     overflow-x: auto;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     position: relative;
     z-index: 9;
 }
@@ -108,8 +108,8 @@ body::before {
 
 .nav a.active { 
     color: white; 
-    border-bottom: 3px solid #ffffff;
-    background: rgba(255, 255, 255, 0.15);
+    border-bottom: 3px solid #c084fc;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 /* Icon Styling */
@@ -149,19 +149,19 @@ body::before {
 
 /* Card Styling */
 .card { 
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     padding: 2rem; 
     border-radius: 20px; 
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     transition: all 0.3s ease;
     position: relative;
 }
 
 .card:hover {
     transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
+    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
 }
 
 /* Typography */
@@ -184,16 +184,16 @@ p, span, div {
 /* Button Styling */
 .btn { 
     padding: 0.75rem 1.5rem; 
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
     color: white; 
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 12px; 
     cursor: pointer; 
     margin: 0.5rem; 
     font-weight: 500;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     font-family: inherit;
     font-size: 0.95rem;
     display: inline-flex;
@@ -202,9 +202,9 @@ p, span, div {
 }
 
 .btn:hover { 
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.35);
     transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
 .btn-primary {
@@ -259,22 +259,22 @@ p, span, div {
 .form-input, .form-select, .form-textarea {
     width: 100%;
     padding: 0.75rem 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 8px;
     color: white;
     font-family: inherit;
     font-size: 0.95rem;
     font-weight: 500;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Enhanced Select Dropdown Styling */
 .form-select {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(15px);
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
     background-position: right 0.5rem center;
     background-repeat: no-repeat;
@@ -286,7 +286,7 @@ p, span, div {
 
 /* Select Option Styling */
 .form-select option {
-    background: rgba(26, 26, 26, 0.95);
+    background: rgba(76, 29, 149, 0.95);
     color: white;
     padding: 0.5rem;
     font-weight: 500;
@@ -294,11 +294,11 @@ p, span, div {
 }
 
 .form-select option:hover {
-    background: rgba(64, 64, 64, 0.95);
+    background: rgba(124, 58, 237, 0.95);
 }
 
 .form-select option:checked {
-    background: rgba(77, 77, 77, 0.95);
+    background: rgba(168, 85, 247, 0.95);
     color: white;
     font-weight: 600;
 }
@@ -310,10 +310,10 @@ p, span, div {
 
 .form-input:focus, .form-select:focus, .form-textarea:focus {
     outline: none;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(20px);
-    border-color: rgba(255, 255, 255, 0.4);
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2), 0 4px 12px rgba(0, 0, 0, 0.25);
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(15px);
+    border-color: rgba(168, 85, 247, 0.6);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.3), 0 4px 12px rgba(0, 0, 0, 0.15);
     transform: translateY(-1px);
 }
 
@@ -401,16 +401,16 @@ table {
     width: 100%; 
     border-collapse: collapse; 
     margin-top: 1rem; 
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.15);
     border-radius: 12px;
     overflow: hidden;
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
 }
 
 th { 
-    background: rgba(255, 255, 255, 0.1); 
+    background: rgba(255, 255, 255, 0.2); 
     padding: 1rem 0.75rem; 
     text-align: left; 
     font-weight: 600;
@@ -425,7 +425,7 @@ td {
 }
 
 tr:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.2);
 }
 
 /* Status Badges */
@@ -697,7 +697,7 @@ code {
     left: -10%;
     width: 160px;
     height: 160px;
-    background: #404040;
+    background: #8b5cf6;
     animation-delay: 0s;
 }
 
@@ -706,7 +706,7 @@ code {
     right: -10%;
     width: 160px;
     height: 160px;
-    background: #2d2d2d;
+    background: #ec4899;
     animation-delay: 2s;
 }
 
@@ -715,7 +715,7 @@ code {
     left: 50%;
     width: 160px;
     height: 160px;
-    background: #1a1a1a;
+    background: #3b82f6;
     animation-delay: 4s;
 }
 
