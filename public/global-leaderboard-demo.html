@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Sales Leaderboard Demo - SyncedUp</title>
+    <meta name="description" content="See why the Global Leaderboard increases sales 47% on average. Watch live rankings, competitions, and agent performance across 100+ elite agencies.">
+    <link rel="stylesheet" href="/css/marketing.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .demo-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 120px 0 80px;
+        }
+        
+        .demo-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border-radius: 6px;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+        }
+        
+        .demo-title {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -1px;
+        }
+        
+        .demo-subtitle {
+            font-size: 20px;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        
+        .live-demo-container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            margin: 48px 0;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .leaderboard-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 20px;
+        }
+        
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 32px;
+        }
+        
+        .leaderboard-table th {
+            background: var(--bg-light);
+            padding: 16px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text-primary);
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .leaderboard-table td {
+            padding: 20px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 15px;
+        }
+        
+        .leaderboard-table tbody tr {
+            transition: all 0.2s ease;
+        }
+        
+        .leaderboard-table tbody tr:hover {
+            background: var(--bg-light);
+        }
+        
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        .rank-badge.gold {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: white;
+        }
+        
+        .rank-badge.silver {
+            background: linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%);
+            color: white;
+        }
+        
+        .rank-badge.bronze {
+            background: linear-gradient(135deg, #CD7F32 0%, #B87333 100%);
+            color: white;
+        }
+        
+        .rank-badge.default {
+            background: var(--bg-gray);
+            color: var(--text-secondary);
+        }
+        
+        .agent-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .agent-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .agent-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .agent-agency {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        
+        .sales-amount {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 16px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-gray);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-dark) 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .competition-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+        
+        .stat-card-demo {
+            background: var(--bg-light);
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .stat-value-demo {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        
+        .stat-label-demo {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            margin: 64px 0;
+        }
+        
+        .benefit-card {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .benefit-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        
+        .benefit-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+        
+        .benefit-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="/images/Transparent.png" alt="SyncedUp" height="40">
+            </div>
+            <div class="nav-menu">
+                <a href="/#features">Features</a>
+                <a href="/global-leaderboard-demo.html">Global Leaderboard</a>
+                <a href="/pricing.html">Pricing</a>
+                <a href="/customers.html">Customers</a>
+                <a href="/resources.html">Resources</a>
+                <a href="/company.html">Company</a>
+            </div>
+            <div class="nav-actions">
+                <a href="/login.html" class="nav-link">Sign In</a>
+                <a href="/demo.html" class="btn btn-primary">Book Demo</a>
+                <a href="/trial.html" class="btn btn-cta">Start Free Trial</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Demo Hero Section -->
+    <section class="demo-hero">
+        <div class="container">
+            <div class="text-center">
+                <div class="demo-badge">🔥 47% Average Sales Increase</div>
+                <h1 class="demo-title">
+                    The Global Leaderboard That's<br>
+                    Transforming Insurance Sales
+                </h1>
+                <p class="demo-subtitle">
+                    Watch your agents compete with the best nationwide. Real rankings. Real results. Real revenue growth.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Demo -->
+    <section class="container" style="margin-top: -40px; position: relative; z-index: 2;">
+        <div class="live-demo-container">
+            <div class="leaderboard-header">
+                <h2 class="leaderboard-title">National Sales Leaderboard - December 2024</h2>
+                <div class="live-indicator">
+                    <div class="live-dot"></div>
+                    <span style="font-size: 14px; font-weight: 600; color: var(--accent);">LIVE</span>
+                </div>
+            </div>
+
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Agent</th>
+                        <th>December Sales</th>
+                        <th>Policies</th>
+                        <th>Goal Progress</th>
+                        <th>Streak</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-data">
+                    <tr>
+                        <td><span class="rank-badge gold">1</span></td>
+                        <td>
+                            <div class="agent-info">
+                                <div class="agent-avatar">MR</div>
+                                <div>
+                                    <div class="agent-name">Michael Rodriguez</div>
+                                    <div class="agent-agency">Elite Insurance Partners</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="sales-amount">$847,230</span></td>
+                        <td>124 policies</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 169%"></div>
+                            </div>
+                            <small style="color: var(--text-muted); margin-top: 4px; display: block;">169% of goal</small>
+                        </td>
+                        <td style="color: var(--accent); font-weight: 600;">🔥 12 days</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rank-badge silver">2</span></td>
+                        <td>
+                            <div class="agent-info">
+                                <div class="agent-avatar">JC</div>
+                                <div>
+                                    <div class="agent-name">Jennifer Chen</div>
+                                    <div class="agent-agency">Allstate Regional</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="sales-amount">$723,450</span></td>
+                        <td>98 policies</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 145%"></div>
+                            </div>
+                            <small style="color: var(--text-muted); margin-top: 4px; display: block;">145% of goal</small>
+                        </td>
+                        <td style="color: var(--accent); font-weight: 600;">⚡ 8 days</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rank-badge bronze">3</span></td>
+                        <td>
+                            <div class="agent-info">
+                                <div class="agent-avatar">DM</div>
+                                <div>
+                                    <div class="agent-name">David Martinez</div>
+                                    <div class="agent-agency">State Farm Elite</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="sales-amount">$692,100</span></td>
+                        <td>87 policies</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 138%"></div>
+                            </div>
+                            <small style="color: var(--text-muted); margin-top: 4px; display: block;">138% of goal</small>
+                        </td>
+                        <td style="color: var(--accent); font-weight: 600;">🚀 15 days</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rank-badge default">4</span></td>
+                        <td>
+                            <div class="agent-info">
+                                <div class="agent-avatar">SK</div>
+                                <div>
+                                    <div class="agent-name">Sarah Kim</div>
+                                    <div class="agent-agency">Liberty Mutual Pro</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="sales-amount">$654,890</span></td>
+                        <td>79 policies</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 131%"></div>
+                            </div>
+                            <small style="color: var(--text-muted); margin-top: 4px; display: block;">131% of goal</small>
+                        </td>
+                        <td style="color: var(--accent); font-weight: 600;">💪 6 days</td>
+                    </tr>
+                    <tr>
+                        <td><span class="rank-badge default">5</span></td>
+                        <td>
+                            <div class="agent-info">
+                                <div class="agent-avatar">AL</div>
+                                <div>
+                                    <div class="agent-name">Alex Thompson</div>
+                                    <div class="agent-agency">Progressive Leaders</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="sales-amount">$598,720</span></td>
+                        <td>73 policies</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 120%"></div>
+                            </div>
+                            <small style="color: var(--text-muted); margin-top: 4px; display: block;">120% of goal</small>
+                        </td>
+                        <td style="color: var(--accent); font-weight: 600;">🎯 4 days</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="competition-stats">
+                <div class="stat-card-demo">
+                    <div class="stat-value-demo">$15.2M</div>
+                    <div class="stat-label-demo">Total December Sales</div>
+                </div>
+                <div class="stat-card-demo">
+                    <div class="stat-value-demo">847</div>
+                    <div class="stat-label-demo">Active Agents</div>
+                </div>
+                <div class="stat-card-demo">
+                    <div class="stat-value-demo">134%</div>
+                    <div class="stat-label-demo">Avg Goal Achievement</div>
+                </div>
+                <div class="stat-card-demo">
+                    <div class="stat-value-demo">47%</div>
+                    <div class="stat-label-demo">Sales Increase vs Last Year</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section style="padding: 80px 0; background: var(--bg-light);">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Why Agencies Love the Global Leaderboard</h2>
+                <p class="section-subtitle">Turn your office into a high-performance sales machine</p>
+            </div>
+
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">🏆</div>
+                    <h3 class="benefit-title">National Competition</h3>
+                    <p class="benefit-description">Your agents compete with the best across 100+ agencies nationwide. The top performers drive everyone up.</p>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">⚡</div>
+                    <h3 class="benefit-title">Real-Time Updates</h3>
+                    <p class="benefit-description">Sales update instantly. Agents see their ranking change with every policy sold. The urgency is addictive.</p>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">🎯</div>
+                    <h3 class="benefit-title">Goal Visualization</h3>
+                    <p class="benefit-description">Progress bars show exactly how close agents are to their goals. Visual motivation drives consistent performance.</p>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">🔥</div>
+                    <h3 class="benefit-title">Hot Streaks</h3>
+                    <p class="benefit-description">Consecutive sales days build momentum. Agents fight to keep their streaks alive, driving daily consistency.</p>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">💰</div>
+                    <h3 class="benefit-title">Automated Rewards</h3>
+                    <p class="benefit-description">Top performers get automatic recognition and prizes. The system runs contests without any admin work.</p>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">📊</div>
+                    <h3 class="benefit-title">Performance Analytics</h3>
+                    <p class="benefit-description">See which agents respond to competition, identify coaching opportunities, and optimize team performance.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="final-cta">
+        <div class="container">
+            <h2>Ready to Transform Your Agency?</h2>
+            <p>Join 100+ agencies using the Global Leaderboard to drive 47% more sales.</p>
+            
+            <div class="cta-buttons">
+                <a href="/trial.html" class="btn btn-cta-primary">
+                    Start Your Free Trial
+                    <span>See results in 48 hours</span>
+                </a>
+                <a href="/demo.html" class="btn btn-cta-secondary">
+                    Schedule Live Demo
+                    <span>See your agents compete live</span>
+                </a>
+            </div>
+            
+            <div class="guarantee">
+                <div>
+                    <strong>Results Guaranteed</strong>
+                    <p>If you don't see increased sales activity within 48 hours, we'll refund everything.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <img src="/images/Transparent.png" alt="SyncedUp">
+                    <p>The insurance intelligence platform.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Product</h4>
+                    <a href="/features.html">Features</a>
+                    <a href="/pricing.html">Pricing</a>
+                    <a href="/global-leaderboard-demo.html">Global Leaderboard</a>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Company</h4>
+                    <a href="/about.html">About</a>
+                    <a href="/customers.html">Customers</a>
+                    <a href="/contact.html">Contact</a>
+                </div>
+                
+                <div class="footer-contact">
+                    <h4>Get Started</h4>
+                    <p>1-800-SYNCEDUP</p>
+                    <p>sales@syncedup.com</p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 SyncedUp Solutions. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simulate live updates to the leaderboard
+        let updateCounter = 0;
+        
+        function updateLeaderboard() {
+            const rows = document.querySelectorAll('#leaderboard-data tr');
+            
+            // Randomly update one agent's sales
+            const randomRow = Math.floor(Math.random() * rows.length);
+            const salesCell = rows[randomRow].querySelector('.sales-amount');
+            
+            if (salesCell) {
+                const currentSales = parseInt(salesCell.textContent.replace(/[$,]/g, ''));
+                const increase = Math.floor(Math.random() * 5000) + 1000; // $1k-$6k increase
+                const newSales = currentSales + increase;
+                
+                // Animate the update
+                salesCell.style.background = 'var(--accent)';
+                salesCell.style.color = 'white';
+                salesCell.style.padding = '4px 8px';
+                salesCell.style.borderRadius = '4px';
+                salesCell.style.transition = 'all 0.3s ease';
+                
+                setTimeout(() => {
+                    salesCell.textContent = `$${newSales.toLocaleString()}`;
+                    
+                    setTimeout(() => {
+                        salesCell.style.background = '';
+                        salesCell.style.color = 'var(--primary)';
+                        salesCell.style.padding = '';
+                        salesCell.style.borderRadius = '';
+                    }, 1000);
+                }, 500);
+            }
+            
+            updateCounter++;
+        }
+        
+        // Update every 8-15 seconds to simulate real activity
+        function scheduleNextUpdate() {
+            const delay = Math.random() * 7000 + 8000; // 8-15 seconds
+            setTimeout(() => {
+                updateLeaderboard();
+                scheduleNextUpdate();
+            }, delay);
+        }
+        
+        // Start the demo updates after page load
+        setTimeout(scheduleNextUpdate, 3000);
+        
+        // Track demo engagement
+        document.querySelectorAll('.btn-cta-primary, .btn-cta-secondary').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                console.log('Demo CTA clicked:', this.textContent.trim());
+                // In a real implementation, this would track to analytics
+            });
+        });
+        
+        // Add visual feedback when hovering over leaderboard rows
+        document.querySelectorAll('#leaderboard-data tr').forEach(row => {
+            row.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.02)';
+                this.style.boxShadow = 'var(--shadow-md)';
+                this.style.borderRadius = '8px';
+            });
+            
+            row.addEventListener('mouseleave', function() {
+                this.style.transform = '';
+                this.style.boxShadow = '';
+                this.style.borderRadius = '';
+            });
+        });
+    </script>
+</body>
+</html>

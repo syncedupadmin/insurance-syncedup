@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start Your 14-Day Free Trial | SyncedUp Insurance Platform</title>
+    <link rel="stylesheet" href="css/marketing.css">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav-container">
+        <div class="nav-content">
+            <div class="nav-logo">
+                <a href="/">SyncedUp</a>
+            </div>
+            <div class="nav-menu">
+                <a href="/">Home</a>
+                <a href="/global-leaderboard-demo.html">Global Leaderboard</a>
+                <a href="/pricing.html">Pricing</a>
+                <a href="/demo.html">Demo</a>
+                <a href="/trial.html" class="nav-cta">Free Trial</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero trial-hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span>14-DAY FREE TRIAL</span>
+            </div>
+            <h1>Start Your Enterprise Insurance Platform Trial</h1>
+            <p class="hero-subtitle">Full access to all features including the Global Leaderboard, automated workflows, and comprehensive analytics. No credit card required.</p>
+            
+            <div class="trial-benefits-grid">
+                <div class="trial-benefit">
+                    <div class="benefit-icon">✓</div>
+                    <span>Full Platform Access</span>
+                </div>
+                <div class="trial-benefit">
+                    <div class="benefit-icon">✓</div>
+                    <span>Global Leaderboard</span>
+                </div>
+                <div class="trial-benefit">
+                    <div class="benefit-icon">✓</div>
+                    <span>Advanced Analytics</span>
+                </div>
+                <div class="trial-benefit">
+                    <div class="benefit-icon">✓</div>
+                    <span>Priority Support</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trial Form Section -->
+    <section class="trial-form-section">
+        <div class="container">
+            <div class="trial-form-container">
+                <div class="trial-form-header">
+                    <h2>Create Your Trial Account</h2>
+                    <p>Get started in less than 2 minutes</p>
+                </div>
+
+                <form id="trial-form" class="trial-form">
+                    <!-- Company Information -->
+                    <div class="form-section">
+                        <h3>Company Information</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="company-name">Company Name *</label>
+                                <input type="text" id="company-name" name="company_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="company-size">Company Size *</label>
+                                <select id="company-size" name="company_size" required>
+                                    <option value="">Select size</option>
+                                    <option value="1-10">1-10 agents</option>
+                                    <option value="11-25">11-25 agents</option>
+                                    <option value="26-50">26-50 agents</option>
+                                    <option value="51-100">51-100 agents</option>
+                                    <option value="100+">100+ agents</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="industry">Insurance Focus *</label>
+                                <select id="industry" name="industry" required>
+                                    <option value="">Select focus</option>
+                                    <option value="auto">Auto Insurance</option>
+                                    <option value="home">Home Insurance</option>
+                                    <option value="commercial">Commercial Insurance</option>
+                                    <option value="life">Life Insurance</option>
+                                    <option value="health">Health Insurance</option>
+                                    <option value="multi-line">Multi-Line</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="annual-revenue">Annual Revenue</label>
+                                <select id="annual-revenue" name="annual_revenue">
+                                    <option value="">Select range</option>
+                                    <option value="under-1m">Under $1M</option>
+                                    <option value="1m-5m">$1M - $5M</option>
+                                    <option value="5m-10m">$5M - $10M</option>
+                                    <option value="10m-25m">$10M - $25M</option>
+                                    <option value="25m+">$25M+</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Administrator Information -->
+                    <div class="form-section">
+                        <h3>Administrator Information</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="first-name">First Name *</label>
+                                <input type="text" id="first-name" name="first_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="last-name">Last Name *</label>
+                                <input type="text" id="last-name" name="last_name" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email">Business Email *</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone Number *</label>
+                                <input type="tel" id="phone" name="phone" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="title">Job Title *</label>
+                            <select id="title" name="title" required>
+                                <option value="">Select title</option>
+                                <option value="owner">Agency Owner</option>
+                                <option value="president">President/CEO</option>
+                                <option value="manager">General Manager</option>
+                                <option value="director">Director of Operations</option>
+                                <option value="administrator">System Administrator</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Security Setup -->
+                    <div class="form-section">
+                        <h3>Account Security</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="password">Password *</label>
+                                <input type="password" id="password" name="password" required>
+                                <div class="password-requirements">
+                                    <small>Minimum 8 characters with uppercase, lowercase, number, and special character</small>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm-password">Confirm Password *</label>
+                                <input type="password" id="confirm-password" name="confirm_password" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Terms and Compliance -->
+                    <div class="form-section">
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="terms" name="terms" required>
+                                <span class="checkbox-custom"></span>
+                                I agree to the <a href="/terms.html" target="_blank">Terms of Service</a> and <a href="/privacy.html" target="_blank">Privacy Policy</a> *
+                            </label>
+                        </div>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="compliance" name="compliance" required>
+                                <span class="checkbox-custom"></span>
+                                I confirm that our agency meets all regulatory compliance requirements for insurance operations *
+                            </label>
+                        </div>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="marketing" name="marketing">
+                                <span class="checkbox-custom"></span>
+                                I would like to receive product updates and industry insights (optional)
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-submit">
+                        <button type="submit" class="btn-cta btn-large">
+                            Start 14-Day Free Trial
+                            <span class="btn-arrow">→</span>
+                        </button>
+                        <p class="form-disclaimer">
+                            No credit card required • Full access • Cancel anytime
+                        </p>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Trial Benefits Sidebar -->
+            <div class="trial-benefits-sidebar">
+                <div class="benefits-card">
+                    <h3>What You Get</h3>
+                    <ul class="benefits-list">
+                        <li>
+                            <span class="benefit-check">✓</span>
+                            Complete Global Leaderboard system
+                        </li>
+                        <li>
+                            <span class="benefit-check">✓</span>
+                            Automated policy management
+                        </li>
+                        <li>
+                            <span class="benefit-check">✓</span>
+                            Advanced reporting & analytics
+                        </li>
+                        <li>
+                            <span class="benefit-check">✓</span>
+                            Agent performance tracking
+                        </li>
+                        <li>
+                            <span class="benefit-check">✓</span>
+                            Commission automation
+                        </li>
+                        <li>
+                            <span class="benefit-check">✓</span>
+                            Customer management portal
+                        </li>
+                        <li>
+                            <span class="benefit-check">✓</span>
+                            Integration with major carriers
+                        </li>
+                        <li>
+                            <span class="benefit-check">✓</span>
+                            24/7 priority support
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="security-card">
+                    <h3>Enterprise Security</h3>
+                    <div class="security-badges">
+                        <div class="security-badge">
+                            <span class="badge-icon">🔒</span>
+                            <div>
+                                <strong>SOC 2 Compliant</strong>
+                                <small>Type II Certified</small>
+                            </div>
+                        </div>
+                        <div class="security-badge">
+                            <span class="badge-icon">🛡️</span>
+                            <div>
+                                <strong>HIPAA Ready</strong>
+                                <small>Healthcare Compliance</small>
+                            </div>
+                        </div>
+                        <div class="security-badge">
+                            <span class="badge-icon">⚡</span>
+                            <div>
+                                <strong>99.9% Uptime</strong>
+                                <small>SLA Guarantee</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="support-card">
+                    <h3>Implementation Support</h3>
+                    <p>Our customer success team will:</p>
+                    <ul>
+                        <li>Set up your Global Leaderboard</li>
+                        <li>Import your existing data</li>
+                        <li>Train your team</li>
+                        <li>Configure integrations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof Section -->
+    <section class="social-proof">
+        <div class="container">
+            <h2>Join Leading Insurance Agencies</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <p>"The Global Leaderboard transformed our agency culture. Sales increased 47% in the first quarter."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <strong>Michael Chen</strong>
+                        <span>CEO, Premier Insurance Group</span>
+                    </div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <p>"Implementation was seamless. The automation saved us 15 hours per week on administrative tasks."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <strong>Sarah Johnson</strong>
+                        <span>Operations Director, Johnson & Associates</span>
+                    </div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <p>"Best investment we've made. The ROI was evident within the first month of implementation."</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <strong>David Rodriguez</strong>
+                        <span>Agency Principal, Rodriguez Insurance</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>SyncedUp</h3>
+                    <p>The enterprise insurance platform that runs your entire agency.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Platform</h4>
+                    <ul class="footer-links">
+                        <li><a href="/global-leaderboard-demo.html">Global Leaderboard</a></li>
+                        <li><a href="/features.html">Features</a></li>
+                        <li><a href="/integrations.html">Integrations</a></li>
+                        <li><a href="/security.html">Security</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul class="footer-links">
+                        <li><a href="/pricing.html">Pricing</a></li>
+                        <li><a href="/demo.html">Demo</a></li>
+                        <li><a href="/support.html">Support</a></li>
+                        <li><a href="/docs.html">Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="/about.html">About</a></li>
+                        <li><a href="/careers.html">Careers</a></li>
+                        <li><a href="/contact.html">Contact</a></li>
+                        <li><a href="/privacy.html">Privacy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 SyncedUp Insurance Platform. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Trial Form JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('trial-form');
+            
+            // Form validation and submission
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (validateForm()) {
+                    submitTrialForm();
+                }
+            });
+            
+            // Real-time password validation
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirm-password');
+            
+            password.addEventListener('input', validatePassword);
+            confirmPassword.addEventListener('input', validatePasswordMatch);
+            
+            function validatePassword() {
+                const pwd = password.value;
+                const requirements = document.querySelector('.password-requirements small');
+                
+                const hasUpper = /[A-Z]/.test(pwd);
+                const hasLower = /[a-z]/.test(pwd);
+                const hasNumber = /\d/.test(pwd);
+                const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd);
+                const hasLength = pwd.length >= 8;
+                
+                const isValid = hasUpper && hasLower && hasNumber && hasSpecial && hasLength;
+                
+                if (pwd.length > 0) {
+                    if (isValid) {
+                        requirements.style.color = 'var(--accent)';
+                        requirements.textContent = 'Password meets requirements ✓';
+                    } else {
+                        requirements.style.color = 'var(--error)';
+                        requirements.textContent = 'Password must include: uppercase, lowercase, number, special character, 8+ chars';
+                    }
+                } else {
+                    requirements.style.color = '';
+                    requirements.textContent = 'Minimum 8 characters with uppercase, lowercase, number, and special character';
+                }
+                
+                return isValid;
+            }
+            
+            function validatePasswordMatch() {
+                const pwd = password.value;
+                const confirmPwd = confirmPassword.value;
+                
+                if (confirmPwd.length > 0) {
+                    if (pwd === confirmPwd) {
+                        confirmPassword.style.borderColor = 'var(--accent)';
+                    } else {
+                        confirmPassword.style.borderColor = 'var(--error)';
+                    }
+                }
+                
+                return pwd === confirmPwd;
+            }
+            
+            function validateForm() {
+                const requiredFields = form.querySelectorAll('[required]');
+                let isValid = true;
+                
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        field.style.borderColor = 'var(--error)';
+                        isValid = false;
+                    } else {
+                        field.style.borderColor = '';
+                    }
+                });
+                
+                // Validate email format
+                const email = document.getElementById('email');
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(email.value)) {
+                    email.style.borderColor = 'var(--error)';
+                    isValid = false;
+                }
+                
+                // Validate password requirements
+                if (!validatePassword()) {
+                    password.style.borderColor = 'var(--error)';
+                    isValid = false;
+                }
+                
+                // Validate password match
+                if (!validatePasswordMatch()) {
+                    confirmPassword.style.borderColor = 'var(--error)';
+                    isValid = false;
+                }
+                
+                return isValid;
+            }
+            
+            function submitTrialForm() {
+                const submitButton = form.querySelector('button[type="submit"]');
+                const originalText = submitButton.innerHTML;
+                
+                // Show loading state
+                submitButton.innerHTML = 'Creating Account...';
+                submitButton.disabled = true;
+                
+                // Collect form data
+                const formData = new FormData(form);
+                const trialData = {};
+                
+                for (let [key, value] of formData.entries()) {
+                    trialData[key] = value;
+                }
+                
+                // Add trial metadata
+                trialData.trial_start = new Date().toISOString();
+                trialData.trial_end = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+                trialData.source = 'trial_page';
+                
+                // Track trial signup event
+                if (window.analytics) {
+                    window.analytics.sendEvent('trial_signup_submitted', {
+                        company_size: trialData.company_size,
+                        industry: trialData.industry,
+                        annual_revenue: trialData.annual_revenue,
+                        job_title: trialData.title
+                    });
+                }
+                
+                // Submit to API
+                fetch('/api/trial/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(trialData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Redirect to trial success/onboarding page
+                        window.location.href = '/trial/welcome.html?token=' + data.trial_token;
+                    } else {
+                        throw new Error(data.message || 'Signup failed');
+                    }
+                })
+                .catch(error => {
+                    console.error('Trial signup error:', error);
+                    alert('There was an error creating your trial account. Please try again or contact support.');
+                    
+                    // Reset button
+                    submitButton.innerHTML = originalText;
+                    submitButton.disabled = false;
+                });
+            }
+        });
+    </script>
+
+    <!-- Marketing Analytics -->
+    <script src="js/marketing-analytics.js"></script>
+</body>
+</html>
