@@ -825,3 +825,150 @@ async function getAgencyRateLimits(agencyId) {
     throw error;
   }
 }
+
+async function deleteAgency(agencyId) {
+  try {
+    // First, check if agency exists and get details
+    const { data: agency, error: fetchError } = await supabase
+      .from('agencies')
+      .select('id, name, profiles(id)')
+      .eq('id', agencyId)
+      .single();
+
+    if (fetchError || !agency) {
+      throw new Error('Agency not found');
+    }
+
+    // Safety check - prevent deletion if agency has users
+    if (agency.profiles && agency.profiles.length > 0) {
+      return {
+        success: false,
+        error: 'Cannot delete agency with existing users. Please remove all users first.',
+        user_count: agency.profiles.length
+      };
+    }
+
+    // Delete agency
+    const { error: deleteError } = await supabase
+      .from('agencies')
+      .delete()
+      .eq('id', agencyId);
+
+    if (deleteError) {
+      throw new Error(`Failed to delete agency: ${deleteError.message}`);
+    }
+
+    return {
+      success: true,
+      message: `Agency "${agency.name}" deleted successfully`,
+      deleted_agency: {
+        id: agency.id,
+        name: agency.name,
+        deleted_at: new Date().toISOString()
+      }
+    };
+  } catch (error) {
+    console.error('Error deleting agency:', error);
+    throw error;
+  }
+}
+
+async function updateAgency(agencyId, updateData) {
+  try {
+    const { data: agency, error } = await supabase
+      .from('agencies')
+      .update({
+        ...updateData,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', agencyId)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(`Failed to update agency: ${error.message}`);
+    }
+
+    return {
+      success: true,
+      message: 'Agency updated successfully',
+      agency
+    };
+  } catch (error) {
+    console.error('Error updating agency:', error);
+    throw error;
+  }
+}
+
+async function performBulkOperations(operationData) {
+  try {
+    const { operation, agency_ids, data } = operationData;
+    
+    switch (operation) {
+      case 'bulk_suspend':
+        const suspendResults = await Promise.all(
+          agency_ids.map(id => suspendAgency(id, data.reason))
+        );
+        return {
+          success: true,
+          message: `${agency_ids.length} agencies suspended`,
+          results: suspendResults
+        };
+        
+      case 'bulk_activate':
+        const activateResults = await Promise.all(
+          agency_ids.map(id => activateAgency(id))
+        );
+        return {
+          success: true,
+          message: `${agency_ids.length} agencies activated`,
+          results: activateResults
+        };
+        
+      case 'bulk_update_plan':
+        const updateResults = await Promise.all(
+          agency_ids.map(id => updateAgencyPricing({ agency_id: id, subscription_plan: data.subscription_plan }))
+        );
+        return {
+          success: true,
+          message: `${agency_ids.length} agencies updated to ${data.subscription_plan}`,
+          results: updateResults
+        };
+        
+      default:
+        throw new Error('Unknown bulk operation');
+    }
+  } catch (error) {
+    console.error('Error performing bulk operations:', error);
+    throw error;
+  }
+}
+
+async function customizeAgencyBranding(brandingData) {
+  try {
+    const { agency_id, branding_config } = brandingData;
+
+    const { data: agency, error } = await supabase
+      .from('agencies')
+      .update({
+        custom_branding: branding_config,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', agency_id)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(`Failed to update branding: ${error.message}`);
+    }
+
+    return {
+      success: true,
+      message: 'Agency branding updated successfully',
+      agency
+    };
+  } catch (error) {
+    console.error('Error updating agency branding:', error);
+    throw error;
+  }
+}

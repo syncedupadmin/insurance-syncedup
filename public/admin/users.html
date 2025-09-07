@@ -24,7 +24,7 @@
     </div>
     
     <!-- Navigation -->
-        <nav class="nav">
+    <nav class="nav">
         <a href="/admin/">
             <i data-lucide="layout-dashboard" class="icon"></i>Dashboard
         </a>
@@ -330,8 +330,24 @@
         });
 
         async function initializePage() {
-            // Initialize Lucide icons
-            lucide.createIcons();
+            // Initialize Lucide icons with retry mechanism
+            function initializeIcons() {
+                if (typeof lucide !== 'undefined') {
+                    try {
+                        lucide.createIcons();
+                        console.log('Lucide icons initialized successfully');
+                    } catch (error) {
+                        console.error('Error initializing Lucide icons:', error);
+                    }
+                } else {
+                    console.warn('Lucide library not loaded, retrying in 500ms...');
+                    setTimeout(initializeIcons, 500);
+                }
+            }
+            
+            // Try to initialize icons immediately and after a delay
+            initializeIcons();
+            setTimeout(initializeIcons, 1000);
             
             // Load all data
             await Promise.all([
@@ -340,12 +356,22 @@
             ]);
             
             updateUI();
+            
+            // Re-initialize icons after content loads
+            setTimeout(initializeIcons, 2000);
         }
 
         async function loadUsersData() {
             try {
-                const users = await // API not configured('/users');
-                usersData = users.map(user => ({
+                const response = await fetch('/api/admin/users', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const users = response.ok ? (await response.json()).data || [] : [];
+                usersData = users.length > 0 ? users.map(user => ({
                     user_id: user.id,
                     first_name: user.name ? user.name.split(' ')[0] : 'Unknown',
                     last_name: user.name ? user.name.split(' ').slice(1).join(' ') : '',
@@ -357,12 +383,20 @@
                     notes: user.notes || '',
                     created_at: user.createdAt || new Date().toISOString(),
                     last_login: user.lastLogin || 'Never'
-                }));
+                })) : [];
+                
+                // If no data from API, load fallback data
+                if (usersData.length === 0) {
+                    console.log('No users from API, loading fallback data');
+                    loadFallbackUsersData();
+                }
+                
                 filteredUsers = [...usersData];
             } catch (error) {
                 console.error('Error loading users data:', error);
-                usersData = [];
-                filteredUsers = [];
+                console.log('Loading fallback data due to error');
+                loadFallbackUsersData();
+                filteredUsers = [...usersData];
             }
         }
 
@@ -630,13 +664,21 @@
 
                 let response;
                 if (editingUserId) {
-                    response = await // API not configured(`/users/${editingUserId}`, {
+                    response = await fetch(`/api/admin/users/${editingUserId}`, {
                         method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
+                            'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify(userData)
                     });
                 } else {
-                    response = await // API not configured('/users', {
+                    response = await fetch('/api/admin/users', {
                         method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
+                            'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify(userData)
                     });
                 }

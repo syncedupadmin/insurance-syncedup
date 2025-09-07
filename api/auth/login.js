@@ -61,30 +61,137 @@ export default async function handler(req, res) {
     const password = String(body.password || '').trim();
     if (!email || !password) return bad(res, 400, 'Email and password are required');
     
-    // DEMO CREDENTIALS - for demo purposes only
-    const demoCredentials = {
-      'admin@demo.com': { password: 'demo123', role: 'admin', name: 'Demo Admin' },
-      'admin@demo': { password: 'demo', role: 'admin', name: 'Demo Admin' },
-      'admin@syncedupsolutions.com': { password: 'TestPassword123!', role: 'admin', name: 'Admin User' }
+    // DEMO ACCOUNTS - For testing and development
+    const demoAccounts = {
+      'admin@demo.com': { 
+        password: 'demo123', 
+        role: 'admin', 
+        name: 'Demo Admin',
+        agency: 'Demo Agency'
+      },
+      'manager@demo.com': { 
+        password: 'demo123', 
+        role: 'manager', 
+        name: 'Demo Manager',
+        agency: 'Demo Agency'
+      },
+      'agent@demo.com': { 
+        password: 'demo123', 
+        role: 'agent', 
+        name: 'Demo Agent',
+        agency: 'Demo Agency'
+      },
+      'service@demo.com': { 
+        password: 'demo123', 
+        role: 'customer_service', 
+        name: 'Demo Service',
+        agency: 'Demo Agency'
+      }
     };
+
+    // PRODUCTION ACCOUNTS - Real users
+    const productionAccounts = {
+      // SUPER ADMIN - Full system access
+      'admin@syncedupsolutions.com': {
+        password: 'TestPassword123!',
+        role: 'super_admin',
+        name: 'System Administrator',
+        firstName: 'System',
+        lastName: 'Administrator', 
+        agency: 'SyncedUp Solutions',
+        isProduction: true
+      },
+      
+      // PHS AGENCY ACCOUNTS - First real customer
+      'admin@phsagency.com': {
+        password: 'PHS@Admin2024!',
+        role: 'admin',
+        name: 'PHS Administrator',
+        firstName: 'PHS',
+        lastName: 'Administrator',
+        agency: 'PHS Insurance Agency',
+        isProduction: true
+      },
+      'manager@phsagency.com': {
+        password: 'PHS@Manager2024!',
+        role: 'manager',
+        name: 'PHS Manager',
+        firstName: 'PHS',
+        lastName: 'Manager',
+        agency: 'PHS Insurance Agency',
+        isProduction: true
+      },
+      'agent1@phsagency.com': {
+        password: 'PHS@Agent2024!',
+        role: 'agent',
+        name: 'PHS Agent One',
+        firstName: 'PHS Agent',
+        lastName: 'One',
+        agency: 'PHS Insurance Agency',
+        isProduction: true
+      }
+    };
+
+    const normalizedEmail = email.toLowerCase().trim();
     
-    if (demoCredentials[email] && demoCredentials[email].password === password) {
-      const demoUser = demoCredentials[email];
-      const safeUser = {
-        id: 'demo-' + email.split('@')[0],
-        email: email,
-        firstName: demoUser.name.split(' ')[0],
-        lastName: demoUser.name.split(' ')[1] || '',
-        name: demoUser.name,
-        role: demoUser.role,
-        agency_id: 'demo-agency',
-        is_active: true
-      };
-      
-      const token = 'demo-token-' + Date.now();
-      
-      console.log('Demo login successful for:', email);
-      return ok(res, { token, user: safeUser });
+    // Check production accounts first
+    if (productionAccounts[normalizedEmail]) {
+      const account = productionAccounts[normalizedEmail];
+      if (account.password === password) {
+        const safeUser = {
+          id: `prod-${normalizedEmail.split('@')[0]}`,
+          email: normalizedEmail,
+          name: account.name,
+          firstName: account.firstName,
+          lastName: account.lastName,
+          role: account.role,
+          agency: account.agency,
+          agency_id: `prod-${account.agency.toLowerCase().replace(/\s+/g, '-')}`,
+          isProduction: true,
+          is_active: true
+        };
+        
+        // Generate secure token for production
+        const token = `prod-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        
+        // Log production login
+        console.log(`PRODUCTION LOGIN: ${normalizedEmail} (${account.role}) at ${new Date().toISOString()}`);
+        
+        return ok(res, { 
+          token, 
+          user: safeUser,
+          redirect: getPortalRedirect(account.role)
+        });
+      }
+    }
+    
+    // Check demo accounts
+    if (demoAccounts[normalizedEmail]) {
+      const account = demoAccounts[normalizedEmail];
+      if (account.password === password) {
+        const safeUser = {
+          id: `demo-${normalizedEmail.split('@')[0]}`,
+          email: normalizedEmail,
+          name: account.name,
+          firstName: account.name.split(' ')[0],
+          lastName: account.name.split(' ')[1] || '',
+          role: account.role,
+          agency: account.agency,
+          agency_id: 'demo-agency',
+          isDemo: true,
+          is_active: true
+        };
+        
+        const token = `demo-${Date.now()}`;
+        
+        console.log(`DEMO LOGIN: ${normalizedEmail} (${account.role})`);
+        
+        return ok(res, { 
+          token, 
+          user: safeUser,
+          redirect: getPortalRedirect(account.role)
+        });
+      }
     }
 
     // Try production Supabase login if demo fails and env vars are available
@@ -169,4 +276,16 @@ export default async function handler(req, res) {
     const code = err?.statusCode || 500;
     return bad(res, code, err?.message || 'Unexpected error');
   }
+}
+
+// Helper function to determine portal redirect based on role
+function getPortalRedirect(role) {
+  const redirects = {
+    'super_admin': '/super-admin',
+    'admin': '/admin',
+    'manager': '/manager',
+    'agent': '/agent',
+    'customer_service': '/customer-service'
+  };
+  return redirects[role] || '/admin';
 }

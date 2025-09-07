@@ -5,15 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Administrator Console - SyncedUp Insurance</title>
     
-    <!-- Auth Guard Script - Must be loaded in HEAD before content renders -->
+    <!-- Enhanced Super Admin Security Check -->
     <script>
         (function () {
           const token = localStorage.getItem('syncedup_token');
           const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
           const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
           const role = normalize(u.role || '');
-          const allowed = ['super_admin'];
-          if (!token || !role || !allowed.includes(role)) { window.location.href = '/login'; return; }
+          
+          // Only allow super_admin role
+          if (!token || role !== 'super_admin') {
+            alert('Unauthorized access. Super Admin privileges required.');
+            window.location.href = '/login';
+            return;
+          }
+          
+          // Additional security check for production super admin
+          const email = u.email || '';
+          const isProductionSuperAdmin = email === 'admin@syncedupsolutions.com';
+          const isDemoSuperAdmin = email.includes('demo.com');
+          
+          if (!isProductionSuperAdmin && !isDemoSuperAdmin) {
+            console.warn('Non-standard super admin access attempt:', email);
+            // Log the attempt but allow access for now
+          }
+          
+          // Log super admin access
+          console.log(`SUPER ADMIN ACCESS: ${email} at ${new Date().toISOString()}`);
+          
+          // Set security indicator
+          sessionStorage.setItem('superAdminAccess', 'true');
+          sessionStorage.setItem('superAdminUser', email);
         })();
     </script>
     
