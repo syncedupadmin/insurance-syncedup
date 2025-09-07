@@ -664,7 +664,7 @@
                 const response = await fetch(`/api/admin/user-management/${userId}`, {
                     method: 'DELETE',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || 'demo-token'}`,
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -706,7 +706,7 @@
                 const response = await fetch('/api/admin/user-management/bulk', {
                     method: 'PUT',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || 'demo-token'}`,
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
@@ -736,7 +736,7 @@
                 const response = await fetch('/api/admin/user-management/bulk', {
                     method: 'PUT',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || 'demo-token'}`,
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({

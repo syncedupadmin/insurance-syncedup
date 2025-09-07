@@ -241,7 +241,7 @@
             try {
                 const response = await fetch('/api/admin/analytics?analytics_type=team_performance', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || 'demo-token'}`,
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -261,7 +261,7 @@
             try {
                 const response = await fetch('/api/manager/goals', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || 'demo-token'}`,
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -281,7 +281,7 @@
             try {
                 const response = await fetch('/api/admin/user-management?role=agent', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || 'demo-token'}`,
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -533,7 +533,7 @@
                 const response = await fetch('/api/manager/goals', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || 'demo-token'}`,
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(goalData)
