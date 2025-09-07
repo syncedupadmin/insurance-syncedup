@@ -1,0 +1,1137 @@
+super-admin.html:210:                    <div class="metric-label">Monthly Recurring Revenue</div>
+super-admin.html:216:                    <div class="metric-label">Annual Recurring Revenue</div>
+super-admin.html:222:                    <div class="metric-label">Customer LTV</div>
+super-admin.html:228:                    <div class="metric-label">Customer Acquisition Cost</div>
+super-admin.html:775:                    <div class="leaderboard-value">$12,500</div>
+super-admin.html:815:                        data: [85000, 92000, 78000, 105000, 115000, 120000, 125000, 118000, 130000, 125000, 135000, 142000],
+super-admin-portal.html:795:                            <div class="stat-label">Monthly Recurring Revenue</div>
+super-admin-portal.html:802:                            <div class="stat-label">Annual Recurring Revenue</div>
+super-admin-portal.html:809:                            <div class="stat-label">Customer LTV</div>
+super-admin-portal.html:816:                            <div class="stat-label">Customer Acquisition Cost</div>
+super-admin-portal.html:1279:                document.getElementById('totalRevenue').textContent = '$125,000';
+super-admin-portal.html:1489:            document.getElementById('mrr').textContent = '$125,000';
+super-admin-portal.html:1491:            document.getElementById('arr').textContent = '$1.5M';
+super-admin-portal.html:1493:            document.getElementById('ltv').textContent = '$12,500';
+super-admin-portal.html:1495:            document.getElementById('cac').textContent = '$850';
+super-admin-portal.html:1614:                    <div class="leaderboard-value">$12,500</div>
+super-admin-portal.html:1652:                        data: [85000, 92000, 78000, 105000, 115000, 120000, 125000, 118000, 130000, 125000, 135000, 142000],
+super-admin-portal.html:1856:                        data: [null, null, 142000, 155000, 168000, 185000, 198000, 215000, 235000],
+super-admin-portal.html:1906:                monthly: [85000, 92000, 78000, 105000, 115000, 120000, 125000, 118000, 130000, 125000, 135000, 142000],
+api\admin\convoso-lists.js:27:          lead_count: 850,
+_backup\manager\manager\settings.html:344:${timestamp},John Smith,12,$28500,Active
+_backup\manager\manager\performance.html:265:            let totalPremium = 28500;
+public\leaderboard\teams.html:314:                    teamSales: 1850000,
+public\leaderboard\monthly.html:297:                    monthlySales: 185000,
+public\manager\performance.html:269:            let totalPremium = 28500;
+public\manager\settings.html:356:${timestamp},John Smith,12,$28500,Active
+api\super-admin\global-leaderboard.js:803:          { name: 'John Smith', current_progress: 8500, percentage: 85 },
+api\super-admin\global-leaderboard.js:986:        description: 'Earned $12,500 in commissions this month',
+api\super-admin\revenue-management.js:196:    // Calculate MRR (Monthly Recurring Revenue)
+api\super-admin\revenue-management.js:202:    // Calculate ARR (Annual Recurring Revenue)
+api\super-admin\revenue-management.js:313:  return newAgenciesThisMonth > 0 ? Math.round(assumedMonthlyCACBudget / newAgenciesThisMonth) : 850;
+api\super-admin\setup-demo-data.js:354:        commission_amount: 850.50,
+public\super-admin.html:384:                    <div class="metric-label">Monthly Recurring Revenue</div>
+public\super-admin.html:390:                    <div class="metric-label">Annual Recurring Revenue</div>
+public\super-admin.html:396:                    <div class="metric-label">Customer LTV</div>
+public\super-admin.html:402:                    <div class="metric-label">Customer Acquisition Cost</div>
+public\super-admin.html:969:                document.getElementById('totalRevenue').textContent = '$125,000';
+public\super-admin.html:981:                document.getElementById('mrr').textContent = '$125,000';
+public\super-admin.html:982:                document.getElementById('arr').textContent = '$1.5M';
+public\super-admin.html:983:                document.getElementById('ltv').textContent = '$12,500';
+public\super-admin.html:984:                document.getElementById('cac').textContent = '$850';
+public\super-admin.html:1089:                    <div class="leaderboard-value">$12,500</div>
+public\super-admin.html:1129:                        data: [85000, 92000, 78000, 105000, 115000, 120000, 125000, 118000, 130000, 125000, 135000, 142000],
+public\_cleanup\backup-files\index_old.html:1000:                            <div class="stat-label">Monthly Recurring Revenue</div>
+public\_cleanup\backup-files\index_old.html:1007:                            <div class="stat-label">Annual Recurring Revenue</div>
+public\_cleanup\backup-files\index_old.html:1014:                            <div class="stat-label">Customer LTV</div>
+public\_cleanup\backup-files\index_old.html:1021:                            <div class="stat-label">Customer Acquisition Cost</div>
+public\_cleanup\duplicate-files\dashboard-with-admin.html:1219:                document.getElementById('totalPremium').textContent = `${((performanceData.totalPremium || 28500) * multiplier).toLocaleString()}`;
+public\_cleanup\duplicate-files\super-admin-folder\revenue-management.html:87:                    <div class="stat-label">Monthly Recurring Revenue</div>
+super-admin.html:255:                        <div class="metric-label">Upcoming Renewals</div>
+super-admin.html:256:                        <button class="btn btn-info" onclick="showRenewals()">View Details</button>
+super-admin.html:260:                        <div class="metric-label">Failed Payments</div>
+super-admin.html:261:                        <button class="btn btn-warning" onclick="retryFailedPayments()">Retry All</button>
+super-admin-portal.html:836:                                        <div class="stat-label">Upcoming Renewals</div>
+super-admin-portal.html:841:                                        <div class="stat-label">Failed Payments</div>
+super-admin-portal.html:842:                                        <button class="btn btn-sm btn-warning" onclick="showFailedPayments()">Retry All</button>
+public\admin\leads.html:694:                            <button class="btn" onclick="showLeadDetails('${lead.lead_id}')" title="View Details" style="padding: 0.4rem; font-size: 0.8rem;">
+public\super-admin.html:429:                        <div class="metric-label">Upcoming Renewals</div>
+public\super-admin.html:430:                        <button class="btn btn-info" onclick="showRenewals()">View Details</button>
+public\super-admin.html:434:                        <div class="metric-label">Failed Payments</div>
+public\super-admin.html:435:                        <button class="btn btn-warning" onclick="retryFailedPayments()">Retry All</button>
+public\_cleanup\backup-files\index_old.html:1041:                                        <div class="stat-label">Upcoming Renewals</div>
+public\_cleanup\backup-files\index_old.html:1046:                                        <div class="stat-label">Failed Payments</div>
+public\_cleanup\backup-files\index_old.html:1047:                                        <button class="btn btn-sm btn-warning" onclick="showFailedPayments()">Retry All</button>
+public\_cleanup\duplicate-files\super-admin-folder\user-administration.html:602:                            <button class="btn" onclick="viewUserDetails(${user.id})" title="View Details" style="padding: 0.5rem;">
+public\_cleanup\duplicate-files\super-admin-folder\agency-management.html:490:                            <button class="btn" onclick="viewAgencyDetails('${agency.id}')" title="View Details" style="padding: 0.5rem;">
+public\_cleanup\duplicate-files\super-admin-folder\revenue-management.html:213:                            Retry All
+public\_cleanup\duplicate-files\super-admin-folder\revenue-management.html:604:                                            <button class="btn" onclick="viewSubscription('${sub.agency}')" title="View Details" style="padding: 0.4rem;">
+public\_cleanup\duplicate-files\super-admin-folder\settings.html:625:                                            <button class="btn" onclick="viewApiKeyDetails(${key.id})" title="View Details" style="padding: 0.4rem;">
+agent.html:805:                    labels: ['July', 'August', 'September', 'October', 'November', 'December'],
+super-admin.html:812:                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+super-admin.html:842:            new Chart(ctx, { type: 'line', data: { labels: ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'], datasets: [{ label: 'Actual', data: [125000, 135000, 142000, null, null, null], borderColor: '#48bb78' }, { label: 'Forecast', data: [null, null, 142000, 148000, 155000, 162000], borderColor: '#667eea', borderDash: [5, 5] }] }, options: { responsive: true, maintainAspectRatio: false } });
+super-admin-portal.html:1649:                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+super-admin-portal.html:1840:                    labels: ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+super-admin-portal.html:1907:                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+api\admin\convoso-leads-search.js:48:        first_name: 'Jane',
+api\carriers\sync.js:23:    const decipher = crypto.createDecipher(algorithm, key);
+api\carriers\sync.js:28:    console.error('Decryption error:', error);
+api\integrations\convoso\campaigns.js:11: * @param {object} credentials - Decrypted Convoso credentials
+api\integrations\convoso\campaigns.js:226:        // Decrypt credentials
+api\integrations\convoso\sync.js:102: * @param {object} credentials - Decrypted Convoso credentials
+api\integrations\convoso\sync.js:328:        // Decrypt credentials
+public\admin\agents.html:844:            const template = 'name,email,agent_code,status\n"John Doe",john@example.com,AG12345,active\n"Jane Smith",jane@example.com,AG67890,active';
+api\admin\convoso-leads.js:66:  const firstNames = ['John', 'Jane', 'Mike', 'Sarah', 'David', 'Lisa', 'Chris', 'Maria'];
+public\admin\leads.html:480:                { lead_id: 'CONV002', first_name: 'Jane', last_name: 'Smith', phone_number: '555-5678', insurance_type: 'home', received_at: new Date(Date.now() - 12*60*1000).toISOString(), lead_temperature: 'hot' },
+public\admin\leads.html:642:                    lead_id: 'CONV002', first_name: 'Jane', last_name: 'Smith', phone_number: '555-5678',
+api\leads\convoso-webhook\[agency].js:397:        // Decrypt webhook secret for signature validation
+public\admin\licensing.html:171:                        agent_name: 'Jane Smith',
+_backup\manager\manager\settings.html:345:${timestamp},Jane Doe,8,$19200,Active
+public\admin\reports.html:76:                    <option value="jane-smith">Jane Smith</option>
+public\admin\reports.html:240:                        <td>Feb 1, 2024</td>
+public\admin\reports.html:296:                    <td>December Sales Report</td>
+public\admin\reports.html:297:                    <td>Jan 2, 2024</td>
+public\admin\reports.html:298:                    <td>Dec 2023</td>
+public\admin\reports.html:307:                    <td>Jan 1, 2024</td>
+public\agent\commissions.html:704:                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+_backup\manager\manager\goals.html:282:                agentName: 'Jane Doe',
+_backup\manager\manager\leads.html:868:                    lead_id: 'CONV002', first_name: 'Jane', last_name: 'Smith', phone_number: '555-5678',
+_backup\manager\manager\reports.html:555:                content += 'Jane Doe,12,$3845,18.4%,3/3\n';
+_backup\manager\manager\reports.html:565:                content += '2025-08-30,John Smith,Jane Doe,Health Plan A,$295,Active\n';
+_backup\manager\manager\reports.html:566:                content += '2025-08-29,Jane Doe,Bob Wilson,Health Plan B,$425,Active\n';
+_backup\manager\manager\reports.html:571:                content += '2025-08-30,Jane Doe,Email,Quote sent to prospect,5 min\n';
+public\agent\sales.html:395:                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+public\super-admin.html:1126:                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+public\super-admin.html:1156:            new Chart(ctx, { type: 'line', data: { labels: ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'], datasets: [{ label: 'Actual', data: [125000, 135000, 142000, null, null, null], borderColor: '#48bb78' }, { label: 'Forecast', data: [null, null, 142000, 148000, 155000, 162000], borderColor: '#667eea', borderDash: [5, 5] }] }, options: { responsive: true, maintainAspectRatio: false } });
+api\utils\encryption.js:92: * Decrypt sensitive data using AES-256-GCM
+api\utils\encryption.js:95: * @returns {string} Decrypted plaintext
+api\utils\encryption.js:127:            console.warn(`Decrypting old data from ${new Date(timestamp)}`);
+api\utils\encryption.js:131:        const decipher = crypto.createDecipher(algorithm, key);
+api\utils\encryption.js:142:        console.error('Decryption error:', error);
+api\utils\encryption.js:143:        throw new Error(`Decryption failed: ${error.message}`);
+api\utils\encryption.js:157:        // Decrypt with old key
+public\_cleanup\backup-files\goals-backup.html:286:                agentName: 'Jane Doe',
+public\_cleanup\backup-files\index_old.html:2295:                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+public\_cleanup\backup-files\index_old.html:2326:                        labels: chartData.labels || ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+public\_cleanup\backup-files\index_old.html:2377:                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+public\_cleanup\backup-files\index_old.html:2800:                    labels: ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+public\_cleanup\backup-files\index_old.html:2832:                        labels: chartData.labels || ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+public\_cleanup\backup-files\index_old.html:2885:                        labels: ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+public\leaderboard\monthly.html:69:                        <option value="12">December 2025</option>
+public\leaderboard\monthly.html:70:                        <option value="11">November 2025</option>
+public\leaderboard\monthly.html:71:                        <option value="10">October 2025</option>
+public\leaderboard\monthly.html:240:            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+public\leaderboard\monthly.html:241:                               'July', 'August', 'September', 'October', 'November', 'December'];
+public\_cleanup\duplicate-files\dashboard-with-admin.html:840:                'AGENT002,Jane Doe,Mary Johnson,Health Plan B,$425.00,$127.50,2025-08-29',
+public\manager\reports.html:588:                content += 'Jane Doe,12,$3845,18.4%,3/3\n';
+public\manager\reports.html:598:                content += '2025-08-30,John Smith,Jane Doe,Health Plan A,$295,Active\n';
+public\manager\reports.html:599:                content += '2025-08-29,Jane Doe,Bob Wilson,Health Plan B,$425,Active\n';
+public\manager\reports.html:604:                content += '2025-08-30,Jane Doe,Email,Quote sent to prospect,5 min\n';
+public\manager\settings.html:357:${timestamp},Jane Doe,8,$19200,Active
+analyze-database-schema.js:33:                // Get sample data to understand structure
+analyze-database-schema.js:34:                const { data: sampleData, error: sampleError } = await supabase
+analyze-database-schema.js:39:                if (sampleError) {
+analyze-database-schema.js:40:                    console.log(`   ❌ Error accessing ${tableName}:`, sampleError.message);
+analyze-database-schema.js:41:                    databaseSchema[tableName] = { error: sampleError.message };
+analyze-database-schema.js:59:                    sampleData: sampleData && sampleData.length > 0 ? sampleData[0] : null,
+analyze-database-schema.js:60:                    recordCount: sampleData ? sampleData.length : 0
+analyze-database-schema.js:68:                if (sampleData && sampleData.length > 0) {
+analyze-database-schema.js:69:                    console.log(`   📄 Sample record keys:`, Object.keys(sampleData[0]));
+analyze-database-schema.js:71:                    console.log(`   📄 No sample data available`);
+fix-agency-api.js:12:        // Test data that matches the actual form
+fix-agency-api.js:13:        const testData = {
+fix-agency-api.js:20:        console.log('Creating agency with data:', testData);
+fix-agency-api.js:30:        const is_active = testData.status === 'active';
+fix-agency-api.js:31:        const monthly_revenue = testData.status === 'trial' ? 0 : (planPricing[testData.plan_type] || 0);
+fix-agency-api.js:34:        const agencyCode = testData.name
+fix-agency-api.js:42:            name: testData.name.trim(),
+fix-agency-api.js:44:            admin_email: testData.contact_email.trim().toLowerCase(),
+fix-agency-api.js:49:            is_demo: false,
+fix-agency-api.js:57:                plan_type: testData.plan_type,
+fix-agency-api.js:58:                status: testData.status,
+fix-database-schema.js:25:            console.log('✅ Current agencies table sample:', agencies[0] ? Object.keys(agencies[0]) : 'No data');
+admin.html:110:        // Agent data will be loaded from API - no fake data
+admin.html:163:                // Show empty state on error - no fake data
+fix-agency-settings.js:41:            if (agency.name.toLowerCase().includes('demo') || agency.code.includes('DEMO')) {
+index.html:378:                    Watch Demo
+agent.html:874:            // This would typically fetch from your API - no sample data
+agent.html:1059:                // No hardcoded data - will be populated from API
+test-convoso-direct.js:44:          email: 'test@example.com'
+test-agency-creation-fixed.js:12:        // Test data that matches the form
+test-agency-creation-fixed.js:13:        const testData = {
+test-agency-creation-fixed.js:20:        console.log('📋 Creating agency with data:', testData);
+test-agency-creation-fixed.js:30:        const is_active = testData.status === 'active';
+test-agency-creation-fixed.js:31:        const monthly_revenue = testData.status === 'trial' ? 0 : (planPricing[testData.plan_type] || 0);
+test-agency-creation-fixed.js:34:        const agencyCode = testData.name
+test-agency-creation-fixed.js:44:            name: testData.name.trim(),
+test-agency-creation-fixed.js:46:            admin_email: testData.contact_email.trim().toLowerCase(),
+test-agency-creation-fixed.js:51:            is_demo: false,
+test-agency-creation-fixed.js:59:                plan_type: testData.plan_type,
+test-agency-creation-fixed.js:60:                status: testData.status,
+test-agency-creation-fixed.js:63:                    api_access: testData.plan_type === 'enterprise',
+test-agency-creation-fixed.js:65:                    advanced_reporting: testData.plan_type !== 'basic',
+test-agency-creation-fixed.js:66:                    white_labeling: testData.plan_type === 'enterprise'
+test-agency-creation-fixed.js:107:                plan_type: agency.settings?.plan_type || testData.plan_type,
+test-create-agency-schema.js:53:    const testAgencyData = {
+test-create-agency-schema.js:55:      contact_email: 'test@example.com',
+test-create-agency-schema.js:64:      .insert([testAgencyData])
+test-create-agency-schema.js:99:        console.log('   Sample agency columns:', Object.keys(existingAgencies[0]));
+run-test-setup.js:52:                        .from('dummy') // This will fail but might give us better error info
+run-test-setup.js:102:                    // Show sample data for key tables
+run-test-setup.js:104:                        const sample = data[0];
+run-test-setup.js:105:                        const keys = Object.keys(sample).slice(0, 3);
+run-test-setup.js:106:                        const sampleData = keys.map(key => `${key}: ${sample[key]}`).join(', ');
+run-test-setup.js:107:                        console.log(`   📄 Sample: ${sampleData}`);
+test-agency-schema.js:24:            console.log('Sample agency record:');
+test-convoso-simple.js:31:        console.log('Sample campaign:', {
+test-convoso-simple.js:64:        console.log('Sample lists:');
+test-convoso-simple.js:84:            email: 'test@example.com',
+test-forgot-password.js:40:  const testEmail = 'nonexistent@example.com';
+super-admin.html:393:            <!-- Demo Login Shortcuts -->
+super-admin.html:396:                    <h3>Demo Account Login Shortcuts</h3>
+super-admin.html:400:                    <button class="btn" onclick="loginAsDemo('agent@demo.com', 'agent')" style="background: #48bb78; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+super-admin.html:401:                        👤 Agent Demo
+super-admin.html:403:                    <button class="btn" onclick="loginAsDemo('manager@demo.com', 'manager')" style="background: #ed8936; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+super-admin.html:404:                        📊 Manager Demo
+super-admin.html:406:                    <button class="btn" onclick="loginAsDemo('admin@demo.com', 'admin')" style="background: #667eea; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+super-admin.html:407:                        ⚙️ Admin Demo
+super-admin.html:409:                    <button class="btn" onclick="loginAsDemo('customerservice@demo.com', 'customer_service')" style="background: #9f7aea; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+super-admin.html:410:                        🎧 Support Demo
+super-admin.html:412:                    <button class="btn" onclick="loginAsDemo('superadmin@demo.com', 'super_admin')" style="background: #f56565; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+super-admin.html:413:                        🔒 Super Admin Demo
+super-admin.html:416:                <p style="color: #718096; font-size: 0.85rem; text-align: center;">All demo accounts use password: <strong>demo123!</strong> and are tied to DEMO001 agency with realistic test data.</p>
+super-admin.html:1184:        async function loginAsDemo(email, role) {
+super-admin.html:1188:                const buttons = document.querySelectorAll('button[onclick*="loginAsDemo"]');
+super-admin.html:1194:                const response = await fetch('/api/super-admin/demo-login', {
+super-admin.html:1219:                    alert(`Demo login failed: ${result.error || 'Unknown error'}`);
+super-admin.html:1220:                    restoreDemoButtons();
+super-admin.html:1224:                console.error('Demo login error:', error);
+super-admin.html:1225:                alert('Demo login failed. Please try again.');
+super-admin.html:1226:                restoreDemoButtons();
+super-admin.html:1230:        function restoreDemoButtons() {
+super-admin.html:1232:                { selector: 'agent@demo.com', text: '👤 Agent Demo', bg: '#48bb78' },
+super-admin.html:1233:                { selector: 'manager@demo.com', text: '📊 Manager Demo', bg: '#ed8936' },
+super-admin.html:1234:                { selector: 'admin@demo.com', text: '⚙️ Admin Demo', bg: '#667eea' },
+super-admin.html:1235:                { selector: 'customerservice@demo.com', text: '🎧 Support Demo', bg: '#9f7aea' },
+super-admin.html:1236:                { selector: 'superadmin@demo.com', text: '🔒 Super Admin Demo', bg: '#f56565' }
+database-inventory.js:38:            // Try to get sample data
+database-inventory.js:39:            const { data: sampleData, error: sampleError } = await supabase
+database-inventory.js:44:            if (sampleError) {
+database-inventory.js:45:                console.log(`   ❌ Table doesn't exist or no access: ${sampleError.message}`);
+database-inventory.js:48:                    error: sampleError.message
+database-inventory.js:61:                columns: sampleData && sampleData.length > 0 ? Object.keys(sampleData[0]) : [],
+database-inventory.js:62:                sampleData: sampleData && sampleData.length > 0 ? sampleData[0] : null,
+database-inventory.js:63:                allSamples: sampleData || []
+database-inventory.js:71:            if (sampleData && sampleData.length > 0) {
+database-inventory.js:72:                console.log(`   🎯 Sample data structure:`, Object.keys(sampleData[0]));
+test-email.js:8:      to: 'your-email@example.com', // Change this to your email
+reset-passwords.js:11:  console.log('Setting all user passwords to "demo123"...');
+reset-passwords.js:13:  const newPasswordHash = await bcrypt.hash('demo123', 10);
+reset-passwords.js:15:  // Update all users to have password "demo123"
+reset-passwords.js:27:    console.log('All passwords updated to "demo123"');
+reset-passwords.js:40:    console.log('\nAll users can now login with password: demo123');
+test-login-with-reset.js:33:      'demo123',        // Demo password
+test-login-with-reset.js:34:      'password'        // Another demo password
+src\data.js:1:// Database-backed data access - no hardcoded data
+manager.html:157:        // Team data will be loaded from API - no fake data
+super-admin-portal.html:1290:            const revenueData = generateSampleRevenueData();
+super-admin-portal.html:1903:        function generateSampleRevenueData() {
+super-admin-portal.html:1904:            // Generate sample data for demo
+api\admin\analytics.js:163:      const mockLeads = Math.max(agentSales.length * 3, 10);
+api\admin\analytics.js:164:      const conversionRate = agentSales.length > 0 ? (agentSales.length / mockLeads) * 100 : 0;
+api\admin\analytics.js:219:    const mockCommissionRate = 0.15; // 15% average
+api\admin\analytics.js:220:    const totalCommissions = totalRevenue * mockCommissionRate;
+api\admin\analytics.js:221:    const mockLeadCosts = Math.floor(Math.random() * 5000) + 2000;
+api\admin\analytics.js:222:    const mockOperatingCosts = Math.floor(Math.random() * 3000) + 1500;
+api\admin\analytics.js:223:    const netProfit = totalRevenue - totalCommissions - mockLeadCosts - mockOperatingCosts;
+api\admin\analytics.js:250:        commission_owed: agentRevenue * mockCommissionRate,
+api\admin\analytics.js:260:        lead_costs: mockLeadCosts,
+api\admin\analytics.js:261:        operating_costs: mockOperatingCosts,
+api\admin\analytics.js:299:    const mockCommissionRate = 0.15;
+api\admin\analytics.js:305:      const commissionOwed = totalRevenue * mockCommissionRate;
+api\admin\analytics.js:314:        commission_rate: mockCommissionRate * 100,
+api\admin\analytics.js:316:        commission_paid: commissionOwed * 0.8, // Mock: 80% paid
+api\admin\analytics.js:317:        commission_pending: commissionOwed * 0.2, // Mock: 20% pending
+api\admin\analytics.js:401:        // Mock additional metrics
+api\admin\analytics.js:448:  // Mock lead analytics since leads table might not exist
+api\admin\analytics.js:449:  const mockLeadData = {
+api\admin\analytics.js:461:  mockLeadData.conversion_rate = mockLeadData.total_leads > 0 
+api\admin\analytics.js:462:    ? (mockLeadData.converted_leads / mockLeadData.total_leads * 100).toFixed(1)
+api\admin\analytics.js:467:    lead_analytics: mockLeadData,
+api\admin\analytics.js:596:    avg_conversion_rate: Math.random() * 15 + 15 // Mock: 15-30%
+scripts\create-test-users.js:15:    email: 'admin@demo.com',
+scripts\create-test-users.js:18:    agency_id: 'DEMO001',
+scripts\create-test-users.js:20:    password_hash: 'demo123', // This will be demo password
+scripts\create-test-users.js:25:    email: 'manager@demo.com', 
+scripts\create-test-users.js:28:    agency_id: 'DEMO001',
+scripts\create-test-users.js:30:    password_hash: 'demo123',
+scripts\create-test-users.js:35:    email: 'agent@demo.com',
+scripts\create-test-users.js:38:    agency_id: 'DEMO001',
+scripts\create-test-users.js:40:    password_hash: 'demo123',
+scripts\create-test-users.js:45:    email: 'super@demo.com',
+scripts\create-test-users.js:48:    agency_id: 'DEMO001', 
+scripts\create-test-users.js:50:    password_hash: 'demo123',
+scripts\create-test-users.js:55:    email: 'service@demo.com',
+scripts\create-test-users.js:58:    agency_id: 'DEMO001',
+scripts\create-test-users.js:60:    password_hash: 'demo123',
+scripts\create-test-users.js:110:    console.log(`${user.role.toUpperCase().padEnd(15)} ${user.email.padEnd(20)} / demo123`);
+api\ai\score-lead.js:47:      factors.push('Young adult demographic');
+api\ai\churn-predictor.js:21:    // For demo purposes, let's create realistic churn risk scenarios
+api\ai\churn-predictor.js:55:          'Lower income demographic'
+api\admin\commission-overrides.js:60:    // If no overrides exist, return demo data
+api\admin\commission-overrides.js:62:      const demoOverrides = await generateDemoCommissionOverrides(agencyId);
+api\admin\commission-overrides.js:64:        commission_overrides: demoOverrides,
+api\admin\commission-overrides.js:66:          total_overrides: demoOverrides.length,
+api\admin\commission-overrides.js:67:          active_overrides: demoOverrides.filter(o => o.is_active).length,
+api\admin\commission-overrides.js:68:          agents_with_overrides: new Set(demoOverrides.map(o => o.agent_id)).size
+api\admin\commission-overrides.js:236:async function generateDemoCommissionOverrides(agencyId) {
+api\admin\commission-overrides.js:237:  // Get agents for the demo
+api\admin\commission-overrides.js:247:    { id: 'demo-agent-1', full_name: 'Sarah Johnson', agent_code: 'SJ001' },
+api\admin\commission-overrides.js:248:    { id: 'demo-agent-2', full_name: 'Michael Chen', agent_code: 'MC002' },
+api\admin\commission-overrides.js:249:    { id: 'demo-agent-3', full_name: 'Emma Rodriguez', agent_code: 'ER003' }
+api\admin\check-tables.js:18:            const { data: testData, error: testError } = await supabase
+api\admin\check-tables.js:33:                count: testData
+api\admin\api-keys.js:59:    // If no API keys exist, return demo data
+api\admin\api-keys.js:62:        api_keys: generateDemoApiKeys(),
+api\admin\api-keys.js:231:function generateDemoApiKeys() {
+api\ai\commission-audit.js:30:    // Note: carrierError might occur if table doesn't exist yet, which is fine for demo
+api\ai\commission-audit.js:38:    // Create some realistic demo data if no actual carrier data exists
+api\admin\convoso-agent-monitor.js:4:    // For now, return sample data structure
+api\admin\convoso-agent-monitor.js:15:    const mockData = {
+api\admin\convoso-agent-monitor.js:44:        // Sample agent data - in production this would come from Convoso API
+api\admin\convoso-agent-monitor.js:61:    mockData.timestamp = new Date().toISOString();
+api\admin\convoso-agent-monitor.js:63:    res.status(200).json(mockData);
+api\admin\convoso-leads-search.js:26:    // For now, return sample data that matches the expected structure
+api\admin\convoso-leads-search.js:27:    const sampleLeads = [
+api\admin\convoso-leads-search.js:34:        email: 'john.doe@example.com',
+api\admin\convoso-leads-search.js:51:        email: 'jane.smith@example.com',
+api\admin\convoso-leads-search.js:68:        email: 'mike.johnson@example.com',
+api\admin\convoso-leads-search.js:82:    let filteredLeads = sampleLeads;
+api\admin\convoso-leads-search.js:84:      filteredLeads = sampleLeads.filter(lead => {
+api\admin\convoso-config.js:12:    // For now, return sample configuration data
+api\admin\convoso-config.js:13:    const mockConfig = {
+api\admin\convoso-config.js:38:    res.status(200).json(mockConfig);
+api\admin\convoso-lists.js:12:    // For now, return sample lists data
+api\admin\convoso-lists.js:13:    const mockLists = {
+api\admin\convoso-lists.js:68:    res.status(200).json(mockLists);
+api\admin\convoso-leads.js:35:    // Enrich leads with sample data for quote system
+api\admin\convoso-leads.js:41:      phone_number: lead.phone_number || generateSamplePhone(),
+api\admin\convoso-leads.js:42:      date_of_birth: lead.date_of_birth || generateSampleDOB(),
+api\admin\convoso-leads.js:44:      email: lead.email || `${lead.convoso_lead_id}@example.com`,
+api\admin\convoso-leads.js:65:  // Generate sample names based on lead ID for demo purposes
+api\admin\convoso-leads.js:78:function generateSamplePhone() {
+api\admin\convoso-leads.js:82:function generateSampleDOB() {
+public\agent\settings.html:452:                // Create sample CSV content
+api\auth\reset-password.js:100:                <a href="https://syncedup-insurance-demo.vercel.app/login.html" class="button">Login to SyncedUp</a>
+api\auth\verify.js:41:      // Handle demo and system users that don't exist in database
+api\auth\verify.js:42:      const demoUsers = {
+api\auth\verify.js:43:        'demo-admin': { id: 'demo-admin', email: 'admin@demo.com', name: 'Admin User', role: 'admin', agency_id: 'DEMO001', is_active: true, must_change_password: false, login_count: 0 },
+api\auth\verify.js:44:        'demo-manager': { id: 'demo-manager', email: 'manager@demo.com', name: 'Manager User', role: 'manager', agency_id: 'DEMO001', is_active: true, must_change_password: false, login_count: 0 },
+api\auth\verify.js:45:        'demo-agent': { id: 'demo-agent', email: 'agent@demo.com', name: 'Agent User', role: 'agent', agency_id: 'DEMO001', is_active: true, must_change_password: false, login_count: 0 },
+api\auth\verify.js:46:        'demo-super': { id: 'demo-super', email: 'super@demo.com', name: 'Super Admin', role: 'super-admin', agency_id: 'DEMO001', is_active: true, must_change_password: false, login_count: 0 },
+api\auth\verify.js:47:        'demo-service': { id: 'demo-service', email: 'service@demo.com', name: 'Customer Service', role: 'customer-service', agency_id: 'DEMO001', is_active: true, must_change_password: false, login_count: 0 },
+api\auth\verify.js:51:      const demoUser = demoUsers[payload.id];
+api\auth\verify.js:52:      if (!demoUser) {
+api\auth\verify.js:55:      user = demoUser;
+api\auth\login-simple.js:55:      // Fallback for demo users
+api\auth\login-simple.js:56:      const demoUsers = {
+api\auth\login-simple.js:70:      user = demoUsers[email.toLowerCase()];
+api\auth\login-simple.js:105:      const testPasswords = ['TestPass123!', 'demo123', 'password', 'demo', '123456'];
+api\admin\onboard-convoso.js:42:    // Test token and get data
+api\admin\onboard-convoso.js:43:    console.log('Testing Convoso token and fetching data...');
+public\assets\session.js:15:  // No demo data - system should use real database data only
+public\assets\session.js:17:  // API helper - no fallback to demo data
+public\assets\session.js:28:        if (user.isDemoAccount) {
+public\assets\session.js:29:          return Array.isArray(data) ? data.filter(item => item.isDemoData || item.agencyId === 'DEMO001') : data;
+public\assets\session.js:31:          return Array.isArray(data) ? data.filter(item => !item.isDemoData && item.agencyId === user.agencyId) : data;
+public\assets\session.js:36:      // Log error and return empty data - no demo fallback
+api\admin\user-management.js:199:    // Send welcome email if requested (mock implementation)
+api\admin\user-management.js:342:  // This is a mock implementation
+api\admin\user-management.js:347:  // Mock email sending function
+api\admin\settings.js:54:    // If no settings exist, return demo data
+api\admin\settings.js:57:        settings: generateDemoSettings(),
+api\admin\settings.js:158:function generateDemoSettings() {
+public\agent\sales.html:505:            // Create sample CSV content for demonstration
+_backup\manager\manager\vendors.html:288:        // Mock vendor data
+_backup\manager\manager\vendors.html:289:        const mockVendorsData = [
+_backup\manager\manager\vendors.html:394:                    vendorsData = data.vendors || mockVendorsData;
+_backup\manager\manager\vendors.html:400:                console.log('Using mock data:', error);
+_backup\manager\manager\vendors.html:401:                vendorsData = mockVendorsData;
+_backup\manager\manager\vendors.html:612:                // Fallback: Add to local mock data for demo
+_backup\manager\manager\vendors.html:632:                alert(`Vendor "${name}" added successfully! (Demo mode)`);
+_backup\manager\manager\vendors.html:678:                // Simulate successful sync for demo
+_backup\manager\manager\vendors.html:687:                alert('Boberdoo sync completed! (Demo mode - simulated data)');
+_backup\manager\manager\vendors.html:776:                // Fallback: Update local data for demo
+_backup\manager\manager\vendors.html:780:                alert(`${vendor.name} has been ${action}d successfully! (Demo mode)`);
+_backup\manager\manager\vendors.html:880:                // Fallback: Update local data for demo
+_backup\manager\manager\vendors.html:892:                alert('Vendor updated successfully! (Demo mode)');
+api\dashboard\cs-stats.js:43:    // Calculate average response time (mock for now)
+api\products.js:55:      // Return FirstEnroll demo data if database query fails
+api\products.js:56:      return res.status(200).json(getFirstEnrollDemoProducts(state));
+api\products.js:59:    // If no products found in database, return demo data
+api\products.js:61:      console.log('No products in database, returning FirstEnroll demo data');
+api\products.js:62:      return res.status(200).json(getFirstEnrollDemoProducts(state));
+api\products.js:68:    // Fallback to demo data on any error
+api\products.js:69:    res.status(200).json(getFirstEnrollDemoProducts());
+api\products.js:73:// FirstEnroll demo products for development/demo purposes
+api\products.js:74:function getFirstEnrollDemoProducts(state = null) {
+api\products.js:75:  const demoProducts = [
+api\products.js:152:    return demoProducts.filter(product => 
+api\products.js:157:  return demoProducts;
+api\chargebacks.js:50:    // Return mock chargeback data since we don't have chargeback tables yet
+api\chargebacks.js:55:    // Mock chargebacks that would hit this week's paycheck
+api\chargebacks.js:56:    const mockChargebacks = [
+api\chargebacks.js:72:    const applicableChargebacks = mockChargebacks.filter(cb => {
+api\carriers\sync.js:4:// Simple encryption for demo purposes (use proper encryption in production)
+api\carriers\sync.js:5:const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'demo-key-32-chars-for-encryption!';
+api\carriers\sync.js:55:        // Table might not exist yet, continue with demo data
+api\carriers\sync.js:58:      // Generate realistic sample commission data for the demo
+api\carriers\sync.js:59:      const sampleCommissions = generateSampleCommissions(req.user.agency_id, carrier);
+api\carriers\sync.js:62:      for (const commission of sampleCommissions) {
+api\carriers\sync.js:69:          // Table might not exist yet, ignore for demo
+api\carriers\sync.js:74:      const auditResults = await runMiniAudit(req.supabase, req.user.agency_id, sampleCommissions);
+api\carriers\sync.js:81:          commissions: sampleCommissions.length,
+api\carriers\sync.js:82:          policies: sampleCommissions.length,
+api\carriers\sync.js:83:          total_amount: sampleCommissions.reduce((sum, c) => sum + c.commission, 0)
+api\carriers\sync.js:88:        message: `Successfully synced ${sampleCommissions.length} commission records from ${carrier}`
+api\carriers\sync.js:154:function generateSampleCommissions(agencyId, carrier) {
+api\commissions.js:19:    // Query portal_commissions table with role-based filtering and demo isolation
+api\commissions.js:22:    // Implement demo/production data isolation
+api\commissions.js:23:    if (isDemo) {
+api\commissions.js:24:      // Demo users only see demo data (DEMO_SALE_* pattern)
+api\commissions.js:25:      query = query.like('sale_id', 'DEMO_SALE_%');
+api\commissions.js:27:      // Production users only see real data (exclude DEMO_SALE_* pattern)
+api\commissions.js:28:      query = query.not('sale_id', 'like', 'DEMO_SALE_%');
+api\commissions.js:52:      // Return empty array for production users - no fake data
+public\_cleanup\test-files\test-upload.html:122:                <input type="email" id="email" placeholder="Email" value="admin@demo.com">
+public\_cleanup\test-files\test-upload.html:123:                <input type="password" id="password" placeholder="Password" value="demo123">
+_backup\manager\manager\team-management.html:197:        // Team data will be loaded from API - no fake data
+_backup\manager\manager\team-management.html:400:                    isDemoData: user.isDemoAccount || false,
+_backup\manager\manager\team-management.html:547:                // Fallback: Update local data for demo
+_backup\manager\manager\team-management.html:555:                alert('Agent updated successfully! (Demo mode)');
+_backup\manager\manager\team-management.html:606:                    alert(`Territory assignment for ${agent.name}: ${territories[territory-1]} (Demo mode)`);
+_backup\manager\manager\team-management.html:631:                    alert(`Goal setting for ${agent.name}: ${salesGoal} sales (Demo mode)`);
+api\email\send.js:48:                <a href="${process.env.APP_URL || 'https://syncedup-insurance-demo.vercel.app'}/login.html" 
+api\email\send.js:170:                <a href="${process.env.APP_URL || 'https://syncedup-insurance-demo.vercel.app'}/login.html" 
+api\customer-service\frequent-members.js:41:      .eq('agency_id', agencyId || 'DEMO001')
+api\customer-service\frequent-members.js:47:      // Return demo data if no real data exists
+api\customer-service\frequent-members.js:48:      const demoData = [
+api\customer-service\frequent-members.js:77:      return res.status(200).json(demoData);
+api\customer-service\frequent-members.js:108:    // If no data, return demo data
+api\customer-service\frequent-members.js:110:      const demoData = [
+api\customer-service\frequent-members.js:142:      return res.status(200).json(demoData);
+public\agent\quotes.html:82:                            <input type="email" id="customerEmail" class="form-input" placeholder="john@example.com" required>
+public\agent\quotes.html:263:                // Mock products - replace with API call
+public\agent\quotes.html:603:            // Generate CSV from real quotes data (no fake data)
+api\manager\vendors.js:47:    // Check if vendors table exists, if not return demo data
+api\manager\vendors.js:54:    // If table doesn't exist or no vendors, return demo data
+api\manager\vendors.js:56:      const demoVendors = generateDemoVendors();
+api\manager\vendors.js:58:        vendors: demoVendors,
+api\manager\vendors.js:59:        summary: calculateVendorSummary(demoVendors),
+api\manager\vendors.js:60:        boberdoo_config: getDemoBoberdooConfig()
+api\manager\vendors.js:207:    // Get leads from the last 30 days (mock data since leads table might not exist)
+api\manager\vendors.js:211:    // Mock lead statistics
+api\manager\vendors.js:212:    const mockStats = {
+api\manager\vendors.js:221:    mockStats.total_cost_30_days = (mockStats.leads_30_days * parseFloat(mockStats.avg_lead_cost)).toFixed(2);
+api\manager\vendors.js:223:    return mockStats;
+api\manager\vendors.js:247:      return getDemoBoberdooConfig();
+api\manager\vendors.js:252:    return getDemoBoberdooConfig();
+api\manager\vendors.js:256:function getDemoBoberdooConfig() {
+api\manager\vendors.js:260:    api_key: 'demo_key_hidden_for_security',
+api\manager\vendors.js:302:function generateDemoVendors() {
+api\manager\goals.js:58:    // Check if goals table exists, if not return demo data
+api\manager\goals.js:65:    // If table doesn't exist or no goals, return demo data
+api\manager\goals.js:68:        goals: generateDemoGoals(agents),
+api\manager\goals.js:243:        // Mock lead data since leads table might not exist
+api\manager\goals.js:271:function generateDemoGoals(agents) {
+api\manager\goals.js:272:  const demoAgents = agents && agents.length > 0 ? agents : [
+api\manager\goals.js:273:    { id: 'demo-agent-1', full_name: 'Sarah Johnson', agent_code: 'SJ001' },
+api\manager\goals.js:274:    { id: 'demo-agent-2', full_name: 'Michael Chen', agent_code: 'MC002' }
+api\manager\goals.js:280:      agent_id: demoAgents[0].id,
+api\manager\goals.js:281:      agent_name: demoAgents[0].full_name,
+api\manager\goals.js:299:      agent_id: demoAgents[1].id,
+api\manager\goals.js:300:      agent_name: demoAgents[1].full_name,
+api\manager\goals.js:318:      agent_id: demoAgents[0].id,
+api\manager\goals.js:319:      agent_name: demoAgents[0].full_name,
+api\manager\goals.js:337:      agent_id: demoAgents[1].id,
+api\manager\goals.js:338:      agent_name: demoAgents[1].full_name,
+api\manager\goals.js:356:      agent_id: demoAgents[0].id,
+api\manager\goals.js:357:      agent_name: demoAgents[0].full_name,
+api\manager\goals.js:375:      agent_id: demoAgents[1].id,
+api\manager\goals.js:376:      agent_name: demoAgents[1].full_name,
+api\integrations\convoso\campaigns.js:19:        // For development, we'll return mock campaign data
+public\_cleanup\test-files\test-auth.html:47:        <button onclick="testLogin('admin@test.com', 'demo123')">Login as Admin</button>
+public\_cleanup\test-files\test-auth.html:48:        <button onclick="testLogin('admin@syncedup.com', 'demo123')">Login as Super Admin</button>
+public\_cleanup\test-files\test-auth.html:49:        <button onclick="testLogin('manager1@demoinsurance.com', 'demo123')">Login as Manager</button>
+public\_cleanup\test-files\test-auth.html:50:        <button onclick="testLogin('agent1@demoinsurance.com', 'demo123')">Login as Agent</button>
+_backup\manager\manager\settings.html:342:                // Create sample CSV content
+public\leaderboard\index.html:349:            // Filter data (mock filtering - replace with actual API filtering)
+api\cancellation.js:5:  getMockCancellations 
+api\cancellation.js:69:      // Get mock cancellations for the specified timeframe
+api\cancellation.js:70:      const cancellations = getMockCancellations(agentId, timeframe);
+public\agent\index.html:263:            // No hardcoded data - show empty state
+api\manager\dashboard-v2.js:5:  isDemoUser, 
+api\manager\dashboard-v2.js:34:    const isDemo = isDemoUser(email, agencyId);
+api\manager\dashboard-v2.js:48:      getAgencyOverview(agencyId, startDate, endDate, isDemo),
+api\manager\dashboard-v2.js:49:      getTeamPerformanceOverview(agencyId, startDate, endDate, isDemo),
+api\manager\dashboard-v2.js:50:      getRecentActivity(agencyId, isDemo),
+api\manager\dashboard-v2.js:51:      getUpcomingGoals(agencyId, isDemo),
+api\manager\dashboard-v2.js:52:      getLeadSummary(agencyId, startDate, endDate, isDemo),
+api\manager\dashboard-v2.js:53:      getSystemAlerts(agencyId, isDemo)
+api\manager\dashboard-v2.js:82:async function getAgencyOverview(agencyId, startDate, endDate, isDemo = false) {
+api\manager\dashboard-v2.js:91:    if (!isDemo) {
+api\manager\dashboard-v2.js:94:      agentsQuery = agentsQuery.eq('agency_id', 'DEMO001');
+api\manager\dashboard-v2.js:108:    salesQuery = applyDataIsolation(salesQuery, 'portal_sales', isDemo);
+api\manager\dashboard-v2.js:110:    if (!isDemo) {
+api\manager\dashboard-v2.js:134:      leadsQuery = applyDataIsolation(leadsQuery, 'convoso_leads', isDemo);
+api\manager\dashboard-v2.js:136:      if (!isDemo) {
+api\manager\dashboard-v2.js:157:      revenue_growth: await calculateGrowthRate(totalSales, startDate, endDate, agencyId, isDemo),
+api\manager\dashboard-v2.js:177:async function getTeamPerformanceOverview(agencyId, startDate, endDate, isDemo = false) {
+api\manager\dashboard-v2.js:187:    if (!isDemo) {
+api\manager\dashboard-v2.js:190:      agentsQuery = agentsQuery.eq('agency_id', 'DEMO001');
+api\manager\dashboard-v2.js:213:    salesQuery = applyDataIsolation(salesQuery, 'portal_sales', isDemo);
+api\manager\dashboard-v2.js:221:    const conversionRates = await getAgentConversionRates(agentIds, startDate, endDate, isDemo);
+api\manager\dashboard-v2.js:265:async function getRecentActivity(agencyId, isDemo = false) {
+api\manager\dashboard-v2.js:277:    salesQuery = applyDataIsolation(salesQuery, 'portal_sales', isDemo);
+api\manager\dashboard-v2.js:279:    if (!isDemo) {
+api\manager\dashboard-v2.js:304:async function getUpcomingGoals(agencyId, isDemo = false) {
+api\manager\dashboard-v2.js:317:    if (!isDemo) {
+api\manager\dashboard-v2.js:320:      goalsQuery = goalsQuery.eq('agency_id', 'DEMO001');
+api\manager\reports.js:100:    // Use demo data if no real data
+api\manager\reports.js:101:    const reportData = sales && sales.length > 0 ? sales : generateDemoSalesData(agents, startDate, endDate);
+api\manager\reports.js:219:      // Mock additional metrics
+api\manager\reports.js:220:      const mockLeads = Math.max(salesCount * 3, 15);
+api\manager\reports.js:221:      const conversionRate = salesCount > 0 ? (salesCount / mockLeads) * 100 : 0;
+api\manager\reports.js:233:        leads_count: mockLeads,
+api\manager\reports.js:278:    const goalsData = goalsError ? generateDemoGoalsForReport() : goals || generateDemoGoalsForReport();
+api\manager\reports.js:312:  // Mock leads data since leads table might not exist
+api\manager\reports.js:313:  const mockLeadsData = generateDemoLeadsData(startDate, endDate);
+api\manager\reports.js:315:  let filteredLeads = mockLeadsData;
+api\manager\reports.js:350:    // Mock additional financial data
+api\manager\reports.js:352:    const mockCommissionRate = 0.15; // 15% average commission
+api\manager\reports.js:353:    const totalCommissions = totalRevenue * mockCommissionRate;
+api\manager\reports.js:354:    const mockLeadCosts = Math.floor(Math.random() * 5000) + 2000;
+api\manager\reports.js:355:    const mockOperatingCosts = Math.floor(Math.random() * 3000) + 1500;
+api\manager\reports.js:356:    const netProfit = totalRevenue - totalCommissions - mockLeadCosts - mockOperatingCosts;
+api\manager\reports.js:361:      lead_costs: mockLeadCosts,
+api\manager\reports.js:362:      operating_costs: mockOperatingCosts,
+api\manager\reports.js:386:    // Mock additional summary metrics
+api\manager\reports.js:387:    const mockMetrics = {
+api\manager\reports.js:402:        ...mockMetrics
+api\manager\reports.js:518:function generateDemoSalesData(agents, startDate, endDate) {
+api\manager\reports.js:519:  const demoSales = [];
+api\manager\reports.js:521:  const agentIds = agents?.map(a => a.id) || ['demo-agent-1', 'demo-agent-2'];
+api\manager\reports.js:527:    demoSales.push({
+api\manager\reports.js:528:      id: `demo-sale-${i}`,
+api\manager\reports.js:538:  return demoSales;
+api\manager\reports.js:541:function generateDemoGoalsForReport() {
+api\manager\reports.js:545:      agent_id: 'demo-agent-1',
+api\manager\reports.js:555:      agent_id: 'demo-agent-2',
+api\manager\reports.js:566:function generateDemoLeadsData(startDate, endDate) {
+api\manager\reports.js:579:      email: `lead${i + 1}@example.com`,
+api\manager\reports.js:582:      assigned_agent_id: `demo-agent-${Math.floor(Math.random() * 2) + 1}`,
+_backup\manager\manager\reports.html:300:        // Mock recent reports data
+_backup\manager\manager\reports.html:377:            document.getElementById('reportsGenerated').textContent = recentReports.length + 8; // Mock total
+_backup\manager\manager\reports.html:439:            alert('Report preview would open here showing a sample of the data and layout before final generation.');
+_backup\manager\manager\reports.html:509:        async function generateMockReport(reportType, format, period, startDate = null, endDate = null) {
+_backup\manager\manager\reports.html:535:            // Add to recent reports for demo
+_backup\manager\manager\reports.html:579:            // For demo purposes, return CSV-like content with tab separators
+_backup\manager\manager\reports.html:608:        function generateMockReportContent(report) {
+_backup\manager\manager\reports.html:664:            // Generate the report using mock functionality
+_backup\manager\manager\reports.html:665:            await generateMockReport(reportType, format, period, startDate, endDate);
+api\database\add-customer-service-role.js:54:    const { data: testData, error: testError } = await supabase
+public\_cleanup\test-files\manual-test.html:80:            <button onclick="testLogin('admin@demo.com', 'demo123', 'admin')">Test Admin Login</button>
+public\_cleanup\test-files\manual-test.html:81:            <button onclick="testLogin('manager@demo.com', 'demo123', 'manager')">Test Manager Login</button>
+public\_cleanup\test-files\manual-test.html:82:            <button onclick="testLogin('agent@demo.com', 'demo123', 'agent')">Test Agent Login</button>
+public\_cleanup\test-files\manual-test.html:83:            <button onclick="testLogin('super@demo.com', 'demo123', 'super-admin')">Test Super Admin</button>
+public\_cleanup\test-files\manual-test.html:331:                    body: JSON.stringify({ email: 'admin@test.com', password: 'demo123' })
+api\manager\team-performance.js:45:    // If no real agents, use demo data
+api\manager\team-performance.js:47:      return res.status(200).json(generateDemoTeamData(timeframe));
+api\manager\team-performance.js:72:      // Calculate conversion rate (mock for now - would need leads data)
+api\manager\team-performance.js:73:      const mockLeads = Math.max(salesCount * 3, 10); // Assume 3:1 lead to sale ratio
+api\manager\team-performance.js:74:      const conversionRate = salesCount > 0 ? (salesCount / mockLeads) * 100 : 0;
+api\manager\team-performance.js:89:          leads_count: mockLeads,
+api\manager\team-performance.js:198:function generateDemoTeamData(timeframe) {
+api\manager\team-performance.js:199:  const demoAgents = [
+api\manager\team-performance.js:202:        id: 'demo-agent-1',
+api\manager\team-performance.js:224:        id: 'demo-agent-2',
+api\manager\team-performance.js:245:        id: 'demo-agent-3',
+api\manager\team-performance.js:275:      top_performer: demoAgents[0],
+api\manager\team-performance.js:276:      bottom_performer: demoAgents[2]
+api\manager\team-performance.js:278:    agent_performance: demoAgents,
+test-super-admin-auth.html:23:            const mockUserData = {
+test-super-admin-auth.html:34:            const mockToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock.token";
+test-super-admin-auth.html:36:            localStorage.setItem('syncedup_token', mockToken);
+test-super-admin-auth.html:37:            localStorage.setItem('syncedup_user', JSON.stringify(mockUserData));
+test-super-admin-auth.html:39:            log('✅ Mock login data stored');
+api\utils\encryption.js:188:        const testData = 'test-data-12345';
+api\utils\encryption.js:191:        const encrypted = encrypt(testData, testAgency);
+api\utils\encryption.js:194:        if (decrypted !== testData) {
+api\utils\encryption.js:195:            results.errors.push('Encryption test failed: data mismatch');
+_backup\manager\manager\performance.html:154:        // No hardcoded agent data - will be loaded from API
+_backup\manager\manager\performance.html:157:        // Sales data will be loaded from API - no fake data
+_backup\manager\manager\performance.html:237:                displayMockData(agentId);
+_backup\manager\manager\performance.html:262:        function displayMockData(agentId) {
+_backup\manager\manager\performance.html:263:            // Use mock data when API fails
+_backup\manager\manager\performance.html:278:            // Calculate conversion rate (mock calculation)
+public\_cleanup\test-files\debug-login.html:52:                    body: JSON.stringify({ email: 'admin@test.com', password: 'demo123' })
+test-portal-access-fixed.js:41:        // Check if it still has hardcoded production URLs
+test-portal-access-fixed.js:48:        console.log(`  ⚠️  Has hardcoded production URL: ${hasProductionURL ? '❌ (needs fix)' : '✅'}`);
+test-production-portal.js:100:      body: JSON.stringify({ email: 'test@example.com', password: 'test' })
+test-production-portal.js:146:  console.log('3. Demo Credentials: superadmin@demo.com / demo123!');
+test-production-portal.js:167:  console.log('3. Login with demo credentials');
+api\utils\data-isolation-helper.js:2:// This utility provides functions to ensure clean separation between demo and production data
+api\utils\data-isolation-helper.js:12: * Check if a user/agency is a demo account
+api\utils\data-isolation-helper.js:13: * @deprecated Demo functionality removed
+api\utils\data-isolation-helper.js:15:export function isDemoUser(email, agencyId) {
+api\utils\data-isolation-helper.js:16:  return false; // Demo functionality removed
+api\utils\data-isolation-helper.js:21: * @deprecated Demo functionality removed - this now only returns production data
+api\utils\data-isolation-helper.js:23:export function applyDataIsolation(query, tableName, isDemo = false, filterField = 'sale_id') {
+api\utils\data-isolation-helper.js:24:  // Always return production data (exclude any demo patterns that might exist)
+api\utils\data-isolation-helper.js:27:      return query.not('sale_id', 'like', 'DEMO_SALE_%');
+api\utils\data-isolation-helper.js:29:      return query.not('ticket_number', 'like', 'TKT-DEMO-%');
+api\utils\data-isolation-helper.js:31:      return query.not('lead_id', 'like', 'DEMO_LEAD_%');
+api\utils\data-isolation-helper.js:33:      return query.not('sale_id', 'like', 'DEMO_SALE_%');
+api\utils\data-isolation-helper.js:35:      return query.neq('agency_id', 'DEMO001');
+api\utils\data-isolation-helper.js:42:export async function getLeadSummary(agencyId, startDate, endDate, isDemo = false) {
+api\utils\data-isolation-helper.js:51:    query = applyDataIsolation(query, 'convoso_leads', isDemo);
+api\utils\data-isolation-helper.js:53:    if (!isDemo) {
+api\utils\data-isolation-helper.js:113:export async function calculateGrowthRate(currentRevenue, startDate, endDate, agencyId, isDemo = false) {
+api\utils\data-isolation-helper.js:124:    query = applyDataIsolation(query, 'portal_sales', isDemo);
+api\utils\data-isolation-helper.js:126:    if (!isDemo) {
+api\utils\data-isolation-helper.js:145:export async function getAgentConversionRates(agentIds, startDate, endDate, isDemo = false) {
+api\utils\data-isolation-helper.js:158:      leadsQuery = applyDataIsolation(leadsQuery, 'convoso_leads', isDemo);
+api\utils\data-isolation-helper.js:168:      salesQuery = applyDataIsolation(salesQuery, 'portal_sales', isDemo);
+api\utils\data-isolation-helper.js:200: * Get system alerts - no fake data, only real alerts
+api\utils\data-isolation-helper.js:202:export async function getSystemAlerts(agencyId, isDemo = false) {
+api\utils\data-isolation-helper.js:212:    if (!isDemo) {
+api\utils\data-isolation-helper.js:245: * Verify production readiness by checking for demo data pollution
+api\utils\data-isolation-helper.js:251:    // Check for non-demo users with demo-like data
+api\utils\data-isolation-helper.js:255:      .not('email', 'like', '%@demo.com')
+api\utils\data-isolation-helper.js:256:      .eq('agency_id', 'DEMO001');
+api\utils\data-isolation-helper.js:259:      issues.push(`Found ${suspiciousUsers.length} non-demo users with DEMO001 agency ID`);
+api\utils\data-isolation-helper.js:262:    // Check for demo data in production tables
+api\utils\data-isolation-helper.js:264:      { table: 'portal_commissions', pattern: 'DEMO_SALE_%', field: 'sale_id' },
+api\utils\data-isolation-helper.js:265:      { table: 'support_tickets', pattern: 'TKT-DEMO-%', field: 'ticket_number' },
+api\utils\data-isolation-helper.js:266:      { table: 'convoso_leads', pattern: 'DEMO_LEAD_%', field: 'lead_id' }
+api\utils\data-isolation-helper.js:276:        issues.push(`No demo data found in ${check.table} - system may be too clean for demo functionality`);
+api\quote.js:53:    // Get products from database or demo data
+api\quote.js:61:    // If no products in database, use demo data
+api\quote.js:63:      selectedProducts = getFirstEnrollDemoProducts().filter(p => 
+api\quote.js:159:  // State-based adjustments (example)
+api\quote.js:272:// Demo products fallback
+api\quote.js:273:function getFirstEnrollDemoProducts() {
+api\utils\cancellationHelpers.js:168:export function getMockCancellations(agentId, timeframe) {
+api\utils\cancellationHelpers.js:171:  // Mock cancellations that occurred this week (no financial impact to agent)
+api\utils\cancellationHelpers.js:172:  const mockCancellations = [
+api\utils\cancellationHelpers.js:204:  const applicableCancellations = mockCancellations.filter(cancellation => {
+public\_cleanup\test-files\auth-diagnostic.html:28:        <input type="email" id="email" placeholder="Email" value="admin@demo.com">
+public\_cleanup\test-files\auth-diagnostic.html:29:        <input type="password" id="password" placeholder="Password" value="demo123">
+api\sales-test.js:20:      // Return test sales data
+api\sales.js:340:  // Fallback to demo products
+api\sales.js:341:  const demoProducts = getFirstEnrollDemoProducts();
+api\sales.js:342:  return demoProducts.find(p => p.id === productId);
+api\sales.js:456:function getFirstEnrollDemoProducts() {
+_backup\manager\manager\leads.html:589:                        'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
+_backup\manager\manager\leads.html:603:                displayMockLiveStats();
+_backup\manager\manager\leads.html:626:        function displayMockLiveStats() {
+_backup\manager\manager\leads.html:627:            // Fallback mock data
+_backup\manager\manager\leads.html:642:                        'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
+_backup\manager\manager\leads.html:709:                        'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
+_backup\manager\manager\leads.html:723:                displayMockSourcePerformance();
+_backup\manager\manager\leads.html:757:        function displayMockSourcePerformance() {
+_backup\manager\manager\leads.html:758:            const mockSources = [
+_backup\manager\manager\leads.html:763:            displaySourcePerformance(mockSources);
+_backup\manager\manager\leads.html:786:                        'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
+_backup\manager\manager\leads.html:804:                displayMockLeadsData();
+_backup\manager\manager\leads.html:858:        function displayMockLeadsData() {
+_backup\manager\manager\leads.html:859:            // Fallback mock data
+_backup\manager\manager\leads.html:860:            const mockLeads = [
+_backup\manager\manager\leads.html:863:                    email: 'john@example.com', source: 'convoso', campaign_name: 'Auto Q4',
+_backup\manager\manager\leads.html:869:                    email: 'jane@example.com', source: 'convoso', campaign_name: 'Home Special',
+_backup\manager\manager\leads.html:875:            leadsData = mockLeads;
+_backup\manager\manager\leads.html:876:            totalLeads = mockLeads.length;
+_backup\manager\manager\leads.html:885:                        'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
+_backup\manager\manager\leads.html:899:                displayMockLiveFeed();
+_backup\manager\manager\leads.html:932:        function displayMockLiveFeed() {
+_backup\manager\manager\leads.html:933:            const mockLatestLeads = [
+_backup\manager\manager\leads.html:938:            displayLiveFeed(mockLatestLeads);
+_backup\manager\manager\leads.html:1108:                        'Authorization': `Bearer ${localStorage.getItem('authToken') || 'mock-token'}`,
+api\test\database.js:10:    console.log('Testing database connection...')
+public\agent\customers.html:291:            // Create sample CSV content for demonstration
+api\quote-test.js:48:    // Get products from database or demo data
+public\_cleanup\misc-files\demo.html:6:    <title>Demo Disabled - SyncedUp Insurance</title>
+public\_cleanup\misc-files\demo.html:33:        <h1>Demo Mode Disabled</h1>
+public\_cleanup\misc-files\demo.html:34:        <p>Demo functionality has been removed from this system. Please use the production interface with real data and proper authentication.</p>
+test-super-admin-portal.js:12:    // Test 1: Database Connection
+test-super-admin-portal.js:13:    console.log('1. Testing database connection...');
+test-super-admin-portal.js:29:      user.email === 'superadmin@demo.com'
+test-super-admin-portal.js:37:      // Create a demo super admin
+test-super-admin-portal.js:39:        email: 'superadmin@demo.com',
+test-super-admin-portal.js:40:        password: 'demo123!',
+test-super-admin-portal.js:43:          name: 'Super Admin Demo',
+test-super-admin-portal.js:51:        console.log('✅ Super admin demo user created: superadmin@demo.com / demo123!');
+test-super-admin-portal.js:55:    // Test 3: Check database tables (optional - for demo purposes)
+test-super-admin-portal.js:56:    console.log('\n3. Testing database table access...');
+test-super-admin-portal.js:60:    const mockAgencies = [
+test-super-admin-portal.js:61:      { id: '1', name: 'Demo Insurance Agency', is_active: true },
+test-super-admin-portal.js:63:      { id: '3', name: 'Sample Insurance Co', is_active: false }
+test-super-admin-portal.js:66:    const mockCommissions = [
+test-super-admin-portal.js:72:    console.log(`✅ Simulated ${mockAgencies.length} agencies for testing:`);
+test-super-admin-portal.js:73:    mockAgencies.forEach(agency => {
+test-super-admin-portal.js:77:    console.log(`✅ Simulated ${mockCommissions.length} commissions for testing:`);
+test-super-admin-portal.js:78:    mockCommissions.forEach(comm => {
+test-super-admin-portal.js:86:    const mockDashboardData = {
+test-super-admin-portal.js:87:      total_agencies: mockAgencies.length,
+test-super-admin-portal.js:88:      active_agencies: mockAgencies.filter(a => a.is_active).length,
+test-super-admin-portal.js:89:      total_revenue: mockCommissions.reduce((sum, c) => sum + (c.commission_amount || 0), 0),
+test-super-admin-portal.js:95:    console.log(`   - Total Agencies: ${mockDashboardData.total_agencies}`);
+test-super-admin-portal.js:96:    console.log(`   - Active Agencies: ${mockDashboardData.active_agencies}`);
+test-super-admin-portal.js:97:    console.log(`   - Total Revenue: $${mockDashboardData.total_revenue.toLocaleString()}`);
+test-super-admin-portal.js:98:    console.log(`   - API Calls Today: ${mockDashboardData.api_calls_today}`);
+test-super-admin-portal.js:99:    console.log(`   - System Health: ${mockDashboardData.system_health}`);
+test-super-admin-portal.js:168:    console.log('   Demo Login: superadmin@demo.com / demo123!');
+api\test\production-readiness.js:3:  isDemoUser, 
+api\test\production-readiness.js:32:  // Test 1: Demo User Identification
+api\test\production-readiness.js:33:  await runTest(testResults, 'Demo User Identification', async () => {
+api\test\production-readiness.js:34:    const demoTests = [
+api\test\production-readiness.js:35:      { email: 'agent@demo.com', agencyId: 'DEMO001', expected: true },
+api\test\production-readiness.js:37:      { email: 'user@demo.com', agencyId: 'PROD001', expected: true },
+api\test\production-readiness.js:38:      { email: 'admin@company.com', agencyId: 'DEMO001', expected: true }
+api\test\production-readiness.js:41:    for (const test of demoTests) {
+api\test\production-readiness.js:42:      const result = isDemoUser(test.email, test.agencyId);
+api\test\production-readiness.js:44:        throw new Error(`Demo user check failed for ${test.email}/${test.agencyId}: expected ${test.expected}, got ${result}`);
+api\test\production-readiness.js:48:    return 'Demo user identification working correctly';
+api\test\production-readiness.js:51:  // Test 2: Data Isolation - Commissions
+api\test\production-readiness.js:52:  await runTest(testResults, 'Commissions Data Isolation', async () => {
+api\test\production-readiness.js:53:    // Test demo isolation
+api\test\production-readiness.js:54:    let demoQuery = supabase.from('portal_commissions').select('sale_id');
+api\test\production-readiness.js:55:    demoQuery = applyDataIsolation(demoQuery, 'portal_commissions', true);
+api\test\production-readiness.js:120:  // Test 7: Database Connection Health
+api\test\production-readiness.js:121:  await runTest(testResults, 'Database Connection', async () => {
+_backup\manager\manager\goals.html:262:        // Mock goals data
+_backup\manager\manager\goals.html:263:        const mockGoalsData = [
+_backup\manager\manager\goals.html:336:        // Agents data will be loaded from API - no fake data
+_backup\manager\manager\goals.html:382:                    goalsData = data.goals || mockGoalsData;
+_backup\manager\manager\goals.html:389:                console.log('Using mock data:', error);
+_backup\manager\manager\goals.html:390:                goalsData = mockGoalsData;
+_backup\manager\manager\goals.html:622:                // Fallback: Add to local mock data for demo
+_backup\manager\manager\goals.html:642:                alert(`Goal "${title}" created successfully! (Demo mode - API not available)`);
+_backup\manager\manager\goals.html:732:                    // Fallback: Update local data for demo
+_backup\manager\manager\goals.html:737:                        alert(`🎉 Goal "${goal.title}" has been completed! Congratulations! (Demo mode)`);
+_backup\manager\manager\goals.html:739:                        alert(`Progress updated successfully! Current: ${progressValue}/${goal.target} ${goal.unit} (Demo mode)`);
+_backup\manager\manager\goals.html:876:                // Fallback: Update local data for demo
+_backup\manager\manager\goals.html:890:                alert('Goal updated successfully! (Demo mode)');
+_backup\manager\manager\index.html:296:            // Show empty state - no fake data
+public\index.html:385:                    Watch Demo
+public\admin\agent-performance.html:468:            // Mock goal progress calculation
+public\customer-service\index.html:537:            // Mock provider search results
+public\contact.html:275:        .demo-section {
+public\contact.html:284:        .demo-features {
+public\contact.html:291:        .demo-feature {
+public\contact.html:297:        .demo-feature::before {
+public\contact.html:352:                    <h3>Book a Demo</h3>
+public\contact.html:354:                    <a href="#demo-form" style="color: var(--primary); text-decoration: none; font-weight: 600;">Schedule Now</a>
+public\contact.html:437:                                    <option value="demo">Request Demo</option>
+public\contact.html:496:        <section class="demo-section" id="demo-form">
+public\contact.html:498:                <h2>Schedule a Personal Demo</h2>
+public\contact.html:499:                <p>See how SyncedUp can transform your agency in a 30-minute personalized demonstration.</p>
+public\contact.html:501:                <div class="demo-features">
+public\contact.html:502:                    <div class="demo-feature">Live dashboard walkthrough</div>
+public\contact.html:503:                    <div class="demo-feature">Custom setup consultation</div>
+public\contact.html:504:                    <div class="demo-feature">Migration planning</div>
+public\contact.html:505:                    <div class="demo-feature">ROI calculation</div>
+public\contact.html:506:                    <div class="demo-feature">Implementation timeline</div>
+public\contact.html:507:                    <div class="demo-feature">Pricing discussion</div>
+public\contact.html:510:                <a href="/login.html" class="btn-primary" style="width: auto; display: inline-block; margin-top: 2rem;">Schedule Demo</a>
+public\customer-service\settings.html:420:                // Mock export - would implement real export later
+public\customer-service\settings.html:423:                // Create mock CSV data
+public\customer-service\settings.html:453:                // Mock report generation - would implement real report later
+public\customer-service\settings.html:456:                // Create mock report HTML
+public\customer-service\member-profile.html:71:            <!-- Demographics -->
+public\customer-service\member-profile.html:73:                <h3><i data-lucide="user" class="card-icon"></i>Demographics</h3>
+public\customer-service\member-profile.html:74:                <div id="demographics">
+public\customer-service\member-profile.html:361:                // Fallback to mock data
+public\customer-service\member-profile.html:379:                // Update UI with mock data
+public\customer-service\member-profile.html:404:                // Show mock data or empty state
+public\customer-service\member-profile.html:405:                const mockProducts = [
+public\customer-service\member-profile.html:426:                const productsHTML = mockProducts.map(product => `
+public\customer-service\member-profile.html:460:            // Mock data - replace with actual API call
+public\customer-service\member-profile.html:490:                // Show mock data
+public\customer-service\member-profile.html:491:                const mockInteractions = [
+public\customer-service\member-profile.html:515:                const historyHTML = mockInteractions.map(interaction => `
+public\customer-service\member-profile.html:553:            // Mock data - replace with actual API call
+public\customer-service\member-profile.html:626:                // Add interaction (mock API call)
+public\customer-service\member-search.html:278:                // Fallback to mock data if API fails
+public\customer-service\member-search.html:279:                const mockResults = [
+public\customer-service\member-search.html:312:                // Apply basic filtering to mock data
+public\customer-service\member-search.html:313:                return mockResults.filter(member => {
+public\customer-service\member-search.html:369:                const response = await fetch(`/api/customer-service/frequent-members?agencyId=${currentUser?.agency_id || 'DEMO001'}`, {
+public\customer-service\member-search.html:409:                // Fallback to mock data
+public\customer-service\member-search.html:410:                const mockMembers = [
+public\customer-service\member-search.html:416:                const membersHTML = mockMembers.map(member => `
+public\admin\convoso-monitor.html:623:                    showSampleData();
+public\admin\convoso-monitor.html:627:                showSampleData();
+public\admin\convoso-monitor.html:651:        function showSampleData() {
+public\admin\convoso-monitor.html:652:            // Show sample/demo data when API is not available
+public\admin\convoso-monitor.html:653:            const sampleData = {
+public\admin\convoso-monitor.html:671:            updateDashboard(sampleData);
+public\_cleanup\duplicate-files\agent-portal.html:492:                    // Use demo data if API fails
+public\_cleanup\duplicate-files\agent-portal.html:503:                // Show empty state on error - no fake data
+public\_cleanup\duplicate-files\agent-portal.html:747:                    // Use demo data
+public\_cleanup\duplicate-files\dashboard-with-admin.html:734:        // Agent data will be loaded from API - no fake data
+public\_cleanup\duplicate-files\dashboard-with-admin.html:785:            // Add agents from mock data (in production, this would come from API)
+public\_cleanup\duplicate-files\dashboard-with-admin.html:821:            // Mock data - in production this would come from API
+public\_cleanup\duplicate-files\dashboard-with-admin.html:836:            // Mock export functionality
+public\_cleanup\duplicate-files\dashboard-with-admin.html:1239:                // Show empty state when API fails - no fake data
+public\admin\vendors.html:292:        // No hardcoded vendor data - will be loaded from API
+public\admin\vendors.html:293:        const mockVendorsData = [];
+public\admin\vendors.html:578:                alert(`Vendor "${name}" added successfully! (Demo mode)`);
+public\admin\vendors.html:624:                // Simulate successful sync for demo
+public\admin\vendors.html:633:                alert('Boberdoo sync completed! (Demo mode - simulated data)');
+public\admin\vendors.html:722:                // Fallback: Update local data for demo
+public\admin\vendors.html:726:                alert(`${vendor.name} has been ${action}d successfully! (Demo mode)`);
+api\super-admin\audit-logs.js:68:        // First try to get from audit_logs table, if it doesn't exist, return mock data
+api\super-admin\audit-logs.js:89:            console.log('Audit logs table not found, returning mock data:', error.message);
+api\super-admin\audit-logs.js:92:                data: generateMockAuditLogs(),
+api\super-admin\audit-logs.js:232:function generateMockAuditLogs() {
+api\super-admin\audit-logs.js:263:        { id: 'super1', name: 'Super Admin', email: 'super@demo.com' },
+api\super-admin\audit-logs.js:271:        { id: 'demo1', name: 'Demo Agency', code: 'DEMO001' }
+public\super-admin.html:689:            <!-- Demo Login Shortcuts -->
+public\super-admin.html:692:                    <h3>Demo Account Login Shortcuts</h3>
+public\super-admin.html:696:                    <button class="btn" onclick="loginAsDemo('agent@demo.com', 'agent')" style="background: #48bb78; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+public\super-admin.html:697:                        👤 Agent Demo
+public\super-admin.html:699:                    <button class="btn" onclick="loginAsDemo('manager@demo.com', 'manager')" style="background: #ed8936; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+public\super-admin.html:700:                        📊 Manager Demo
+public\super-admin.html:702:                    <button class="btn" onclick="loginAsDemo('admin@demo.com', 'admin')" style="background: #667eea; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+public\super-admin.html:703:                        ⚙️ Admin Demo
+public\super-admin.html:705:                    <button class="btn" onclick="loginAsDemo('customerservice@demo.com', 'customer_service')" style="background: #9f7aea; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+public\super-admin.html:706:                        🎧 Support Demo
+public\super-admin.html:708:                    <button class="btn" onclick="loginAsDemo('superadmin@demo.com', 'super_admin')" style="background: #f56565; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+public\super-admin.html:709:                        🔒 Super Admin Demo
+public\super-admin.html:712:                <p style="color: #718096; font-size: 0.85rem; text-align: center;">All demo accounts use password: <strong>demo123!</strong> and are tied to DEMO001 agency with realistic test data.</p>
+public\super-admin.html:1200:                    // Display empty state instead of mock data
+public\super-admin.html:1204:                // Display empty state instead of mock data
+public\super-admin.html:1789:        async function loginAsDemo(email, role) {
+public\super-admin.html:1793:                const buttons = document.querySelectorAll('button[onclick*="loginAsDemo"]');
+public\super-admin.html:1799:                const response = await fetch('/api/super-admin/demo-login', {
+public\super-admin.html:1824:                    alert(`Demo login failed: ${result.error || 'Unknown error'}`);
+public\super-admin.html:1825:                    restoreDemoButtons();
+public\super-admin.html:1829:                console.error('Demo login error:', error);
+public\super-admin.html:1830:                alert('Demo login failed. Please try again.');
+public\super-admin.html:1831:                restoreDemoButtons();
+public\super-admin.html:1835:        function restoreDemoButtons() {
+public\super-admin.html:1837:                { selector: 'agent@demo.com', text: '👤 Agent Demo', bg: '#48bb78' },
+public\super-admin.html:1838:                { selector: 'manager@demo.com', text: '📊 Manager Demo', bg: '#ed8936' },
+public\super-admin.html:1839:                { selector: 'admin@demo.com', text: '⚙️ Admin Demo', bg: '#667eea' },
+public\super-admin.html:1840:                { selector: 'customerservice@demo.com', text: '🎧 Support Demo', bg: '#9f7aea' },
+public\super-admin.html:1841:                { selector: 'superadmin@demo.com', text: '🔒 Super Admin Demo', bg: '#f56565' }
+public\admin\convoso-leads.html:762:                    showSampleData();
+public\admin\convoso-leads.html:766:                showSampleData();
+public\admin\convoso-leads.html:770:        function showSampleData() {
+public\admin\convoso-leads.html:771:            // Show sample data when API is not available
+public\admin\convoso-leads.html:774:                    id: 'sample-1',
+public\admin\convoso-leads.html:779:                    email: 'john@example.com',
+api\super-admin\agencies.js:169:            is_demo: false,
+api\super-admin\agencies.js:346:            // Return mock success for demo
+api\super-admin\agency-stats.js:67:            // Use mock data if database not accessible
+public\admin\users.html:626:                    isDemoAccount: currentUser.isDemoAccount || false,
+public\_cleanup\backup-files\goals-backup.html:266:        // Mock goals data
+public\_cleanup\backup-files\goals-backup.html:267:        const mockGoalsData = [
+public\_cleanup\backup-files\goals-backup.html:340:        // Agents data will be loaded from API - no fake data
+public\_cleanup\backup-files\goals-backup.html:386:                    goalsData = data.goals || mockGoalsData;
+public\_cleanup\backup-files\goals-backup.html:393:                console.log('Using mock data:', error);
+public\_cleanup\backup-files\goals-backup.html:394:                goalsData = mockGoalsData;
+public\_cleanup\backup-files\goals-backup.html:626:                // Fallback: Add to local mock data for demo
+public\_cleanup\backup-files\goals-backup.html:646:                alert(`Goal "${title}" created successfully! (Demo mode - API not available)`);
+public\_cleanup\backup-files\goals-backup.html:736:                    // Fallback: Update local data for demo
+public\_cleanup\backup-files\goals-backup.html:741:                        alert(`🎉 Goal "${goal.title}" has been completed! Congratulations! (Demo mode)`);
+public\_cleanup\backup-files\goals-backup.html:743:                        alert(`Progress updated successfully! Current: ${progressValue}/${goal.target} ${goal.unit} (Demo mode)`);
+public\_cleanup\backup-files\goals-backup.html:880:                // Fallback: Update local data for demo
+public\_cleanup\backup-files\goals-backup.html:894:                alert('Goal updated successfully! (Demo mode)');
+public\_cleanup\duplicate-files\super-admin-folder\index.html:363:            // Generate sample data
+api\super-admin\demo-login.js:51:        // Valid demo accounts with DEMO001 agency
+api\super-admin\demo-login.js:52:        const demoAccounts = {
+api\super-admin\demo-login.js:53:            'agent@demo.com': { role: 'agent', name: 'Demo Agent' },
+api\super-admin\demo-login.js:54:            'manager@demo.com': { role: 'manager', name: 'Demo Manager' },
+api\super-admin\demo-login.js:55:            'admin@demo.com': { role: 'admin', name: 'Demo Admin' },
+api\super-admin\demo-login.js:56:            'customerservice@demo.com': { role: 'customer_service', name: 'Demo Support' },
+api\super-admin\demo-login.js:57:            'superadmin@demo.com': { role: 'super_admin', name: 'Demo Super Admin' }
+api\super-admin\demo-login.js:60:        if (!demoAccounts[email]) {
+api\super-admin\demo-login.js:61:            return res.status(404).json({ error: 'Demo account not found' });
+api\super-admin\demo-login.js:65:        if (demoAccounts[email].role !== role) {
+api\super-admin\demo-login.js:66:            return res.status(400).json({ error: 'Role mismatch for demo account' });
+api\super-admin\demo-login.js:69:        // Try to find the demo agency first
+api\super-admin\demo-login.js:70:        let { data: demoAgency } = await supabase
+api\super-admin\demo-login.js:73:            .eq('code', 'DEMO001')
+api\super-admin\demo-login.js:76:        // If demo agency doesn't exist, create it
+api\super-admin\demo-login.js:77:        if (!demoAgency) {
+api\super-admin\demo-login.js:81:                    name: 'Demo Insurance Agency',
+api\super-admin\demo-login.js:82:                    code: 'DEMO001',
+api\super-admin\demo-login.js:83:                    admin_email: 'admin@demo.com',
+api\super-admin\demo-login.js:85:                    is_demo: true,
+api\super-admin\demo-login.js:112:                console.error('Error creating demo agency:', agencyError);
+api\super-admin\demo-login.js:113:                return res.status(500).json({ error: 'Failed to create demo agency' });
+api\super-admin\demo-login.js:116:            demoAgency = newAgency;
+api\super-admin\demo-login.js:119:        // Try to find the demo user
+api\super-admin\demo-login.js:120:        let { data: demoUser } = await supabase
+api\super-admin\demo-login.js:124:            .eq('agency_id', demoAgency.id)
+api\super-admin\demo-login.js:127:        // If demo user doesn't exist, create it
+api\super-admin\demo-login.js:128:        if (!demoUser) {
+api\super-admin\demo-login.js:129:            const hashedPassword = await bcrypt.hash('demo123!', 12);
+api\super-admin\demo-login.js:136:                    name: demoAccounts[email].name,
+api\super-admin\demo-login.js:138:                    agency_id: demoAgency.id,
+api\super-admin\demo-login.js:147:                console.error('Error creating demo user:', userError);
+api\super-admin\demo-login.js:148:                return res.status(500).json({ error: 'Failed to create demo user' });
+api\super-admin\demo-login.js:151:            demoUser = newUser;
+api\super-admin\demo-login.js:154:        // Generate demo token
+api\super-admin\demo-login.js:155:        const demoToken = jwt.sign(
+api\super-admin\demo-login.js:157:                id: demoUser.id,
+api\super-admin\demo-login.js:158:                email: demoUser.email,
+api\super-admin\demo-login.js:159:                role: demoUser.role,
+api\super-admin\demo-login.js:160:                agency_id: demoUser.agency_id,
+api\super-admin\demo-login.js:161:                agency_code: demoAgency.code,
+api\super-admin\demo-login.js:162:                name: demoUser.name,
+api\super-admin\demo-login.js:163:                demo: true
+api\super-admin\demo-login.js:173:                login_count: (demoUser.login_count || 0) + 1,
+api\super-admin\demo-login.js:176:            .eq('id', demoUser.id);
+api\super-admin\demo-login.js:180:            token: demoToken,
+api\super-admin\demo-login.js:182:                id: demoUser.id,
+api\super-admin\demo-login.js:183:                email: demoUser.email,
+api\super-admin\demo-login.js:184:                name: demoUser.name,
+api\super-admin\demo-login.js:185:                role: demoUser.role,
+api\super-admin\demo-login.js:186:                agency_id: demoUser.agency_id,
+api\super-admin\demo-login.js:187:                agency_code: demoAgency.code,
+api\super-admin\demo-login.js:188:                is_demo: true
+api\super-admin\demo-login.js:190:            message: `Logged in as ${demoAccounts[email].name}`
+api\super-admin\demo-login.js:194:        console.error('Demo login error:', error);
+public\_cleanup\duplicate-files\super-admin-folder\user-administration.html:1004:                // Update locally for demo
+api\super-admin\debug-create-agency.js:15:    console.log('Testing database connection...');
+api\super-admin\debug-create-agency.js:23:    console.log('Agencies table test:', { data: agenciesTest, error: agenciesError });
+api\super-admin\debug-create-agency.js:31:    console.log('Portal_users table test:', { data: usersTest, error: usersError });
+api\super-admin\debug-create-agency.js:43:    console.log('Agency creation test:', { data: testAgency, error: createError });
+api\super-admin\debug-create-agency.js:59:      console.log('User creation test:', { data: testUser, error: userError });
+api\super-admin\create-agency.js:113:        is_demo: false,
+public\admin\commissions.html:157:                <button class="btn btn-primary" onclick="showAddOverrideModal()">
+public\admin\commissions.html:338:    <div id="overrideModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+public\admin\commissions.html:340:            <h3 id="overrideModalTitle">Add Agent Override</h3>
+public\admin\commissions.html:387:                    <button type="button" class="btn" onclick="closeOverrideModal()">Cancel</button>
+public\admin\commissions.html:669:                    agentName: 'Sample Agent',
+public\admin\commissions.html:680:                    agentName: 'Sample Agent',
+public\admin\commissions.html:819:        function showAddOverrideModal() {
+public\admin\commissions.html:821:            document.getElementById('overrideModalTitle').textContent = 'Add Agent Override';
+public\admin\commissions.html:828:            document.getElementById('overrideModal').style.display = 'flex';
+public\admin\commissions.html:831:        function closeOverrideModal() {
+public\admin\commissions.html:832:            document.getElementById('overrideModal').style.display = 'none';
+public\admin\commissions.html:868:            document.getElementById('overrideModalTitle').textContent = 'Edit Agent Override';
+public\admin\commissions.html:878:            document.getElementById('overrideModal').style.display = 'flex';
+public\admin\commissions.html:899:                // For demo purposes, delete locally
+public\admin\commissions.html:922:                // For demo purposes, delete locally
+public\admin\commissions.html:963:                // For demo purposes, add/update locally
+public\admin\commissions.html:1012:                    closeOverrideModal();
+public\admin\commissions.html:1019:                // For demo purposes, add/update locally
+public\admin\commissions.html:1036:                closeOverrideModal();
+public\admin\commissions.html:1056:            // No hardcoded data - generate from actual commission data
+public\_cleanup\backup-files\index_old.html:3173:            // Store the setting locally for demonstration
+public\_cleanup\backup-files\index_old.html:3198:            // Create a mock CSV export
+public\_cleanup\duplicate-files\super-admin-folder\settings.html:332:                            <button type="button" class="btn btn-success" onclick="testDatabaseConnection()">
+public\_cleanup\duplicate-files\super-admin-folder\settings.html:776:        function testDatabaseConnection() {
+public\_cleanup\duplicate-files\super-admin-folder\settings.html:777:            alert('Testing database connection...');
+public\admin\settings.html:196:                        <input type="url" id="logoUrl" class="form-input" placeholder="https://example.com/logo.png">
+public\admin\settings.html:201:                        <input type="url" id="faviconUrl" class="form-input" placeholder="https://example.com/favicon.ico">
+public\admin\settings.html:727:                showSuccess('System configuration saved successfully!'); // Demo fallback
+public\admin\settings.html:760:                showSuccess('Branding settings saved successfully!'); // Demo fallback
+public\admin\settings.html:794:                showSuccess('Agency settings saved successfully!'); // Demo fallback
+public\admin\settings.html:861:                // For demo purposes, add locally
+public\admin\settings.html:913:                // For demo purposes, remove locally
+public\admin\settings.html:937:                showSuccess(`Connection test successful for ${key.service}`); // Demo fallback
+api\super-admin\global-leaderboard.js:983:        user_email: 'sarah@example.com',
+api\super-admin\global-leaderboard.js:994:        user_email: 'mike@example.com',
+public\admin\agents.html:844:            const template = 'name,email,agent_code,status\n"John Doe",john@example.com,AG12345,active\n"Jane Smith",jane@example.com,AG67890,active';
+public\admin\leads.html:821:                        email: 'john.doe@example.com',
+public\admin\leads.html:841:                    email: 'john.doe@example.com',
+public\admin\leads.html:948:                // For demo purposes, update locally
+public\admin\leads.html:956:                alert('Lead status updated locally (demo mode)');
+public\admin\leads.html:993:                alert('Lead assigned successfully!'); // Demo fallback
+public\admin\onboarding.html:198:                            <i class="fas fa-flask mr-2"></i>Generate Test Data
+public\admin\onboarding.html:332:                            <li>✓ Test webhook delivery with a sample lead</li>
+public\admin\onboarding.html:412:                testMode: formData.get('testMode') === 'on'
+api\super-admin\notifications.js:69:        // Try to get from notifications table, fallback to mock data
+api\super-admin\notifications.js:93:            console.log('Notifications table not found, returning mock data');
+api\super-admin\notifications.js:94:            const mockNotifications = generateMockNotifications();
+api\super-admin\notifications.js:97:                data: mockNotifications,
+api\super-admin\notifications.js:98:                unread_count: mockNotifications.filter(n => n.status === 'unread').length,
+api\super-admin\notifications.js:102:                    total: mockNotifications.length,
+api\super-admin\notifications.js:103:                    total_pages: Math.ceil(mockNotifications.length / parseInt(limit))
+api\super-admin\notifications.js:281:function generateMockNotifications() {
+public\admin\reports.html:175:                <div class="report-desc">Customer demographics, retention, and lifetime value</div>
+public\admin\reports.html:282:            // Mock data - replace with actual API call
+public\admin\reports.html:292:            // Mock recent reports data
+public\admin\licensing.html:157:                // Mock data for demo
+public\manager\performance.html:158:        // No hardcoded agent data - will be loaded from API
+public\manager\performance.html:161:        // Sales data will be loaded from API - no fake data
+public\manager\performance.html:241:                displayMockData(agentId);
+public\manager\performance.html:266:        function displayMockData(agentId) {
+public\manager\performance.html:267:            // Use mock data when API fails
+public\manager\performance.html:282:            // Calculate conversion rate (mock calculation)
+public\manager\team-management.html:201:        // Team data will be loaded from API - no fake data
+public\manager\team-management.html:405:                    isDemoData: user.isDemoAccount || false,
+public\manager\team-management.html:551:                // Fallback: Update local data for demo
+public\manager\team-management.html:559:                alert('Agent updated successfully! (Demo mode)');
+public\manager\team-management.html:610:                    alert(`Territory assignment for ${agent.name}: ${territories[territory-1]} (Demo mode)`);
+public\manager\team-management.html:635:                    alert(`Goal setting for ${agent.name}: ${salesGoal} sales (Demo mode)`);
+public\manager\index.html:292:            // Show empty state - no fake data
+api\super-admin\production-cleanup.js:32:      demo_users_preserved: 0,
+api\super-admin\production-cleanup.js:42:    // Step 1: Identify and preserve demo users
+api\super-admin\production-cleanup.js:43:    const { data: demoUsers, error: demoUsersError } = await supabase
+api\super-admin\production-cleanup.js:46:      .or('email.like.%@demo.com,email.eq.admin@syncedupsolutions.com');
+api\super-admin\production-cleanup.js:48:    if (demoUsersError) {
+api\super-admin\production-cleanup.js:49:      throw new Error(`Failed to identify demo users: ${demoUsersError.message}`);
+api\super-admin\production-cleanup.js:52:    results.demo_users_preserved = demoUsers?.length || 0;
+api\super-admin\production-cleanup.js:53:    const demoUserIds = demoUsers?.map(u => u.id) || [];
+api\super-admin\production-cleanup.js:55:    console.log(`Preserving ${results.demo_users_preserved} demo users`);
+api\super-admin\production-cleanup.js:57:    // Step 2: Clean leads data (keep only DEMO_LEAD_* patterns)
+api\super-admin\production-cleanup.js:62:        .not('lead_id', 'like', 'DEMO_LEAD_%')
+api\super-admin\production-cleanup.js:63:        .not('agent_assignment', 'in', `(${demoUserIds.join(',')})`);
+api\super-admin\production-cleanup.js:74:    // Step 3: Clean commission data (keep only DEMO_SALE_* patterns)  
+api\super-admin\production-cleanup.js:79:        .not('sale_id', 'like', 'DEMO_SALE_%')
+api\super-admin\production-cleanup.js:80:        .neq('agency_id', 'DEMO001');
+api\super-admin\production-cleanup.js:91:    // Step 4: Clean support tickets (keep only TKT-DEMO-* patterns)
+api\super-admin\production-cleanup.js:96:        .not('ticket_number', 'like', 'TKT-DEMO-%')
+api\super-admin\production-cleanup.js:97:        .neq('agency_id', 'DEMO001');
+api\super-admin\production-cleanup.js:108:    // Step 5: Clean sales data (keep only DEMO_SALE_* patterns)
+api\super-admin\production-cleanup.js:113:        .not('sale_id', 'like', 'DEMO_SALE_%')
+api\super-admin\production-cleanup.js:114:        .neq('agency_id', 'DEMO001');
+api\super-admin\production-cleanup.js:125:    // Step 6: Clean non-demo users (keep only @demo.com emails)
+api\super-admin\production-cleanup.js:130:        .not('email', 'like', '%@demo.com')
+api\super-admin\production-cleanup.js:143:    // Step 7: Verification - ensure only demo data remains
+api\super-admin\production-cleanup.js:146:        // Verify demo users count
+api\super-admin\production-cleanup.js:150:          .like('email', '%@demo.com'),
+api\super-admin\production-cleanup.js:152:        // Verify no non-demo commissions
+api\super-admin\production-cleanup.js:156:          .not('sale_id', 'like', 'DEMO_SALE_%'),
+api\super-admin\production-cleanup.js:158:        // Verify no non-demo tickets
+api\super-admin\production-cleanup.js:162:          .not('ticket_number', 'like', 'TKT-DEMO-%'),
+api\super-admin\production-cleanup.js:164:        // Verify no non-demo leads
+api\super-admin\production-cleanup.js:168:          .not('lead_id', 'like', 'DEMO_LEAD_%')
+api\super-admin\production-cleanup.js:171:      const [demoUsersCheck, nonDemoCommissions, nonDemoTickets, nonDemoLeads] = verificationQueries;
+api\super-admin\production-cleanup.js:173:      if (demoUsersCheck.error || nonDemoCommissions.error || nonDemoTickets.error || nonDemoLeads.error) {
+api\super-admin\production-cleanup.js:177:      const demoUserCount = demoUsersCheck.count || 0;
+api\super-admin\production-cleanup.js:178:      const nonDemoCommissionCount = nonDemoCommissions.count || 0;
+api\super-admin\production-cleanup.js:179:      const nonDemoTicketCount = nonDemoTickets.count || 0;
+api\super-admin\production-cleanup.js:180:      const nonDemoLeadCount = nonDemoLeads.count || 0;
+api\super-admin\production-cleanup.js:182:      if (demoUserCount >= 5 && nonDemoCommissionCount === 0 && 
+api\super-admin\production-cleanup.js:183:          nonDemoTicketCount === 0 && nonDemoLeadCount === 0) {
+api\super-admin\production-cleanup.js:187:          `Verification failed: Demo users: ${demoUserCount}, ` +
+api\super-admin\production-cleanup.js:188:          `Non-demo commissions: ${nonDemoCommissionCount}, ` + 
+api\super-admin\production-cleanup.js:189:          `Non-demo tickets: ${nonDemoTicketCount}, ` +
+api\super-admin\production-cleanup.js:190:          `Non-demo leads: ${nonDemoLeadCount}`
+api\super-admin\production-cleanup.js:209:        'Test demo account functionality',
+public\manager\reports.html:472:            alert('Report preview would open here showing a sample of the data and layout before final generation.');
+public\manager\reports.html:542:        async function generateMockReport(reportType, format, period, startDate = null, endDate = null) {
+public\manager\reports.html:568:            // Add to recent reports for demo
+public\manager\reports.html:612:            // For demo purposes, return CSV-like content with tab separators
+public\manager\reports.html:641:        function generateMockReportContent(report) {
+public\manager\reports.html:697:            // Generate the report using mock functionality
+public\manager\reports.html:698:            await generateMockReport(reportType, format, period, startDate, endDate);
+public\manager\settings.html:354:                // Create sample CSV content
+public\manager\convoso-leads.html:753:                    showSampleData();
+public\manager\convoso-leads.html:757:                showSampleData();
+public\manager\convoso-leads.html:761:        function showSampleData() {
+public\manager\convoso-leads.html:762:            // Show sample data when API is not available
+public\manager\convoso-leads.html:765:                    id: 'sample-1',
+public\manager\convoso-leads.html:770:                    email: 'john@example.com',
+public\manager\convoso-monitor.html:612:                    showSampleData();
+public\manager\convoso-monitor.html:616:                showSampleData();
+public\manager\convoso-monitor.html:640:        function showSampleData() {
+public\manager\convoso-monitor.html:641:            // Show sample/demo data when API is not available
+public\manager\convoso-monitor.html:642:            const sampleData = {
+public\manager\convoso-monitor.html:660:            updateDashboard(sampleData);
+api\super-admin\revenue-chart.js:105:        // If no real data, generate realistic mock data
+public\manager\goals.html:286:            // Show empty state - no fake data
+api\super-admin\security-events.js:45:            { id: 3, type: 'password_reset', message: 'Password reset requested for user@example.com', severity: 'info', timestamp: new Date(Date.now() - 600000).toISOString() },
+api\super-admin\system-events.js:120:        // If no real events, return empty array instead of fake data
+api\super-admin\setup-demo-data.js:5:async function setupDemoDataHandler(req, res) {
+api\super-admin\setup-demo-data.js:6:  // Demo data setup has been disabled
+api\super-admin\setup-demo-data.js:8:    error: 'Demo data functionality has been removed',
+api\super-admin\setup-demo-data.js:32:    // Demo user accounts data
+api\super-admin\setup-demo-data.js:33:    const demoUsers = [
+api\super-admin\setup-demo-data.js:35:        email: 'agent@demo.com',
+api\super-admin\setup-demo-data.js:36:        password: 'demo123!',
+api\super-admin\setup-demo-data.js:37:        name: 'Demo Agent',
+api\super-admin\setup-demo-data.js:40:        agency_id: 'DEMO001'
+api\super-admin\setup-demo-data.js:43:        email: 'manager@demo.com', 
+api\super-admin\setup-demo-data.js:44:        password: 'demo123!',
+api\super-admin\setup-demo-data.js:45:        name: 'Demo Manager',
+api\super-admin\setup-demo-data.js:48:        agency_id: 'DEMO001'
+api\super-admin\setup-demo-data.js:51:        email: 'admin@demo.com',
+api\super-admin\setup-demo-data.js:52:        password: 'demo123!',
+api\super-admin\setup-demo-data.js:53:        name: 'Demo Admin',
+api\super-admin\setup-demo-data.js:56:        agency_id: 'DEMO001'
+api\super-admin\setup-demo-data.js:59:        email: 'customerservice@demo.com',
+api\super-admin\setup-demo-data.js:60:        password: 'demo123!',
+api\super-admin\setup-demo-data.js:61:        name: 'Demo Support',
+api\super-admin\setup-demo-data.js:64:        agency_id: 'DEMO001'
+api\super-admin\setup-demo-data.js:67:        email: 'superadmin@demo.com',
+api\super-admin\setup-demo-data.js:68:        password: 'demo123!',
+api\super-admin\setup-demo-data.js:69:        name: 'Demo Super Admin',
+api\super-admin\setup-demo-data.js:72:        agency_id: 'DEMO001'
+api\super-admin\setup-demo-data.js:76:    // 1. Create demo users
+api\super-admin\setup-demo-data.js:77:    for (const userData of demoUsers) {
+api\super-admin\setup-demo-data.js:115:          console.log(`Created demo user: ${userData.email}`);
+api\super-admin\setup-demo-data.js:126:      .eq('email', 'agent@demo.com')
+api\super-admin\setup-demo-data.js:131:    // 2. Create fake leads data
+api\super-admin\setup-demo-data.js:132:    const fakeLeads = [
+api\super-admin\setup-demo-data.js:134:        lead_id: 'DEMO_LEAD_001',
+api\super-admin\setup-demo-data.js:140:        campaign_id: 'DEMO_CAMP_001',
+api\super-admin\setup-demo-data.js:158:        lead_id: 'DEMO_LEAD_002', 
+api\super-admin\setup-demo-data.js:164:        campaign_id: 'DEMO_CAMP_002',
+api\super-admin\setup-demo-data.js:181:        lead_id: 'DEMO_LEAD_003',
+api\super-admin\setup-demo-data.js:187:        campaign_id: 'DEMO_CAMP_001',
+api\super-admin\setup-demo-data.js:205:        lead_id: 'DEMO_LEAD_004',
+api\super-admin\setup-demo-data.js:211:        campaign_id: 'DEMO_CAMP_003',
+api\super-admin\setup-demo-data.js:228:        lead_id: 'DEMO_LEAD_005',
+api\super-admin\setup-demo-data.js:234:        campaign_id: 'DEMO_CAMP_002',
+api\super-admin\setup-demo-data.js:254:    for (const leadData of fakeLeads) {
+api\super-admin\setup-demo-data.js:270:    // 3. Create fake support tickets
+api\super-admin\setup-demo-data.js:271:    const fakeSupportTickets = [
+api\super-admin\setup-demo-data.js:273:        ticket_number: 'TKT-DEMO-001',
+api\super-admin\setup-demo-data.js:278:        agency_id: 'DEMO001',
+api\super-admin\setup-demo-data.js:283:        ticket_number: 'TKT-DEMO-002',
+api\super-admin\setup-demo-data.js:288:        agency_id: 'DEMO001', 
+api\super-admin\setup-demo-data.js:293:        ticket_number: 'TKT-DEMO-003',
+api\super-admin\setup-demo-data.js:298:        agency_id: 'DEMO001',
+api\super-admin\setup-demo-data.js:304:        ticket_number: 'TKT-DEMO-004', 
+api\super-admin\setup-demo-data.js:309:        agency_id: 'DEMO001',
+api\super-admin\setup-demo-data.js:316:    for (const ticketData of fakeSupportTickets) {
+api\super-admin\setup-demo-data.js:332:    // 4. Create fake commission data
+api\super-admin\setup-demo-data.js:333:    const fakeCommissions = [
+api\super-admin\setup-demo-data.js:335:        sale_id: 'DEMO_SALE_001',
+api\super-admin\setup-demo-data.js:337:        agency_id: 'DEMO001',
+api\super-admin\setup-demo-data.js:347:        policy_number: 'POL-DEMO-001',
+api\super-admin\setup-demo-data.js:351:        sale_id: 'DEMO_SALE_002',
+api\super-admin\setup-demo-data.js:353:        agency_id: 'DEMO001', 
+api\super-admin\setup-demo-data.js:362:        policy_number: 'POL-DEMO-002',
+api\super-admin\setup-demo-data.js:366:        sale_id: 'DEMO_SALE_003',
+api\super-admin\setup-demo-data.js:368:        agency_id: 'DEMO001',
+api\super-admin\setup-demo-data.js:378:        policy_number: 'POL-DEMO-003',
+api\super-admin\setup-demo-data.js:382:        sale_id: 'DEMO_SALE_004',
+api\super-admin\setup-demo-data.js:384:        agency_id: 'DEMO001',
+api\super-admin\setup-demo-data.js:394:        policy_number: 'POL-DEMO-004',
+api\super-admin\setup-demo-data.js:398:        sale_id: 'DEMO_SALE_005',
+api\super-admin\setup-demo-data.js:400:        agency_id: 'DEMO001',
+api\super-admin\setup-demo-data.js:409:        policy_number: 'POL-DEMO-005',
+api\super-admin\setup-demo-data.js:417:    for (const commissionData of fakeCommissions) {
+api\super-admin\setup-demo-data.js:435:      message: 'Demo data setup completed',
+api\super-admin\setup-demo-data.js:440:    console.error('Demo setup error:', error);
+api\super-admin\setup-demo-data.js:445:export default requireAuth(['super_admin'])(setupDemoDataHandler);
+api\super-admin\system-settings.js:811:async function testAllIntegrations(testData) {
+api\super-admin\system-settings.js:813:    const { integration_types = ['all'] } = testData;
+api\super-admin\system-settings.js:915:async function sendTestEmail(emailData) {
+api\super-admin\system-settings.js:917:    const { recipient_email, template_name = 'test' } = emailData;
+api\super-admin\users.js:56:            console.log('Users table not accessible, returning mock data');
+api\super-admin\users.js:57:            // Mock data
+api\super-admin\users.js:59:                { id: '1', name: 'John Admin', email: 'admin@demo.com', role: 'admin', status: 'Active', created_at: '2024-01-15', last_login: '2024-01-20' },
+api\super-admin\users.js:60:                { id: '2', name: 'Sarah Manager', email: 'manager@demo.com', role: 'manager', status: 'Active', created_at: '2024-01-16', last_login: '2024-01-19' },
+api\super-admin\users.js:61:                { id: '3', name: 'Mike Agent', email: 'agent@demo.com', role: 'agent', status: 'Active', created_at: '2024-01-17', last_login: '2024-01-20' }
+api\super-admin\user-administration.js:308:        // Simulate distribution for demo (in real app, you'd have actual login timestamp data)
+api\super-admin\user-administration.js:512:        user_email: `user${Math.floor(Math.random() * 100) + 1}@example.com`,

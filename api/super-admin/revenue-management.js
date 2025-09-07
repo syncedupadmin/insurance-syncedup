@@ -310,7 +310,7 @@ function calculateCustomerAcquisitionCost(agencies) {
     return createdAt.getMonth() === thisMonth.getMonth() && createdAt.getFullYear() === thisMonth.getFullYear();
   }).length;
 
-  return newAgenciesThisMonth > 0 ? Math.round(assumedMonthlyCACBudget / newAgenciesThisMonth) : 850;
+  return newAgenciesThisMonth > 0 ? Math.round(assumedMonthlyCACBudget / newAgenciesThisMonth) : 0; // TODO: Calculate real CAC from actual data
 }
 
 async function getRevenueForecast(timeframe) {

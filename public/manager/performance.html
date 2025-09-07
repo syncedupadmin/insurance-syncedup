@@ -264,10 +264,10 @@
         }
         
         function displayMockData(agentId) {
-            // Use mock data when API fails
-            let totalSales = 12;
-            let totalPremium = 28500;
-            let avgSale = 2375;
+            // TODO: Remove this function - use real API data only
+            let totalSales = 0;
+            let totalPremium = 0;
+            let avgSale = 0;
             
             if (agentId === 'ALL') {
                 const activeAgents = agents.filter(a => a.active).length;

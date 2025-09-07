@@ -351,11 +351,11 @@
             const timestamp = new Date().toISOString().split('T')[0];
             
             if (format === 'csv') {
-                // Create sample CSV content
+                // TODO: Fetch real data from API endpoint
                 const csvContent = `Date,Agent,Sales Count,Premium Volume,Status
-${timestamp},John Smith,12,$28500,Active
-${timestamp},Jane Doe,8,$19200,Active
-${timestamp},Mike Johnson,15,$32100,Active`;
+${timestamp},--,0,$0,--
+${timestamp},--,0,$0,--
+${timestamp},--,0,$0,--`;
                 
                 const blob = new Blob([csvContent], { type: 'text/csv' });
                 const url = window.URL.createObjectURL(blob);

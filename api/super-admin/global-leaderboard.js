@@ -800,7 +800,7 @@ async function getMilestoneSystem() {
         reward: { badge: 'high_earner', points: 500, cash_bonus: 250 },
         achieved_by: 67,
         next_achievers: [
-          { name: 'John Smith', current_progress: 8500, percentage: 85 },
+          { name: 'John Smith', current_progress: 0, percentage: 0 }, // TODO: Use real progress data
           { name: 'Mary Johnson', current_progress: 7200, percentage: 72 }
         ]
       },
@@ -983,7 +983,7 @@ async function getRecentAchievements() {
         user_email: 'sarah@example.com',
         achievement_type: 'milestone',
         achievement_name: 'First $10K Month',
-        description: 'Earned $12,500 in commissions this month',
+        description: 'Commission data will be populated from real sales',
         achieved_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
         badge_awarded: 'high_earner',
         points_earned: 500

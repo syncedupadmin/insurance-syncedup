@@ -351,7 +351,7 @@ async function setupDemoDataHandler(req, res) {
         sale_id: 'DEMO_SALE_002',
         agent_id: agentId,
         agency_id: 'DEMO001', 
-        commission_amount: 850.50,
+        commission_amount: 0, // TODO: Use real commission amounts
         status: 'pending',
         product_name: 'Home Insurance Policy',
         premium_amount: 5670,

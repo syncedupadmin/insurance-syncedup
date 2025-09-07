@@ -24,7 +24,7 @@ export default async function handler(req, res) {
           id: 341, 
           name: 'PHS DATA - NextGen Shared',
           status: 'N',
-          lead_count: 850,
+          lead_count: 0, // TODO: Fetch real count from Convoso API
           agency: 'PHS'
         },
         { 
