@@ -1,31 +1,863 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <link rel="canonical" href="https://insurance.syncedupsolutions.com/dashboard" />
-    <script>
-        (function() {
-          const token = localStorage.getItem('syncedup_token');
-          const user  = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
-          const role = normalize(user.role || '');
-          const allowed = ['agent','manager','admin','super_admin','customer_service'];
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SyncedUp Insurance Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-          if (!token || !role) { window.location.href = '/login'; return; }
-          if (!allowed.includes(role)) { window.location.href = '/login'; return; }
-          
-          if (role === 'super_admin') {
-              window.location.href = '/super-admin';
-          } else if (role === 'admin') {
-              window.location.href = '/admin'; // admin folder exists
-          } else if (role === 'manager') {
-              window.location.href = '/manager'; // manager folder exists
-          } else {
-              window.location.href = '/agent'; // agent folder exists
-          }
-        })();
-    </script>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Glass Cards */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .card-icon.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .card-icon.success {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+
+        .card-icon.info {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+        }
+
+        .card-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .card h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 0.875rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn.success {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+
+        .btn.info {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+        }
+
+        /* Product List */
+        .product-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 1rem;
+            padding-right: 0.5rem;
+        }
+
+        .product-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .product-list::-webkit-scrollbar-track {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+        }
+
+        .product-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+
+        .product-item {
+            background: rgba(102, 126, 234, 0.05);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .product-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .product-item.selected {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border-color: #667eea;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+        }
+
+        .product-type {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Add-on Cards */
+        .addon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .addon-item {
+            background: rgba(102, 126, 234, 0.05);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .addon-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+        }
+
+        .addon-item.selected {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border-color: #667eea;
+        }
+
+        .addon-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+        }
+
+        .addon-price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        /* Cost Breakdown */
+        .cost-breakdown {
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+            color: #4a5568;
+        }
+
+        .cost-item.total {
+            border-top: 2px solid rgba(102, 126, 234, 0.2);
+            padding-top: 0.75rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #2d3748;
+        }
+
+        /* Dashboard Stats */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-top: 0.25rem;
+        }
+
+        /* Split Sale Toggle */
+        .split-sale-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: #cbd5e0;
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(24px);
+        }
+
+        /* Success/Error Messages */
+        #saleResult, #performanceResult {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, rgba(72, 187, 120, 0.1) 0%, rgba(56, 161, 105, 0.1) 100%);
+            border: 2px solid #48bb78;
+            color: #22543d;
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, rgba(252, 129, 129, 0.1) 0%, rgba(245, 101, 101, 0.1) 100%);
+            border: 2px solid #fc8181;
+            color: #742a2a;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .dashboard-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
 </head>
 <body>
-    <p>Loading dashboard...</p>
+    <div class="container">
+        <div class="header">
+            <h1>SyncedUp Insurance Portal</h1>
+            <p>Agent Dashboard</p>
+        </div>
+
+        <div class="grid">
+            <!-- Quote Products Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon primary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                        </svg>
+                    </div>
+                    <h2>Quote Products</h2>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="stateSelect">Select State</label>
+                        <select id="stateSelect">
+                            <option value="">Choose a state...</option>
+                            <option value="AL">Alabama</option>
+                            <option value="AR">Arkansas</option>
+                            <option value="AZ">Arizona</option>
+                            <option value="FL">Florida</option>
+                            <option value="GA">Georgia</option>
+                            <option value="KY">Kentucky</option>
+                            <option value="LA">Louisiana</option>
+                            <option value="MS">Mississippi</option>
+                            <option value="NC">North Carolina</option>
+                            <option value="NV">Nevada</option>
+                            <option value="OH">Ohio</option>
+                            <option value="OK">Oklahoma</option>
+                            <option value="SC">South Carolina</option>
+                            <option value="TN">Tennessee</option>
+                            <option value="TX">Texas</option>
+                            <option value="VA">Virginia</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="coverageType">Coverage Type</label>
+                        <select id="coverageType">
+                            <option value="">Choose type...</option>
+                            <option value="individual">Individual</option>
+                            <option value="family">Family</option>
+                            <option value="individual_spouse">Individual + Spouse</option>
+                            <option value="individual_children">Individual + Children</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button class="btn" id="getProductsBtn" onclick="getProducts()">Get Available Products</button>
+                
+                <div id="productList" class="product-list" style="display: none;">
+                    <!-- Products will be populated here -->
+                </div>
+                
+                <div id="addonSection" style="display: none; margin-top: 1.5rem;">
+                    <label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">Available Add-ons</label>
+                    <div class="addon-grid" id="addonList">
+                        <!-- Add-ons will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Record Sale Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon success">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <h2>Record Sale</h2>
+                </div>
+                
+                <div class="split-sale-toggle">
+                    <div class="toggle-switch" id="splitSaleToggle" onclick="toggleSplitSale()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <label style="margin: 0; cursor: pointer;" onclick="toggleSplitSale()">Split Sale (Different payment months)</label>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="customerName">Customer Name</label>
+                        <input type="text" id="customerName" placeholder="Customer Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="customerEmail">Customer Email</label>
+                        <input type="email" id="customerEmail" placeholder="customer@email.com">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="selectedProduct">Selected Health Plan</label>
+                    <input type="text" id="selectedProduct" readonly placeholder="Click a product from Quote Products">
+                    <input type="hidden" id="productPrice" value="0">
+                </div>
+                
+                <div class="form-group" id="healthPostDateGroup">
+                    <label for="healthPostDate">Health Plan Effective Date</label>
+                    <input type="date" id="healthPostDate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="selectedAddon">Selected Add-on</label>
+                    <input type="text" id="selectedAddon" readonly placeholder="Click an add-on (optional)">
+                    <input type="hidden" id="addonPrice" value="0">
+                </div>
+                
+                <div class="form-group" id="addonPostDateGroup" style="display: none;">
+                    <label for="addonPostDate">Add-on Effective Date</label>
+                    <input type="date" id="addonPostDate">
+                </div>
+                
+                <div class="cost-breakdown" id="costBreakdown">
+                    <div class="cost-item">
+                        <span>Health Plan Premium:</span>
+                        <span id="healthPremiumDisplay">$0.00</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>Add-on Premium:</span>
+                        <span id="addonPremiumDisplay">$0.00</span>
+                    </div>
+                    <div class="cost-item">
+                        <span>Enrollment Fee:</span>
+                        <span>$25.00</span>
+                    </div>
+                    <div class="cost-item total">
+                        <span>Total Monthly Premium:</span>
+                        <span id="totalPremiumDisplay">$25.00</span>
+                    </div>
+                    <div class="cost-item" style="color: #059669; font-weight: 600;">
+                        <span>Agent Commission (30%):</span>
+                        <span id="commissionDisplay">$0.00</span>
+                    </div>
+                </div>
+                
+                <button class="btn success" onclick="recordSale()">Record Sale</button>
+                
+                <div id="saleResult"></div>
+            </div>
+
+            <!-- Agent Performance Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon info">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+                        </svg>
+                    </div>
+                    <h2>My Performance</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label for="timeframe">Time Period</label>
+                    <select id="timeframe">
+                        <option value="thisweek">This Week</option>
+                        <option value="lastweek">Last Week</option>
+                        <option value="thismonth">This Month</option>
+                        <option value="lastmonth">Last Month</option>
+                    </select>
+                </div>
+                
+                <button class="btn info" onclick="getAgentPerformance()">View Performance</button>
+                
+                <div id="performanceDashboard" style="display: none;">
+                    <div class="dashboard-stats" style="margin-top: 1.5rem;">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalSales">0</div>
+                            <div class="stat-label">Total Sales</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalPremium">$0</div>
+                            <div class="stat-label">Premium</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalCommission">$0</div>
+                            <div class="stat-label">Commission</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="avgSale">$0</div>
+                            <div class="stat-label">Avg Sale</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="performanceResult"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get agent info from session/localStorage - AGENT ONLY
+        let currentAgent = null;
+        
+        // Check for logged in user on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get agent data from localStorage (set during login)
+            const userData = localStorage.getItem('syncedup_user');
+            if (userData) {
+                currentAgent = JSON.parse(userData);
+                console.log('Logged in as:', currentAgent.name, '- ID:', currentAgent.id);
+                
+                // Allow agents, admin, and super-admin to access this dashboard
+                if (!['agent', 'admin', 'super-admin'].includes(currentAgent.role)) {
+                    window.location.href = '/login.html';
+                }
+            } else {
+                // Redirect to login if not authenticated
+                window.location.href = '/login.html';
+            }
+        });
+
+        // Product database with real FirstEnroll products
+        const products = {
+            'AL': {
+                'individual': [
+                    { id: 'good-health-ind-al', name: 'Good Health Distribution Partner', type: 'Individual', price: 339 },
+                    { id: 'summit-100-ind-al', name: 'Summit Plan 100', type: 'Individual', price: 232 },
+                    { id: 'summit-200-ind-al', name: 'Summit Plan 200', type: 'Individual', price: 270 },
+                    { id: 'sigma-plus-100-ind-al', name: 'Sigma Care PLUS 100', type: 'Individual', price: 214 }
+                ],
+                'family': [
+                    { id: 'good-health-fam-al', name: 'Good Health Distribution Partner', type: 'Family', price: 569 },
+                    { id: 'summit-100-fam-al', name: 'Summit Plan 100', type: 'Family', price: 453 },
+                    { id: 'summit-200-fam-al', name: 'Summit Plan 200', type: 'Family', price: 510 },
+                    { id: 'sigma-plus-100-fam-al', name: 'Sigma Care PLUS 100', type: 'Family', price: 428 }
+                ]
+            },
+            'AZ': {
+                'individual': [
+                    { id: 'good-health-ind-az', name: 'Good Health Distribution Partner', type: 'Individual', price: 339 },
+                    { id: 'summit-100-ind-az', name: 'Summit Plan 100', type: 'Individual', price: 232 },
+                    { id: 'access-health-trad-az', name: 'Access Health Traditional STM', type: 'Individual', price: 125 },
+                    { id: 'access-health-lite-az', name: 'Access Health Lite STM', type: 'Individual', price: 89 }
+                ],
+                'family': [
+                    { id: 'good-health-fam-az', name: 'Good Health Distribution Partner', type: 'Family', price: 569 },
+                    { id: 'summit-100-fam-az', name: 'Summit Plan 100', type: 'Family', price: 453 },
+                    { id: 'access-health-trad-fam-az', name: 'Access Health Traditional STM', type: 'Family', price: 285 }
+                ]
+            }
+            // Add more states and products as needed
+        };
+
+        const addons = [
+            { id: 'dental-vision', name: 'Dental & Vision', price: 49 },
+            { id: 'accident', name: 'Accident Protection', price: 35 },
+            { id: 'critical-illness', name: 'Critical Illness', price: 65 },
+            { id: 'life-50k', name: 'Life Insurance $50K', price: 25 },
+            { id: 'telemedicine', name: 'Telemedicine', price: 15 }
+        ];
+
+        let selectedProduct = null;
+        let selectedAddon = null;
+        let splitSale = false;
+
+        function getProducts() {
+            const state = document.getElementById('stateSelect').value;
+            const coverage = document.getElementById('coverageType').value;
+            
+            if (!state || !coverage) {
+                alert('Please select both state and coverage type');
+                return;
+            }
+            
+            const stateProducts = products[state];
+            if (!stateProducts || !stateProducts[coverage]) {
+                alert('No products available for this selection');
+                return;
+            }
+            
+            const productList = document.getElementById('productList');
+            const addonSection = document.getElementById('addonSection');
+            productList.innerHTML = '';
+            
+            stateProducts[coverage].forEach(product => {
+                const item = document.createElement('div');
+                item.className = 'product-item';
+                item.onclick = () => selectProduct(product);
+                item.innerHTML = `
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-type">${product.type} Coverage</div>
+                    <div class="product-price">${product.price}/month</div>
+                `;
+                productList.appendChild(item);
+            });
+            
+            // Show add-ons
+            const addonList = document.getElementById('addonList');
+            addonList.innerHTML = '';
+            addons.forEach(addon => {
+                const item = document.createElement('div');
+                item.className = 'addon-item';
+                item.onclick = () => selectAddon(addon);
+                item.innerHTML = `
+                    <div class="addon-name">${addon.name}</div>
+                    <div class="addon-price">${addon.price}</div>
+                `;
+                addonList.appendChild(item);
+            });
+            
+            productList.style.display = 'block';
+            addonSection.style.display = 'block';
+        }
+
+        function selectProduct(product) {
+            selectedProduct = product;
+            document.getElementById('selectedProduct').value = `${product.name} - ${product.type}`;
+            document.getElementById('productPrice').value = product.price;
+            
+            // Update UI
+            document.querySelectorAll('.product-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            updateCostBreakdown();
+        }
+
+        function selectAddon(addon) {
+            selectedAddon = addon;
+            document.getElementById('selectedAddon').value = addon.name;
+            document.getElementById('addonPrice').value = addon.price;
+            
+            // Update UI
+            document.querySelectorAll('.addon-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            updateCostBreakdown();
+        }
+
+        function toggleSplitSale() {
+            splitSale = !splitSale;
+            const toggle = document.getElementById('splitSaleToggle');
+            const addonDateGroup = document.getElementById('addonPostDateGroup');
+            
+            if (splitSale) {
+                toggle.classList.add('active');
+                addonDateGroup.style.display = 'block';
+            } else {
+                toggle.classList.remove('active');
+                addonDateGroup.style.display = 'none';
+            }
+        }
+
+        function updateCostBreakdown() {
+            const productPrice = parseFloat(document.getElementById('productPrice').value) || 0;
+            const addonPrice = parseFloat(document.getElementById('addonPrice').value) || 0;
+            const enrollmentFee = 25;
+            const total = productPrice + addonPrice;
+            const commission = total * 0.30;
+            
+            document.getElementById('healthPremiumDisplay').textContent = `${productPrice.toFixed(2)}`;
+            document.getElementById('addonPremiumDisplay').textContent = `${addonPrice.toFixed(2)}`;
+            document.getElementById('totalPremiumDisplay').textContent = `${(total + enrollmentFee).toFixed(2)}`;
+            document.getElementById('commissionDisplay').textContent = `${commission.toFixed(2)}`;
+        }
+
+        function recordSale() {
+            const customerName = document.getElementById('customerName').value;
+            const customerEmail = document.getElementById('customerEmail').value;
+            
+            if (!customerName || !customerEmail || !selectedProduct) {
+                alert('Please fill in all required fields and select a product');
+                return;
+            }
+            
+            const saleData = {
+                agentId: currentAgent?.id || 'AGENT001', // Use logged in agent's ID only
+                agentName: currentAgent?.name || 'Unknown Agent',
+                customerName,
+                customerEmail,
+                product: selectedProduct,
+                addon: selectedAddon,
+                splitSale,
+                healthEffectiveDate: document.getElementById('healthPostDate').value,
+                addonEffectiveDate: splitSale ? document.getElementById('addonPostDate').value : document.getElementById('healthPostDate').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Here you would send to your API
+            console.log('Recording sale:', saleData);
+            
+            const resultDiv = document.getElementById('saleResult');
+            resultDiv.className = 'success-message';
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <strong>✓ Sale Recorded Successfully!</strong><br>
+                Customer: ${customerName}<br>
+                Product: ${selectedProduct.name}<br>
+                ${selectedAddon ? `Add-on: ${selectedAddon.name}<br>` : ''}
+                Commission: ${((selectedProduct.price + (selectedAddon?.price || 0)) * 0.30).toFixed(2)}
+            `;
+            
+            // Reset form after 3 seconds
+            setTimeout(() => {
+                clearSaleForm();
+                resultDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        function clearSaleForm() {
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerEmail').value = '';
+            document.getElementById('selectedProduct').value = '';
+            document.getElementById('selectedAddon').value = '';
+            document.getElementById('productPrice').value = '0';
+            document.getElementById('addonPrice').value = '0';
+            document.getElementById('healthPostDate').value = '';
+            document.getElementById('addonPostDate').value = '';
+            selectedProduct = null;
+            selectedAddon = null;
+            updateCostBreakdown();
+        }
+
+        async function getAgentPerformance() {
+            const timeframe = document.getElementById('timeframe').value;
+            const agentId = currentAgent?.id || 'AGENT001'; // Use logged in agent's ID only
+            
+            try {
+                // Call API with agent's ID from session
+                const response = await fetch(`/api/dashboard?agentId=${agentId}&timeframe=${timeframe}`);
+                const performanceData = await response.json();
+                
+                document.getElementById('totalSales').textContent = performanceData.totalSales || 0;
+                document.getElementById('totalPremium').textContent = `$${(performanceData.totalPremium || 0).toLocaleString()}`;
+                document.getElementById('totalCommission').textContent = `$${(performanceData.totalCommission || 0).toLocaleString()}`;
+                document.getElementById('avgSale').textContent = `$${(performanceData.averageSale || 0).toLocaleString()}`;                
+                
+                document.getElementById('performanceDashboard').style.display = 'block';
+            } catch (error) {
+                console.error('Failed to load performance data:', error);
+                document.getElementById('totalSales').textContent = '0';
+                document.getElementById('totalPremium').textContent = '$0';
+                document.getElementById('totalCommission').textContent = '$0';
+                document.getElementById('avgSale').textContent = '$0';
+                
+                document.getElementById('performanceDashboard').style.display = 'block';
+            }
+        }
+    </script>
+    <script src="/assets/session-prod.js"></script>
 </body>
 </html>
