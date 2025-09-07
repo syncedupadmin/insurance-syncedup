@@ -442,6 +442,15 @@
 
     </script>
     
+    <!-- Simple Theme Loading -->
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('theme') === 'professional') {
+                document.body.classList.add('professional-mode');
+            }
+        });
+    </script>
+    
     <!-- Professional Theme System -->
     <script src="/js/theme-switcher.js"></script>
 </body>

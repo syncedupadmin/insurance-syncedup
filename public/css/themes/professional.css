@@ -1,0 +1,33 @@
+/* PROFESSIONAL THEME - SIMPLE VERSION */
+body.professional-mode {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: Arial, sans-serif !important;
+}
+
+body.professional-mode .sidebar {
+    background: #f0f0f0 !important;
+    border-right: 1px solid #ddd !important;
+}
+
+body.professional-mode .card,
+body.professional-mode .dashboard-card {
+    background: #ffffff !important;
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+}
+
+/* Remove all glassmorphism effects */
+body.professional-mode * {
+    backdrop-filter: none !important;
+    background: transparent !important;
+}
+
+body.professional-mode .sidebar {
+    background: #2c3e50 !important;
+}
+
+body.professional-mode .main-content {
+    background: #ecf0f1 !important;
+}

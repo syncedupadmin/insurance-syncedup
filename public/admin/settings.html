@@ -1053,45 +1053,43 @@ Business City, ST 12345</textarea>
             }, 3000);
         }
 
-        // Professional Mode functionality
+        // Professional Mode functionality - SIMPLE VERSION
         function toggleProfessionalMode() {
-            const isProfessional = localStorage.getItem('professionalMode') === 'true';
-            localStorage.setItem('professionalMode', (!isProfessional).toString());
-            updateProfessionalModeButton();
-            
-            if (!isProfessional) {
-                // Disable classic mode when enabling professional mode
-                localStorage.setItem('classicMode', 'false');
-                updateClassicModeButton();
-                showSuccess('Professional Mode enabled! Page will reload to apply changes.');
+            if (document.body.classList.contains('professional-mode')) {
+                document.body.classList.remove('professional-mode');
+                localStorage.setItem('theme', 'default');
+                showSuccess('Professional mode disabled');
             } else {
-                showSuccess('Professional Mode disabled! Page will reload to apply changes.');
+                document.body.classList.add('professional-mode');
+                localStorage.setItem('theme', 'professional');
+                showSuccess('Professional mode enabled');
             }
-            
-            // Reload page to apply theme changes
-            setTimeout(() => {
-                window.location.reload();
-            }, 1000);
+            updateProfessionalModeButton();
         }
 
         function toggleClassicMode() {
-            const isClassic = localStorage.getItem('classicMode') === 'true';
-            localStorage.setItem('classicMode', (!isClassic).toString());
-            updateClassicModeButton();
-            
-            if (!isClassic) {
-                localStorage.setItem('professionalMode', 'false');
+            // Use the theme switcher system
+            if (window.themeSystem) {
+                const currentTheme = localStorage.getItem('selectedTheme') || 'default';
+                if (currentTheme === 'classic') {
+                    // Switch back to default
+                    window.themeSystem.applyTheme('default');
+                    showSuccess('Classic Mode disabled!');
+                } else {
+                    // Switch to classic
+                    window.themeSystem.applyTheme('classic');
+                    showSuccess('Classic Mode enabled!');
+                }
                 updateProfessionalModeButton();
-                showSuccess('Classic Mode enabled! Page will reload to apply changes.');
+                updateClassicModeButton();
             } else {
-                showSuccess('Classic Mode disabled! Page will reload to apply changes.');
+                console.error('Theme system not available');
+                showError('Theme system not loaded. Please refresh the page.');
             }
-            
-            setTimeout(() => { window.location.reload(); }, 1000);
         }
 
         function updateProfessionalModeButton() {
-            const isProfessional = localStorage.getItem('professionalMode') === 'true';
+            const isProfessional = document.body.classList.contains('professional-mode');
             const button = document.getElementById('professionalModeToggle');
             const text = document.getElementById('professionalModeText');
             
@@ -1107,7 +1105,8 @@ Business City, ST 12345</textarea>
         }
 
         function updateClassicModeButton() {
-            const isClassic = localStorage.getItem('classicMode') === 'true';
+            const currentTheme = localStorage.getItem('selectedTheme') || 'default';
+            const isClassic = currentTheme === 'classic';
             const button = document.getElementById('classicModeToggle');
             const text = document.getElementById('classicModeText');
             
@@ -1122,8 +1121,12 @@ Business City, ST 12345</textarea>
             }
         }
 
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', () => {
+        // Apply saved theme on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('theme') === 'professional') {
+                document.body.classList.add('professional-mode');
+            }
+            
             initializePage();
             
             // Initialize button states

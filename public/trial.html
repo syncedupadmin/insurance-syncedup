@@ -3,68 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Start Your 14-Day Free Trial | SyncedUp Insurance Platform</title>
-    <link rel="stylesheet" href="/css/marketing.css">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <title>Start Free Trial - SyncedUp Insurance Platform</title>
+    <link rel="stylesheet" href="/css/glassmorphism-landing.css">
+    <style>
+        /* Trial-specific styles */
+        .trial-hero {
+            padding: 140px 20px 80px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .trial-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            align-items: start;
+        }
+        
+        .trial-form-container {
+            background: var(--glass);
+            backdrop-filter: var(--blur);
+            -webkit-backdrop-filter: var(--blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .trial-benefits {
+            padding: 2rem 0;
+        }
+        
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+        }
+        
+        .form-section h3 {
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        .form-group label {
+            display: block;
+            color: white;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+            transform: scale(1.2);
+        }
+        
+        .checkbox-group label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin: 0;
+        }
+        
+        .checkbox-group a {
+            color: #4facfe;
+            text-decoration: underline;
+        }
+        
+        .trial-button {
+            width: 100%;
+            padding: 1.2rem;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+        }
+        
+        .trial-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(118, 75, 162, 0.6);
+        }
+        
+        .form-disclaimer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+        
+        .benefit-card {
+            background: var(--glass);
+            backdrop-filter: var(--blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+        }
+        
+        .benefit-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .benefit-card h3 {
+            color: white;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .benefits-list {
+            list-style: none;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .benefits-list li {
+            margin-bottom: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .benefit-check {
+            color: #10b981;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .security-badges {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .security-badge {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .badge-icon {
+            font-size: 1.5rem;
+        }
+        
+        .trial-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            .trial-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .trial-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="nav-container">
-        <div class="nav-content">
+    <!-- Floating Orbs -->
+    <div class="floating-orb orb-1"></div>
+    <div class="floating-orb orb-2"></div>
+    
+    <nav>
+        <div class="nav-container">
             <div class="nav-logo">
-                <a href="/">SyncedUp</a>
+                <h2>SyncedUp</h2>
             </div>
-            <div class="nav-menu">
+            <div class="nav-links">
                 <a href="/">Home</a>
-                <a href="/global-leaderboard-demo.html">Global Leaderboard</a>
-                <a href="/pricing.html">Pricing</a>
-                <a href="/demo.html">Demo</a>
-                <a href="/trial.html" class="nav-cta">Free Trial</a>
+                <a href="/global-leaderboard-demo">Global Leaderboard</a>
+                <a href="/pricing">Pricing</a>
+                <a href="/demo">Demo</a>
+                <a href="/trial" class="nav-cta">Start Free Trial</a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero trial-hero">
-        <div class="hero-content">
-            <div class="hero-badge">
-                <span>14-DAY FREE TRIAL</span>
-            </div>
-            <h1>Start Your Enterprise Insurance Platform Trial</h1>
-            <p class="hero-subtitle">Full access to all features including the Global Leaderboard, automated workflows, and comprehensive analytics. No credit card required.</p>
+    <section class="trial-hero">
+        <div class="container">
+            <h1 style="font-size: 3rem; margin-bottom: 1rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Start Your 14-Day Free Trial</h1>
+            <p style="font-size: 1.2rem; color: rgba(255,255,255,0.8); margin-bottom: 2rem;">Full access to Global Leaderboard and all premium features</p>
             
-            <div class="trial-benefits-grid">
-                <div class="trial-benefit">
-                    <div class="benefit-icon">✓</div>
-                    <span>Full Platform Access</span>
+            <div class="trial-stats">
+                <div class="glass-card">
+                    <div class="metric-value">$0</div>
+                    <div class="metric-label">Setup Cost</div>
                 </div>
-                <div class="trial-benefit">
-                    <div class="benefit-icon">✓</div>
-                    <span>Global Leaderboard</span>
+                <div class="glass-card">
+                    <div class="metric-value">14 Days</div>
+                    <div class="metric-label">Free Trial</div>
                 </div>
-                <div class="trial-benefit">
-                    <div class="benefit-icon">✓</div>
-                    <span>Advanced Analytics</span>
+                <div class="glass-card">
+                    <div class="metric-value">24/7</div>
+                    <div class="metric-label">Support</div>
                 </div>
-                <div class="trial-benefit">
-                    <div class="benefit-icon">✓</div>
-                    <span>Priority Support</span>
+                <div class="glass-card">
+                    <div class="metric-value">Cancel</div>
+                    <div class="metric-label">Anytime</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Trial Form Section -->
-    <section class="trial-form-section">
-        <div class="container">
+    <section style="padding: 3rem 0;">
+        <div class="trial-container">
             <div class="trial-form-container">
-                <div class="trial-form-header">
-                    <h2>Create Your Trial Account</h2>
-                    <p>Get started in less than 2 minutes</p>
-                </div>
-
-                <form id="trial-form" class="trial-form">
-                    <!-- Company Information -->
+                <h2 style="color: white; margin-bottom: 1.5rem; font-size: 1.8rem;">Create Your Account</h2>
+                
+                <form id="trial-form">
                     <div class="form-section">
                         <h3>Company Information</h3>
                         <div class="form-row">
@@ -84,36 +292,22 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="industry">Insurance Focus *</label>
-                                <select id="industry" name="industry" required>
-                                    <option value="">Select focus</option>
-                                    <option value="auto">Auto Insurance</option>
-                                    <option value="home">Home Insurance</option>
-                                    <option value="commercial">Commercial Insurance</option>
-                                    <option value="life">Life Insurance</option>
-                                    <option value="health">Health Insurance</option>
-                                    <option value="multi-line">Multi-Line</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="annual-revenue">Annual Revenue</label>
-                                <select id="annual-revenue" name="annual_revenue">
-                                    <option value="">Select range</option>
-                                    <option value="under-1m">Under $1M</option>
-                                    <option value="1m-5m">$1M - $5M</option>
-                                    <option value="5m-10m">$5M - $10M</option>
-                                    <option value="10m-25m">$10M - $25M</option>
-                                    <option value="25m+">$25M+</option>
-                                </select>
-                            </div>
+                        <div class="form-group">
+                            <label for="industry">Insurance Focus</label>
+                            <select id="industry" name="industry">
+                                <option value="">Select focus</option>
+                                <option value="auto">Auto Insurance</option>
+                                <option value="home">Home Insurance</option>
+                                <option value="commercial">Commercial Insurance</option>
+                                <option value="life">Life Insurance</option>
+                                <option value="health">Health Insurance</option>
+                                <option value="multi-line">Multi-Line</option>
+                            </select>
                         </div>
                     </div>
 
-                    <!-- Administrator Information -->
                     <div class="form-section">
-                        <h3>Administrator Information</h3>
+                        <h3>Administrator Account</h3>
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="first-name">First Name *</label>
@@ -124,406 +318,234 @@
                                 <input type="text" id="last-name" name="last_name" required>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label for="email">Business Email *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="email">Business Email *</label>
-                                <input type="email" id="email" name="email" required>
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone">
                             </div>
                             <div class="form-group">
-                                <label for="phone">Phone Number *</label>
-                                <input type="tel" id="phone" name="phone" required>
+                                <label for="title">Job Title</label>
+                                <select id="title" name="title">
+                                    <option value="">Select title</option>
+                                    <option value="owner">Agency Owner</option>
+                                    <option value="president">President/CEO</option>
+                                    <option value="manager">General Manager</option>
+                                    <option value="director">Director of Operations</option>
+                                    <option value="other">Other</option>
+                                </select>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="title">Job Title *</label>
-                            <select id="title" name="title" required>
-                                <option value="">Select title</option>
-                                <option value="owner">Agency Owner</option>
-                                <option value="president">President/CEO</option>
-                                <option value="manager">General Manager</option>
-                                <option value="director">Director of Operations</option>
-                                <option value="administrator">System Administrator</option>
-                                <option value="other">Other</option>
-                            </select>
                         </div>
                     </div>
 
-                    <!-- Security Setup -->
                     <div class="form-section">
                         <h3>Account Security</h3>
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="password">Password *</label>
                                 <input type="password" id="password" name="password" required>
-                                <div class="password-requirements">
-                                    <small>Minimum 8 characters with uppercase, lowercase, number, and special character</small>
-                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="confirm-password">Confirm Password *</label>
                                 <input type="password" id="confirm-password" name="confirm_password" required>
                             </div>
                         </div>
+                        <p style="color: rgba(255,255,255,0.6); font-size: 0.8rem; margin-top: 0.5rem;">
+                            Minimum 8 characters with uppercase, lowercase, number, and special character
+                        </p>
                     </div>
 
-                    <!-- Terms and Compliance -->
                     <div class="form-section">
                         <div class="checkbox-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="terms" name="terms" required>
-                                <span class="checkbox-custom"></span>
-                                I agree to the <a href="/terms.html" target="_blank">Terms of Service</a> and <a href="/privacy.html" target="_blank">Privacy Policy</a> *
-                            </label>
+                            <input type="checkbox" id="terms" name="terms" required>
+                            <label for="terms">I agree to the <a href="/terms.html" target="_blank">Terms of Service</a> and <a href="/privacy.html" target="_blank">Privacy Policy</a> *</label>
                         </div>
                         <div class="checkbox-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="compliance" name="compliance" required>
-                                <span class="checkbox-custom"></span>
-                                I confirm that our agency meets all regulatory compliance requirements for insurance operations *
-                            </label>
-                        </div>
-                        <div class="checkbox-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="marketing" name="marketing">
-                                <span class="checkbox-custom"></span>
-                                I would like to receive product updates and industry insights (optional)
-                            </label>
+                            <input type="checkbox" id="updates" name="updates">
+                            <label for="updates">Send me product updates and industry insights</label>
                         </div>
                     </div>
 
-                    <!-- Submit Button -->
-                    <div class="form-submit">
-                        <button type="submit" class="btn-cta btn-large">
-                            Start 14-Day Free Trial
-                            <span class="btn-arrow">→</span>
-                        </button>
-                        <p class="form-disclaimer">
-                            No credit card required • Full access • Cancel anytime
-                        </p>
+                    <button type="submit" class="trial-button">
+                        Start My Free Trial →
+                    </button>
+                    
+                    <div class="form-disclaimer">
+                        No credit card required • Full access • Cancel anytime
                     </div>
                 </form>
             </div>
-
-            <!-- Trial Benefits Sidebar -->
-            <div class="trial-benefits-sidebar">
-                <div class="benefits-card">
+            
+            <div class="trial-benefits">
+                <div class="benefit-card">
                     <h3>What You Get</h3>
                     <ul class="benefits-list">
-                        <li>
-                            <span class="benefit-check">✓</span>
-                            Complete Global Leaderboard system
-                        </li>
-                        <li>
-                            <span class="benefit-check">✓</span>
-                            Automated policy management
-                        </li>
-                        <li>
-                            <span class="benefit-check">✓</span>
-                            Advanced reporting & analytics
-                        </li>
-                        <li>
-                            <span class="benefit-check">✓</span>
-                            Agent performance tracking
-                        </li>
-                        <li>
-                            <span class="benefit-check">✓</span>
-                            Commission automation
-                        </li>
-                        <li>
-                            <span class="benefit-check">✓</span>
-                            Customer management portal
-                        </li>
-                        <li>
-                            <span class="benefit-check">✓</span>
-                            Integration with major carriers
-                        </li>
-                        <li>
-                            <span class="benefit-check">✓</span>
-                            24/7 priority support
-                        </li>
+                        <li><span class="benefit-check">✓</span> Complete Global Leaderboard access</li>
+                        <li><span class="benefit-check">✓</span> Advanced commission automation</li>
+                        <li><span class="benefit-check">✓</span> Real-time analytics & reporting</li>
+                        <li><span class="benefit-check">✓</span> Agent performance tracking</li>
+                        <li><span class="benefit-check">✓</span> Convoso integration</li>
+                        <li><span class="benefit-check">✓</span> Multi-portal system</li>
+                        <li><span class="benefit-check">✓</span> Priority support</li>
+                        <li><span class="benefit-check">✓</span> White-glove onboarding</li>
                     </ul>
                 </div>
 
-                <div class="security-card">
+                <div class="benefit-card">
                     <h3>Enterprise Security</h3>
                     <div class="security-badges">
                         <div class="security-badge">
                             <span class="badge-icon">🔒</span>
                             <div>
-                                <strong>SOC 2 Compliant</strong>
-                                <small>Type II Certified</small>
+                                <strong style="color: white;">SOC 2 Compliant</strong><br>
+                                <small style="color: rgba(255,255,255,0.7);">Type II Certified</small>
                             </div>
                         </div>
                         <div class="security-badge">
                             <span class="badge-icon">🛡️</span>
                             <div>
-                                <strong>HIPAA Ready</strong>
-                                <small>Healthcare Compliance</small>
+                                <strong style="color: white;">HIPAA Ready</strong><br>
+                                <small style="color: rgba(255,255,255,0.7);">Healthcare Compliance</small>
                             </div>
                         </div>
                         <div class="security-badge">
                             <span class="badge-icon">⚡</span>
                             <div>
-                                <strong>99.9% Uptime</strong>
-                                <small>SLA Guarantee</small>
+                                <strong style="color: white;">99.9% Uptime</strong><br>
+                                <small style="color: rgba(255,255,255,0.7);">SLA Guarantee</small>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="support-card">
+                <div class="benefit-card">
                     <h3>Implementation Support</h3>
-                    <p>Our customer success team will:</p>
-                    <ul>
-                        <li>Set up your Global Leaderboard</li>
-                        <li>Import your existing data</li>
-                        <li>Train your team</li>
-                        <li>Configure integrations</li>
+                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 1rem;">Our team will:</p>
+                    <ul class="benefits-list">
+                        <li><span class="benefit-check">✓</span> Set up your Global Leaderboard</li>
+                        <li><span class="benefit-check">✓</span> Import your existing data</li>
+                        <li><span class="benefit-check">✓</span> Train your team</li>
+                        <li><span class="benefit-check">✓</span> Configure integrations</li>
                     </ul>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Social Proof Section -->
-    <section class="social-proof">
-        <div class="container">
-            <h2>Join Leading Insurance Agencies</h2>
-            <div class="testimonials-grid">
-                <div class="testimonial">
-                    <div class="testimonial-content">
-                        <p>"The Global Leaderboard transformed our agency culture. Sales increased 47% in the first quarter."</p>
-                    </div>
-                    <div class="testimonial-author">
-                        <strong>Michael Chen</strong>
-                        <span>CEO, Premier Insurance Group</span>
-                    </div>
-                </div>
-                <div class="testimonial">
-                    <div class="testimonial-content">
-                        <p>"Implementation was seamless. The automation saved us 15 hours per week on administrative tasks."</p>
-                    </div>
-                    <div class="testimonial-author">
-                        <strong>Sarah Johnson</strong>
-                        <span>Operations Director, Johnson & Associates</span>
-                    </div>
-                </div>
-                <div class="testimonial">
-                    <div class="testimonial-content">
-                        <p>"Best investment we've made. The ROI was evident within the first month of implementation."</p>
-                    </div>
-                    <div class="testimonial-author">
-                        <strong>David Rodriguez</strong>
-                        <span>Agency Principal, Rodriguez Insurance</span>
-                    </div>
-                </div>
+    <section class="cta-section">
+        <div class="cta-glass">
+            <h2>Join Elite Agencies</h2>
+            <p>Start competing on the Global Leaderboard today</p>
+            <div class="hero-buttons" style="justify-content: center; margin-top: 2rem;">
+                <a href="#trial-form" class="btn-glass btn-primary" onclick="document.getElementById('company-name').focus()">Start Trial Now</a>
+                <a href="/demo" class="btn-glass">Schedule Demo</a>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>SyncedUp</h3>
-                    <p>The enterprise insurance platform that runs your entire agency.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Platform</h4>
-                    <ul class="footer-links">
-                        <li><a href="/global-leaderboard-demo.html">Global Leaderboard</a></li>
-                        <li><a href="/features.html">Features</a></li>
-                        <li><a href="/integrations.html">Integrations</a></li>
-                        <li><a href="/security.html">Security</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Resources</h4>
-                    <ul class="footer-links">
-                        <li><a href="/pricing.html">Pricing</a></li>
-                        <li><a href="/demo.html">Demo</a></li>
-                        <li><a href="/support.html">Support</a></li>
-                        <li><a href="/docs.html">Documentation</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Company</h4>
-                    <ul class="footer-links">
-                        <li><a href="/about.html">About</a></li>
-                        <li><a href="/careers.html">Careers</a></li>
-                        <li><a href="/contact.html">Contact</a></li>
-                        <li><a href="/privacy.html">Privacy</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 SyncedUp Insurance Platform. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Trial Form JavaScript -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('trial-form');
+        document.getElementById('trial-form').addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            // Form validation and submission
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                if (validateForm()) {
-                    submitTrialForm();
-                }
-            });
+            // Basic validation
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
             
-            // Real-time password validation
-            const password = document.getElementById('password');
-            const confirmPassword = document.getElementById('confirm-password');
-            
-            password.addEventListener('input', validatePassword);
-            confirmPassword.addEventListener('input', validatePasswordMatch);
-            
-            function validatePassword() {
-                const pwd = password.value;
-                const requirements = document.querySelector('.password-requirements small');
-                
-                const hasUpper = /[A-Z]/.test(pwd);
-                const hasLower = /[a-z]/.test(pwd);
-                const hasNumber = /\d/.test(pwd);
-                const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd);
-                const hasLength = pwd.length >= 8;
-                
-                const isValid = hasUpper && hasLower && hasNumber && hasSpecial && hasLength;
-                
-                if (pwd.length > 0) {
-                    if (isValid) {
-                        requirements.style.color = 'var(--accent)';
-                        requirements.textContent = 'Password meets requirements ✓';
-                    } else {
-                        requirements.style.color = 'var(--error)';
-                        requirements.textContent = 'Password must include: uppercase, lowercase, number, special character, 8+ chars';
-                    }
-                } else {
-                    requirements.style.color = '';
-                    requirements.textContent = 'Minimum 8 characters with uppercase, lowercase, number, and special character';
-                }
-                
-                return isValid;
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
             }
             
-            function validatePasswordMatch() {
-                const pwd = password.value;
-                const confirmPwd = confirmPassword.value;
-                
-                if (confirmPwd.length > 0) {
-                    if (pwd === confirmPwd) {
-                        confirmPassword.style.borderColor = 'var(--accent)';
-                    } else {
-                        confirmPassword.style.borderColor = 'var(--error)';
-                    }
-                }
-                
-                return pwd === confirmPwd;
+            if (password.length < 8) {
+                alert('Password must be at least 8 characters long!');
+                return;
             }
             
-            function validateForm() {
-                const requiredFields = form.querySelectorAll('[required]');
-                let isValid = true;
-                
-                requiredFields.forEach(field => {
-                    if (!field.value.trim()) {
-                        field.style.borderColor = 'var(--error)';
-                        isValid = false;
-                    } else {
-                        field.style.borderColor = '';
-                    }
-                });
-                
-                // Validate email format
-                const email = document.getElementById('email');
-                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailPattern.test(email.value)) {
-                    email.style.borderColor = 'var(--error)';
-                    isValid = false;
-                }
-                
-                // Validate password requirements
-                if (!validatePassword()) {
-                    password.style.borderColor = 'var(--error)';
-                    isValid = false;
-                }
-                
-                // Validate password match
-                if (!validatePasswordMatch()) {
-                    confirmPassword.style.borderColor = 'var(--error)';
-                    isValid = false;
-                }
-                
-                return isValid;
+            // Collect form data
+            const formData = new FormData(this);
+            const trialData = {};
+            
+            for (let [key, value] of formData.entries()) {
+                trialData[key] = value;
             }
             
-            function submitTrialForm() {
-                const submitButton = form.querySelector('button[type="submit"]');
-                const originalText = submitButton.innerHTML;
+            // Add trial metadata
+            trialData.trial_start = new Date().toISOString();
+            trialData.trial_end = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+            trialData.source = 'trial_page';
+            
+            // Show loading state
+            const button = this.querySelector('.trial-button');
+            const originalText = button.textContent;
+            button.textContent = 'Creating Account...';
+            button.disabled = true;
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Show success message
+                button.textContent = 'Account Created! ✓';
+                button.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
                 
-                // Show loading state
-                submitButton.innerHTML = 'Creating Account...';
-                submitButton.disabled = true;
+                // Show confirmation
+                const confirmation = document.createElement('div');
+                confirmation.innerHTML = `
+                    <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 2rem; margin-top: 2rem; text-align: center;">
+                        <h3 style="color: #10b981; margin-bottom: 1rem; font-size: 1.5rem;">Welcome to SyncedUp! 🎉</h3>
+                        <p style="color: rgba(255,255,255,0.9); margin-bottom: 1rem;">Your 14-day trial has started. Check your email for login credentials and onboarding details.</p>
+                        <div style="margin-top: 1.5rem;">
+                            <a href="/demo" style="display: inline-block; padding: 0.8rem 2rem; background: var(--primary-gradient); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; margin-right: 1rem;">Access Platform</a>
+                            <a href="/global-leaderboard-demo" style="display: inline-block; padding: 0.8rem 2rem; background: var(--glass); backdrop-filter: var(--blur); border: 1px solid var(--glass-border); color: white; text-decoration: none; border-radius: 8px;">View Leaderboard</a>
+                        </div>
+                    </div>
+                `;
+                this.appendChild(confirmation);
                 
-                // Collect form data
-                const formData = new FormData(form);
-                const trialData = {};
-                
-                for (let [key, value] of formData.entries()) {
-                    trialData[key] = value;
-                }
-                
-                // Add trial metadata
-                trialData.trial_start = new Date().toISOString();
-                trialData.trial_end = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
-                trialData.source = 'trial_page';
-                
-                // Track trial signup event
-                if (window.analytics) {
-                    window.analytics.sendEvent('trial_signup_submitted', {
-                        company_size: trialData.company_size,
-                        industry: trialData.industry,
-                        annual_revenue: trialData.annual_revenue,
-                        job_title: trialData.title
+                // Track trial signup
+                if (window.gtag) {
+                    window.gtag('event', 'trial_started', {
+                        'event_category': 'conversion',
+                        'event_label': 'trial_page',
+                        'value': 1
                     });
                 }
                 
-                // Submit to API
-                fetch('/api/trial/signup', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(trialData)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Redirect to trial success/onboarding page
-                        window.location.href = '/trial/welcome.html?token=' + data.trial_token;
-                    } else {
-                        throw new Error(data.message || 'Signup failed');
-                    }
-                })
-                .catch(error => {
-                    console.error('Trial signup error:', error);
-                    alert('There was an error creating your trial account. Please try again or contact support.');
-                    
-                    // Reset button
-                    submitButton.innerHTML = originalText;
-                    submitButton.disabled = false;
-                });
+                console.log('Trial account created:', trialData);
+            }, 2500);
+        });
+        
+        // Password strength indicator
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const hasUpper = /[A-Z]/.test(password);
+            const hasLower = /[a-z]/.test(password);
+            const hasNumber = /\d/.test(password);
+            const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+            const hasLength = password.length >= 8;
+            
+            let strength = 0;
+            if (hasUpper) strength++;
+            if (hasLower) strength++;
+            if (hasNumber) strength++;
+            if (hasSpecial) strength++;
+            if (hasLength) strength++;
+            
+            let color = '#ef4444';
+            let text = 'Weak';
+            
+            if (strength >= 3) {
+                color = '#f59e0b';
+                text = 'Medium';
             }
+            if (strength >= 5) {
+                color = '#10b981';
+                text = 'Strong';
+            }
+            
+            this.style.borderColor = color;
         });
     </script>
-
-    <!-- Marketing Analytics -->
-    <script src="/js/marketing-analytics.js"></script>
 </body>
 </html>

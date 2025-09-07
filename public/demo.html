@@ -3,441 +3,314 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Schedule Your Live Demo - SyncedUp</title>
-    <meta name="description" content="See SyncedUp in action with a personalized demo. Watch live Global Leaderboard competition, commission automation, and ROI calculation for your agency.">
-    <link rel="stylesheet" href="/css/marketing.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>Schedule Demo - SyncedUp Insurance Platform</title>
+    <link rel="stylesheet" href="/css/glassmorphism-landing.css">
     <style>
-        .demo-form-section {
-            padding: 80px 0;
-            background: var(--bg-light);
+        /* Demo-specific styles */
+        .demo-hero {
+            padding: 140px 20px 80px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .demo-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            align-items: start;
         }
         
         .demo-form-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 16px;
-            padding: 48px;
-            box-shadow: var(--shadow-xl);
-            border: 1px solid #e2e8f0;
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 32px;
-        }
-        
-        .form-group {
-            margin-bottom: 24px;
-        }
-        
-        .form-group.full-width {
-            grid-column: span 2;
-        }
-        
-        .form-label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-            font-size: 14px;
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.2s ease;
-            font-family: inherit;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-        
-        .form-select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 16px;
-            background: white;
-            font-family: inherit;
-        }
-        
-        .form-textarea {
-            min-height: 100px;
-            resize: vertical;
+            background: var(--glass);
+            backdrop-filter: var(--blur);
+            -webkit-backdrop-filter: var(--blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-lg);
         }
         
         .demo-benefits {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 32px;
-            margin: 64px 0;
+            padding: 2rem 0;
         }
         
         .benefit-item {
             display: flex;
             align-items: flex-start;
-            gap: 16px;
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
         
         .benefit-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--primary);
-            color: white;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-gradient);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 1.5rem;
             flex-shrink: 0;
         }
         
         .benefit-content h3 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-primary);
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
         }
         
         .benefit-content p {
-            color: var(--text-secondary);
-            line-height: 1.5;
-            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
         }
         
-        .demo-preview {
-            background: var(--bg-white);
-            border-radius: 16px;
-            padding: 40px;
-            border: 1px solid #e2e8f0;
-            margin: 32px 0;
+        .form-group {
+            margin-bottom: 1.5rem;
         }
         
-        .demo-video-placeholder {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            border-radius: 12px;
-            padding: 80px 40px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .play-button {
-            width: 80px;
-            height: 80px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 24px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-        
-        .play-button:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.1);
-        }
-        
-        .play-button::after {
-            content: "▶";
-            font-size: 24px;
-            margin-left: 4px;
-        }
-        
-        .social-proof-mini {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 32px;
-            margin: 32px 0;
-            opacity: 0.8;
-        }
-        
-        .social-proof-mini .stat {
-            text-align: center;
-        }
-        
-        .social-proof-mini .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-        
-        .social-proof-mini .stat-label {
-            font-size: 12px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .urgency-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--error);
-            margin-bottom: 24px;
-        }
-        
-        .urgency-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--error);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-        
-        .form-success {
-            display: none;
-            text-align: center;
-            padding: 48px;
-            background: rgba(16, 185, 129, 0.1);
-            border: 2px solid rgba(16, 185, 129, 0.2);
-            border-radius: 16px;
-            color: var(--accent);
-        }
-        
-        .form-success.show {
+        .form-group label {
             display: block;
-        }
-        
-        .form-success h3 {
-            font-size: 24px;
-            margin-bottom: 16px;
-            color: var(--accent);
-        }
-        
-        .next-steps {
-            background: var(--bg-light);
-            padding: 32px;
-            border-radius: 12px;
-            margin-top: 32px;
-        }
-        
-        .next-steps h4 {
-            font-size: 18px;
+            color: white;
+            margin-bottom: 0.5rem;
             font-weight: 600;
-            margin-bottom: 16px;
-            color: var(--text-primary);
         }
         
-        .next-steps ol {
-            padding-left: 20px;
-            color: var(--text-secondary);
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
         }
         
-        .next-steps li {
-            margin-bottom: 8px;
-            line-height: 1.5;
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .demo-button {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .demo-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(118, 75, 162, 0.5);
+        }
+        
+        .social-proof-section {
+            padding: 4rem 20px;
+            text-align: center;
+        }
+        
+        .testimonial-carousel {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .testimonial-item {
+            background: var(--glass);
+            backdrop-filter: var(--blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .testimonial-quote {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .author-avatar {
+            width: 60px;
+            height: 60px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        
+        .author-info {
+            text-align: left;
+        }
+        
+        .author-name {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+        
+        .author-title {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+        
+        .demo-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            .demo-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
+    <!-- Floating Orbs -->
+    <div class="floating-orb orb-1"></div>
+    <div class="floating-orb orb-2"></div>
+    
+    <nav>
         <div class="nav-container">
             <div class="nav-logo">
-                <img src="/images/Transparent.png" alt="SyncedUp" height="40">
+                <h2>SyncedUp</h2>
             </div>
-            <div class="nav-menu">
-                <a href="/#features">Features</a>
-                <a href="/global-leaderboard-demo.html">Global Leaderboard</a>
-                <a href="/pricing.html">Pricing</a>
-                <a href="/customers.html">Customers</a>
-                <a href="/resources.html">Resources</a>
-                <a href="/company.html">Company</a>
-            </div>
-            <div class="nav-actions">
-                <a href="/login.html" class="nav-link">Sign In</a>
-                <a href="/trial.html" class="btn btn-cta">Start Free Trial</a>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/global-leaderboard-demo">Global Leaderboard</a>
+                <a href="/pricing">Pricing</a>
+                <a href="/demo">Demo</a>
+                <a href="/trial" class="nav-cta">Start Free Trial</a>
             </div>
         </div>
     </nav>
 
-    <!-- Demo Hero -->
-    <section class="hero">
+    <section class="demo-hero">
         <div class="container">
-            <div class="hero-content">
-                <div class="hero-text" style="max-width: 100%; text-align: center;">
-                    <div class="urgency-indicator">
-                        <div class="urgency-dot"></div>
-                        <span>Only 3 demo slots left this week</span>
-                    </div>
-                    <h1 class="hero-title">
-                        See Your Agency's ROI<br>
-                        in Real-Time
-                    </h1>
-                    <p class="hero-subtitle">
-                        Get a personalized 20-minute demo showing exactly how SyncedUp will transform your agency. 
-                        We'll calculate your custom ROI and show you the Global Leaderboard in action.
-                    </p>
-                    <div class="social-proof-mini">
-                        <div class="stat">
-                            <div class="stat-value">47%</div>
-                            <div class="stat-label">Avg Sales Increase</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-value">$89K+</div>
-                            <div class="stat-label">Annual Savings</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-value">3 mins</div>
-                            <div class="stat-label">Setup Time</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <h1 style="font-size: 3rem; margin-bottom: 1rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">See SyncedUp in Action</h1>
+            <p style="font-size: 1.2rem; color: rgba(255,255,255,0.8); margin-bottom: 3rem;">Get a personalized demo and see how the Global Leaderboard transforms your agency</p>
         </div>
     </section>
 
-    <!-- Demo Form Section -->
-    <section class="demo-form-section">
-        <div class="container">
+    <section style="padding: 3rem 0;">
+        <div class="demo-container">
             <div class="demo-form-container">
-                <!-- Demo Form -->
-                <div id="demo-form">
-                    <h2 style="text-align: center; margin-bottom: 32px; color: var(--text-primary);">
-                        Schedule Your Personalized Demo
-                    </h2>
-                    
-                    <form id="demoRequestForm" onsubmit="submitDemoForm(event)">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="firstName" class="form-label">First Name *</label>
-                                <input type="text" id="firstName" name="firstName" class="form-input" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="lastName" class="form-label">Last Name *</label>
-                                <input type="text" id="lastName" name="lastName" class="form-input" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="email" class="form-label">Work Email *</label>
-                                <input type="email" id="email" name="email" class="form-input" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="phone" class="form-label">Phone Number *</label>
-                                <input type="tel" id="phone" name="phone" class="form-input" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="company" class="form-label">Agency Name *</label>
-                                <input type="text" id="company" name="company" class="form-input" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="agentCount" class="form-label">Number of Agents *</label>
-                                <select id="agentCount" name="agentCount" class="form-select" required>
-                                    <option value="">Select range...</option>
-                                    <option value="1-10">1-10 agents</option>
-                                    <option value="11-25">11-25 agents</option>
-                                    <option value="26-50">26-50 agents</option>
-                                    <option value="51-100">51-100 agents</option>
-                                    <option value="100+">100+ agents</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="role" class="form-label">Your Role *</label>
-                                <select id="role" name="role" class="form-select" required>
-                                    <option value="">Select role...</option>
-                                    <option value="owner">Agency Owner</option>
-                                    <option value="manager">Manager/Director</option>
-                                    <option value="admin">Administrator</option>
-                                    <option value="agent">Agent</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="timePreference" class="form-label">Best Time to Call *</label>
-                                <select id="timePreference" name="timePreference" class="form-select" required>
-                                    <option value="">Select time...</option>
-                                    <option value="morning">Morning (9am-12pm)</option>
-                                    <option value="afternoon">Afternoon (12pm-4pm)</option>
-                                    <option value="evening">Evening (4pm-7pm)</option>
-                                    <option value="flexible">I'm flexible</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <label for="challenges" class="form-label">What's your biggest challenge right now? (Optional)</label>
-                                <textarea id="challenges" name="challenges" class="form-input form-textarea" 
-                                    placeholder="e.g., Commission tracking errors, manual admin work, agent motivation, etc."></textarea>
-                            </div>
-                            
-                            <div class="form-group full-width">
-                                <button type="submit" class="btn btn-cta" style="width: 100%; padding: 16px;">
-                                    Schedule My Demo Now
-                                </button>
-                            </div>
+                <h2 style="color: white; margin-bottom: 1.5rem; font-size: 1.8rem;">Schedule Your Demo</h2>
+                <form id="demo-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="first-name">First Name *</label>
+                            <input type="text" id="first-name" name="firstName" required>
                         </div>
-                    </form>
-                </div>
-                
-                <!-- Success Message -->
-                <div id="form-success" class="form-success">
-                    <h3>🎉 Demo Scheduled Successfully!</h3>
-                    <p style="margin-bottom: 24px; font-size: 16px;">
-                        Thank you! Our team will contact you within 2 hours to confirm your personalized demo time.
+                        <div class="form-group">
+                            <label for="last-name">Last Name *</label>
+                            <input type="text" id="last-name" name="lastName" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Business Email *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="company">Company Name *</label>
+                            <input type="text" id="company" name="company" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="agents">Number of Agents</label>
+                            <select id="agents" name="agents">
+                                <option value="">Select range</option>
+                                <option value="1-10">1-10 agents</option>
+                                <option value="11-25">11-25 agents</option>
+                                <option value="26-50">26-50 agents</option>
+                                <option value="51-100">51-100 agents</option>
+                                <option value="100+">100+ agents</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="timeline">Implementation Timeline</label>
+                            <select id="timeline" name="timeline">
+                                <option value="">Select timeline</option>
+                                <option value="immediate">Immediate (within 30 days)</option>
+                                <option value="quarter">This Quarter</option>
+                                <option value="six-months">Next 6 months</option>
+                                <option value="exploring">Just exploring</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="challenges">Current Challenges (Optional)</label>
+                        <textarea id="challenges" name="challenges" placeholder="What challenges is your agency facing that we might help solve?"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="demo-button">
+                        Schedule My Demo
+                    </button>
+                    
+                    <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; text-align: center; margin-top: 1rem;">
+                        We'll contact you within 24 hours to schedule your personalized demo
                     </p>
-                    
-                    <div class="next-steps">
-                        <h4>What happens next:</h4>
-                        <ol>
-                            <li><strong>Within 2 hours:</strong> Our team calls to confirm your demo time</li>
-                            <li><strong>Before the demo:</strong> We'll prepare your custom ROI calculation</li>
-                            <li><strong>During the demo:</strong> See live Global Leaderboard competition and automated commission tracking</li>
-                            <li><strong>After the demo:</strong> Get instant access to your free trial if you're ready</li>
-                        </ol>
-                    </div>
-                    
-                    <div style="margin-top: 32px;">
-                        <a href="/trial.html" class="btn btn-primary" style="margin-right: 16px;">Start Free Trial Now</a>
-                        <a href="/" class="btn btn-secondary">Back to Homepage</a>
-                    </div>
-                </div>
+                </form>
             </div>
-        </div>
-    </section>
-
-    <!-- Demo Benefits -->
-    <section style="padding: 80px 0; background: var(--bg-white);">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">What You'll See in Your Demo</h2>
-                <p class="section-subtitle">A personalized walkthrough of exactly how SyncedUp works for your agency</p>
-            </div>
-
+            
             <div class="demo-benefits">
+                <h2 style="color: white; margin-bottom: 2rem; font-size: 1.8rem;">What You'll See in Your Demo</h2>
+                
                 <div class="benefit-item">
                     <div class="benefit-icon">🏆</div>
                     <div class="benefit-content">
                         <h3>Live Global Leaderboard</h3>
-                        <p>Watch real agents compete in real-time. See how the competition drives 47% more sales on average.</p>
+                        <p>Watch real-time competition drive sales growth across agencies. See how rankings motivate agents to perform at their peak.</p>
                     </div>
                 </div>
                 
@@ -445,201 +318,154 @@
                     <div class="benefit-icon">💰</div>
                     <div class="benefit-content">
                         <h3>Commission Automation</h3>
-                        <p>See how automated commission tracking eliminates errors and saves 15+ hours per week.</p>
+                        <p>See how our AI catches commission errors before they cost you thousands. Automated calculations and split management.</p>
                     </div>
                 </div>
                 
                 <div class="benefit-item">
                     <div class="benefit-icon">📊</div>
                     <div class="benefit-content">
-                        <h3>Your Custom ROI</h3>
-                        <p>We'll calculate your exact savings and revenue increase based on your agency size.</p>
+                        <h3>Executive Dashboards</h3>
+                        <p>Real-time analytics and reporting that give you complete visibility into your agency's performance and growth.</p>
                     </div>
                 </div>
                 
                 <div class="benefit-item">
                     <div class="benefit-icon">⚡</div>
                     <div class="benefit-content">
-                        <h3>3-Minute Setup</h3>
-                        <p>Watch us set up a full agency in under 3 minutes. No IT team required.</p>
+                        <h3>Convoso Integration</h3>
+                        <p>The only platform with native Convoso integration. See live call data, agent status, and conversion metrics in one view.</p>
                     </div>
                 </div>
                 
                 <div class="benefit-item">
                     <div class="benefit-icon">🎯</div>
                     <div class="benefit-content">
-                        <h3>Convoso Integration</h3>
-                        <p>See native power dialer integration that connects calls directly to commission tracking.</p>
-                    </div>
-                </div>
-                
-                <div class="benefit-item">
-                    <div class="benefit-icon">📱</div>
-                    <div class="benefit-content">
-                        <h3>Mobile Experience</h3>
-                        <p>Agents love the mobile app. See how they track performance and compete anywhere.</p>
+                        <h3>Custom ROI Analysis</h3>
+                        <p>We'll calculate your specific savings potential based on your agency size and current operations.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Demo Video Preview -->
-    <section style="padding: 80px 0; background: var(--bg-light);">
-        <div class="container">
-            <div class="demo-preview">
-                <h2 style="text-align: center; margin-bottom: 32px; color: var(--text-primary);">
-                    Get a Preview: 3-Minute Platform Overview
-                </h2>
-                
-                <div class="demo-video-placeholder" onclick="playDemoVideo()">
-                    <div class="play-button"></div>
-                    <h3 style="margin-bottom: 16px; font-size: 24px;">Watch SyncedUp in Action</h3>
-                    <p style="opacity: 0.9; font-size: 16px;">
-                        See the Global Leaderboard, commission tracking, and agent dashboards in under 3 minutes.
-                    </p>
+    <section class="demo-stats">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                <div class="glass-card">
+                    <div class="metric-value">15min</div>
+                    <div class="metric-label">Demo Duration</div>
+                </div>
+                <div class="glass-card">
+                    <div class="metric-value">47%</div>
+                    <div class="metric-label">Avg Sales Increase</div>
+                </div>
+                <div class="glass-card">
+                    <div class="metric-value">7days</div>
+                    <div class="metric-label">Implementation Time</div>
+                </div>
+                <div class="glass-card">
+                    <div class="metric-value">$89K+</div>
+                    <div class="metric-label">Annual Savings</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Final CTA -->
-    <section class="final-cta">
-        <div class="container">
-            <h2>Ready to See SyncedUp Transform Your Agency?</h2>
-            <p>Schedule your personalized demo now. No obligation. No pressure. Just results.</p>
-            
-            <div class="cta-buttons">
-                <a href="#demo-form" class="btn btn-cta-primary">
-                    Schedule Demo
-                    <span>Get your custom ROI</span>
-                </a>
-                <a href="/trial.html" class="btn btn-cta-secondary">
-                    Skip Demo - Start Trial
-                    <span>Try it yourself first</span>
-                </a>
+    <section class="social-proof-section">
+        <h2 style="font-size: 2.5rem; margin-bottom: 3rem; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">What Agency Owners Say</h2>
+        
+        <div class="testimonial-carousel">
+            <div class="testimonial-item">
+                <div class="testimonial-quote">
+                    "The demo was incredible. In 15 minutes, I saw exactly how the Global Leaderboard would transform our culture. We implemented within a week and sales are up 52% this quarter."
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">TR</div>
+                    <div class="author-info">
+                        <div class="author-name">Tom Richards</div>
+                        <div class="author-title">CEO, Richards Insurance Group</div>
+                    </div>
+                </div>
             </div>
             
-            <div class="guarantee">
-                <div>
-                    <strong>No Pressure Guarantee</strong>
-                    <p>Our demos are educational only. We'll never pressure you to buy anything.</p>
+            <div class="testimonial-item">
+                <div class="testimonial-quote">
+                    "I was skeptical about another software platform, but the demo showed me features I didn't even know I needed. The ROI analysis was eye-opening - we're saving $127K annually."
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">LM</div>
+                    <div class="author-info">
+                        <div class="author-name">Lisa Martinez</div>
+                        <div class="author-title">President, Apex Coverage Solutions</div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <img src="/images/Transparent.png" alt="SyncedUp">
-                    <p>The insurance intelligence platform.</p>
-                </div>
-                
-                <div class="footer-links">
-                    <h4>Product</h4>
-                    <a href="/features.html">Features</a>
-                    <a href="/pricing.html">Pricing</a>
-                    <a href="/global-leaderboard-demo.html">Global Leaderboard</a>
-                </div>
-                
-                <div class="footer-links">
-                    <h4>Company</h4>
-                    <a href="/about.html">About</a>
-                    <a href="/customers.html">Customers</a>
-                    <a href="/contact.html">Contact</a>
-                </div>
-                
-                <div class="footer-contact">
-                    <h4>Get Started</h4>
-                    <p>1-800-SYNCEDUP</p>
-                    <p>sales@syncedup.com</p>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2024 SyncedUp Solutions. All rights reserved.</p>
+    <section class="cta-section">
+        <div class="cta-glass">
+            <h2>Ready to See the Future?</h2>
+            <p>Join the agencies already dominating with SyncedUp</p>
+            <div class="hero-buttons" style="justify-content: center; margin-top: 2rem;">
+                <a href="#demo-form" class="btn-glass btn-primary" onclick="document.getElementById('first-name').focus()">Schedule Demo</a>
+                <a href="/trial" class="btn-glass">Start Free Trial</a>
             </div>
         </div>
-    </footer>
+    </section>
 
-    <script src="/js/marketing-analytics.js"></script>
     <script>
-        function submitDemoForm(event) {
-            event.preventDefault();
+        document.getElementById('demo-form').addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            // Get form data
-            const formData = new FormData(event.target);
-            const demoData = Object.fromEntries(formData.entries());
+            // Collect form data
+            const formData = new FormData(this);
+            const demoData = {};
             
-            // Track demo request
-            if (window.analytics) {
-                window.analytics.sendEvent('demo_request', {
-                    ...demoData,
-                    form_completed_time: Date.now() - window.analytics.startTime
-                });
+            for (let [key, value] of formData.entries()) {
+                demoData[key] = value;
             }
             
-            // Simulate form submission
+            // Add timestamp and source
+            demoData.timestamp = new Date().toISOString();
+            demoData.source = 'demo_page';
+            demoData.page = 'demo.html';
+            
+            // Show loading state
+            const button = this.querySelector('.demo-button');
+            const originalText = button.textContent;
+            button.textContent = 'Scheduling...';
+            button.disabled = true;
+            
+            // Simulate API call
             setTimeout(() => {
-                // Hide form and show success message
-                document.getElementById('demo-form').style.display = 'none';
-                document.getElementById('form-success').classList.add('show');
+                // Show success message
+                button.textContent = 'Demo Scheduled! ✓';
+                button.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
                 
-                // Scroll to success message
-                document.getElementById('form-success').scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'center' 
-                });
-            }, 1000);
-            
-            // In a real implementation, send data to your CRM/backend
-            console.log('Demo request submitted:', demoData);
-            
-            return false;
-        }
-        
-        function playDemoVideo() {
-            // Track video engagement
-            if (window.analytics) {
-                window.analytics.sendEvent('demo_video_play', {
-                    video_type: 'platform_overview'
-                });
-            }
-            
-            // In a real implementation, this would open a video player
-            alert('Demo video would play here. In the real implementation, this would open a professional product demo video.');
-        }
-        
-        // Track form field interactions
-        document.addEventListener('focusin', (e) => {
-            if (e.target.matches('.form-input, .form-select')) {
-                if (window.analytics) {
-                    window.analytics.sendEvent('demo_form_field_focus', {
-                        field_name: e.target.name,
-                        field_type: e.target.type || 'select'
+                // Show confirmation message
+                const confirmation = document.createElement('div');
+                confirmation.innerHTML = `
+                    <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 1.5rem; margin-top: 1rem; text-align: center;">
+                        <h3 style="color: #10b981; margin-bottom: 0.5rem;">Demo Scheduled Successfully!</h3>
+                        <p style="color: rgba(255,255,255,0.9);">We'll contact you within 24 hours to confirm your personalized demo time.</p>
+                        <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-top: 1rem;">Check your email for confirmation details.</p>
+                    </div>
+                `;
+                this.appendChild(confirmation);
+                
+                // Track demo request
+                if (window.gtag) {
+                    window.gtag('event', 'demo_requested', {
+                        'event_category': 'lead_generation',
+                        'event_label': 'demo_page'
                     });
                 }
-            }
+                
+                console.log('Demo request submitted:', demoData);
+            }, 2000);
         });
-        
-        // Add urgency to form
-        let slotsLeft = 3;
-        setInterval(() => {
-            if (Math.random() < 0.3 && slotsLeft > 1) { // 30% chance every interval
-                slotsLeft--;
-                document.querySelector('.urgency-indicator span').textContent = 
-                    `Only ${slotsLeft} demo slots left this week`;
-                
-                if (window.analytics) {
-                    window.analytics.sendEvent('urgency_update', {
-                        slots_remaining: slotsLeft
-                    });
-                }
-            }
-        }, 45000); // Check every 45 seconds
     </script>
 </body>
 </html>
