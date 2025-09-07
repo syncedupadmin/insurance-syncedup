@@ -464,6 +464,26 @@ ${timestamp},Mike Johnson,15,$32100,Active`;
             }
         }
 
+        function toggleClassicMode() {
+            const isClassic = localStorage.getItem('classicMode') === 'true';
+            localStorage.setItem('classicMode', (!isClassic).toString());
+            updateClassicModeButton();
+            
+            if (!isClassic) {
+                // Disable professional mode when enabling classic mode
+                localStorage.setItem('professionalMode', 'false');
+                updateProfessionalModeButton();
+                showSuccess('Classic Mode enabled! Page will reload to apply changes.');
+            } else {
+                showSuccess('Classic Mode disabled! Page will reload to apply changes.');
+            }
+            
+            // Reload page to apply theme changes
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+
         function updateClassicModeButton() {
             const isClassic = localStorage.getItem('classicMode') === 'true';
             const button = document.getElementById('classicModeToggle');

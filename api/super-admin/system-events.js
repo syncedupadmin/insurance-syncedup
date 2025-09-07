@@ -32,13 +32,23 @@ export default async function handler(req, res) {
         
         try {
             decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
+            console.log(`JWT decoded successfully. User: ${decoded.email || decoded.id}, Role: ${decoded.role}`);
         } catch (jwtError) {
-            return res.status(403).json({ error: 'Invalid token' });
+            console.log('JWT verification failed:', jwtError.message);
+            return res.status(403).json({ 
+                error: 'Invalid token',
+                debug: jwtError.message
+            });
         }
         
-        // Check if user is super-admin
-        if (decoded.role !== 'super-admin' && decoded.role !== 'super_admin') {
-            return res.status(403).json({ error: 'Insufficient permissions' });
+        // Check if user is super-admin (handle multiple role formats)
+        const allowedRoles = ['super-admin', 'super_admin', 'admin'];
+        if (!allowedRoles.includes(decoded.role)) {
+            console.log(`Role check failed. User role: ${decoded.role}, User: ${decoded.email || decoded.id}`);
+            return res.status(403).json({ 
+                error: 'Insufficient permissions',
+                debug: `User role: ${decoded.role}, Required: ${allowedRoles.join(', ')}`
+            });
         }
 
         // Get system events
