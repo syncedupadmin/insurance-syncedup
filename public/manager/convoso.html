@@ -4,254 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Convoso Dashboard - Manager Portal</title>
-    
-    <!-- Favicons -->
-    <link rel="icon" type="image/png" sizes="50x50" href="/favicons/favicon-50x50.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/favicons/android-chrome-512x512.png">
+    <link rel="stylesheet" href="/manager/manager-global.css">
     
     <!-- Auth Guard Script - Must be loaded in HEAD before content renders -->
     <script>
         (function () {
-            const token = localStorage.getItem('syncedup_token');
-            const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-            const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
-            const role = normalize(u.role || '');
-            const allowed = ['manager','admin','super_admin'];
-            if (!token || !role || !allowed.includes(role)) { 
-                window.location.href = '/login'; 
-                return; 
-            }
+          const token = localStorage.getItem('syncedup_token');
+          const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
+          const role = normalize(u.role || '');
+          const allowed = ['manager','admin','super_admin'];
+          if (!token || !role || !allowed.includes(role)) { window.location.href = '/login'; return; }
         })();
     </script>
     
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            background: #f5f5f5; 
-            min-height: 100vh;
-        }
-        
-        .header { 
-            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); 
-            color: white; 
-            padding: 1rem 2rem; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-        
-        .nav { 
-            display: flex; 
-            gap: 2rem; 
-            padding: 0 2rem; 
-            background: white; 
-            border-bottom: 1px solid #e2e8f0; 
-            overflow-x: auto; 
-        }
-        
-        .nav a { 
-            padding: 1rem; 
-            text-decoration: none; 
-            color: #2d3748; 
-            font-weight: 500; 
-            white-space: nowrap; 
-        }
-        
-        .nav a.active { 
-            color: #4299e1; 
-            border-bottom: 2px solid #4299e1; 
-        }
-        
-        .container { 
-            max-width: 1400px; 
-            margin: 2rem auto; 
-            padding: 0 2rem; 
-        }
-        
-        .card { 
-            background: white; 
-            padding: 1.5rem; 
-            border-radius: 8px; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
-            margin-bottom: 1.5rem; 
-        }
-        
-        .grid { 
-            display: grid; 
-            gap: 1.5rem; 
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-        }
-        
-        .btn { 
-            padding: 0.75rem 1.5rem; 
-            background: #4299e1; 
-            color: white; 
-            border: none; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            margin: 0.5rem; 
-            font-size: 0.875rem;
-        }
-        
-        .btn:hover { background: #3182ce; }
-        .btn-success { background: #48bb78; }
-        .btn-warning { background: #ed8936; }
-        .btn-purple { background: #667eea; }
-        
-        .stat-value { 
-            font-size: 2rem; 
-            font-weight: bold; 
-            color: #4299e1; 
-            margin-bottom: 0.5rem;
-        }
-        
-        .stat-label { 
-            color: #718096; 
-            font-size: 0.875rem; 
-        }
-        
-        .manager-notice { 
-            background: linear-gradient(135deg, rgba(66, 153, 225, 0.1) 0%, rgba(102, 126, 234, 0.1) 100%); 
-            border: 2px solid #4299e1; 
-            border-radius: 8px; 
-            padding: 1rem; 
-            margin-bottom: 2rem; 
-            text-align: center;
-        }
-        
-        .message { 
-            padding: 1rem; 
-            margin-bottom: 1.5rem; 
-            border-radius: 8px; 
-        }
-        
-        .message.success { 
-            background: #f0fff4; 
-            border: 1px solid #9ae6b4; 
-            color: #2f855a; 
-        }
-        
-        .message.error { 
-            background: #fed7d7; 
-            border: 1px solid #feb2b2; 
-            color: #c53030; 
-        }
-        
-        .modal { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            right: 0; 
-            bottom: 0; 
-            background: rgba(0,0,0,0.5); 
-            display: none; 
-            align-items: center; 
-            justify-content: center; 
-            z-index: 1000; 
-        }
-        
-        .modal.show { display: flex; }
-        
-        .modal-content { 
-            background: white; 
-            padding: 2rem; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-            max-width: 90vw; 
-            max-height: 80vh; 
-            overflow: auto; 
-        }
-        
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 1rem; 
-            min-width: 800px;
-        }
-        
-        th { 
-            background: #f7fafc; 
-            padding: 0.75rem; 
-            text-align: left; 
-            font-weight: 600; 
-            border-bottom: 2px solid #e2e8f0;
-        }
-        
-        td { 
-            padding: 0.75rem; 
-            border-bottom: 1px solid #f7fafc; 
-        }
-        
-        .badge { 
-            padding: 0.25rem 0.5rem; 
-            border-radius: 12px; 
-            font-size: 0.75rem; 
-            font-weight: 500; 
-        }
-        
-        .badge-new { 
-            background: #f0fff4; 
-            color: #2f855a; 
-            border: 1px solid #9ae6b4; 
-        }
-        
-        .activity-grid {
-            display: grid;
-            gap: 1.5rem;
-            grid-template-columns: 1fr 1fr;
-        }
-        
-        .activity-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        
-        .activity-header {
-            padding: 1rem;
-            border-bottom: 1px solid #e2e8f0;
-            background: #f7fafc;
-        }
-        
-        .activity-content {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .activity-item {
-            padding: 1rem;
-            border-bottom: 1px solid #f7fafc;
-        }
-    </style>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
 </head>
 <body>
+    <!-- Header -->
     <div class="header">
-        <h1>📞 Convoso Dashboard</h1>
-        <select id="time-range" style="padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid white; background: rgba(255,255,255,0.1); color: white;">
-            <option value="today" style="color: #2d3748;">Today</option>
-            <option value="week" style="color: #2d3748;">This Week</option>
-            <option value="month" style="color: #2d3748;">This Month</option>
-            <option value="quarter" style="color: #2d3748;">This Quarter</option>
-        </select>
+        <h1>Convoso Dashboard</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="/manager" class="nav-link">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="/manager/leads" class="nav-link">
+            <i data-lucide="user-plus" class="icon"></i>
+            Leads
+        </a>
+        <a href="/manager/team-management" class="nav-link">
+            <i data-lucide="users" class="icon"></i>
+            Team Management
+        </a>
+        <a href="/manager/performance" class="nav-link">
+            <i data-lucide="trending-up" class="icon"></i>
+            Team Performance
+        </a>
+        <a href="/manager/reports" class="nav-link">
+            <i data-lucide="file-text" class="icon"></i>
+            Reports
+        </a>
+        <a href="/manager/goals" class="nav-link">
+            <i data-lucide="target" class="icon"></i>
+            Goals
+        </a>
+        <a href="/manager/vendors" class="nav-link">
+            <i data-lucide="building-2" class="icon"></i>
+            Vendors
+        </a>
+        <a href="/manager/settings" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+        <a href="/manager/convoso.html" class="nav-link active">
+            <i data-lucide="phone-call" class="icon"></i>
+            Convoso
+        </a>
+        <a href="/global-leaderboard" class="nav-link">
+            <i data-lucide="trophy" class="icon"></i>
+            Global Leaderboard
+        </a>
     </div>
     
-    <nav class="nav">
-        <a href="/manager/">Dashboard</a>
-        <a href="/manager/agents.html">Team Management</a>
-        <a href="/manager/performance.html">Team Performance</a>
-        <a href="/manager/reports.html">Reports</a>
-        <a href="/manager/convoso.html" class="active">Convoso</a>
-    </nav>
-    
     <div class="container">
-        <!-- Manager Notice -->
         <div class="manager-notice">
-            <p style="margin: 0; color: #2d3748; font-weight: 500;">
-                🎯 <span style="color: #4299e1; font-weight: 600;">Manager Dashboard</span> - Monitor your team's call center performance and lead conversion rates
-            </p>
+            <h3><i data-lucide="phone-call"></i> Convoso Dashboard</h3>
+            <p>Monitor your team's call center performance and lead conversion rates.</p>
         </div>
         
         <!-- Message Display -->
@@ -633,6 +463,26 @@
                 messageEl.style.display = 'none';
             }, 5000);
         }
+        
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/login';
+        }
+        
+        // Initialize Lucide icons and user display
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Lucide icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+            
+            // Display user info
+            const userData = localStorage.getItem('syncedup_user');
+            if (userData) {
+                const user = JSON.parse(userData);
+                document.getElementById('userDisplay').textContent = user.name || user.email || 'Manager';
+            }
+        });
     </script>
 </body>
 </html>

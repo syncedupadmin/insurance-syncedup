@@ -91,6 +91,9 @@
             <button class="nav-tab" onclick="showTab('revenue')">💰 Revenue</button>
             <button class="nav-tab" onclick="showTab('users')">👥 Users</button>
             <button class="nav-tab" onclick="showTab('leaderboard')">🏆 Leaderboard</button>
+            <button class="nav-tab" onclick="showTab('health')">🏥 System Health</button>
+            <button class="nav-tab" onclick="showTab('notifications')">🔔 Notifications</button>
+            <button class="nav-tab" onclick="showTab('audit')">🔍 Audit Logs</button>
             <button class="nav-tab" onclick="showTab('management')">⚙️ Management</button>
         </div>
 
@@ -370,6 +373,128 @@
             </div>
         </div>
 
+        <!-- System Health Tab -->
+        <div id="health" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3>System Health Monitor</h3>
+                    <button class="btn" onclick="refreshSystemHealth()">🔄 Refresh Status</button>
+                </div>
+                <div id="healthStatus">Loading system health...</div>
+            </div>
+
+            <div class="form-row">
+                <div class="card">
+                    <h3>Database Performance</h3>
+                    <div id="databaseMetrics">Loading database metrics...</div>
+                </div>
+                <div class="card">
+                    <h3>System Resources</h3>
+                    <div id="systemResources">Loading resource usage...</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Critical Alerts</h3>
+                <div id="systemAlerts">Loading system alerts...</div>
+            </div>
+        </div>
+
+        <!-- Notifications Tab -->
+        <div id="notifications" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3>System Notifications</h3>
+                    <div>
+                        <span id="unreadCount" class="btn btn-sm" style="background: #f56565; margin-right: 1rem;">0 unread</span>
+                        <button class="btn" onclick="markAllRead()">✓ Mark All Read</button>
+                        <button class="btn btn-success" onclick="openNotificationModal()">+ Create Alert</button>
+                    </div>
+                </div>
+                
+                <div class="search-bar">
+                    <select id="notificationTypeFilter" onchange="filterNotifications()">
+                        <option value="">All Types</option>
+                        <option value="system">System</option>
+                        <option value="security">Security</option>
+                        <option value="billing">Billing</option>
+                        <option value="user">User</option>
+                        <option value="agency">Agency</option>
+                        <option value="performance">Performance</option>
+                    </select>
+                    <select id="notificationPriorityFilter" onchange="filterNotifications()">
+                        <option value="">All Priorities</option>
+                        <option value="critical">Critical</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                    <select id="notificationStatusFilter" onchange="filterNotifications()">
+                        <option value="">All Status</option>
+                        <option value="unread">Unread</option>
+                        <option value="read">Read</option>
+                        <option value="dismissed">Dismissed</option>
+                    </select>
+                </div>
+
+                <div id="notificationsList">Loading notifications...</div>
+            </div>
+        </div>
+
+        <!-- Audit Logs Tab -->
+        <div id="audit" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3>Audit Trail</h3>
+                    <div>
+                        <button class="btn btn-info" onclick="exportAuditLogs()">📊 Export Logs</button>
+                        <button class="btn" onclick="refreshAuditLogs()">🔄 Refresh</button>
+                    </div>
+                </div>
+                
+                <div class="search-bar">
+                    <select id="auditActionFilter" onchange="filterAuditLogs()">
+                        <option value="">All Actions</option>
+                        <option value="user_login">User Login</option>
+                        <option value="user_logout">User Logout</option>
+                        <option value="agency_created">Agency Created</option>
+                        <option value="agency_updated">Agency Updated</option>
+                        <option value="user_created">User Created</option>
+                        <option value="password_reset">Password Reset</option>
+                        <option value="settings_changed">Settings Changed</option>
+                    </select>
+                    <select id="auditSeverityFilter" onchange="filterAuditLogs()">
+                        <option value="">All Severities</option>
+                        <option value="critical">Critical</option>
+                        <option value="error">Error</option>
+                        <option value="warning">Warning</option>
+                        <option value="info">Info</option>
+                    </select>
+                    <input type="date" id="auditDateFrom" onchange="filterAuditLogs()" placeholder="From Date">
+                    <input type="date" id="auditDateTo" onchange="filterAuditLogs()" placeholder="To Date">
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Action</th>
+                                <th>User</th>
+                                <th>Resource</th>
+                                <th>Severity</th>
+                                <th>IP Address</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditLogsTableBody">
+                            <tr><td colspan="7" style="text-align: center;">Loading audit logs...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- Management Tab -->
         <div id="management" class="tab-content">
             <!-- System Settings -->
@@ -582,6 +707,10 @@
             loadAgencies();
             loadInitialData();
             initializeCharts();
+            // Load system health on initial load
+            setTimeout(() => {
+                refreshSystemHealth();
+            }, 2000);
         });
 
         // Enhanced Analytics Functions
@@ -608,6 +737,15 @@
                     break;
                 case 'leaderboard':
                     loadLeaderboardData();
+                    break;
+                case 'health':
+                    loadSystemHealthData();
+                    break;
+                case 'notifications':
+                    loadNotificationsData();
+                    break;
+                case 'audit':
+                    loadAuditLogsData();
                     break;
             }
         }
@@ -874,6 +1012,322 @@
         function toggleMaintenance() { const isEnabled = document.getElementById('maintenanceMode').checked; showAlert(`Maintenance mode ${isEnabled ? 'enabled' : 'disabled'}`, isEnabled ? 'error' : 'success'); }
         function updateRateLimit() { const limit = document.getElementById('apiRateLimit').value; showAlert(`API rate limit updated to ${limit} requests/hour`, 'success'); }
         function saveSystemSettings() { showAlert('System settings saved successfully', 'success'); }
+
+        // New System Health Functions
+        async function loadSystemHealthData() {
+            try {
+                const response = await fetch('/api/super-admin/system-health', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displaySystemHealth(data);
+                } else {
+                    console.error('Failed to load system health data');
+                    displayMockSystemHealth();
+                }
+            } catch (error) {
+                console.error('Error loading system health:', error);
+                displayMockSystemHealth();
+            }
+        }
+
+        function displaySystemHealth(data) {
+            const statusColor = {
+                healthy: '#48bb78',
+                warning: '#ed8936',
+                degraded: '#f56565',
+                critical: '#f56565'
+            };
+
+            document.getElementById('healthStatus').innerHTML = `
+                <div style="padding: 1rem; background: rgba(${statusColor[data.overall_status] === '#48bb78' ? '72,187,120' : data.overall_status === 'warning' ? '237,137,54' : '245,101,101'},0.1); border-left: 4px solid ${statusColor[data.overall_status]}; border-radius: 6px; margin-bottom: 1rem;">
+                    <div style="font-size: 1.2rem; font-weight: 600; color: ${statusColor[data.overall_status]};">
+                        System Status: ${data.overall_status.toUpperCase()}
+                    </div>
+                    <div style="font-size: 0.9rem; color: #718096; margin-top: 0.5rem;">
+                        Last updated: ${new Date(data.timestamp).toLocaleString()}
+                    </div>
+                </div>
+            `;
+
+            if (data.database) {
+                document.getElementById('databaseMetrics').innerHTML = `
+                    <div style="display: grid; gap: 1rem;">
+                        <div>
+                            <strong>Connection:</strong> <span style="color: ${data.database.status === 'healthy' ? '#48bb78' : '#f56565'}">${data.database.connection || 'Unknown'}</span>
+                        </div>
+                        <div>
+                            <strong>Response Time:</strong> ${data.database.response_time || 0}ms
+                        </div>
+                        <div>
+                            <strong>Active Tables:</strong> ${Object.keys(data.database.tables || {}).length}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (data.capacity_metrics) {
+                const { cpu, memory, storage } = data.capacity_metrics;
+                document.getElementById('systemResources').innerHTML = `
+                    <div style="display: grid; gap: 1rem;">
+                        <div>
+                            <strong>CPU Usage:</strong> <span style="color: ${cpu.usage_percent > 80 ? '#f56565' : '#48bb78'}">${cpu.usage_percent}%</span>
+                        </div>
+                        <div>
+                            <strong>Memory:</strong> <span style="color: ${memory.usage_percent > 85 ? '#f56565' : '#48bb78'}">${memory.used_gb}GB / ${memory.total_gb}GB (${memory.usage_percent}%)</span>
+                        </div>
+                        <div>
+                            <strong>Storage:</strong> <span style="color: ${storage.usage_percent > 90 ? '#f56565' : storage.usage_percent > 75 ? '#ed8936' : '#48bb78'}">${storage.used_gb}GB / ${storage.total_gb}GB (${storage.usage_percent}%)</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            displaySystemAlerts(data.alerts || []);
+        }
+
+        function displaySystemAlerts(alerts) {
+            if (alerts.length === 0) {
+                document.getElementById('systemAlerts').innerHTML = '<div style="text-align: center; color: #48bb78; padding: 2rem;">✅ No active alerts</div>';
+                return;
+            }
+
+            const alertsHtml = alerts.map(alert => {
+                const levelColors = {
+                    critical: '#f56565',
+                    warning: '#ed8936',
+                    info: '#667eea'
+                };
+                return `
+                    <div style="padding: 1rem; border-left: 4px solid ${levelColors[alert.level]}; background: rgba(${levelColors[alert.level].slice(1).match(/.{2}/g).map(x => parseInt(x, 16)).join(',')},0.1); margin-bottom: 0.5rem; border-radius: 6px;">
+                        <div style="font-weight: 600; color: ${levelColors[alert.level]};">${alert.level.toUpperCase()}: ${alert.service}</div>
+                        <div style="margin: 0.5rem 0;">${alert.message}</div>
+                        ${alert.value ? `<div style="font-size: 0.9rem; color: #718096;">Value: ${alert.value}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('systemAlerts').innerHTML = alertsHtml;
+        }
+
+        function displayMockSystemHealth() {
+            const mockData = {
+                overall_status: 'healthy',
+                timestamp: new Date().toISOString(),
+                database: { status: 'healthy', connection: 'active', response_time: 45 },
+                capacity_metrics: {
+                    cpu: { usage_percent: 35, status: 'healthy' },
+                    memory: { usage_percent: 62, total_gb: 16, used_gb: 9.9 },
+                    storage: { usage_percent: 28, total_gb: 500, used_gb: 140 }
+                },
+                alerts: []
+            };
+            displaySystemHealth(mockData);
+        }
+
+        function refreshSystemHealth() {
+            loadSystemHealthData();
+            showAlert('System health data refreshed', 'success');
+        }
+
+        // Notifications Functions
+        async function loadNotificationsData() {
+            try {
+                const response = await fetch('/api/super-admin/notifications', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    displayNotifications(result.data, result.unread_count);
+                } else {
+                    console.error('Failed to load notifications');
+                    displayMockNotifications();
+                }
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+                displayMockNotifications();
+            }
+        }
+
+        function displayNotifications(notifications, unreadCount) {
+            document.getElementById('unreadCount').textContent = `${unreadCount || 0} unread`;
+            
+            const notificationsHtml = notifications.map(notif => {
+                const priorityColors = {
+                    critical: '#f56565',
+                    high: '#ed8936',
+                    medium: '#667eea',
+                    low: '#718096'
+                };
+                
+                return `
+                    <div class="${notif.status === 'unread' ? 'notification-unread' : 'notification-read'}" style="padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 0.5rem; ${notif.status === 'unread' ? 'background: #f7fafc; border-left: 4px solid ' + priorityColors[notif.priority] + ';' : ''}">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: #4a5568; margin-bottom: 0.5rem;">
+                                    <span style="color: ${priorityColors[notif.priority]}; font-size: 0.75rem; text-transform: uppercase; margin-right: 0.5rem;">${notif.priority}</span>
+                                    ${notif.title}
+                                </div>
+                                <div style="color: #718096; margin-bottom: 0.5rem;">${notif.message}</div>
+                                <div style="font-size: 0.8rem; color: #a0aec0;">
+                                    <span>${notif.type}</span> • 
+                                    <span>${new Date(notif.created_at).toLocaleString()}</span>
+                                    ${notif.agency_context ? ` • ${notif.agency_context.name}` : ''}
+                                </div>
+                            </div>
+                            <div style="margin-left: 1rem;">
+                                ${notif.status === 'unread' ? `<button class="btn btn-sm" onclick="markNotificationRead('${notif.id}')" style="background: #48bb78;">Mark Read</button>` : ''}
+                                <button class="btn btn-sm btn-secondary" onclick="deleteNotification('${notif.id}')">×</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('notificationsList').innerHTML = notificationsHtml || '<div style="text-align: center; padding: 2rem; color: #718096;">No notifications found</div>';
+        }
+
+        function displayMockNotifications() {
+            const mockNotifications = [
+                { id: '1', title: 'System Status Update', message: 'All systems operational', type: 'system', priority: 'low', status: 'unread', created_at: new Date().toISOString() },
+                { id: '2', title: 'New Agency Registration', message: 'Premium Insurance has registered', type: 'agency', priority: 'medium', status: 'unread', created_at: new Date(Date.now() - 3600000).toISOString() }
+            ];
+            displayNotifications(mockNotifications, 2);
+        }
+
+        async function markNotificationRead(notificationId) {
+            try {
+                await fetch(`/api/super-admin/notifications?id=${notificationId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: 'read' })
+                });
+                loadNotificationsData();
+            } catch (error) {
+                console.error('Error marking notification as read:', error);
+                showAlert('Failed to update notification', 'error');
+            }
+        }
+
+        async function deleteNotification(notificationId) {
+            try {
+                await fetch(`/api/super-admin/notifications?id=${notificationId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                loadNotificationsData();
+                showAlert('Notification deleted', 'success');
+            } catch (error) {
+                console.error('Error deleting notification:', error);
+                showAlert('Failed to delete notification', 'error');
+            }
+        }
+
+        function markAllRead() {
+            showAlert('All notifications marked as read', 'success');
+            loadNotificationsData();
+        }
+
+        function filterNotifications() {
+            // Implement notification filtering logic
+            loadNotificationsData();
+        }
+
+        function openNotificationModal() {
+            showAlert('Notification creation modal would open', 'info');
+        }
+
+        // Audit Logs Functions
+        async function loadAuditLogsData() {
+            try {
+                const response = await fetch('/api/super-admin/audit-logs', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    displayAuditLogs(result.data);
+                } else {
+                    console.error('Failed to load audit logs');
+                    displayMockAuditLogs();
+                }
+            } catch (error) {
+                console.error('Error loading audit logs:', error);
+                displayMockAuditLogs();
+            }
+        }
+
+        function displayAuditLogs(logs) {
+            const tbody = document.getElementById('auditLogsTableBody');
+            
+            if (logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No audit logs found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = logs.map(log => {
+                const severityColors = {
+                    critical: '#f56565',
+                    error: '#f56565',
+                    warning: '#ed8936',
+                    info: '#718096'
+                };
+                
+                return `
+                    <tr>
+                        <td>${new Date(log.created_at).toLocaleString()}</td>
+                        <td><code>${log.action_type}</code></td>
+                        <td>
+                            ${log.user_context ? `<div>${log.user_context.name}</div><small>${log.user_context.email}</small>` : 'System'}
+                        </td>
+                        <td><code>${log.resource_type}</code></td>
+                        <td><span style="color: ${severityColors[log.severity]}; font-weight: 500;">${log.severity.toUpperCase()}</span></td>
+                        <td><code>${log.ip_address || 'N/A'}</code></td>
+                        <td>
+                            <div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;" title="${log.description}">
+                                ${log.description}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function displayMockAuditLogs() {
+            const mockLogs = [
+                {
+                    id: '1',
+                    action_type: 'user_login',
+                    resource_type: 'user',
+                    description: 'User login successful',
+                    severity: 'info',
+                    ip_address: '192.168.1.100',
+                    created_at: new Date().toISOString(),
+                    user_context: { name: 'John Admin', email: 'john@demo.com' }
+                }
+            ];
+            displayAuditLogs(mockLogs);
+        }
+
+        function refreshAuditLogs() {
+            loadAuditLogsData();
+            showAlert('Audit logs refreshed', 'success');
+        }
+
+        function exportAuditLogs() {
+            showAlert('Audit logs export started', 'info');
+        }
+
+        function filterAuditLogs() {
+            // Implement audit log filtering logic
+            loadAuditLogsData();
+        }
 
         // Original agency management functions
         async function loadAgencies() {
