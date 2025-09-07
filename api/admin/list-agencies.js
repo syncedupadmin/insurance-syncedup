@@ -12,8 +12,8 @@ export default async function handler(req, res) {
 
   try {
     const { data: agencies, error } = await supabase
-      .from('agencies')
-      .select('id, name, is_active, campaigns, lists, queues, webhook_url, last_sync, created_at')
+      .from('agency_integrations')
+      .select('id, agency_name as name, is_active, integration_settings, webhook_url, last_validation_at as last_sync, created_at')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -24,9 +24,17 @@ export default async function handler(req, res) {
       });
     }
 
+    // Transform the data to match expected format
+    const transformedAgencies = (agencies || []).map(agency => ({
+      ...agency,
+      campaigns: agency.integration_settings?.campaigns || [],
+      lists: agency.integration_settings?.lists || [],
+      queues: agency.integration_settings?.queues || []
+    }));
+
     return res.status(200).json({
       success: true,
-      agencies: agencies || []
+      agencies: transformedAgencies
     });
     
   } catch (error) {
