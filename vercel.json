@@ -5,7 +5,6 @@
     { "source": "/login", "destination": "/login.html" },
     { "source": "/admin", "destination": "/admin.html" },
     { "source": "/super-admin", "destination": "/super-admin.html" },
-    { "source": "/super-admin-portal", "destination": "/super-admin-portal.html" },
     { "source": "/dashboard", "destination": "/dashboard.html" },
     { "source": "/manager", "destination": "/manager/index.html" },
     { "source": "/manager/(.*)", "destination": "/manager/$1.html" },

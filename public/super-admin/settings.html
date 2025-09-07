@@ -481,6 +481,33 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Interface Theme Settings -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i data-lucide="monitor" class="card-icon"></i>
+                        Interface Theme
+                    </h3>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Display Mode</label>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Switch between super admin interface, corporate Fortune 500 style, and classic Windows 95 theme</p>
+                    
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button class="btn btn-secondary" id="professionalModeToggle" onclick="toggleProfessionalMode()">
+                            <i data-lucide="briefcase"></i>
+                            <span id="professionalModeText">Professional Mode</span>
+                        </button>
+                        
+                        <button class="btn btn-secondary" id="classicModeToggle" onclick="toggleClassicMode()">
+                            <i data-lucide="palette"></i>
+                            <span id="classicModeText">Classic Mode</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -821,8 +848,87 @@
             alert('Data retention settings saved successfully!');
         }
 
+        // Professional Mode functionality
+        function toggleProfessionalMode() {
+            const isProfessional = localStorage.getItem('professionalMode') === 'true';
+            localStorage.setItem('professionalMode', (!isProfessional).toString());
+            updateProfessionalModeButton();
+            
+            if (!isProfessional) {
+                // Disable classic mode when enabling professional mode
+                localStorage.setItem('classicMode', 'false');
+                updateClassicModeButton();
+                alert('Professional Mode enabled! Page will reload to apply changes.');
+            } else {
+                alert('Professional Mode disabled! Page will reload to apply changes.');
+            }
+            
+            // Reload page to apply theme changes
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+
+        function toggleClassicMode() {
+            const isClassic = localStorage.getItem('classicMode') === 'true';
+            localStorage.setItem('classicMode', (!isClassic).toString());
+            updateClassicModeButton();
+            
+            if (!isClassic) {
+                // Disable professional mode when enabling classic mode
+                localStorage.setItem('professionalMode', 'false');
+                updateProfessionalModeButton();
+                alert('Classic Mode enabled! Page will reload to apply changes.');
+            } else {
+                alert('Classic Mode disabled! Page will reload to apply changes.');
+            }
+            
+            // Reload page to apply theme changes
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+
+        function updateProfessionalModeButton() {
+            const isProfessional = localStorage.getItem('professionalMode') === 'true';
+            const button = document.getElementById('professionalModeToggle');
+            const text = document.getElementById('professionalModeText');
+            
+            if (isProfessional) {
+                button.classList.remove('btn-secondary');
+                button.classList.add('btn-primary');
+                text.textContent = 'Disable Professional';
+            } else {
+                button.classList.remove('btn-primary');
+                button.classList.add('btn-secondary');
+                text.textContent = 'Enable Professional';
+            }
+        }
+
+        function updateClassicModeButton() {
+            const isClassic = localStorage.getItem('classicMode') === 'true';
+            const button = document.getElementById('classicModeToggle');
+            const text = document.getElementById('classicModeText');
+            
+            if (isClassic) {
+                button.classList.remove('btn-secondary');
+                button.classList.add('btn-primary');
+                text.textContent = 'Disable Classic';
+            } else {
+                button.classList.remove('btn-primary');
+                button.classList.add('btn-secondary');
+                text.textContent = 'Enable Classic';
+            }
+        }
+
         // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', initializePage);
+        document.addEventListener('DOMContentLoaded', () => {
+            initializePage();
+            
+            // Initialize button states
+            updateProfessionalModeButton();
+            updateClassicModeButton();
+        });
     </script>
     <script src="/assets/session-prod.js"></script>
 </body>

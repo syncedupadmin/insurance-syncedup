@@ -402,11 +402,19 @@ Business City, ST 12345</textarea>
 
             <div class="form-group">
                 <label class="form-label">Display Mode</label>
-                <p style="color: rgba(255,255,255,0.7); margin-bottom: 1rem;">Switch between modern glassmorphism and classic Windows 95 theme</p>
-                <button class="btn btn-primary" id="classicModeToggle" onclick="toggleClassicMode()">
-                    <i data-lucide="palette" class="icon"></i>
-                    Classic Mode
-                </button>
+                <p style="color: rgba(255,255,255,0.7); margin-bottom: 1rem;">Switch between purple glassmorphism, corporate Fortune 500 style, and classic Windows 95 theme</p>
+                
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button class="btn btn-secondary" id="professionalModeToggle" onclick="toggleProfessionalMode()">
+                        <i data-lucide="briefcase" class="icon"></i>
+                        <span id="professionalModeText">Professional Mode</span>
+                    </button>
+                    
+                    <button class="btn btn-primary" id="classicModeToggle" onclick="toggleClassicMode()">
+                        <i data-lucide="palette" class="icon"></i>
+                        <span id="classicModeText">Classic Mode</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1046,8 +1054,67 @@ Business City, ST 12345</textarea>
             }, 3000);
         }
 
+        // Professional Mode functionality
+        function toggleProfessionalMode() {
+            const isProfessional = localStorage.getItem('professionalMode') === 'true';
+            localStorage.setItem('professionalMode', (!isProfessional).toString());
+            updateProfessionalModeButton();
+            
+            if (!isProfessional) {
+                // Disable classic mode when enabling professional mode
+                localStorage.setItem('classicMode', 'false');
+                updateClassicModeButton();
+                showSuccess('Professional Mode enabled! Page will reload to apply changes.');
+            } else {
+                showSuccess('Professional Mode disabled! Page will reload to apply changes.');
+            }
+            
+            // Reload page to apply theme changes
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+
+        function updateProfessionalModeButton() {
+            const isProfessional = localStorage.getItem('professionalMode') === 'true';
+            const button = document.getElementById('professionalModeToggle');
+            const text = document.getElementById('professionalModeText');
+            
+            if (isProfessional) {
+                button.classList.remove('btn-secondary');
+                button.classList.add('btn-primary');
+                text.textContent = 'Disable Professional';
+            } else {
+                button.classList.remove('btn-primary');
+                button.classList.add('btn-secondary');
+                text.textContent = 'Enable Professional';
+            }
+        }
+
+        function updateClassicModeButton() {
+            const isClassic = localStorage.getItem('classicMode') === 'true';
+            const button = document.getElementById('classicModeToggle');
+            const text = document.getElementById('classicModeText');
+            
+            if (isClassic) {
+                button.classList.remove('btn-secondary');
+                button.classList.add('btn-primary');
+                text.textContent = 'Disable Classic';
+            } else {
+                button.classList.remove('btn-primary');
+                button.classList.add('btn-secondary');
+                text.textContent = 'Enable Classic';
+            }
+        }
+
         // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', initializePage);
+        document.addEventListener('DOMContentLoaded', () => {
+            initializePage();
+            
+            // Initialize button states
+            updateProfessionalModeButton();
+            updateClassicModeButton();
+        });
 
         // Handle clicks outside modals to close them
         document.addEventListener('click', (e) => {

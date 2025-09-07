@@ -47,6 +47,17 @@
             <h3><i data-lucide="palette" class="card-icon"></i>Interface Theme</h3>
             <p style="color: var(--cs-text-secondary); margin-bottom: 2rem;">Customize your customer service portal experience</p>
             
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; background: rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 1rem;">
+                <div>
+                    <h4 style="color: var(--cs-text-primary); margin-bottom: 0.5rem;">Professional Mode</h4>
+                    <p style="color: var(--cs-text-secondary); margin: 0; font-size: 0.9rem;">Switch to Fortune 500 corporate dashboard with advanced metrics</p>
+                </div>
+                <button id="professionalModeToggle" class="btn btn-secondary" onclick="toggleProfessionalMode()">
+                    <i data-lucide="briefcase" style="margin-right: 0.5rem;"></i>
+                    <span id="professionalModeText">Enable Professional</span>
+                </button>
+            </div>
+            
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; background: rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 2rem;">
                 <div>
                     <h4 style="color: var(--cs-text-primary); margin-bottom: 0.5rem;">Classic Mode</h4>
@@ -257,6 +268,7 @@
             loadUserInfo();
             loadSettings();
             updateClassicModeButton();
+            updateProfessionalModeButton();
             
             // Initialize Lucide icons
             lucide.createIcons();
@@ -354,8 +366,44 @@
                 localStorage.setItem('classicMode', 'false');
                 alert('Classic Mode disabled! The page will reload.');
             } else {
+                // Disable Professional Mode first
+                localStorage.setItem('professionalMode', 'false');
                 localStorage.setItem('classicMode', 'true');
                 alert('Classic Mode enabled! The page will reload with Windows 95 styling.');
+            }
+            
+            // Reload the page to apply the theme change
+            window.location.reload();
+        }
+
+        // Professional mode toggle functionality
+        function updateProfessionalModeButton() {
+            const isProfessionalMode = localStorage.getItem('professionalMode') === 'true';
+            const button = document.getElementById('professionalModeToggle');
+            const text = document.getElementById('professionalModeText');
+            
+            if (isProfessionalMode) {
+                text.textContent = 'Exit Professional';
+                button.classList.add('btn-primary');
+                button.classList.remove('btn-secondary');
+            } else {
+                text.textContent = 'Enable Professional';
+                button.classList.add('btn-secondary');
+                button.classList.remove('btn-primary');
+            }
+        }
+
+        function toggleProfessionalMode() {
+            const isCurrentlyProfessional = localStorage.getItem('professionalMode') === 'true';
+            
+            if (isCurrentlyProfessional) {
+                localStorage.setItem('professionalMode', 'false');
+                alert('Professional Mode disabled! The page will reload.');
+            } else {
+                // Disable Classic Mode first
+                localStorage.setItem('classicMode', 'false');
+                localStorage.setItem('professionalMode', 'true');
+                alert('Professional Mode enabled! The page will reload with Fortune 500 corporate styling.');
             }
             
             // Reload the page to apply the theme change
