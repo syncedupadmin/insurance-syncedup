@@ -589,17 +589,58 @@ body::before {
 body.classic-mode {
     background: #000000 !important;
     background-image: 
+        /* Pac-Man maze-like grid pattern */
+        linear-gradient(90deg, #0000FF 1px, transparent 1px),
+        linear-gradient(180deg, #0000FF 1px, transparent 1px),
+        /* Glowing orb effects */
         radial-gradient(circle at 20% 20%, rgba(0, 0, 255, 0.3) 0%, transparent 50%),
         radial-gradient(circle at 80% 60%, rgba(255, 255, 0, 0.2) 0%, transparent 50%),
         radial-gradient(circle at 40% 80%, rgba(255, 0, 255, 0.2) 0%, transparent 50%);
+    background-size: 40px 40px, 40px 40px, 100% 100%, 100% 100%, 100% 100%;
     font-family: 'Courier New', monospace !important;
-    animation: none;
+    animation: pacmanMaze 10s linear infinite;
     overflow-x: hidden;
+}
+
+@keyframes pacmanMaze {
+    0% { background-position: 0px 0px, 0px 0px; }
+    100% { background-position: 40px 40px, 40px 40px; }
 }
 
 /* Remove star field effect in classic mode */
 body.classic-mode::before {
     display: none;
+}
+
+/* Add animated Pac-Man characters floating around */
+body.classic-mode::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    background-image:
+        /* Pac-Man characters */
+        radial-gradient(circle at 10% 30%, #FFFF00 8px, transparent 9px),
+        radial-gradient(circle at 90% 70%, #FF00FF 8px, transparent 9px),
+        radial-gradient(circle at 50% 20%, #00FFFF 8px, transparent 9px),
+        radial-gradient(circle at 20% 80%, #FF0000 8px, transparent 9px);
+    background-size: 200px 200px;
+    animation: pacmanFloat 15s linear infinite;
+}
+
+@keyframes pacmanFloat {
+    0% { 
+        background-position: -200px 0px, 100vw 0px, 50vw -200px, 0px 100vh;
+        transform: rotate(0deg);
+    }
+    100% { 
+        background-position: 100vw 0px, -200px 0px, 50vw 100vh, 0px -200px;
+        transform: rotate(360deg);
+    }
 }
 
 /* Classic Mode Header */
@@ -775,6 +816,53 @@ body.classic-mode .leaderboard-table td {
     color: #FFFFFF !important;
     border-bottom: 1px solid #FFFF00 !important;
     text-shadow: 1px 1px 0px #000000;
+    position: relative;
+}
+
+/* Add power pellets to table rows */
+body.classic-mode .leaderboard-table tr:nth-child(odd)::before {
+    content: '●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    color: #FFFF00;
+    font-size: 8px;
+    line-height: 2;
+    letter-spacing: 8px;
+    overflow: hidden;
+    white-space: nowrap;
+    animation: pelletMove 3s linear infinite;
+    z-index: 0;
+}
+
+body.classic-mode .leaderboard-table tr:nth-child(even)::before {
+    content: '◦◦◦◦◦◦◦◦◦◦◦◦◦◦◦◦◦◦◦◦◦◦◦◦◦◦◦◦◦◦';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    color: #00FFFF;
+    font-size: 8px;
+    line-height: 2;
+    letter-spacing: 8px;
+    overflow: hidden;
+    white-space: nowrap;
+    animation: pelletMove 2s linear infinite reverse;
+    z-index: 0;
+}
+
+@keyframes pelletMove {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Ensure text content is above pellets */
+body.classic-mode .leaderboard-table td > * {
+    position: relative;
+    z-index: 1;
 }
 
 body.classic-mode .leaderboard-table tr:hover {
@@ -832,7 +920,43 @@ body.classic-mode .agent-avatar {
     text-shadow: none;
     font-weight: bold;
     position: relative;
-    animation: pacmanChomp 2s ease-in-out infinite;
+    overflow: hidden;
+}
+
+/* Add Pac-Man mouth animation */
+body.classic-mode .agent-avatar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000000;
+    clip-path: polygon(50% 50%, 100% 0%, 100% 35%, 85% 50%, 100% 65%, 100% 100%);
+    animation: pacmanMouth 1s ease-in-out infinite alternate;
+}
+
+/* Different ghost colors for different ranks */
+body.classic-mode .rank-1 .agent-avatar {
+    background: radial-gradient(circle, #FFFF00, #FFA500) !important;
+}
+body.classic-mode .rank-2 .agent-avatar {
+    background: radial-gradient(circle, #FF00FF, #FF69B4) !important;
+    border-color: #FFFF00;
+}
+body.classic-mode .rank-3 .agent-avatar {
+    background: radial-gradient(circle, #00FFFF, #40E0D0) !important;
+    border-color: #0000FF;
+}
+body.classic-mode .rank-4 .agent-avatar, 
+body.classic-mode .rank-5 .agent-avatar {
+    background: radial-gradient(circle, #FF0000, #FF6347) !important;
+    border-color: #FFFFFF;
+}
+
+@keyframes pacmanMouth {
+    0% { clip-path: polygon(50% 50%, 100% 0%, 100% 100%); }
+    100% { clip-path: polygon(50% 50%, 100% 0%, 100% 35%, 85% 50%, 100% 65%, 100% 100%); }
 }
 
 @keyframes pacmanChomp {
@@ -998,3 +1122,334 @@ body.classic-mode .no-data::after {
         margin-bottom: 1rem;
     }
 }
+
+/* ===========================================
+   PROFESSIONAL MODE - Fortune 500 Dashboard
+   ========================================== */
+
+/* Professional Mode Base - Layout Only (Preserve Colors) */
+body.professional-mode {
+    font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.01em;
+}
+
+/* Executive Header Enhancement */
+body.professional-mode .header {
+    position: relative;
+    border-bottom: 3px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+body.professional-mode .header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, var(--lb-accent) 50%, transparent 100%);
+}
+
+body.professional-mode .header h1 {
+    font-weight: 700;
+    font-size: 2.2rem;
+    letter-spacing: -0.02em;
+    position: relative;
+}
+
+body.professional-mode .header h1::after {
+    content: "ENTERPRISE DASHBOARD";
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-size: 0.4em;
+    opacity: 0.4;
+    font-weight: 400;
+    letter-spacing: 2px;
+}
+
+/* KPI Metrics Bar */
+body.professional-mode .container::before {
+    content: "";
+    display: block;
+    background: rgba(255, 255, 255, 0.05);
+    height: 80px;
+    margin: 0 -2rem 2rem -2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+}
+
+/* Executive Navigation Enhancement */
+body.professional-mode .nav {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(20px);
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0;
+}
+
+body.professional-mode .nav-link {
+    padding: 1.2rem 2rem;
+    font-weight: 500;
+    font-size: 0.95rem;
+    letter-spacing: 0.025em;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+}
+
+body.professional-mode .nav-link.active {
+    background: rgba(255, 255, 255, 0.08);
+    border-bottom-color: var(--lb-accent);
+    font-weight: 600;
+}
+
+body.professional-mode .nav-link:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-1px);
+}
+
+/* Grid System Enhancement */
+body.professional-mode .grid {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+body.professional-mode .grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Card Professional Enhancement */
+body.professional-mode .card {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    backdrop-filter: blur(20px);
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.professional-mode .card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--lb-accent), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+body.professional-mode .card:hover::before {
+    opacity: 0.6;
+}
+
+body.professional-mode .card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Professional Typography */
+body.professional-mode .stat-value {
+    font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    font-size: 2.8rem;
+    line-height: 1;
+}
+
+body.professional-mode .stat-label {
+    font-weight: 500;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 0.75rem;
+}
+
+/* Executive Table Enhancement */
+body.professional-mode table {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+body.professional-mode th {
+    background: rgba(255, 255, 255, 0.08);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 1.2rem 1rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+body.professional-mode td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-weight: 400;
+}
+
+body.professional-mode tbody tr:hover {
+    background: rgba(255, 255, 255, 0.06);
+    cursor: pointer;
+}
+
+/* Professional Champions Layout */
+body.professional-mode #champion1,
+body.professional-mode #champion2,
+body.professional-mode #champion3 {
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+body.professional-mode #champion1::before {
+    content: "LEADER";
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 8px;
+    letter-spacing: 1px;
+    opacity: 0.5;
+    font-weight: 600;
+}
+
+body.professional-mode #champion2::before {
+    content: "RUNNER-UP";
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 8px;
+    letter-spacing: 1px;
+    opacity: 0.5;
+    font-weight: 600;
+}
+
+body.professional-mode #champion3::before {
+    content: "THIRD";
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 8px;
+    letter-spacing: 1px;
+    opacity: 0.5;
+    font-weight: 600;
+}
+
+/* Professional Filters */
+body.professional-mode .filters {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+body.professional-mode .filter-group label {
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+body.professional-mode .filter-select {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+body.professional-mode .filter-select:focus {
+    outline: none;
+    border-color: var(--lb-accent);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+}
+
+/* Executive Status Indicators */
+body.professional-mode .achievement {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Professional Mode Toggle Styling */
+body.professional-mode .professional-toggle {
+    background: var(--lb-accent) !important;
+    color: var(--lb-primary) !important;
+    font-weight: 600;
+    border: 2px solid var(--lb-accent) !important;
+}
+
+/* Responsive Professional Mode */
+@media (max-width: 1024px) {
+    body.professional-mode .header h1::after {
+        display: none;
+    }
+    
+    body.professional-mode .grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    body.professional-mode .filters {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    body.professional-mode .header h1 {
+        font-size: 1.8rem;
+    }
+    
+    body.professional-mode .nav-link {
+        padding: 1rem;
+        font-size: 0.9rem;
+    }
+    
+    body.professional-mode .grid-4 {
+        grid-template-columns: 1fr;
+    }
+    
+    body.professional-mode .stat-value {
+        font-size: 2.2rem;
+    }
+}
+
+/* Professional Mode Animations */
+@keyframes executiveSlideIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+body.professional-mode .card {
+    animation: executiveSlideIn 0.5s ease-out;
+    animation-fill-mode: both;
+}
+
+body.professional-mode .card:nth-child(1) { animation-delay: 0.1s; }
+body.professional-mode .card:nth-child(2) { animation-delay: 0.2s; }
+body.professional-mode .card:nth-child(3) { animation-delay: 0.3s; }
+body.professional-mode .card:nth-child(4) { animation-delay: 0.4s; }

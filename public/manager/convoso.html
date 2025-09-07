@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convoso Dashboard - Manager Portal</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="50x50" href="/favicons/favicon-50x50.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicons/android-chrome-512x512.png">
+    
+    <!-- Auth Guard Script - Must be loaded in HEAD before content renders -->
+    <script>
+        (function () {
+            const token = localStorage.getItem('syncedup_token');
+            const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+            const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
+            const role = normalize(u.role || '');
+            const allowed = ['manager','admin','super_admin'];
+            if (!token || !role || !allowed.includes(role)) { 
+                window.location.href = '/login'; 
+                return; 
+            }
+        })();
+    </script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: #f5f5f5; 
+            min-height: 100vh;
+        }
+        
+        .header { 
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); 
+            color: white; 
+            padding: 1rem 2rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        
+        .nav { 
+            display: flex; 
+            gap: 2rem; 
+            padding: 0 2rem; 
+            background: white; 
+            border-bottom: 1px solid #e2e8f0; 
+            overflow-x: auto; 
+        }
+        
+        .nav a { 
+            padding: 1rem; 
+            text-decoration: none; 
+            color: #2d3748; 
+            font-weight: 500; 
+            white-space: nowrap; 
+        }
+        
+        .nav a.active { 
+            color: #4299e1; 
+            border-bottom: 2px solid #4299e1; 
+        }
+        
+        .container { 
+            max-width: 1400px; 
+            margin: 2rem auto; 
+            padding: 0 2rem; 
+        }
+        
+        .card { 
+            background: white; 
+            padding: 1.5rem; 
+            border-radius: 8px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+            margin-bottom: 1.5rem; 
+        }
+        
+        .grid { 
+            display: grid; 
+            gap: 1.5rem; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+        }
+        
+        .btn { 
+            padding: 0.75rem 1.5rem; 
+            background: #4299e1; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            margin: 0.5rem; 
+            font-size: 0.875rem;
+        }
+        
+        .btn:hover { background: #3182ce; }
+        .btn-success { background: #48bb78; }
+        .btn-warning { background: #ed8936; }
+        .btn-purple { background: #667eea; }
+        
+        .stat-value { 
+            font-size: 2rem; 
+            font-weight: bold; 
+            color: #4299e1; 
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label { 
+            color: #718096; 
+            font-size: 0.875rem; 
+        }
+        
+        .manager-notice { 
+            background: linear-gradient(135deg, rgba(66, 153, 225, 0.1) 0%, rgba(102, 126, 234, 0.1) 100%); 
+            border: 2px solid #4299e1; 
+            border-radius: 8px; 
+            padding: 1rem; 
+            margin-bottom: 2rem; 
+            text-align: center;
+        }
+        
+        .message { 
+            padding: 1rem; 
+            margin-bottom: 1.5rem; 
+            border-radius: 8px; 
+        }
+        
+        .message.success { 
+            background: #f0fff4; 
+            border: 1px solid #9ae6b4; 
+            color: #2f855a; 
+        }
+        
+        .message.error { 
+            background: #fed7d7; 
+            border: 1px solid #feb2b2; 
+            color: #c53030; 
+        }
+        
+        .modal { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background: rgba(0,0,0,0.5); 
+            display: none; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 1000; 
+        }
+        
+        .modal.show { display: flex; }
+        
+        .modal-content { 
+            background: white; 
+            padding: 2rem; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            max-width: 90vw; 
+            max-height: 80vh; 
+            overflow: auto; 
+        }
+        
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 1rem; 
+            min-width: 800px;
+        }
+        
+        th { 
+            background: #f7fafc; 
+            padding: 0.75rem; 
+            text-align: left; 
+            font-weight: 600; 
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        td { 
+            padding: 0.75rem; 
+            border-bottom: 1px solid #f7fafc; 
+        }
+        
+        .badge { 
+            padding: 0.25rem 0.5rem; 
+            border-radius: 12px; 
+            font-size: 0.75rem; 
+            font-weight: 500; 
+        }
+        
+        .badge-new { 
+            background: #f0fff4; 
+            color: #2f855a; 
+            border: 1px solid #9ae6b4; 
+        }
+        
+        .activity-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: 1fr 1fr;
+        }
+        
+        .activity-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .activity-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f7fafc;
+        }
+        
+        .activity-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .activity-item {
+            padding: 1rem;
+            border-bottom: 1px solid #f7fafc;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📞 Convoso Dashboard</h1>
+        <select id="time-range" style="padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid white; background: rgba(255,255,255,0.1); color: white;">
+            <option value="today" style="color: #2d3748;">Today</option>
+            <option value="week" style="color: #2d3748;">This Week</option>
+            <option value="month" style="color: #2d3748;">This Month</option>
+            <option value="quarter" style="color: #2d3748;">This Quarter</option>
+        </select>
+    </div>
+    
+    <nav class="nav">
+        <a href="/manager/">Dashboard</a>
+        <a href="/manager/agents.html">Team Management</a>
+        <a href="/manager/performance.html">Team Performance</a>
+        <a href="/manager/reports.html">Reports</a>
+        <a href="/manager/convoso.html" class="active">Convoso</a>
+    </nav>
+    
+    <div class="container">
+        <!-- Manager Notice -->
+        <div class="manager-notice">
+            <p style="margin: 0; color: #2d3748; font-weight: 500;">
+                🎯 <span style="color: #4299e1; font-weight: 600;">Manager Dashboard</span> - Monitor your team's call center performance and lead conversion rates
+            </p>
+        </div>
+        
+        <!-- Message Display -->
+        <div id="message" class="message" style="display: none;"></div>
+        
+        <!-- Stats Cards -->
+        <div class="grid">
+            <div class="card">
+                <div class="stat-value" id="total-leads">0</div>
+                <div class="stat-label">Total Leads</div>
+            </div>
+            <div class="card">
+                <div class="stat-value" id="completed-calls">0</div>
+                <div class="stat-label">Completed Calls</div>
+            </div>
+            <div class="card">
+                <div class="stat-value" id="active-agents">0</div>
+                <div class="stat-label">Active Agents</div>
+            </div>
+            <div class="card">
+                <div class="stat-value" id="avg-duration">0:00</div>
+                <div class="stat-label">Avg Call Duration</div>
+            </div>
+        </div>
+        
+        <!-- Recent Activity Grid -->
+        <div class="activity-grid">
+            <!-- Recent Calls -->
+            <div class="activity-card">
+                <div class="activity-header">
+                    <h3 style="margin: 0; color: #2d3748; font-weight: 600;">Recent Calls</h3>
+                </div>
+                <div class="activity-content" id="recent-calls">
+                    <div class="activity-item" style="text-align: center; color: #718096;">
+                        Loading recent calls...
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Lead Activity -->
+            <div class="activity-card">
+                <div class="activity-header">
+                    <h3 style="margin: 0; color: #2d3748; font-weight: 600;">Lead Activity</h3>
+                </div>
+                <div class="activity-content" id="lead-activity">
+                    <div class="activity-item" style="text-align: center; color: #718096;">
+                        Loading lead activity...
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div style="margin-top: 2rem;">
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button class="btn">👥 Manage Team</button>
+                <button class="btn btn-success">📊 Team Performance</button>
+                <button class="btn btn-warning">📋 Generate Reports</button>
+                <button class="btn btn-purple" onclick="viewAllLeads()">🎯 View All Leads</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Leads Modal -->
+    <div id="leads-modal" class="modal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="margin: 0; color: #2d3748;">All Convoso Leads</h2>
+                <button onclick="hideLeadsModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #718096;">×</button>
+            </div>
+            <div id="leads-content">
+                <div style="text-align: center; padding: 2rem; color: #718096;">
+                    Loading leads...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedTimeRange = 'today';
+        let stats = { totalLeads: 0, completedCalls: 0, activeAgents: 0, avgCallDuration: 0 };
+        
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            
+            // Add event listener for time range change
+            document.getElementById('time-range').addEventListener('change', function(e) {
+                selectedTimeRange = e.target.value;
+                loadData();
+            });
+        });
+        
+        async function loadData() {
+            try {
+                await Promise.all([
+                    fetchConvosoStats(),
+                    fetchRecentCalls(),
+                    fetchLeadActivity()
+                ]);
+            } catch (error) {
+                console.error('Failed to load data:', error);
+                showMessage('Failed to load dashboard data', 'error');
+            }
+        }
+        
+        async function fetchConvosoStats() {
+            try {
+                const response = await fetch(`/api/manager/convoso-stats?range=${selectedTimeRange}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    stats = data.stats || stats;
+                    updateStatsDisplay();
+                }
+            } catch (error) {
+                console.error('Failed to fetch stats:', error);
+            }
+        }
+        
+        async function fetchRecentCalls() {
+            try {
+                const response = await fetch(`/api/manager/recent-calls?range=${selectedTimeRange}&limit=10`);
+                if (response.ok) {
+                    const data = await response.json();
+                    renderRecentCalls(data.calls || []);
+                }
+            } catch (error) {
+                console.error('Failed to fetch recent calls:', error);
+                document.getElementById('recent-calls').innerHTML = `
+                    <div class="activity-item" style="text-align: center; color: #e53e3e;">
+                        Failed to load recent calls
+                    </div>
+                `;
+            }
+        }
+        
+        async function fetchLeadActivity() {
+            try {
+                const response = await fetch(`/api/manager/lead-activity?range=${selectedTimeRange}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    renderLeadActivity(data.activity || []);
+                }
+            } catch (error) {
+                console.error('Failed to fetch lead activity:', error);
+                document.getElementById('lead-activity').innerHTML = `
+                    <div class="activity-item" style="text-align: center; color: #e53e3e;">
+                        Failed to load lead activity
+                    </div>
+                `;
+            }
+        }
+        
+        function updateStatsDisplay() {
+            document.getElementById('total-leads').textContent = stats.totalLeads.toLocaleString();
+            document.getElementById('completed-calls').textContent = stats.completedCalls.toLocaleString();
+            document.getElementById('active-agents').textContent = stats.activeAgents;
+            document.getElementById('avg-duration').textContent = formatDuration(stats.avgCallDuration);
+        }
+        
+        function formatDuration(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        function renderRecentCalls(calls) {
+            if (calls.length === 0) {
+                document.getElementById('recent-calls').innerHTML = `
+                    <div class="activity-item" style="text-align: center; color: #718096;">
+                        No recent calls found
+                    </div>
+                `;
+                return;
+            }
+            
+            document.getElementById('recent-calls').innerHTML = calls.map(call => {
+                const dispositionStyle = getDispositionColor(call.disposition);
+                return `
+                    <div class="activity-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <div style="font-weight: 500; color: #2d3748;">
+                                ${call.agent_name || `Agent ${call.agent_id}`}
+                            </div>
+                            <div style="font-size: 0.875rem; color: #718096;">
+                                ${formatDuration(call.duration)}
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="font-size: 0.75rem; color: #a0aec0;">
+                                ${new Date(call.call_time).toLocaleString()}
+                            </div>
+                            <span style="padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem; font-weight: 500; background: ${dispositionStyle.background}; color: ${dispositionStyle.color}; border: 1px solid ${dispositionStyle.border};">
+                                ${call.disposition || 'Unknown'}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderLeadActivity(activity) {
+            if (activity.length === 0) {
+                document.getElementById('lead-activity').innerHTML = `
+                    <div class="activity-item" style="text-align: center; color: #718096;">
+                        No recent activity found
+                    </div>
+                `;
+                return;
+            }
+            
+            document.getElementById('lead-activity').innerHTML = activity.map(item => {
+                const dispositionStyle = getDispositionColor(item.last_disposition);
+                return `
+                    <div class="activity-item">
+                        <div style="display: flex; align-items: flex-start;">
+                            <div style="width: 8px; height: 8px; border-radius: 50%; background: #4299e1; margin-top: 0.5rem; margin-right: 0.75rem; flex-shrink: 0;"></div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 500; color: #2d3748; margin-bottom: 0.25rem;">
+                                    Lead ${item.convoso_lead_id} updated
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <div style="font-size: 0.75rem; color: #718096;">
+                                        Status: ${item.status}
+                                    </div>
+                                    <div style="font-size: 0.75rem; color: #a0aec0;">
+                                        ${new Date(item.updated_at).toLocaleString()}
+                                    </div>
+                                </div>
+                                ${item.last_disposition ? `
+                                    <span style="padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem; font-weight: 500; background: ${dispositionStyle.background}; color: ${dispositionStyle.color}; border: 1px solid ${dispositionStyle.border};">
+                                        ${item.last_disposition}
+                                    </span>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function getDispositionColor(disposition) {
+            switch (disposition?.toLowerCase()) {
+                case 'sale':
+                case 'interested':
+                    return { background: '#f0fff4', color: '#2f855a', border: '#9ae6b4' };
+                case 'callback':
+                case 'follow up':
+                    return { background: '#fffbeb', color: '#c05621', border: '#fbd38d' };
+                case 'not interested':
+                case 'dnc':
+                    return { background: '#fed7d7', color: '#c53030', border: '#feb2b2' };
+                default:
+                    return { background: '#f7fafc', color: '#4a5568', border: '#e2e8f0' };
+            }
+        }
+        
+        async function viewAllLeads() {
+            showLeadsModal();
+            try {
+                const response = await fetch(`/api/admin/convoso-leads?limit=50`);
+                if (response.ok) {
+                    const data = await response.json();
+                    renderLeads(data.leads || []);
+                }
+            } catch (error) {
+                console.error('Failed to fetch leads:', error);
+                document.getElementById('leads-content').innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #e53e3e;">
+                        Failed to load leads
+                    </div>
+                `;
+            }
+        }
+        
+        function showLeadsModal() {
+            document.getElementById('leads-modal').classList.add('show');
+            document.getElementById('leads-content').innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #718096;">
+                    Loading leads...
+                </div>
+            `;
+        }
+        
+        function hideLeadsModal() {
+            document.getElementById('leads-modal').classList.remove('show');
+        }
+        
+        function renderLeads(leads) {
+            if (leads.length === 0) {
+                document.getElementById('leads-content').innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #718096;">
+                        No leads found
+                    </div>
+                `;
+                return;
+            }
+            
+            document.getElementById('leads-content').innerHTML = `
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Lead</th>
+                                <th>Phone</th>
+                                <th>Agency</th>
+                                <th>Status</th>
+                                <th>Disposition</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${leads.map(lead => `
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 500; color: #2d3748;">
+                                            ${lead.first_name} ${lead.last_name}
+                                        </div>
+                                        <div style="font-size: 0.75rem; color: #718096;">
+                                            ID: ${lead.convoso_lead_id}
+                                        </div>
+                                    </td>
+                                    <td style="color: #4a5568;">${lead.phone_number}</td>
+                                    <td style="font-size: 0.875rem; color: #718096;">
+                                        ${lead.agencies?.name || 'Unknown'}
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-new">
+                                            ${lead.status || 'NEW'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        ${lead.last_disposition ? `
+                                            <span class="badge" style="background: ${getDispositionColor(lead.last_disposition).background}; color: ${getDispositionColor(lead.last_disposition).color}; border: 1px solid ${getDispositionColor(lead.last_disposition).border};">
+                                                ${lead.last_disposition}
+                                            </span>
+                                        ` : '<span style="color: #a0aec0; font-size: 0.875rem;">-</span>'}
+                                    </td>
+                                    <td style="font-size: 0.875rem; color: #718096;">
+                                        ${new Date(lead.created_at).toLocaleDateString()}
+                                    </td>
+                                    <td>
+                                        <button onclick="openQuote('${lead.id}', '${lead.first_name || 'Unknown'}', '${lead.last_name || 'Lead'}', '${lead.phone_number || ''}', '${lead.date_of_birth || '1980-01-01'}', '${lead.postal_code || '90210'}', '${lead.email || ''}')" 
+                                                class="btn" style="padding: 0.375rem 0.75rem; font-size: 0.75rem;">
+                                            Get Quote
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        function openQuote(leadId, firstName, lastName, phone, dob, zip, email) {
+            const quoteUrl = `/agent/quote?` + new URLSearchParams({
+                lead_id: leadId,
+                first_name: firstName,
+                last_name: lastName,
+                phone: phone,
+                dob: dob,
+                zip: zip,
+                email: email,
+                source: 'convoso'
+            });
+            
+            window.open(quoteUrl, '_blank', 'width=1200,height=800');
+        }
+        
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = `message ${type}`;
+            messageEl.style.display = 'block';
+            
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

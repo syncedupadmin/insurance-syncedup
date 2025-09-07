@@ -855,33 +855,59 @@
         }
 
         // View team leaderboard
-        function viewTeamLeaderboard() {
+        async function viewTeamLeaderboard() {
             if (!isAdmin) {
                 alert('Access denied. Admin privileges required.');
                 return;
             }
             
-            const leaderboardData = [
-                { name: 'John Smith', sales: 45, revenue: '$134,500' },
-                { name: 'Jane Doe', sales: 38, revenue: '$114,200' },
-                { name: 'Mike Johnson', sales: 32, revenue: '$96,800' },
-                { name: 'David Brown', sales: 28, revenue: '$84,400' }
-            ];
-            
-            let html = '<h4 style="margin: 1rem 0;">🏆 Team Leaderboard (This Month)</h4>';
-            html += '<div style="max-height: 200px; overflow-y: auto;">';
-            
-            leaderboardData.forEach((agent, index) => {
-                html += `
-                    <div style="display: flex; justify-content: space-between; padding: 0.5rem; margin-bottom: 0.5rem; background: rgba(102, 126, 234, 0.05); border-radius: 8px;">
-                        <span><strong>#${index + 1}</strong> ${agent.name}</span>
-                        <span>${agent.sales} sales • ${agent.revenue}</span>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            showAdminResult(html, 'info');
+            try {
+                showAdminResult('Loading team leaderboard...', 'info');
+                
+                const response = await fetch('/api/manager/team-performance', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch team data');
+                }
+                
+                const result = await response.json();
+                const leaderboardData = result.data || [];
+                
+                let html = '<h4 style="margin: 1rem 0;">🏆 Team Leaderboard (This Month)</h4>';
+                html += '<div style="max-height: 200px; overflow-y: auto;">';
+                
+                if (leaderboardData.length === 0) {
+                    html += `
+                        <div style="text-align: center; padding: 2rem; color: #666;">
+                            <p>No team performance data available</p>
+                        </div>
+                    `;
+                } else {
+                    leaderboardData.forEach((agent, index) => {
+                        const agentName = agent.name || `Agent #${String(index + 1).padStart(3, '0')}`;
+                        const salesCount = agent.sales || 0;
+                        const revenue = agent.revenue ? `$${agent.revenue.toLocaleString()}` : '$0';
+                        
+                        html += `
+                            <div style="display: flex; justify-content: space-between; padding: 0.5rem; margin-bottom: 0.5rem; background: rgba(102, 126, 234, 0.05); border-radius: 8px;">
+                                <span><strong>#${index + 1}</strong> ${agentName}</span>
+                                <span>${salesCount} sales • ${revenue}</span>
+                            </div>
+                        `;
+                    });
+                }
+                
+                html += '</div>';
+                showAdminResult(html, 'info');
+            } catch (error) {
+                console.error('Error loading team leaderboard:', error);
+                showAdminResult(`❌ Error loading team leaderboard: ${error.message}`, 'error');
+            }
         }
 
         // Manage agents

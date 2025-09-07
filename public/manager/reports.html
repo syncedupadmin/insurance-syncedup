@@ -54,7 +54,7 @@
             <i data-lucide="settings" class="icon"></i>
             Settings
         </a>
-        <a href="/leaderboard" class="nav-link">
+        <a href="/global-leaderboard" class="nav-link">
             <i data-lucide="trophy" class="icon"></i>
             Global Leaderboard
         </a>
@@ -297,41 +297,8 @@
     <script>
         let currentUser = null;
         
-        // Mock recent reports data
-        const recentReports = [
-            {
-                name: 'Weekly Team Performance',
-                type: 'Performance',
-                generated: '2025-08-30 14:30',
-                period: 'Aug 26-30, 2025',
-                format: 'PDF',
-                id: 'RPT001'
-            },
-            {
-                name: 'Monthly Sales Summary',
-                type: 'Sales',
-                generated: '2025-08-30 09:15',
-                period: 'August 2025',
-                format: 'Excel',
-                id: 'RPT002'
-            },
-            {
-                name: 'Vendor ROI Analysis',
-                type: 'Vendors',
-                generated: '2025-08-29 16:45',
-                period: 'Q3 2025',
-                format: 'PDF',
-                id: 'RPT003'
-            },
-            {
-                name: 'Agent Activity Report',
-                type: 'Activity',
-                generated: '2025-08-28 11:20',
-                period: 'Aug 1-28, 2025',
-                format: 'CSV',
-                id: 'RPT004'
-            }
-        ];
+        // Recent reports data - will be loaded from API
+        let recentReports = [];
         
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication
@@ -372,42 +339,104 @@
             }
         });
         
-        function loadReportsData() {
-            // Display stats
-            document.getElementById('reportsGenerated').textContent = recentReports.length + 8; // Mock total
-            document.getElementById('scheduledReports').textContent = '2';
-            document.getElementById('dataPoints').textContent = '1,247';
-            document.getElementById('lastExport').textContent = 'Today';
-            
-            // Display recent reports
-            displayRecentReports();
+        async function loadReportsData() {
+            try {
+                // Fetch reports data from API
+                const response = await fetch('/api/manager/reports', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                let reportsData = {
+                    recentReports: [],
+                    totalGenerated: 0,
+                    scheduled: 0,
+                    dataPoints: 0,
+                    lastExport: null
+                };
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && result.data) {
+                        reportsData = {
+                            recentReports: result.data.recentReports || [],
+                            totalGenerated: result.data.totalGenerated || 0,
+                            scheduled: result.data.scheduled || 0,
+                            dataPoints: result.data.dataPoints || 0,
+                            lastExport: result.data.lastExport
+                        };
+                        recentReports = reportsData.recentReports;
+                    }
+                } else {
+                    console.warn('Reports API not available, showing empty state');
+                }
+                
+                // Display stats with proper defaults
+                document.getElementById('reportsGenerated').textContent = reportsData.totalGenerated.toString();
+                document.getElementById('scheduledReports').textContent = reportsData.scheduled.toString();
+                document.getElementById('dataPoints').textContent = reportsData.dataPoints.toLocaleString();
+                document.getElementById('lastExport').textContent = reportsData.lastExport ? 
+                    new Date(reportsData.lastExport).toLocaleDateString() : '--';
+                
+                // Display recent reports
+                displayRecentReports();
+            } catch (error) {
+                console.error('Error loading reports data:', error);
+                // Show error state with zeros
+                document.getElementById('reportsGenerated').textContent = '0';
+                document.getElementById('scheduledReports').textContent = '0';
+                document.getElementById('dataPoints').textContent = '0';
+                document.getElementById('lastExport').textContent = '--';
+                displayRecentReports();
+            }
         }
         
         function displayRecentReports() {
             const tableBody = document.getElementById('recentReportsTable');
             tableBody.innerHTML = '';
             
-            recentReports.forEach(report => {
+            if (recentReports.length === 0) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td><strong>${report.name}</strong></td>
-                    <td>${report.type}</td>
-                    <td>${new Date(report.generated).toLocaleString()}</td>
-                    <td>${report.period}</td>
-                    <td>${report.format}</td>
-                    <td>
-                        <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin: 0.1rem;" 
-                                onclick="downloadReport('${report.id}')">
-                                <i data-lucide="download"></i> Download
-                        </button>
-                        <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin: 0.1rem;" 
-                                onclick="shareReport('${report.id}')">
-                                <i data-lucide="share"></i> Share
-                        </button>
+                    <td colspan="6" style="text-align: center; padding: 2rem; color: #666;">
+                        <i data-lucide="file-text" style="margin-bottom: 1rem; width: 48px; height: 48px;"></i>
+                        <p>No reports available</p>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem;">Generate your first report using the options above</p>
                     </td>
                 `;
                 tableBody.appendChild(row);
-            });
+            } else {
+                recentReports.forEach(report => {
+                    const reportName = report.name || 'Untitled Report';
+                    const reportType = report.type || 'Unknown';
+                    const generated = report.generated ? new Date(report.generated).toLocaleString() : '--';
+                    const period = report.period || '--';
+                    const format = report.format || 'PDF';
+                    const reportId = report.id || '';
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>${reportName}</strong></td>
+                        <td>${reportType}</td>
+                        <td>${generated}</td>
+                        <td>${period}</td>
+                        <td>${format}</td>
+                        <td>
+                            <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin: 0.1rem;" 
+                                    onclick="downloadReport('${reportId}')" ${reportId ? '' : 'disabled'}>
+                                    <i data-lucide="download"></i> Download
+                            </button>
+                            <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin: 0.1rem;" 
+                                    onclick="shareReport('${reportId}')" ${reportId ? '' : 'disabled'}>
+                                    <i data-lucide="share"></i> Share
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
         }
         
         function generateQuickReport(reportType) {
