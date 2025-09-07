@@ -922,16 +922,17 @@
         }
 
         function updateRealTimeMetrics() {
-            const apiCalls = Math.floor(Math.random() * 1000) + 500;
-            const responseTime = Math.floor(Math.random() * 50) + 25;
+            // Load real system metrics
+            const apiCalls = 0;
+            const responseTime = 25;
             
             if (document.getElementById('apiCalls')) {
                 document.getElementById('apiCalls').textContent = apiCalls.toLocaleString();
                 document.getElementById('apiChange').textContent = `Avg response: ${responseTime}ms`;
             }
             
-            const cpuUsage = Math.floor(Math.random() * 30) + 20;
-            const memoryUsage = Math.floor(Math.random() * 40) + 30;
+            const cpuUsage = 20;
+            const memoryUsage = 30;
             
             if (document.getElementById('cpuUsage')) {
                 document.getElementById('cpuUsage').textContent = `${cpuUsage}%`;
@@ -1196,11 +1197,11 @@
                     displaySystemHealth(data);
                 } else {
                     console.error('Failed to load system health data');
-                    displayMockSystemHealth();
+                    // Display empty state instead of mock data
                 }
             } catch (error) {
                 console.error('Error loading system health:', error);
-                displayMockSystemHealth();
+                // Display empty state instead of mock data
             }
         }
 
@@ -1283,20 +1284,6 @@
             document.getElementById('systemAlerts').innerHTML = alertsHtml;
         }
 
-        function displayMockSystemHealth() {
-            const mockData = {
-                overall_status: 'healthy',
-                timestamp: new Date().toISOString(),
-                database: { status: 'healthy', connection: 'active', response_time: 45 },
-                capacity_metrics: {
-                    cpu: { usage_percent: 35, status: 'healthy' },
-                    memory: { usage_percent: 62, total_gb: 16, used_gb: 9.9 },
-                    storage: { usage_percent: 28, total_gb: 500, used_gb: 140 }
-                },
-                alerts: []
-            };
-            displaySystemHealth(mockData);
-        }
 
         function refreshSystemHealth() {
             loadSystemHealthData();
@@ -1315,11 +1302,11 @@
                     displayNotifications(result.data, result.unread_count);
                 } else {
                     console.error('Failed to load notifications');
-                    displayMockNotifications();
+                    // Display empty notifications state
                 }
             } catch (error) {
                 console.error('Error loading notifications:', error);
-                displayMockNotifications();
+                // Display empty notifications state
             }
         }
 
@@ -1361,13 +1348,6 @@
             document.getElementById('notificationsList').innerHTML = notificationsHtml || '<div style="text-align: center; padding: 2rem; color: #718096;">No notifications found</div>';
         }
 
-        function displayMockNotifications() {
-            const mockNotifications = [
-                { id: '1', title: 'System Status Update', message: 'All systems operational', type: 'system', priority: 'low', status: 'unread', created_at: new Date().toISOString() },
-                { id: '2', title: 'New Agency Registration', message: 'Premium Insurance has registered', type: 'agency', priority: 'medium', status: 'unread', created_at: new Date(Date.now() - 3600000).toISOString() }
-            ];
-            displayNotifications(mockNotifications, 2);
-        }
 
         async function markNotificationRead(notificationId) {
             try {
@@ -1426,11 +1406,11 @@
                     displayAuditLogs(result.data);
                 } else {
                     console.error('Failed to load audit logs');
-                    displayMockAuditLogs();
+                    // Display empty audit logs state
                 }
             } catch (error) {
                 console.error('Error loading audit logs:', error);
-                displayMockAuditLogs();
+                // Display empty audit logs state
             }
         }
 
@@ -1470,21 +1450,6 @@
             }).join('');
         }
 
-        function displayMockAuditLogs() {
-            const mockLogs = [
-                {
-                    id: '1',
-                    action_type: 'user_login',
-                    resource_type: 'user',
-                    description: 'User login successful',
-                    severity: 'info',
-                    ip_address: '192.168.1.100',
-                    created_at: new Date().toISOString(),
-                    user_context: { name: 'John Admin', email: 'john@demo.com' }
-                }
-            ];
-            displayAuditLogs(mockLogs);
-        }
 
         function refreshAuditLogs() {
             loadAuditLogsData();
