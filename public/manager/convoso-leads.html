@@ -32,14 +32,22 @@
     <link rel="stylesheet" href="/manager/manager-global.css">
     
     <style>
+        /* Override font to match site fonts and ensure consistent styling */
+        body, * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        }
+        
         .leads-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 50%, #1d4ed8 100%);
             color: white;
             padding: 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
         }
         
         .leads-title {
@@ -344,28 +352,6 @@
     </style>
 </head>
 <body>
-    <!-- Leads Header -->
-    <div class="leads-header">
-        <div class="leads-title">
-            <i data-lucide="users"></i>
-            Manage Leads
-        </div>
-        <div class="leads-stats">
-            <div class="stat-item">
-                <div class="stat-value" id="total-leads">0</div>
-                <div>Total Leads in Account</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value">Calculate</div>
-                <div>Total Leads Allowed</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value">4120000</div>
-                <div>Total Leads Allowed</div>
-            </div>
-        </div>
-    </div>
-    
     <!-- Navigation -->
     <div class="nav">
         <a href="/manager" class="nav-link">
@@ -386,6 +372,28 @@
         <a href="/manager/settings" class="nav-link">
             <i data-lucide="settings" class="icon"></i>Settings
         </a>
+    </div>
+    
+    <!-- Leads Header -->
+    <div class="leads-header">
+        <div class="leads-title">
+            <i data-lucide="users"></i>
+            Manage Leads
+        </div>
+        <div class="leads-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="total-leads">0</div>
+                <div>Total Leads in Account</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">Calculate</div>
+                <div>Total Leads Allowed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="total-allowed">-</div>
+                <div>Total Leads Allowed</div>
+            </div>
+        </div>
     </div>
     
     <div class="container">

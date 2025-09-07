@@ -32,14 +32,22 @@
     <link rel="stylesheet" href="/admin/admin-global.css">
     
     <style>
+        /* Override font to match site fonts */
+        body, * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        }
+        
         .monitor-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #4c1d95 0%, #5b21b6 50%, #6d28d9 100%);
             color: white;
             padding: 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
         }
         
         .monitor-title {
@@ -292,6 +300,37 @@
     </style>
 </head>
 <body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <a href="/admin/">
+            <i data-lucide="layout-dashboard" class="icon"></i>Dashboard
+        </a>
+        <a href="/admin/agent-performance">
+            <i data-lucide="trending-up" class="icon"></i>Agent Performance
+        </a>
+        <a href="/admin/users">
+            <i data-lucide="users" class="icon"></i>Users
+        </a>
+        <a href="/admin/convoso-leads">
+            <i data-lucide="users" class="icon"></i>Leads
+        </a>
+        <a href="/admin/vendors">
+            <i data-lucide="building-2" class="icon"></i>Vendors
+        </a>
+        <a href="/admin/commissions">
+            <i data-lucide="dollar-sign" class="icon"></i>Commissions
+        </a>
+        <a href="/admin/settings">
+            <i data-lucide="settings" class="icon"></i>Settings
+        </a>
+        <a href="/admin/convoso-monitor" class="active">
+            <i data-lucide="monitor-speaker" class="icon"></i>Convoso
+        </a>
+        <a href="/global-leaderboard">
+            <i data-lucide="trophy" class="icon"></i>Global Leaderboard
+        </a>
+    </nav>
+    
     <!-- Monitor Header -->
     <div class="monitor-header">
         <div class="monitor-title">
@@ -335,37 +374,6 @@
         </div>
     </div>
     
-    <!-- Navigation -->
-    <nav class="nav">
-        <a href="/admin/">
-            <i data-lucide="layout-dashboard" class="icon"></i>Dashboard
-        </a>
-        <a href="/admin/agent-performance">
-            <i data-lucide="trending-up" class="icon"></i>Agent Performance
-        </a>
-        <a href="/admin/users">
-            <i data-lucide="users" class="icon"></i>Users
-        </a>
-        <a href="/admin/convoso-leads">
-            <i data-lucide="users" class="icon"></i>Leads
-        </a>
-        <a href="/admin/vendors">
-            <i data-lucide="building-2" class="icon"></i>Vendors
-        </a>
-        <a href="/admin/commissions">
-            <i data-lucide="dollar-sign" class="icon"></i>Commissions
-        </a>
-        <a href="/admin/settings">
-            <i data-lucide="settings" class="icon"></i>Settings
-        </a>
-        <a href="/admin/convoso-monitor" class="active">
-            <i data-lucide="monitor-speaker" class="icon"></i>Convoso
-        </a>
-        <a href="/global-leaderboard">
-            <i data-lucide="trophy" class="icon"></i>Global Leaderboard
-        </a>
-    </nav>
-    
     <div class="container">
         <!-- Call Statistics -->
         <div class="stats-grid">
@@ -394,55 +402,55 @@
         <!-- Performance Metrics -->
         <div class="performance-grid">
             <div class="performance-card">
-                <div class="performance-label">Dialable Leads: <span id="dialable-leads">409983</span></div>
+                <div class="performance-label">Dialable Leads: <span id="dialable-leads">-</span></div>
             </div>
             <div class="performance-card">
-                <div class="performance-label">Leads in Hopper: <span id="leads-hopper">2512</span></div>
+                <div class="performance-label">Leads in Hopper: <span id="leads-hopper">-</span></div>
             </div>
             <div class="performance-card">
                 <div class="performance-label">Dial Level: -</div>
             </div>
             <div class="performance-card">
-                <div class="performance-label">Avg Agents: <span id="avg-agents">3.23</span></div>
+                <div class="performance-label">Avg Agents: <span id="avg-agents">-</span></div>
             </div>
         </div>
         
         <div class="performance-grid">
             <div class="performance-card">
-                <div class="performance-label">Outbound Calls Today: <span id="outbound-today">94626</span></div>
+                <div class="performance-label">Outbound Calls Today: <span id="outbound-today">-</span></div>
             </div>
             <div class="performance-card">
-                <div class="performance-label">Manual Calls Today: <span id="manual-today">135</span></div>
+                <div class="performance-label">Manual Calls Today: <span id="manual-today">-</span></div>
             </div>
             <div class="performance-card">
-                <div class="performance-label">Outbound Dropped: <span id="outbound-dropped">1.40%</span></div>
+                <div class="performance-label">Outbound Dropped: <span id="outbound-dropped">-</span></div>
                 <div class="performance-bar">
-                    <div class="performance-fill" style="background: #f6ad55; width: 1.4%;"></div>
+                    <div class="performance-fill" style="background: #f6ad55; width: 0%;"></div>
                 </div>
             </div>
             <div class="performance-card">
-                <div class="performance-label">Outbound (Dropped / Answered): <span id="outbound-ratio">188 / 13415</span></div>
+                <div class="performance-label">Outbound (Dropped / Answered): <span id="outbound-ratio">- / -</span></div>
             </div>
         </div>
         
         <div class="performance-grid">
             <div class="performance-card">
-                <div class="performance-label">Inbound Calls Answered: <span id="inbound-answered">990</span></div>
+                <div class="performance-label">Inbound Calls Answered: <span id="inbound-answered">-</span></div>
             </div>
             <div class="performance-card">
-                <div class="performance-label">Inbound Answered: <span id="inbound-answered-percent">84.98%</span></div>
+                <div class="performance-label">Inbound Answered: <span id="inbound-answered-percent">-</span></div>
                 <div class="performance-bar">
-                    <div class="performance-fill" style="background: #48bb78; width: 84.98%;"></div>
+                    <div class="performance-fill" style="background: #48bb78; width: 0%;"></div>
                 </div>
             </div>
             <div class="performance-card">
-                <div class="performance-label">Inbound Abandoned: <span id="inbound-abandoned">12.79%</span></div>
+                <div class="performance-label">Inbound Abandoned: <span id="inbound-abandoned">-</span></div>
                 <div class="performance-bar">
-                    <div class="performance-fill" style="background: #f56565; width: 12.79%;"></div>
+                    <div class="performance-fill" style="background: #f56565; width: 0%;"></div>
                 </div>
             </div>
             <div class="performance-card">
-                <div class="performance-label">Inbound (Abandoned / Received): <span id="inbound-ratio">149 / 1165</span></div>
+                <div class="performance-label">Inbound (Abandoned / Received): <span id="inbound-ratio">- / -</span></div>
             </div>
         </div>
         
@@ -464,32 +472,32 @@
         <!-- Agent Status Overview -->
         <div class="agent-status-grid">
             <div class="agent-status-card">
-                <div class="agent-status-icon">👥</div>
+                <div class="agent-status-icon"><i data-lucide="users"></i></div>
                 <div class="agent-status-number" id="agents-logged-in">0</div>
                 <div class="agent-status-label">Agents Logged In</div>
             </div>
             <div class="agent-status-card">
-                <div class="agent-status-icon">⏱️</div>
+                <div class="agent-status-icon"><i data-lucide="clock"></i></div>
                 <div class="agent-status-number" id="agents-waiting">0</div>
                 <div class="agent-status-label">Agents Waiting</div>
             </div>
             <div class="agent-status-card">
-                <div class="agent-status-icon">📞</div>
+                <div class="agent-status-icon"><i data-lucide="phone"></i></div>
                 <div class="agent-status-number" id="agents-in-call">0</div>
                 <div class="agent-status-label">Agents In Call</div>
             </div>
             <div class="agent-status-card">
-                <div class="agent-status-icon">📝</div>
+                <div class="agent-status-icon"><i data-lucide="edit"></i></div>
                 <div class="agent-status-number" id="agents-in-dispo">0</div>
                 <div class="agent-status-label">Agents In Dispo</div>
             </div>
             <div class="agent-status-card">
-                <div class="agent-status-icon">⏸️</div>
+                <div class="agent-status-icon"><i data-lucide="pause"></i></div>
                 <div class="agent-status-number" id="agents-paused">0</div>
                 <div class="agent-status-label">Agents Paused</div>
             </div>
             <div class="agent-status-card">
-                <div class="agent-status-icon">⚠️</div>
+                <div class="agent-status-icon"><i data-lucide="alert-triangle"></i></div>
                 <div class="agent-status-number" id="agents-dead-call">0</div>
                 <div class="agent-status-label">Agents In Dead Call</div>
             </div>
@@ -500,7 +508,9 @@
             <div class="table-header">
                 <div class="table-title">Live Agent Status</div>
                 <div>
-                    <button class="btn btn-success" onclick="refreshAgentData()">🔄 Refresh</button>
+                    <button class="btn btn-success" onclick="refreshAgentData()">
+                        <i data-lucide="refresh-cw"></i> Refresh
+                    </button>
                 </div>
             </div>
             <table>
