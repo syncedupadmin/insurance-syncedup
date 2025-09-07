@@ -32,22 +32,19 @@
             color: white;
         }
         
-        .leaderboard-title {
-            font-size: 2rem;
-            font-weight: 700;
-            background: var(--accent-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 0.5rem;
+        .leaderboard-title { 
+            font-family: var(--font-display); 
+            font-size: 1.8rem; 
+            color: #CFE6FF; 
         }
         
-        .live-indicator {
+        .live-indicator { 
+            background: rgba(16,185,129,.12); 
+            color:#22c55e; 
+            border:1px solid rgba(16,185,129,.25);
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
             padding: 0.5rem 1rem;
             border-radius: 20px;
             font-size: 0.9rem;
@@ -97,14 +94,13 @@
             background: rgba(255, 255, 255, 0.1);
         }
         
-        .rank {
-            font-weight: 700;
-            font-size: 1.2rem;
+        .rank{ 
+            font-weight: 700; 
+            color: rgba(255,255,255,.86); 
         }
-        
-        .rank-1 { color: #ffd700; }
-        .rank-2 { color: #c0c0c0; }
-        .rank-3 { color: #cd7f32; }
+        .rank-1,.rank-2,.rank-3{ 
+            color: inherit; 
+        }
         
         .agent-info {
             display: flex;
@@ -112,32 +108,34 @@
             gap: 0.8rem;
         }
         
-        .agent-avatar {
-            width: 40px;
-            height: 40px;
-            background: var(--primary-gradient);
+        .agent-avatar{ 
+            width: 36px;
+            height:36px; 
+            font-weight:600; 
+            font-size:.85rem; 
+            color:#dbeafe; 
+            background: rgba(147,197,253,.12); 
+            border:1px solid rgba(147,197,253,.25);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: 600;
         }
         
-        .sales-amount {
-            font-weight: 700;
-            color: #10b981;
-            font-size: 1.1rem;
+        .leaderboard-row:hover{ 
+            background: rgba(255,255,255,0.06); 
         }
         
-        .trend-up {
-            color: #10b981;
-            font-size: 0.9rem;
+        .sales-amount{ 
+            color:#9EC5FF; 
+            font-weight:700; 
         }
         
-        .trend-down {
-            color: #ef4444;
-            font-size: 0.9rem;
+        .trend-up{ 
+            color:#22c55e; 
+        } 
+        .trend-down{ 
+            color:#ef4444; 
         }
         
         .demo-stats {
@@ -176,6 +174,17 @@
     </style>
 </head>
 <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    
+    <!-- Minimal SVG icon sprites -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+        <symbol id="ic-trophy" viewBox="0 0 24 24"><path fill="currentColor" d="M7 4h10v2h3v3a5 5 0 0 1-5 5h-1v2h3v2H7v-2h3v-2H9a5 5 0 0 1-5-5V6h3V4Zm-1 4v1a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V8h-12Z"/></symbol>
+        <symbol id="ic-chart" viewBox="0 0 24 24"><path fill="currentColor" d="M3 3h2v18H3V3Zm16 8h2v10h-2V11Zm-8 4h2v6h-2v-6Zm4-10h2v16h-2V5Zm-8 8h2v8H7v-8Z"/></symbol>
+        <symbol id="ic-bolt" viewBox="0 0 24 24"><path fill="currentColor" d="M13 2L3 14h7l-1 8 10-12h-7l1-8Z"/></symbol>
+        <symbol id="ic-target" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2Zm0 4a6 6 0 1 0 6 6h-2a4 4 0 1 1-4-4V6Z"/></symbol>
+        <symbol id="ic-fire" viewBox="0 0 24 24"><path fill="currentColor" d="M12 23a7.5 7.5 0 0 1-5.138-12.963C8.204 8.774 11.5 6.5 11 1.5c6 4 9 8 3 14 1 0 2.5-.5 2.5-2.5 0 3.5-2.5 8.5-4.5 8.5z"/></symbol>
+    </svg>
+    
     <!-- Floating Orbs -->
     <div class="floating-orb orb-1"></div>
     <div class="floating-orb orb-2"></div>
@@ -195,7 +204,8 @@
         </div>
     </nav>
 
-    <section class="demo-hero">
+    <main id="main">
+        <section class="demo-hero">
         <div class="container">
             <h1 style="font-size: 3rem; margin-bottom: 1rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Global Leaderboard Demo</h1>
             <p style="font-size: 1.2rem; color: rgba(255,255,255,0.8); margin-bottom: 3rem;">Watch real-time competition drive unprecedented sales growth</p>
@@ -298,17 +308,17 @@
 
         <div class="features-demo">
             <div class="feature-card">
-                <div class="feature-icon">🔥</div>
+                <div class="feature-icon" aria-hidden="true"><svg width="24" height="24"><use href="#ic-fire"/></svg></div>
                 <h3>Competitive Drive</h3>
                 <p>Watch your agents push harder when they see their national ranking. Competition breeds excellence.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">📈</div>
+                <div class="feature-icon" aria-hidden="true"><svg width="24" height="24"><use href="#ic-chart"/></svg></div>
                 <h3>Performance Tracking</h3>
                 <p>Every sale, every call, every interaction tracked and ranked in real-time across the entire network.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🏆</div>
+                <div class="feature-icon" aria-hidden="true"><svg width="24" height="24"><use href="#ic-trophy"/></svg></div>
                 <h3>Recognition System</h3>
                 <p>Top performers get the recognition they deserve with rankings, badges, and achievement systems.</p>
             </div>
@@ -324,10 +334,11 @@
                 <a href="/demo" class="btn-glass">Schedule Demo</a>
             </div>
         </div>
-    </section>
+        </section>
+    </main>
 
     <div class="update-notification" id="update-notification">
-        🔥 Sarah Lee just closed a $12,500 policy!
+        Sarah Lee just closed a $12,500 policy!
     </div>
 
     <script>
@@ -349,7 +360,7 @@
                 maximumFractionDigits: 0
             });
             
-            notification.innerHTML = `🔥 ${randomAgent.name} just closed a ${saleAmount} policy!`;
+            notification.innerHTML = `${randomAgent.name} just closed a ${saleAmount} policy!`;
             notification.classList.add('show');
             
             setTimeout(() => {

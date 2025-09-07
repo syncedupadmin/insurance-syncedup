@@ -222,6 +222,16 @@
     </style>
 </head>
 <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    
+    <!-- Minimal SVG icon sprites -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+        <symbol id="ic-trophy" viewBox="0 0 24 24"><path fill="currentColor" d="M7 4h10v2h3v3a5 5 0 0 1-5 5h-1v2h3v2H7v-2h3v-2H9a5 5 0 0 1-5-5V6h3V4Zm-1 4v1a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V8h-12Z"/></symbol>
+        <symbol id="ic-shield" viewBox="0 0 24 24"><path fill="currentColor" d="M12 1l9 4v7c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4z"/></symbol>
+        <symbol id="ic-bolt" viewBox="0 0 24 24"><path fill="currentColor" d="M13 2L3 14h7l-1 8 10-12h-7l1-8Z"/></symbol>
+        <symbol id="ic-check" viewBox="0 0 24 24"><path fill="currentColor" d="M20 6L9 17l-5-5 1.41-1.41L9 14.17 18.59 4.59 20 6z"/></symbol>
+    </svg>
+    
     <!-- Floating Orbs -->
     <div class="floating-orb orb-1"></div>
     <div class="floating-orb orb-2"></div>
@@ -241,7 +251,8 @@
         </div>
     </nav>
 
-    <section class="trial-hero">
+    <main id="main">
+        <section class="trial-hero">
         <div class="container">
             <h1 style="font-size: 3rem; margin-bottom: 1rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Start Your 14-Day Free Trial</h1>
             <p style="font-size: 1.2rem; color: rgba(255,255,255,0.8); margin-bottom: 2rem;">Full access to Global Leaderboard and all premium features</p>
@@ -383,14 +394,14 @@
                 <div class="benefit-card">
                     <h3>What You Get</h3>
                     <ul class="benefits-list">
-                        <li><span class="benefit-check">✓</span> Complete Global Leaderboard access</li>
-                        <li><span class="benefit-check">✓</span> Advanced commission automation</li>
-                        <li><span class="benefit-check">✓</span> Real-time analytics & reporting</li>
-                        <li><span class="benefit-check">✓</span> Agent performance tracking</li>
-                        <li><span class="benefit-check">✓</span> Convoso integration</li>
-                        <li><span class="benefit-check">✓</span> Multi-portal system</li>
-                        <li><span class="benefit-check">✓</span> Priority support</li>
-                        <li><span class="benefit-check">✓</span> White-glove onboarding</li>
+                        <li><span class="benefit-check"><svg width="16" height="16"><use href="#ic-check"/></svg></span> Complete Global Leaderboard access</li>
+                        <li><span class="benefit-check"><svg width="16" height="16"><use href="#ic-check"/></svg></span> Advanced commission automation</li>
+                        <li><span class="benefit-check"><svg width="16" height="16"><use href="#ic-check"/></svg></span> Real-time analytics & reporting</li>
+                        <li><span class="benefit-check"><svg width="16" height="16"><use href="#ic-check"/></svg></span> Agent performance tracking</li>
+                        <li><span class="benefit-check"><svg width="16" height="16"><use href="#ic-check"/></svg></span> Convoso integration</li>
+                        <li><span class="benefit-check"><svg width="16" height="16"><use href="#ic-check"/></svg></span> Multi-portal system</li>
+                        <li><span class="benefit-check"><svg width="16" height="16"><use href="#ic-check"/></svg></span> Priority support</li>
+                        <li><span class="benefit-check"><svg width="16" height="16"><use href="#ic-check"/></svg></span> White-glove onboarding</li>
                     </ul>
                 </div>
 
@@ -398,7 +409,7 @@
                     <h3>Enterprise Security</h3>
                     <div class="security-badges">
                         <div class="security-badge">
-                            <span class="badge-icon">🔒</span>
+                            <span class="badge-icon"><svg width="16" height="16"><use href="#ic-shield"/></svg></span>
                             <div>
                                 <strong style="color: white;">SOC 2 Compliant</strong><br>
                                 <small style="color: rgba(255,255,255,0.7);">Type II Certified</small>
@@ -412,7 +423,7 @@
                             </div>
                         </div>
                         <div class="security-badge">
-                            <span class="badge-icon">⚡</span>
+                            <span class="badge-icon"><svg width="16" height="16"><use href="#ic-bolt"/></svg></span>
                             <div>
                                 <strong style="color: white;">99.9% Uptime</strong><br>
                                 <small style="color: rgba(255,255,255,0.7);">SLA Guarantee</small>
@@ -444,7 +455,8 @@
                 <a href="/demo" class="btn-glass">Schedule Demo</a>
             </div>
         </div>
-    </section>
+        </section>
+    </main>
 
     <script>
         document.getElementById('trial-form').addEventListener('submit', function(e) {

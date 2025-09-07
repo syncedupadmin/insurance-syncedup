@@ -35,19 +35,19 @@
             overflow: hidden;
         }
         
-        .pricing-card.popular {
-            border: 2px solid #4facfe;
-            background: rgba(79, 172, 254, 0.1);
+        .pricing-card.popular{ 
+            border:1.5px solid rgba(79,172,254,.45); 
+            background: rgba(255,255,255,0.06); 
         }
         
-        .pricing-card.popular::before {
-            content: 'Most Popular';
+        .pricing-card.popular::before{
+            content:'Recommended';
+            background: linear-gradient(90deg,#7aa8ff,#a3bfff);
+            color:#0b142b;
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            background: var(--accent-gradient);
-            color: white;
             padding: 0.5rem;
             text-align: center;
             font-weight: 600;
@@ -67,13 +67,11 @@
             margin-bottom: 1rem;
         }
         
-        .plan-price {
-            font-size: 3rem;
+        .plan-price{ 
+            font-size:2.5rem; 
+            background:none; 
+            color:#D7E7FF;
             font-weight: 800;
-            background: var(--accent-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
             margin-bottom: 0.5rem;
         }
         
@@ -95,20 +93,22 @@
             gap: 0.5rem;
         }
         
-        .plan-features li::before {
-            content: '✓';
-            color: #10b981;
-            font-weight: bold;
-            font-size: 1.2rem;
+        .plan-features li::before{ 
+            content:''; 
+            width:8px;
+            height:8px;
+            border-radius:50%; 
+            background:#22c55e; 
+            display:inline-block; 
         }
         
-        .plan-button {
+        .plan-button{ 
+            border-radius:10px;
             width: 100%;
             padding: 1rem;
             background: var(--primary-gradient);
             color: white;
             border: none;
-            border-radius: 10px;
             font-weight: 600;
             font-size: 1.1rem;
             cursor: pointer;
@@ -219,6 +219,8 @@
     </style>
 </head>
 <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    
     <!-- Floating Orbs -->
     <div class="floating-orb orb-1"></div>
     <div class="floating-orb orb-2"></div>
@@ -238,12 +240,13 @@
         </div>
     </nav>
 
-    <section class="pricing-hero">
-        <div class="container">
-            <h1 style="font-size: 3rem; margin-bottom: 1rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Simple, Transparent Pricing</h1>
-            <p style="font-size: 1.2rem; color: rgba(255,255,255,0.8); margin-bottom: 3rem;">No surprises. No hidden fees. Just results.</p>
-        </div>
-    </section>
+    <main id="main">
+        <section class="pricing-hero">
+            <div class="container">
+                <h1 style="font-size: 3rem; margin-bottom: 1rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Simple, Transparent Pricing</h1>
+                <p style="font-size: 1.2rem; color: rgba(255,255,255,0.8); margin-bottom: 3rem;">No surprises. No hidden fees. Just results.</p>
+            </div>
+        </section>
 
     <section style="padding: 3rem 0;">
         <div class="pricing-grid">
@@ -268,7 +271,7 @@
                 <div class="plan-period">per month</div>
                 <ul class="plan-features">
                     <li>Up to 50 agents</li>
-                    <li>Full Global Leaderboard</li>
+                    <li>Advanced Global Leaderboard with cross-agency tiers</li>
                     <li>Advanced commission automation</li>
                     <li>Real-time analytics</li>
                     <li>Convoso integration</li>
@@ -380,6 +383,7 @@
             </div>
         </div>
     </section>
+    </main>
 
     <script>
         // ROI Calculator

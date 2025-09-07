@@ -7,6 +7,19 @@
     <link rel="stylesheet" href="/css/glassmorphism-landing.css">
 </head>
 <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    
+    <!-- Minimal SVG icon sprites -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+        <symbol id="ic-trophy" viewBox="0 0 24 24"><path fill="currentColor" d="M7 4h10v2h3v3a5 5 0 0 1-5 5h-1v2h3v2H7v-2h3v-2H9a5 5 0 0 1-5-5V6h3V4Zm-1 4v1a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V8h-12Z"/></symbol>
+        <symbol id="ic-chart" viewBox="0 0 24 24"><path fill="currentColor" d="M3 3h2v18H3V3Zm16 8h2v10h-2V11Zm-8 4h2v6h-2v-6Zm4-10h2v16h-2V5Zm-8 8h2v8H7v-8Z"/></symbol>
+        <symbol id="ic-bolt" viewBox="0 0 24 24"><path fill="currentColor" d="M13 2L3 14h7l-1 8 10-12h-7l1-8Z"/></symbol>
+        <symbol id="ic-target" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2Zm0 4a6 6 0 1 0 6 6h-2a4 4 0 1 1-4-4V6Z"/></symbol>
+        <symbol id="ic-phone" viewBox="0 0 24 24"><path fill="currentColor" d="M6.6 10.8c1.2 2.4 3.2 4.4 5.6 5.6l1.9-1.9a1 1 0 0 1 1-.26c1.1.37 2.3.57 3.5.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.6 21 3 13.4 3 4a1 1 0 0 1 1-1h3.2a1 1 0 0 1 1 1c0 1.2.2 2.4.57 3.5a1 1 0 0 1-.26 1L6.6 10.8Z"/></symbol>
+        <symbol id="ic-diamond" viewBox="0 0 24 24"><path fill="currentColor" d="M6 2h12l4 6-10 12L2 8l4-6zm2.7 2L6.89 7h3.82L8.7 4zM12 4.68L9.71 7h4.58L12 4.68zM15.3 4l1.81 3h3.82L18.89 4h-3.59zM5.11 9l5.64 8.95L6.89 9H5.11zm2.78 0l3.86 6.13L15.61 9H7.89zm7.72 0l-3.86 8.95L17.11 9h-1.5z"/></symbol>
+        <symbol id="ic-rocket" viewBox="0 0 24 24"><path fill="currentColor" d="M14 6a8 8 0 0 0-7.7 6h4.14l.5-1.5.5 1.5h4.51A8 8 0 0 0 14 6zM4.34 14H6l1.5 4.5L6 22l-1.66-8zm15.32 0L16 22l-1.5-3.5L16 14h1.66z"/></symbol>
+    </svg>
+    
     <!-- Floating Orbs -->
     <div class="floating-orb orb-1"></div>
     <div class="floating-orb orb-2"></div>
@@ -26,11 +39,12 @@
         </div>
     </nav>
 
-    <section class="hero">
-        <div class="hero-container">
-            <div class="hero-content">
-                <h1>The Future of Insurance Management</h1>
-                <p>Transform your agency with the industry's first Global Leaderboard system. Watch sales soar by 47% as your agents compete, collaborate, and dominate.</p>
+    <main id="main">
+        <section class="hero">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <h1>The Future of Insurance Management</h1>
+                    <p>Transform your agency with the industry's first Global Leaderboard. Drive performance through competition, eliminate manual commission work, and operate on real-time data.</p>
                 <div class="hero-buttons">
                     <a href="/trial" class="btn-glass btn-primary">Start 14-Day Trial</a>
                     <a href="/demo" class="btn-glass">Watch Demo</a>
@@ -62,32 +76,32 @@
         <p class="features-subtitle">Everything you need in one stunning platform</p>
         <div class="feature-grid">
             <div class="feature-card">
-                <div class="feature-icon">🏆</div>
+                <div class="feature-icon" aria-hidden="true"><svg width="24" height="24"><use href="#ic-trophy"/></svg></div>
                 <h3>Global Leaderboard</h3>
                 <p>Real-time competition across agencies. Drive unprecedented growth through gamification and watch your agents compete nationally for top rankings.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">💎</div>
+                <div class="feature-icon" aria-hidden="true"><svg width="24" height="24"><use href="#ic-diamond"/></svg></div>
                 <h3>Commission Intelligence</h3>
                 <p>AI-powered tracking ensures you never lose a dollar. Automated calculations, splits, and error detection that catches problems before they cost you.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🚀</div>
+                <div class="feature-icon" aria-hidden="true"><svg width="24" height="24"><use href="#ic-rocket"/></svg></div>
                 <h3>Complete Automation</h3>
                 <p>From lead capture to commission payout, everything runs on autopilot. Focus on growth while the platform handles operations seamlessly.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">📊</div>
+                <div class="feature-icon" aria-hidden="true"><svg width="24" height="24"><use href="#ic-chart"/></svg></div>
                 <h3>Executive Analytics</h3>
                 <p>Make data-driven decisions with real-time dashboards. Track performance, identify trends, and optimize operations across your entire agency.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">📞</div>
+                <div class="feature-icon" aria-hidden="true"><svg width="24" height="24"><use href="#ic-phone"/></svg></div>
                 <h3>Convoso Integration</h3>
                 <p>The only platform with native Convoso integration. See live agent status, call metrics, and conversions in real-time without switching systems.</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">🎯</div>
+                <div class="feature-icon" aria-hidden="true"><svg width="24" height="24"><use href="#ic-target"/></svg></div>
                 <h3>Multi-Portal System</h3>
                 <p>Role-based portals for admins, managers, agents, and support. Everyone gets exactly what they need with beautiful, intuitive interfaces.</p>
             </div>
@@ -103,7 +117,8 @@
                 <a href="/demo" class="btn-glass">Schedule Demo</a>
             </div>
         </div>
-    </section>
+        </section>
+    </main>
 
     <footer>
         <div style="text-align: center; color: rgba(255,255,255,0.5);">
