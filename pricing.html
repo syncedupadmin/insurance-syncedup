@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing - SyncedUp Insurance Intelligence Platform</title>
+    <meta name="description" content="Simple, transparent pricing that scales with your agency. From $299/month for 10 agents to custom enterprise solutions for unlimited teams.">
+    <link rel="stylesheet" href="/css/marketing.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .pricing-hero {
+            padding: 120px 0 80px;
+            background: var(--bg-white);
+            text-align: center;
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 32px;
+            margin: 64px 0;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .pricing-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 40px;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .pricing-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .pricing-card.featured {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.02) 0%, rgba(16, 185, 129, 0.02) 100%);
+            transform: scale(1.05);
+        }
+        
+        .pricing-card.featured .plan-name {
+            color: var(--primary);
+        }
+        
+        .popular-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            padding: 6px 24px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        
+        .plan-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        
+        .plan-description {
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+        
+        .plan-price {
+            margin-bottom: 32px;
+        }
+        
+        .price-amount {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+        
+        .price-period {
+            font-size: 16px;
+            color: var(--text-muted);
+            margin-left: 8px;
+        }
+        
+        .price-note {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+        
+        .plan-features {
+            list-style: none;
+            margin: 32px 0;
+        }
+        
+        .plan-features li {
+            padding: 12px 0;
+            padding-left: 28px;
+            position: relative;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        
+        .plan-features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        .plan-cta {
+            width: 100%;
+            margin-top: auto;
+        }
+        
+        .enterprise-contact {
+            text-align: center;
+            margin-top: 32px;
+            padding: 32px;
+            background: var(--bg-light);
+            border-radius: 16px;
+        }
+        
+        .comparison-section {
+            padding: 80px 0;
+            background: var(--bg-light);
+        }
+        
+        .feature-comparison {
+            overflow-x: auto;
+            margin-top: 48px;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            min-width: 800px;
+        }
+        
+        .comparison-table th {
+            background: var(--bg-light);
+            padding: 20px 16px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--text-primary);
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .comparison-table th.feature-header {
+            text-align: left;
+            background: white;
+        }
+        
+        .comparison-table td {
+            padding: 16px;
+            border-bottom: 1px solid #f1f5f9;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .comparison-table td.feature-name {
+            text-align: left;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .comparison-table .included {
+            color: var(--accent);
+            font-weight: 700;
+        }
+        
+        .comparison-table .limited {
+            color: var(--warning);
+            font-weight: 600;
+        }
+        
+        .comparison-table .not-included {
+            color: var(--text-muted);
+        }
+        
+        .faq-section {
+            padding: 80px 0;
+            background: var(--bg-white);
+        }
+        
+        .faq-grid {
+            display: grid;
+            gap: 24px;
+            max-width: 800px;
+            margin: 48px auto 0;
+        }
+        
+        .faq-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        
+        .faq-question {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+        
+        .faq-answer {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .roi-highlight {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            color: white;
+            padding: 48px;
+            border-radius: 16px;
+            text-align: center;
+            margin: 64px 0;
+        }
+        
+        .roi-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        
+        .roi-subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 32px;
+        }
+        
+        .roi-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 32px;
+            margin-top: 32px;
+        }
+        
+        .roi-stat {
+            text-align: center;
+        }
+        
+        .roi-stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        
+        .roi-stat-label {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="/images/Transparent.png" alt="SyncedUp" height="40">
+            </div>
+            <div class="nav-menu">
+                <a href="/#features">Features</a>
+                <a href="/global-leaderboard-demo.html">Global Leaderboard</a>
+                <a href="/pricing.html">Pricing</a>
+                <a href="/customers.html">Customers</a>
+                <a href="/resources.html">Resources</a>
+                <a href="/company.html">Company</a>
+            </div>
+            <div class="nav-actions">
+                <a href="/login.html" class="nav-link">Sign In</a>
+                <a href="/demo.html" class="btn btn-primary">Book Demo</a>
+                <a href="/trial.html" class="btn btn-cta">Start Free Trial</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Pricing Hero -->
+    <section class="pricing-hero">
+        <div class="container">
+            <div class="hero-badge">SIMPLE, TRANSPARENT PRICING</div>
+            <h1 class="hero-title">
+                Plans That Scale<br>
+                With Your Success
+            </h1>
+            <p class="hero-subtitle">
+                No hidden fees. No setup costs. Cancel anytime.<br>
+                Every plan includes the Global Leaderboard and full platform access.
+            </p>
+        </div>
+    </section>
+
+    <!-- Pricing Cards -->
+    <section class="container">
+        <div class="pricing-grid">
+            <!-- Starter Plan -->
+            <div class="pricing-card">
+                <h3 class="plan-name">Starter</h3>
+                <p class="plan-description">Perfect for growing agencies ready to automate their operations.</p>
+                
+                <div class="plan-price">
+                    <span class="price-amount">$299</span>
+                    <span class="price-period">/month</span>
+                    <p class="price-note">Up to 10 agents</p>
+                </div>
+                
+                <ul class="plan-features">
+                    <li>Global Leaderboard access</li>
+                    <li>Automated commission tracking</li>
+                    <li>Basic reporting dashboard</li>
+                    <li>Agent performance metrics</li>
+                    <li>License renewal alerts</li>
+                    <li>Email support</li>
+                    <li>Mobile app access</li>
+                    <li>API access (limited)</li>
+                </ul>
+                
+                <a href="/trial.html" class="btn btn-primary plan-cta">Start Free Trial</a>
+            </div>
+
+            <!-- Growth Plan -->
+            <div class="pricing-card featured">
+                <div class="popular-badge">Most Popular</div>
+                <h3 class="plan-name">Growth</h3>
+                <p class="plan-description">Everything growing agencies need to scale efficiently and compete nationally.</p>
+                
+                <div class="plan-price">
+                    <span class="price-amount">$799</span>
+                    <span class="price-period">/month</span>
+                    <p class="price-note">Up to 50 agents</p>
+                </div>
+                
+                <ul class="plan-features">
+                    <li>Everything in Starter, plus:</li>
+                    <li>Advanced competition features</li>
+                    <li>Convoso power dialer integration</li>
+                    <li>Custom goal setting & tracking</li>
+                    <li>Advanced analytics dashboard</li>
+                    <li>Team management tools</li>
+                    <li>Priority phone support</li>
+                    <li>Custom contests & rewards</li>
+                    <li>Unlimited API access</li>
+                    <li>Advanced reporting suite</li>
+                </ul>
+                
+                <a href="/trial.html" class="btn btn-cta plan-cta">Start Free Trial</a>
+            </div>
+
+            <!-- Enterprise Plan -->
+            <div class="pricing-card">
+                <h3 class="plan-name">Enterprise</h3>
+                <p class="plan-description">Built for large agencies and multi-office operations that demand the ultimate.</p>
+                
+                <div class="plan-price">
+                    <span class="price-amount">Custom</span>
+                    <p class="price-note">Unlimited agents</p>
+                </div>
+                
+                <ul class="plan-features">
+                    <li>Everything in Growth, plus:</li>
+                    <li>Unlimited agents & offices</li>
+                    <li>White-label options</li>
+                    <li>Custom integrations</li>
+                    <li>Dedicated success manager</li>
+                    <li>24/7 priority support</li>
+                    <li>Advanced security features</li>
+                    <li>Custom reporting & analytics</li>
+                    <li>On-premise deployment options</li>
+                    <li>SLA guarantees</li>
+                </ul>
+                
+                <a href="/demo.html" class="btn btn-secondary plan-cta">Schedule Demo</a>
+            </div>
+        </div>
+
+        <div class="enterprise-contact">
+            <h3 style="margin-bottom: 16px; color: var(--text-primary);">Need Something Custom?</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 24px;">
+                Large agencies with unique requirements get custom solutions, pricing, and dedicated support.
+            </p>
+            <a href="/demo.html" class="btn btn-primary">Talk to Enterprise Sales</a>
+        </div>
+    </section>
+
+    <!-- ROI Highlight -->
+    <section class="container">
+        <div class="roi-highlight">
+            <h2 class="roi-title">Average ROI: 347% in First Year</h2>
+            <p class="roi-subtitle">See why agencies save $89,000+ annually with SyncedUp</p>
+            
+            <div class="roi-stats">
+                <div class="roi-stat">
+                    <div class="roi-stat-value">$89K+</div>
+                    <div class="roi-stat-label">Annual Savings</div>
+                </div>
+                <div class="roi-stat">
+                    <div class="roi-stat-value">47%</div>
+                    <div class="roi-stat-label">Sales Increase</div>
+                </div>
+                <div class="roi-stat">
+                    <div class="roi-stat-value">3 mins</div>
+                    <div class="roi-stat-label">Setup Time</div>
+                </div>
+                <div class="roi-stat">
+                    <div class="roi-stat-value">24 hrs</div>
+                    <div class="roi-stat-label">To See Results</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Comparison -->
+    <section class="comparison-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Compare Plans</h2>
+                <p class="section-subtitle">See exactly what's included in each plan</p>
+            </div>
+            
+            <div class="feature-comparison">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th class="feature-header">Features</th>
+                            <th>Starter</th>
+                            <th>Growth</th>
+                            <th>Enterprise</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="feature-name">Global Leaderboard</td>
+                            <td class="included">✓</td>
+                            <td class="included">✓</td>
+                            <td class="included">✓</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Commission Tracking</td>
+                            <td class="included">✓</td>
+                            <td class="included">✓</td>
+                            <td class="included">✓</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Agent Limit</td>
+                            <td class="limited">Up to 10</td>
+                            <td class="limited">Up to 50</td>
+                            <td class="included">Unlimited</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Convoso Integration</td>
+                            <td class="not-included">—</td>
+                            <td class="included">✓</td>
+                            <td class="included">✓</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Advanced Analytics</td>
+                            <td class="not-included">—</td>
+                            <td class="included">✓</td>
+                            <td class="included">✓</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Custom Integrations</td>
+                            <td class="not-included">—</td>
+                            <td class="not-included">—</td>
+                            <td class="included">✓</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">White Label Options</td>
+                            <td class="not-included">—</td>
+                            <td class="not-included">—</td>
+                            <td class="included">✓</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Support Level</td>
+                            <td class="limited">Email</td>
+                            <td class="included">Phone</td>
+                            <td class="included">24/7 Priority</td>
+                        </tr>
+                        <tr>
+                            <td class="feature-name">Setup & Training</td>
+                            <td class="included">Self-service</td>
+                            <td class="included">Guided setup</td>
+                            <td class="included">White-glove</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Frequently Asked Questions</h2>
+                <p class="section-subtitle">Everything you need to know about SyncedUp pricing</p>
+            </div>
+            
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h3 class="faq-question">Is there a setup fee?</h3>
+                    <p class="faq-answer">No setup fees, ever. You can start your free trial immediately and be up and running in 3 minutes. We believe in earning your business, not charging upfront.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h3 class="faq-question">Can I change plans anytime?</h3>
+                    <p class="faq-answer">Yes, you can upgrade or downgrade anytime. Changes take effect immediately, and we'll prorate your billing automatically.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h3 class="faq-question">What happens if I go over my agent limit?</h3>
+                    <p class="faq-answer">We'll automatically suggest an upgrade to accommodate your growth. You'll never lose access to the platform, and we'll work with you to find the right plan.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h3 class="faq-question">Is the Global Leaderboard really included in all plans?</h3>
+                    <p class="faq-answer">Yes! Every plan includes full access to the Global Leaderboard. This is our signature feature and we believe every agency should benefit from the competition.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h3 class="faq-question">Do you offer discounts for annual billing?</h3>
+                    <p class="faq-answer">Yes, save 15% when you pay annually. Contact sales for volume discounts on 100+ agents or multi-year agreements.</p>
+                </div>
+                
+                <div class="faq-item">
+                    <h3 class="faq-question">What integrations are included?</h3>
+                    <p class="faq-answer">All plans include integrations with major carriers and basic CRM systems. Growth and Enterprise plans include Convoso power dialer and advanced integrations.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta">
+        <div class="container">
+            <h2>Ready to Transform Your Agency?</h2>
+            <p>Join 100+ agencies saving $89,000+ annually with complete automation.</p>
+            
+            <div class="cta-buttons">
+                <a href="/trial.html" class="btn btn-cta-primary">
+                    Start 14-Day Free Trial
+                    <span>No credit card required</span>
+                </a>
+                <a href="/demo.html" class="btn btn-cta-secondary">
+                    Schedule Live Demo
+                    <span>See your custom ROI</span>
+                </a>
+            </div>
+            
+            <div class="guarantee">
+                <div>
+                    <strong>30-Day Money-Back Guarantee</strong>
+                    <p>If SyncedUp doesn't save you at least 10 hours in your first month, we'll refund everything.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <img src="/images/Transparent.png" alt="SyncedUp">
+                    <p>The insurance intelligence platform.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Product</h4>
+                    <a href="/features.html">Features</a>
+                    <a href="/pricing.html">Pricing</a>
+                    <a href="/global-leaderboard-demo.html">Global Leaderboard</a>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Company</h4>
+                    <a href="/about.html">About</a>
+                    <a href="/customers.html">Customers</a>
+                    <a href="/contact.html">Contact</a>
+                </div>
+                
+                <div class="footer-contact">
+                    <h4>Get Started</h4>
+                    <p>1-800-SYNCEDUP</p>
+                    <p>sales@syncedup.com</p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 SyncedUp Solutions. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Track pricing page engagement
+        document.querySelectorAll('.plan-cta').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const planName = this.closest('.pricing-card').querySelector('.plan-name').textContent;
+                console.log('Plan selected:', planName);
+                // Track conversion event
+            });
+        });
+        
+        // Highlight recommended plan
+        const featuredCard = document.querySelector('.pricing-card.featured');
+        if (featuredCard) {
+            featuredCard.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+        }
+    </script>
+</body>
+</html>
