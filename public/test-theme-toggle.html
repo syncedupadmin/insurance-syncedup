@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Toggle Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            transition: all 0.3s ease;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 8px;
+            background: #f5f5f5;
+        }
+        .btn {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Theme Toggle Test</h1>
+        <p>This page tests if the theme toggle system is working correctly.</p>
+        
+        <div>
+            <h3>Theme Controls:</h3>
+            <button class="btn btn-primary" onclick="testProfessionalMode()">Professional Mode</button>
+            <button class="btn btn-secondary" onclick="testClassicMode()">Classic Mode</button>
+            <button class="btn btn-secondary" onclick="testModernMode()">Modern Mode</button>
+        </div>
+        
+        <div>
+            <h3>Debug Info:</h3>
+            <button class="btn" onclick="checkThemeSystem()">Check Theme System</button>
+            <button class="btn" onclick="showCurrentTheme()">Show Current Theme</button>
+            <button class="btn" onclick="showLocalStorage()">Show localStorage</button>
+        </div>
+        
+        <div id="status" class="status" style="display: none;"></div>
+        <div id="debug" style="margin-top: 20px;"></div>
+    </div>
+
+    <script src="/js/theme-switcher.js"></script>
+    <script>
+        function showStatus(message, isError = false) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.style.display = 'block';
+            statusDiv.className = isError ? 'status error' : 'status';
+            statusDiv.innerHTML = message;
+        }
+        
+        function testProfessionalMode() {
+            try {
+                if (window.themeSystem && window.themeSystem.applyTheme) {
+                    window.themeSystem.applyTheme('professional');
+                    showStatus('✅ Professional Mode applied successfully!');
+                    updateDebugInfo();
+                } else {
+                    showStatus('❌ Theme system not available', true);
+                }
+            } catch (error) {
+                showStatus('❌ Error: ' + error.message, true);
+            }
+        }
+        
+        function testClassicMode() {
+            try {
+                if (window.themeSystem && window.themeSystem.applyTheme) {
+                    window.themeSystem.applyTheme('classic');
+                    showStatus('✅ Classic Mode applied successfully!');
+                    updateDebugInfo();
+                } else {
+                    showStatus('❌ Theme system not available', true);
+                }
+            } catch (error) {
+                showStatus('❌ Error: ' + error.message, true);
+            }
+        }
+        
+        function testModernMode() {
+            try {
+                if (window.themeSystem && window.themeSystem.applyTheme) {
+                    window.themeSystem.applyTheme('modern');
+                    showStatus('✅ Modern Mode applied successfully!');
+                    updateDebugInfo();
+                } else {
+                    showStatus('❌ Theme system not available', true);
+                }
+            } catch (error) {
+                showStatus('❌ Error: ' + error.message, true);
+            }
+        }
+        
+        function checkThemeSystem() {
+            const debugDiv = document.getElementById('debug');
+            let info = '<h4>Theme System Check:</h4>';
+            
+            info += `<p><strong>window.themeSystem:</strong> ${window.themeSystem ? '✅ Available' : '❌ Not available'}</p>`;
+            
+            if (window.themeSystem) {
+                info += `<p><strong>applyTheme:</strong> ${window.themeSystem.applyTheme ? '✅ Available' : '❌ Not available'}</p>`;
+                info += `<p><strong>detectPortal:</strong> ${window.themeSystem.detectPortal ? '✅ Available' : '❌ Not available'}</p>`;
+                info += `<p><strong>getThemePreferences:</strong> ${window.themeSystem.getThemePreferences ? '✅ Available' : '❌ Not available'}</p>`;
+            }
+            
+            info += `<p><strong>window.toggleClassicMode:</strong> ${window.toggleClassicMode ? '✅ Available' : '❌ Not available'}</p>`;
+            info += `<p><strong>window.toggleProfessionalMode:</strong> ${window.toggleProfessionalMode ? '✅ Available' : '❌ Not available'}</p>`;
+            
+            debugDiv.innerHTML = info;
+            showStatus('Theme system check complete!');
+        }
+        
+        function showCurrentTheme() {
+            const currentTheme = localStorage.getItem('selectedTheme') || 'not set';
+            const debugDiv = document.getElementById('debug');
+            debugDiv.innerHTML = `<h4>Current Theme:</h4><p><strong>${currentTheme}</strong></p>`;
+            showStatus(`Current theme: ${currentTheme}`);
+        }
+        
+        function showLocalStorage() {
+            const debugDiv = document.getElementById('debug');
+            let info = '<h4>localStorage Theme Keys:</h4>';
+            
+            info += `<p><strong>selectedTheme:</strong> ${localStorage.getItem('selectedTheme') || 'not set'}</p>`;
+            info += `<p><strong>detectedPortal:</strong> ${localStorage.getItem('detectedPortal') || 'not set'}</p>`;
+            info += `<p><strong>classicMode (old):</strong> ${localStorage.getItem('classicMode') || 'not set'}</p>`;
+            info += `<p><strong>professionalMode (old):</strong> ${localStorage.getItem('professionalMode') || 'not set'}</p>`;
+            
+            debugDiv.innerHTML = info;
+            showStatus('localStorage info displayed!');
+        }
+        
+        function updateDebugInfo() {
+            setTimeout(() => {
+                showCurrentTheme();
+            }, 100);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                checkThemeSystem();
+                showCurrentTheme();
+            }, 500);
+        });
+        
+        // Listen for theme changes
+        document.addEventListener('themeChanged', (event) => {
+            showStatus(`🎨 Theme changed to: ${event.detail.theme}`);
+            updateDebugInfo();
+        });
+    </script>
+</body>
+</html>
