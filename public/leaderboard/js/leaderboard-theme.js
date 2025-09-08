@@ -77,7 +77,7 @@ class LeaderboardThemeSystem {
      */
     isLeaderboardPage() {
         const path = window.location.pathname;
-        return path.includes('/leaderboard/') || path.includes('/leaderboard');
+        return path.includes('/leaderboard') || path.includes('leaderboard') || path === '/global-leaderboard' || path.startsWith('/global-leaderboard');
     }
 
     /**
