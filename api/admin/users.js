@@ -44,7 +44,17 @@ export default async function handler(req, res) {
     .single();
 
   // Super admin access required for user management
-  if (!currentUser || currentUser.role !== 'super_admin') {
+  // Normalize role to handle different formats
+  const normalizeRole = (role) => {
+    const roleMap = {
+      'super-admin': 'super_admin',
+      'customer-service': 'customer_service'
+    };
+    return roleMap[role] || role;
+  };
+  
+  const normalizedRole = normalizeRole(currentUser?.role || '');
+  if (!currentUser || normalizedRole !== 'super_admin') {
     return res.status(403).json({ error: 'Super admin access required' });
   }
 
