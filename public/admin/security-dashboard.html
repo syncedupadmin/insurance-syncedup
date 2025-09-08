@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Critical Theme Flash Prevention -->
+    <script>
+    (function(){
+        var t=localStorage.getItem("selectedTheme")||"professional";
+        var h=document.documentElement;
+        if(t==="classic"){h.classList.add("classic-mode");h.style.backgroundColor="#008080";}
+        else if(t==="modern"){h.classList.add("modern-mode");h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        else{h.style.background="linear-gradient(135deg,#ff6b35 0%,#f72585 100%)";}
+        h.style.visibility="hidden";
+        setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
+    })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Dashboard - SyncedUp Insurance Admin</title>
+    
+    <!-- Favicons - Purple for Admin Portal -->
+    <link rel="icon" type="image/png" sizes="50x50" href="/favicons/admin-50x50.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/admin-180x180.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicons/admin-512x512.png">
+    
+    <link rel="stylesheet" href="/admin/admin-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <style>
+        .security-dashboard {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .threat-level-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .threat-level-display {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .threat-level-display[data-level="low"] {
+            background: linear-gradient(135deg, #10b981, #059669);
+            animation: pulse-green 3s infinite;
+        }
+
+        .threat-level-display[data-level="medium"] {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            animation: pulse-yellow 3s infinite;
+        }
+
+        .threat-level-display[data-level="high"] {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            animation: pulse-red 3s infinite;
+        }
+
+        .threat-level-display[data-level="critical"] {
+            background: linear-gradient(135deg, #7c3aed, #5b21b6);
+            animation: pulse-purple 3s infinite;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.3); }
+            50% { box-shadow: 0 0 50px rgba(16, 185, 129, 0.6); }
+        }
+
+        @keyframes pulse-yellow {
+            0%, 100% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.3); }
+            50% { box-shadow: 0 0 50px rgba(245, 158, 11, 0.6); }
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.3); }
+            50% { box-shadow: 0 0 50px rgba(239, 68, 68, 0.6); }
+        }
+
+        @keyframes pulse-purple {
+            0%, 100% { box-shadow: 0 0 30px rgba(124, 58, 237, 0.3); }
+            50% { box-shadow: 0 0 50px rgba(124, 58, 237, 0.6); }
+        }
+
+        .threat-level-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .threat-level-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .security-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            transition: transform 0.2s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .metric-card.alert {
+            border-color: rgb(239, 68, 68);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .metric-card.warning {
+            border-color: rgb(245, 158, 11);
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .metric-card.success {
+            border-color: rgb(34, 197, 94);
+            background: rgba(34, 197, 94, 0.05);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card.alert .metric-value {
+            color: rgb(239, 68, 68);
+        }
+
+        .metric-card.warning .metric-value {
+            color: rgb(245, 158, 11);
+        }
+
+        .metric-card.success .metric-value {
+            color: rgb(34, 197, 94);
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .activity-feed-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .activity-feed-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .activity-feed-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .activity-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: rgb(34, 197, 94);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgb(34, 197, 94);
+            animation: pulse 2s infinite;
+        }
+
+        .activity-feed {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 0.5rem;
+            transition: all 0.2s ease;
+            animation: slideInRight 0.3s ease;
+        }
+
+        .activity-item:hover {
+            background: var(--hover-bg);
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .activity-icon.login {
+            background: rgba(34, 197, 94, 0.1);
+            color: rgb(34, 197, 94);
+        }
+
+        .activity-icon.failed {
+            background: rgba(239, 68, 68, 0.1);
+            color: rgb(239, 68, 68);
+        }
+
+        .activity-icon.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: rgb(245, 158, 11);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-message {
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-details {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+
+        .activity-time {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            white-space: nowrap;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .security-alerts-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .security-alerts-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .security-alerts-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .alert-count {
+            background: rgb(239, 68, 68);
+            color: white;
+            border-radius: 9999px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .security-alerts {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 0.5rem;
+            border-left: 4px solid transparent;
+            background: var(--hover-bg);
+            transition: all 0.2s ease;
+        }
+
+        .alert-item.high {
+            border-left-color: rgb(239, 68, 68);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .alert-item.medium {
+            border-left-color: rgb(245, 158, 11);
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .alert-item.low {
+            border-left-color: rgb(59, 130, 246);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-description {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .active-sessions-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            margin-top: 2rem;
+        }
+
+        .active-sessions-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .active-sessions-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .sessions-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .sessions-table th,
+        .sessions-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sessions-table th {
+            background: var(--secondary-bg);
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .sessions-table tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+        .session-user {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .session-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .session-status.active {
+            background: rgba(34, 197, 94, 0.1);
+            color: rgb(34, 197, 94);
+        }
+
+        .session-status.idle {
+            background: rgba(245, 158, 11, 0.1);
+            color: rgb(245, 158, 11);
+        }
+
+        .terminate-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: rgb(239, 68, 68);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .terminate-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .security-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .control-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+        }
+
+        .control-panel-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .control-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .control-item:last-child {
+            border-bottom: none;
+        }
+
+        .control-label {
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .control-value {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-switch.active {
+            background: var(--primary-color);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-switch.active::after {
+            left: 22px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .scan-progress {
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .scan-progress.show {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--secondary-bg);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .security-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .security-metrics {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .threat-level-display {
+                width: 150px;
+                height: 150px;
+                font-size: 1.25rem;
+            }
+
+            .sessions-table-container {
+                overflow-x: auto;
+            }
+
+            .sessions-table {
+                min-width: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating particles effect -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    
+    <!-- Header -->
+    <div class="header">
+        <h1>Security Dashboard</h1>
+        <div class="header-actions">
+            <button class="btn" style="background: transparent; border: 1px solid white;" onclick="runSecurityScan()">
+                <i data-lucide="shield" class="icon"></i>Run Scan
+            </button>
+            <button class="btn" style="background: transparent; border: 1px solid white;" onclick="refreshSecurityData()">
+                <i data-lucide="refresh-cw" class="icon"></i>Refresh
+            </button>
+            <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>Logout
+            </button>
+        </div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="nav">
+        <a href="/admin/">
+            <i data-lucide="layout-dashboard" class="icon"></i>Dashboard
+        </a>
+        <a href="/admin/user-management">
+            <i data-lucide="users" class="icon"></i>User Management
+        </a>
+        <a href="/admin/security-dashboard" class="active">
+            <i data-lucide="shield" class="icon"></i>Security
+        </a>
+        <a href="/admin/agent-performance">
+            <i data-lucide="trending-up" class="icon"></i>Performance
+        </a>
+        <a href="/admin/licenses">
+            <i data-lucide="shield-check" class="icon"></i>Licenses
+        </a>
+        <a href="/admin/leads">
+            <i data-lucide="user-plus" class="icon"></i>Leads
+        </a>
+        <a href="/admin/vendors">
+            <i data-lucide="building-2" class="icon"></i>Vendors
+        </a>
+        <a href="/admin/commissions">
+            <i data-lucide="dollar-sign" class="icon"></i>Commissions
+        </a>
+        <a href="/admin/settings">
+            <i data-lucide="settings" class="icon"></i>Settings
+        </a>
+        <a href="/leaderboard/">
+            <i data-lucide="trophy" class="icon"></i>Leaderboard
+        </a>
+    </nav>
+
+    <div class="security-dashboard">
+        <!-- Threat Level Indicator -->
+        <div class="threat-level-container">
+            <h2 class="threat-level-title">Current Threat Level</h2>
+            <div class="threat-level-display" data-level="low" id="threatLevelDisplay">
+                <span id="threatLevelText">LOW</span>
+            </div>
+            <p class="threat-level-description" id="threatLevelDescription">
+                System operating normally. No immediate security concerns detected.
+            </p>
+            <div class="scan-progress" id="scanProgress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="scanProgressFill"></div>
+                </div>
+                <div class="progress-text" id="scanProgressText">Security scan in progress...</div>
+            </div>
+        </div>
+
+        <!-- Security Metrics -->
+        <div class="security-metrics">
+            <div class="metric-card" id="activeUsersCard">
+                <div class="metric-value" id="activeUsersMetric">-</div>
+                <div class="metric-label">Active Users</div>
+            </div>
+            
+            <div class="metric-card" id="failedLoginsCard">
+                <div class="metric-value" id="failedLoginsMetric">-</div>
+                <div class="metric-label">Failed Logins (24h)</div>
+            </div>
+            
+            <div class="metric-card" id="lockedAccountsCard">
+                <div class="metric-value" id="lockedAccountsMetric">-</div>
+                <div class="metric-label">Locked Accounts</div>
+            </div>
+            
+            <div class="metric-card" id="mfaAdoptionCard">
+                <div class="metric-value" id="mfaAdoptionMetric">-</div>
+                <div class="metric-label">2FA Adoption</div>
+            </div>
+            
+            <div class="metric-card" id="suspiciousActivityCard">
+                <div class="metric-value" id="suspiciousActivityMetric">-</div>
+                <div class="metric-label">Suspicious Activity</div>
+            </div>
+            
+            <div class="metric-card" id="lastScanCard">
+                <div class="metric-value" id="lastScanMetric">-</div>
+                <div class="metric-label">Last Security Scan</div>
+            </div>
+        </div>
+
+        <!-- Activity Feed and Security Alerts -->
+        <div class="security-grid">
+            <!-- Live Activity Feed -->
+            <div class="activity-feed-container">
+                <div class="activity-feed-header">
+                    <h3 class="activity-feed-title">Live Activity</h3>
+                    <div class="activity-status">
+                        <div class="status-dot"></div>
+                        <span>Live Updates</span>
+                    </div>
+                </div>
+                <div class="activity-feed" id="activityFeed">
+                    <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                        <i data-lucide="loader" class="icon spin"></i>
+                        Loading activity feed...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Alerts -->
+            <div class="security-alerts-container">
+                <div class="security-alerts-header">
+                    <h3 class="security-alerts-title">Security Alerts</h3>
+                    <div class="alert-count" id="alertCount">0</div>
+                </div>
+                <div class="security-alerts" id="securityAlerts">
+                    <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                        <i data-lucide="shield-check" class="icon"></i>
+                        <p>No security alerts at this time</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Sessions -->
+        <div class="active-sessions-container">
+            <div class="active-sessions-header">
+                <h3 class="active-sessions-title">Active Sessions</h3>
+                <button class="btn btn-secondary" onclick="refreshSessions()">
+                    <i data-lucide="refresh-cw" class="icon"></i>Refresh
+                </button>
+            </div>
+            <div class="sessions-table-container">
+                <table class="sessions-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>IP Address</th>
+                            <th>Location</th>
+                            <th>Started</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sessionsTableBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                <i data-lucide="loader" class="icon spin"></i>
+                                Loading active sessions...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Security Controls -->
+        <div class="security-controls">
+            <!-- Access Control -->
+            <div class="control-panel">
+                <h3 class="control-panel-title">Access Control</h3>
+                
+                <div class="control-item">
+                    <span class="control-label">IP Whitelist</span>
+                    <div class="toggle-switch" id="ipWhitelistToggle" onclick="toggleIPWhitelist()"></div>
+                </div>
+                
+                <div class="control-item">
+                    <span class="control-label">Rate Limiting</span>
+                    <div class="toggle-switch active" id="rateLimitToggle" onclick="toggleRateLimit()"></div>
+                </div>
+                
+                <div class="control-item">
+                    <span class="control-label">2FA Required</span>
+                    <div class="toggle-switch" id="mfaRequiredToggle" onclick="toggleMFARequired()"></div>
+                </div>
+                
+                <div class="control-item">
+                    <span class="control-label">Session Timeout</span>
+                    <span class="control-value" id="sessionTimeout">60 minutes</span>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary btn-sm" onclick="configureAccessControl()">
+                        <i data-lucide="settings" class="icon"></i>Configure
+                    </button>
+                </div>
+            </div>
+
+            <!-- Password Policy -->
+            <div class="control-panel">
+                <h3 class="control-panel-title">Password Policy</h3>
+                
+                <div class="control-item">
+                    <span class="control-label">Minimum Length</span>
+                    <span class="control-value">12 characters</span>
+                </div>
+                
+                <div class="control-item">
+                    <span class="control-label">Password Expiry</span>
+                    <span class="control-value">90 days</span>
+                </div>
+                
+                <div class="control-item">
+                    <span class="control-label">Lockout After</span>
+                    <span class="control-value">5 attempts</span>
+                </div>
+                
+                <div class="control-item">
+                    <span class="control-label">Lockout Duration</span>
+                    <span class="control-value">15 minutes</span>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary btn-sm" onclick="configurePasswordPolicy()">
+                        <i data-lucide="key" class="icon"></i>Configure
+                    </button>
+                </div>
+            </div>
+
+            <!-- Monitoring -->
+            <div class="control-panel">
+                <h3 class="control-panel-title">Monitoring</h3>
+                
+                <div class="control-item">
+                    <span class="control-label">Login Monitoring</span>
+                    <div class="toggle-switch active" id="loginMonitorToggle" onclick="toggleLoginMonitor()"></div>
+                </div>
+                
+                <div class="control-item">
+                    <span class="control-label">Failed Login Alerts</span>
+                    <div class="toggle-switch active" id="failedLoginAlertsToggle" onclick="toggleFailedLoginAlerts()"></div>
+                </div>
+                
+                <div class="control-item">
+                    <span class="control-label">Geo-blocking</span>
+                    <div class="toggle-switch" id="geoBlockToggle" onclick="toggleGeoBlock()"></div>
+                </div>
+                
+                <div class="control-item">
+                    <span class="control-label">Auto Security Scan</span>
+                    <span class="control-value">Daily at 2:00 AM</span>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-warning btn-sm" onclick="generateSecurityReport()">
+                        <i data-lucide="file-text" class="icon"></i>Generate Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/admin/js/security-dashboard.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSecurityDashboard();
+        });
+    </script>
+</body>
+</html>

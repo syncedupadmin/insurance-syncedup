@@ -1,17 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Critical Theme Flash Prevention -->
+    <!-- Convoso - Theme System Disabled -->
     <script>
-    (function(){
-        var t=localStorage.getItem("selectedTheme")||"professional";
-        var h=document.documentElement;
-        if(t==="classic"){h.classList.add("classic-mode");h.style.backgroundColor="#008080";}
-        else if(t==="modern"){h.classList.add("modern-mode");h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
-        else{h.style.background="linear-gradient(-45deg,#4c1d95,#5b21b6,#6d28d9,#7c3aed)";}
-        h.style.visibility="hidden";
-        setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
-    })();
+    // Prevent theme system from applying backgrounds to Convoso pages
+    window.CONVOSO_PAGE = true;
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -108,6 +101,20 @@
             background: #f0fff4; 
             color: #2f855a; 
             border: 1px solid #9ae6b4; 
+        }
+        
+        /* CRITICAL: Override any theme backgrounds for Convoso pages */
+        html, body {
+            background: #f5f7fa !important;
+            background-image: none !important;
+            background-attachment: fixed !important;
+        }
+        
+        html.classic-mode,
+        html.modern-mode,
+        html[style*="background"] {
+            background: #f5f7fa !important;
+            background-image: none !important;
         }
     </style>
 </head>

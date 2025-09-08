@@ -1,0 +1,496 @@
+/* Analytics Mode Theme - Clean white/gray design focused on data visualization */
+
+.lb-analytics-mode {
+    /* Color Palette */
+    --lb-primary-bg: #FFFFFF;
+    --lb-secondary-bg: #F8F9FA;
+    --lb-tertiary-bg: #E9ECEF;
+    --lb-accent: #3498DB;
+    --lb-accent-secondary: #2C3E50;
+    --lb-gold: #F39C12;
+    --lb-silver: #95A5A6;
+    --lb-bronze: #E67E22;
+    --lb-text-primary: #2C3E50;
+    --lb-text-secondary: #5A6C7D;
+    --lb-text-muted: #95A5A6;
+    --lb-border-color: #DEE2E6;
+    --lb-success: #27AE60;
+    --lb-error: #E74C3C;
+    
+    /* Effects */
+    --lb-shadow: 0 2px 12px rgba(44, 62, 80, 0.1);
+    --lb-shadow-hover: 0 4px 20px rgba(44, 62, 80, 0.15);
+    --lb-shadow-strong: 0 8px 32px rgba(44, 62, 80, 0.2);
+}
+
+/* Body styles */
+.lb-analytics-mode {
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%);
+    color: var(--lb-text-primary);
+}
+
+/* Header */
+.lb-analytics-mode .leaderboard-header {
+    background: var(--lb-primary-bg);
+    border-bottom: 2px solid var(--lb-border-color);
+    box-shadow: var(--lb-shadow);
+}
+
+.lb-analytics-mode .leaderboard-title {
+    color: var(--lb-text-primary);
+    font-weight: 700;
+    position: relative;
+}
+
+.lb-analytics-mode .leaderboard-title::after {
+    content: '📊';
+    margin-left: 0.5rem;
+    animation: chartPulse 2s ease-in-out infinite;
+}
+
+@keyframes chartPulse {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.05); opacity: 1; }
+}
+
+/* Theme buttons */
+.lb-analytics-mode .theme-btn {
+    color: var(--lb-text-secondary);
+    border-color: var(--lb-border-color);
+    background: var(--lb-primary-bg);
+}
+
+.lb-analytics-mode .theme-btn:hover {
+    border-color: var(--lb-accent);
+    color: var(--lb-accent);
+    box-shadow: var(--lb-shadow-hover);
+}
+
+.lb-analytics-mode .theme-btn.active {
+    background: var(--lb-accent);
+    color: var(--lb-primary-bg);
+    border-color: var(--lb-accent);
+    box-shadow: var(--lb-shadow-hover);
+}
+
+/* Controls */
+.lb-analytics-mode .leaderboard-controls {
+    background: var(--lb-secondary-bg);
+    border-bottom: 1px solid var(--lb-border-color);
+}
+
+.lb-analytics-mode .leaderboard-tab {
+    background: var(--lb-primary-bg);
+    color: var(--lb-text-secondary);
+    border-color: var(--lb-border-color);
+    box-shadow: var(--lb-shadow);
+}
+
+.lb-analytics-mode .leaderboard-tab.active {
+    background: var(--lb-accent);
+    color: var(--lb-primary-bg);
+    border-color: var(--lb-accent);
+    box-shadow: var(--lb-shadow-hover);
+}
+
+.lb-analytics-mode .leaderboard-tab:hover {
+    border-color: var(--lb-accent);
+    color: var(--lb-accent);
+    box-shadow: var(--lb-shadow-hover);
+}
+
+.lb-analytics-mode .filter-select {
+    background: var(--lb-primary-bg);
+    color: var(--lb-text-primary);
+    border-color: var(--lb-border-color);
+    box-shadow: var(--lb-shadow);
+}
+
+.lb-analytics-mode .filter-select:focus {
+    border-color: var(--lb-accent);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.lb-analytics-mode .btn {
+    background: var(--lb-accent);
+    color: var(--lb-primary-bg);
+    box-shadow: var(--lb-shadow);
+    border: none;
+}
+
+.lb-analytics-mode .btn:hover {
+    background: var(--lb-accent-secondary);
+    box-shadow: var(--lb-shadow-hover);
+}
+
+/* Metrics */
+.lb-analytics-mode .leaderboard-metric {
+    background: var(--lb-primary-bg);
+    border: 1px solid var(--lb-border-color);
+    box-shadow: var(--lb-shadow);
+    position: relative;
+}
+
+.lb-analytics-mode .leaderboard-metric:hover {
+    box-shadow: var(--lb-shadow-hover);
+    border-color: var(--lb-accent);
+}
+
+.lb-analytics-mode .leaderboard-metric::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--lb-accent);
+    border-radius: 0 var(--lb-border-radius) var(--lb-border-radius) 0;
+    opacity: 0;
+    transition: var(--lb-transition);
+}
+
+.lb-analytics-mode .leaderboard-metric:hover::before {
+    opacity: 1;
+}
+
+.lb-analytics-mode .leaderboard-metric-value {
+    color: var(--lb-accent);
+    font-weight: 600;
+}
+
+.lb-analytics-mode .leaderboard-metric-label {
+    color: var(--lb-text-secondary);
+}
+
+/* Metrics with data visualization elements */
+.lb-analytics-mode .leaderboard-metric::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 12px;
+    width: 30px;
+    height: 20px;
+    background: linear-gradient(45deg, 
+        var(--lb-accent) 0%, 
+        transparent 50%, 
+        var(--lb-accent) 100%);
+    opacity: 0.1;
+    border-radius: 2px 2px 0 0;
+}
+
+/* Podium */
+.lb-analytics-mode .podium-place {
+    background: var(--lb-primary-bg);
+    border: 1px solid var(--lb-border-color);
+    box-shadow: var(--lb-shadow);
+    position: relative;
+}
+
+.lb-analytics-mode .podium-place:hover {
+    box-shadow: var(--lb-shadow-hover);
+}
+
+.lb-analytics-mode .podium-place.gold {
+    border-left: 4px solid var(--lb-gold);
+}
+
+.lb-analytics-mode .podium-place.silver {
+    border-left: 4px solid var(--lb-silver);
+}
+
+.lb-analytics-mode .podium-place.bronze {
+    border-left: 4px solid var(--lb-bronze);
+}
+
+.lb-analytics-mode .podium-medal {
+    background: var(--lb-secondary-bg);
+    color: var(--lb-text-primary);
+    border: 2px solid var(--lb-border-color);
+    font-weight: 700;
+}
+
+.lb-analytics-mode .podium-place.gold .podium-medal {
+    background: var(--lb-gold);
+    color: var(--lb-primary-bg);
+    border-color: var(--lb-gold);
+}
+
+.lb-analytics-mode .podium-place.silver .podium-medal {
+    background: var(--lb-silver);
+    color: var(--lb-primary-bg);
+    border-color: var(--lb-silver);
+}
+
+.lb-analytics-mode .podium-place.bronze .podium-medal {
+    background: var(--lb-bronze);
+    color: var(--lb-primary-bg);
+    border-color: var(--lb-bronze);
+}
+
+.lb-analytics-mode .podium-name {
+    color: var(--lb-text-primary);
+    font-weight: 600;
+}
+
+.lb-analytics-mode .podium-office {
+    color: var(--lb-text-secondary);
+}
+
+.lb-analytics-mode .podium-amount {
+    color: var(--lb-accent);
+    font-weight: 700;
+}
+
+/* Data visualization badges for podium */
+.lb-analytics-mode .podium-place::after {
+    content: attr(data-trend);
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--lb-tertiary-bg);
+    color: var(--lb-text-secondary);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Table */
+.lb-analytics-mode .rankings-table {
+    background: var(--lb-primary-bg);
+    border: 1px solid var(--lb-border-color);
+    box-shadow: var(--lb-shadow);
+}
+
+.lb-analytics-mode .rankings-table th {
+    background: var(--lb-secondary-bg);
+    color: var(--lb-text-primary);
+    border-bottom: 2px solid var(--lb-border-color);
+    font-weight: 600;
+    position: relative;
+}
+
+.lb-analytics-mode .rankings-table th:hover {
+    background: var(--lb-tertiary-bg);
+    cursor: pointer;
+}
+
+/* Sortable indicators */
+.lb-analytics-mode .rankings-table th.sortable::after {
+    content: '⇅';
+    position: absolute;
+    right: 8px;
+    color: var(--lb-text-muted);
+    font-size: 12px;
+}
+
+.lb-analytics-mode .rankings-table th.sort-asc::after {
+    content: '↑';
+    color: var(--lb-accent);
+}
+
+.lb-analytics-mode .rankings-table th.sort-desc::after {
+    content: '↓';
+    color: var(--lb-accent);
+}
+
+.lb-analytics-mode .rankings-table td {
+    color: var(--lb-text-primary);
+    border-bottom: 1px solid var(--lb-border-color);
+}
+
+.lb-analytics-mode .rankings-table tbody tr:hover {
+    background: var(--lb-secondary-bg);
+    box-shadow: inset 4px 0 0 var(--lb-accent);
+}
+
+.lb-analytics-mode .rankings-table tbody tr:nth-child(even) {
+    background: rgba(248, 249, 250, 0.5);
+}
+
+.lb-analytics-mode .rankings-table tbody tr:nth-child(even):hover {
+    background: var(--lb-secondary-bg);
+}
+
+.lb-analytics-mode .rank-badge {
+    background: var(--lb-secondary-bg);
+    color: var(--lb-text-primary);
+    border: 1px solid var(--lb-border-color);
+    font-weight: 600;
+}
+
+.lb-analytics-mode .rank-badge.gold {
+    background: var(--lb-gold);
+    color: var(--lb-primary-bg);
+    border-color: var(--lb-gold);
+}
+
+.lb-analytics-mode .rank-badge.silver {
+    background: var(--lb-silver);
+    color: var(--lb-primary-bg);
+    border-color: var(--lb-silver);
+}
+
+.lb-analytics-mode .rank-badge.bronze {
+    background: var(--lb-bronze);
+    color: var(--lb-primary-bg);
+    border-color: var(--lb-bronze);
+}
+
+.lb-analytics-mode .trend-up {
+    color: var(--lb-success);
+    font-weight: 600;
+}
+
+.lb-analytics-mode .trend-down {
+    color: var(--lb-error);
+    font-weight: 600;
+}
+
+.lb-analytics-mode .trend-flat {
+    color: var(--lb-text-muted);
+}
+
+/* Enhanced trend indicators with mini charts */
+.lb-analytics-mode .trend-indicator {
+    position: relative;
+    padding-right: 20px;
+}
+
+.lb-analytics-mode .trend-indicator::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 8px;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.lb-analytics-mode .trend-up::after {
+    background-image: linear-gradient(45deg, transparent 40%, var(--lb-success) 40%, var(--lb-success) 60%, transparent 60%);
+}
+
+.lb-analytics-mode .trend-down::after {
+    background-image: linear-gradient(-45deg, transparent 40%, var(--lb-error) 40%, var(--lb-error) 60%, transparent 60%);
+}
+
+.lb-analytics-mode .trend-flat::after {
+    background-image: linear-gradient(0deg, transparent 40%, var(--lb-text-muted) 40%, var(--lb-text-muted) 60%, transparent 60%);
+}
+
+/* System status */
+.lb-analytics-mode .system-status {
+    background: var(--lb-primary-bg);
+    border: 1px solid var(--lb-border-color);
+    color: var(--lb-text-secondary);
+    box-shadow: var(--lb-shadow);
+}
+
+.lb-analytics-mode .status-indicator {
+    background: var(--lb-success);
+}
+
+/* Export and tooltip functionality */
+.lb-analytics-mode .export-btn {
+    position: absolute;
+    top: var(--lb-spacing-md);
+    right: var(--lb-spacing-md);
+    background: var(--lb-accent);
+    color: var(--lb-primary-bg);
+    border: none;
+    padding: var(--lb-spacing-sm) var(--lb-spacing-md);
+    border-radius: var(--lb-border-radius);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: var(--lb-shadow);
+    transition: var(--lb-transition);
+}
+
+.lb-analytics-mode .export-btn:hover {
+    background: var(--lb-accent-secondary);
+    box-shadow: var(--lb-shadow-hover);
+}
+
+/* Tooltip styles */
+.lb-analytics-mode .tooltip {
+    position: relative;
+    cursor: help;
+}
+
+.lb-analytics-mode .tooltip::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--lb-accent-secondary);
+    color: var(--lb-primary-bg);
+    padding: var(--lb-spacing-sm);
+    border-radius: var(--lb-border-radius);
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--lb-transition);
+    z-index: 1000;
+    box-shadow: var(--lb-shadow);
+}
+
+.lb-analytics-mode .tooltip:hover::before {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(-4px);
+}
+
+/* Progress bars for metrics */
+.lb-analytics-mode .metric-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background: var(--lb-accent);
+    border-radius: 0 0 var(--lb-border-radius) var(--lb-border-radius);
+    transition: width 1s ease-out;
+}
+
+/* Data table enhancements */
+.lb-analytics-mode .data-cell {
+    position: relative;
+}
+
+.lb-analytics-mode .data-cell.highlight {
+    background: rgba(52, 152, 219, 0.1);
+    animation: dataHighlight 0.6s ease-out;
+}
+
+@keyframes dataHighlight {
+    0% { background: rgba(52, 152, 219, 0.3); }
+    100% { background: rgba(52, 152, 219, 0.1); }
+}
+
+/* Print styles for analytics */
+@media print {
+    .lb-analytics-mode {
+        background: white !important;
+        color: black !important;
+    }
+    
+    .lb-analytics-mode .leaderboard-header,
+    .lb-analytics-mode .leaderboard-controls {
+        border-bottom: 2px solid #000 !important;
+    }
+    
+    .lb-analytics-mode .podium-place,
+    .lb-analytics-mode .leaderboard-metric,
+    .lb-analytics-mode .rankings-table {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+}
