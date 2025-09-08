@@ -11,41 +11,77 @@
     <script>
         (function () {
           try {
-            const token = localStorage.getItem('syncedup_token');
-            const userStr = localStorage.getItem('syncedup_user');
+            // Check multiple possible token keys
+            const tokenKeys = ['syncedup_token', 'authToken', 'token'];
+            const userKeys = ['syncedup_user', 'user', 'currentUser'];
+            
+            let token = null;
+            let userStr = null;
+            
+            // Try different token keys
+            for (const key of tokenKeys) {
+              const t = localStorage.getItem(key);
+              if (t) {
+                token = t;
+                console.log('Auth check - Found token with key:', key);
+                break;
+              }
+            }
+            
+            // Try different user keys
+            for (const key of userKeys) {
+              const u = localStorage.getItem(key);
+              if (u) {
+                userStr = u;
+                console.log('Auth check - Found user with key:', key);
+                break;
+              }
+            }
             
             console.log('Auth check - Token exists:', !!token);
-            console.log('Auth check - User data:', userStr);
+            console.log('Auth check - User data exists:', !!userStr);
             
             if (!token) {
               console.log('No token found, redirecting to login');
+              alert('Authentication required. Please login first.');
               window.location.href = '/login';
               return;
             }
             
             if (!userStr) {
               console.log('No user data found, redirecting to login');
+              alert('User data missing. Please login again.');
               window.location.href = '/login';
               return;
             }
             
             const u = JSON.parse(userStr);
+            console.log('Auth check - Full user object:', u);
+            
             const role = u.role || '';
-            // Allow both formats: underscore (super_admin) and hyphen (super-admin)
+            // Allow both formats and be more flexible
             const allowed = ['agent','manager','admin','super_admin','customer_service','super-admin','customer-service'];
             
-            console.log('Auth check - User role:', u.role, 'Normalized:', role);
+            console.log('Auth check - User role:', role);
+            console.log('Auth check - Email:', u.email);
             console.log('Auth check - Role allowed:', allowed.includes(role));
             
             if (!role || !allowed.includes(role)) {
-              console.log('Invalid role, redirecting to login');
+              console.log('Invalid role, redirecting to login. Role was:', role);
+              alert(`Access denied. Your role "${role}" is not authorized for the leaderboard.`);
               window.location.href = '/login';
               return;
             }
             
-            console.log('Auth check passed');
+            console.log('Auth check passed for user:', u.email, 'with role:', role);
+            
+            // Store user info globally for debugging
+            window.currentUser = u;
+            window.authToken = token;
+            
           } catch (error) {
             console.error('Auth check error:', error);
+            alert('Authentication error: ' + error.message);
             window.location.href = '/login';
           }
         })();
@@ -320,6 +356,38 @@
         // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
             loadLeaderboardData();
+            
+            // Theme system debugging and fallback
+            console.log('DOM loaded, checking theme system...');
+            console.log('Current page URL:', window.location.href);
+            console.log('Current pathname:', window.location.pathname);
+            
+            setTimeout(() => {
+                const hasThemeClass = document.body.className.includes('lb-') && document.body.className.includes('-mode');
+                console.log('Theme system status:', {
+                    hasThemeClass,
+                    bodyClasses: document.body.className,
+                    themeSystem: window.leaderboardTheme ? 'loaded' : 'not loaded'
+                });
+                
+                if (!hasThemeClass) {
+                    console.warn('Theme not applied, forcing competition theme...');
+                    document.body.classList.add('lb-competition-mode');
+                    
+                    // Also try to load the CSS manually
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = '/leaderboard/css/themes/competition.css';
+                    document.head.appendChild(link);
+                    console.log('Manually loaded competition theme CSS');
+                }
+                
+                // Extra debug info
+                console.log('Authentication info:', {
+                    user: window.currentUser,
+                    token: !!window.authToken
+                });
+            }, 1000);
             
             // Theme system is auto-initialized by leaderboard-theme.js
             // Listen for theme changes to update display if needed
