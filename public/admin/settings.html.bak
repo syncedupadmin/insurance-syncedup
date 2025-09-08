@@ -417,11 +417,6 @@ Business City, ST 12345</textarea>
                         <i data-lucide="palette" class="icon"></i>
                         <span id="classicModeText">Classic Mode</span>
                     </button>
-                    
-                    <button class="btn btn-secondary" id="modernModeToggle" onclick="toggleModernMode()">
-                        <i data-lucide="sparkles" class="icon"></i>
-                        <span id="modernModeText">Modern Mode</span>
-                    </button>
                 </div>
             </div>
         </div>
@@ -1064,34 +1059,33 @@ Business City, ST 12345</textarea>
 
         // Professional Mode functionality - SIMPLE VERSION
         function toggleProfessionalMode() {
-            if (window.themeSystem) {
-                window.themeSystem.applyTheme('professional');
-                showSuccess('Professional Mode enabled! Corporate glassmorphism theme activated.');
-                updateAllThemeButtons();
+            if (document.body.classList.contains('professional-mode')) {
+                document.body.classList.remove('professional-mode');
+                localStorage.setItem('theme', 'default');
+                showSuccess('Professional mode disabled');
             } else {
-                console.error('Theme system not available');
-                showError('Theme system not loaded. Please refresh the page.');
+                document.body.classList.add('professional-mode');
+                localStorage.setItem('theme', 'professional');
+                showSuccess('Professional mode enabled');
             }
+            updateProfessionalModeButton();
         }
 
         function toggleClassicMode() {
             // Use the theme switcher system
             if (window.themeSystem) {
-                window.themeSystem.applyTheme('classic');
-                showSuccess('Classic Mode enabled! Windows 95 theme activated.');
-                updateAllThemeButtons();
-            } else {
-                console.error('Theme system not available');
-                showError('Theme system not loaded. Please refresh the page.');
-            }
-        }
-
-        function toggleModernMode() {
-            // Use the theme switcher system
-            if (window.themeSystem) {
-                window.themeSystem.applyTheme('modern');
-                showSuccess('Modern Mode enabled! Dark theme with glow effects activated.');
-                updateAllThemeButtons();
+                const currentTheme = localStorage.getItem('selectedTheme') || 'default';
+                if (currentTheme === 'classic') {
+                    // Switch back to default
+                    window.themeSystem.applyTheme('default');
+                    showSuccess('Classic Mode disabled!');
+                } else {
+                    // Switch to classic
+                    window.themeSystem.applyTheme('classic');
+                    showSuccess('Classic Mode enabled!');
+                }
+                updateProfessionalModeButton();
+                updateClassicModeButton();
             } else {
                 console.error('Theme system not available');
                 showError('Theme system not loaded. Please refresh the page.');
@@ -1131,69 +1125,17 @@ Business City, ST 12345</textarea>
             }
         }
 
-        // Update all theme button states based on current theme
-        function updateAllThemeButtons() {
-            const currentTheme = localStorage.getItem('selectedTheme') || 'professional';
-            
-            // Update Professional Mode button
-            const profButton = document.getElementById('professionalModeToggle');
-            const profText = document.getElementById('professionalModeText');
-            if (profButton && profText) {
-                if (currentTheme === 'professional') {
-                    profButton.classList.remove('btn-secondary');
-                    profButton.classList.add('btn-primary');
-                    profText.textContent = 'Professional (Active)';
-                } else {
-                    profButton.classList.remove('btn-primary');
-                    profButton.classList.add('btn-secondary');
-                    profText.textContent = 'Professional Mode';
-                }
-            }
-
-            // Update Classic Mode button
-            const classicButton = document.getElementById('classicModeToggle');
-            const classicText = document.getElementById('classicModeText');
-            if (classicButton && classicText) {
-                if (currentTheme === 'classic') {
-                    classicButton.classList.remove('btn-secondary');
-                    classicButton.classList.add('btn-primary');
-                    classicText.textContent = 'Classic (Active)';
-                } else {
-                    classicButton.classList.remove('btn-primary');
-                    classicButton.classList.add('btn-secondary');
-                    classicText.textContent = 'Classic Mode';
-                }
-            }
-
-            // Update Modern Mode button
-            const modernButton = document.getElementById('modernModeToggle');
-            const modernText = document.getElementById('modernModeText');
-            if (modernButton && modernText) {
-                if (currentTheme === 'modern') {
-                    modernButton.classList.remove('btn-secondary');
-                    modernButton.classList.add('btn-primary');
-                    modernText.textContent = 'Modern (Active)';
-                } else {
-                    modernButton.classList.remove('btn-primary');
-                    modernButton.classList.add('btn-secondary');
-                    modernText.textContent = 'Modern Mode';
-                }
-            }
-        }
-
         // Apply saved theme on page load
         window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('theme') === 'professional') {
+                document.body.classList.add('professional-mode');
+            }
+            
             initializePage();
             
-            // Initialize all theme button states
-            setTimeout(() => {
-                updateAllThemeButtons();
-            }, 500);
-            
-            // Listen for theme changes from the theme system
-            document.addEventListener('themeChanged', () => {
-                updateAllThemeButtons();
-            });
+            // Initialize button states
+            updateProfessionalModeButton();
+            updateClassicModeButton();
         });
 
         // Handle clicks outside modals to close them
