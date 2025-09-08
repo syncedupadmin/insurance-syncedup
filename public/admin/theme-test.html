@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Critical Theme Flash Prevention -->
+    <script>
+    (function(){
+        var t=localStorage.getItem("selectedTheme")||"professional";
+        var h=document.documentElement;
+        if(t==="classic"){h.classList.add("classic-mode");h.style.backgroundColor="#008080";}
+        else if(t==="modern"){h.classList.add("modern-mode");h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        else{h.style.background="linear-gradient(135deg,#ff6b35 0%,#f72585 100%)";}
+        h.style.visibility="hidden";
+        setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
+    })();
+    </script>
+    <title>Admin Theme Test</title>
+    <link rel="stylesheet" href="/admin/admin-global.css">
+    <script src="/js/theme-switcher.js"></script>
+</head>
+<body>
+    <div style="padding: 2rem;">
+        <h1>Theme Test Page</h1>
+        
+        <div class="card" style="margin: 1rem 0; padding: 1rem; border: 1px solid #ccc;">
+            <h2>Current Theme Info</h2>
+            <p>Theme: <span id="current-theme">Loading...</span></p>
+            <p>Body Classes: <span id="body-classes">Loading...</span></p>
+            <p>Loaded CSS: <span id="loaded-css">Loading...</span></p>
+        </div>
+        
+        <div class="card" style="margin: 1rem 0; padding: 1rem; border: 1px solid #ccc;">
+            <h2>Quick Theme Switch</h2>
+            <button onclick="window.themeSystem.applyTheme('professional')" style="margin: 0.5rem; padding: 0.5rem 1rem;">Professional</button>
+            <button onclick="window.themeSystem.applyTheme('classic')" style="margin: 0.5rem; padding: 0.5rem 1rem;">Classic</button>
+            <button onclick="window.themeSystem.applyTheme('modern')" style="margin: 0.5rem; padding: 0.5rem 1rem;">Modern</button>
+        </div>
+        
+        <div class="card" style="margin: 1rem 0; padding: 1rem; border: 1px solid #ccc;">
+            <h2>Visual Test Elements</h2>
+            <p>This text should change color based on theme</p>
+            <button style="margin: 0.5rem; padding: 0.5rem 1rem;">Sample Button</button>
+            <input type="text" placeholder="Sample input" style="margin: 0.5rem; padding: 0.5rem;">
+        </div>
+    </div>
+    
+    <script>
+        function updateInfo() {
+            document.getElementById('current-theme').textContent = 
+                localStorage.getItem('selectedTheme') || 'professional (default)';
+            document.getElementById('body-classes').textContent = 
+                document.body.className || 'none';
+            document.getElementById('loaded-css').textContent = 
+                Array.from(document.querySelectorAll('link[data-theme-css]'))
+                    .map(l => l.getAttribute('data-theme-css')).join(', ') || 'none (professional uses base CSS)';
+        }
+        
+        // Update info every 500ms to catch changes
+        setInterval(updateInfo, 500);
+        updateInfo();
+    </script>
+</body>
+</html>
