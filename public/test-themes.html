@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #f5f5f5;
+        }
+        .btn {
+            padding: 10px 20px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            background: #fff;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        input, select {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Theme System Test</h1>
+        <p>This page tests the theme toggle functionality with sample UI elements.</p>
+
+        <div>
+            <h2>Theme Controls</h2>
+            <button class="btn btn-primary" onclick="testProfessionalTheme()">Professional Mode</button>
+            <button class="btn" onclick="testClassicTheme()">Classic Mode (Windows 95)</button>
+            <button class="btn" onclick="clearTheme()">Clear Theme</button>
+        </div>
+
+        <div class="card">
+            <h3>Sample Card</h3>
+            <p>This card should change appearance when themes are applied.</p>
+            <button class="btn">Sample Button</button>
+        </div>
+
+        <div class="card">
+            <h3>Form Elements</h3>
+            <input type="text" placeholder="Sample input" />
+            <select>
+                <option>Sample option 1</option>
+                <option>Sample option 2</option>
+            </select>
+        </div>
+
+        <div class="card">
+            <h3>Sample Table</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Value</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Sample Item 1</td>
+                        <td>100</td>
+                        <td>Active</td>
+                    </tr>
+                    <tr>
+                        <td>Sample Item 2</td>
+                        <td>200</td>
+                        <td>Inactive</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="status" class="status">
+            Ready to test themes. Current theme: <span id="currentTheme">professional</span>
+        </div>
+
+        <div class="card">
+            <h3>Debug Information</h3>
+            <button class="btn" onclick="showDebugInfo()">Show Debug Info</button>
+            <div id="debug"></div>
+        </div>
+    </div>
+
+    <script src="/js/theme-switcher.js"></script>
+    <script>
+        function updateStatus(message) {
+            document.getElementById('status').innerHTML = message;
+        }
+
+        function updateCurrentTheme() {
+            const theme = localStorage.getItem('selectedTheme') || 'professional';
+            document.getElementById('currentTheme').textContent = theme;
+        }
+
+        function testProfessionalTheme() {
+            console.log('Testing Professional Theme');
+            if (window.themeSystem && window.themeSystem.applyTheme) {
+                window.themeSystem.applyTheme('professional');
+                updateStatus('✅ Professional theme applied successfully!');
+                updateCurrentTheme();
+            } else {
+                updateStatus('❌ Theme system not available');
+                console.error('window.themeSystem not available');
+            }
+        }
+
+        function testClassicTheme() {
+            console.log('Testing Classic Theme (Windows 95)');
+            if (window.themeSystem && window.themeSystem.applyTheme) {
+                window.themeSystem.applyTheme('classic');
+                updateStatus('✅ Classic theme (Windows 95) applied successfully!');
+                updateCurrentTheme();
+            } else {
+                updateStatus('❌ Theme system not available');
+                console.error('window.themeSystem not available');
+            }
+        }
+
+        function clearTheme() {
+            // Remove all theme classes
+            const themes = ['professional-mode', 'classic-mode', 'modern-mode'];
+            themes.forEach(theme => {
+                document.body.classList.remove(theme);
+                document.documentElement.classList.remove(theme);
+            });
+            
+            // Remove theme CSS
+            const themeLinks = document.querySelectorAll('link[data-theme-css]');
+            themeLinks.forEach(link => link.remove());
+            
+            localStorage.removeItem('selectedTheme');
+            updateStatus('🧹 All themes cleared');
+            updateCurrentTheme();
+        }
+
+        function showDebugInfo() {
+            const debug = document.getElementById('debug');
+            let info = '<h4>Debug Information:</h4>';
+            
+            info += `<p><strong>window.themeSystem:</strong> ${window.themeSystem ? '✅ Available' : '❌ Missing'}</p>`;
+            
+            if (window.themeSystem) {
+                info += `<p><strong>applyTheme function:</strong> ${typeof window.themeSystem.applyTheme === 'function' ? '✅ Available' : '❌ Missing'}</p>`;
+                info += `<p><strong>detectPortal function:</strong> ${typeof window.themeSystem.detectPortal === 'function' ? '✅ Available' : '❌ Missing'}</p>`;
+            }
+            
+            info += `<p><strong>localStorage selectedTheme:</strong> ${localStorage.getItem('selectedTheme') || 'not set'}</p>`;
+            info += `<p><strong>localStorage detectedPortal:</strong> ${localStorage.getItem('detectedPortal') || 'not set'}</p>`;
+            
+            info += `<p><strong>Body classes:</strong> ${document.body.className || 'none'}</p>`;
+            info += `<p><strong>HTML classes:</strong> ${document.documentElement.className || 'none'}</p>`;
+            
+            const themeLinks = document.querySelectorAll('link[data-theme-css]');
+            info += `<p><strong>Theme CSS loaded:</strong> ${themeLinks.length > 0 ? Array.from(themeLinks).map(link => link.href).join(', ') : 'none'}</p>`;
+            
+            debug.innerHTML = info;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCurrentTheme();
+            
+            // Listen for theme changes
+            document.addEventListener('themeChanged', function(event) {
+                updateStatus(`🎨 Theme changed to: ${event.detail.theme}`);
+                updateCurrentTheme();
+            });
+            
+            // Auto-show debug info after a delay
+            setTimeout(showDebugInfo, 1000);
+        });
+    </script>
+</body>
+</html>

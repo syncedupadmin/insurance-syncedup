@@ -1,135 +1,127 @@
-/* CLASSIC THEME - Retro Pac-Man Style */
+/* CLASSIC THEME - Windows 95 Style */
 
 /* Base Classic Mode Styles */
 body.classic-mode {
-    background: #000000 !important;
-    background-image: 
-        /* Pac-Man maze-like grid pattern */
-        linear-gradient(90deg, #0000FF 1px, transparent 1px),
-        linear-gradient(180deg, #0000FF 1px, transparent 1px),
-        /* Starfield effect */
-        radial-gradient(circle at 25% 25%, #FFFFFF 1px, transparent 1px),
-        radial-gradient(circle at 75% 75%, #FFFFFF 1px, transparent 1px),
-        radial-gradient(circle at 50% 10%, #FFFFFF 1px, transparent 1px),
-        radial-gradient(circle at 10% 90%, #FFFFFF 1px, transparent 1px);
-    background-size: 40px 40px, 40px 40px, 200px 200px, 200px 200px, 200px 200px, 200px 200px;
-    color: #FFFFFF !important;
-    font-family: 'Courier New', monospace !important;
-    animation: retroGrid 4s linear infinite;
+    background: #c0c0c0 !important; /* Windows 95 gray background */
+    background-image: none !important;
+    color: #000000 !important;
+    font-family: 'MS Sans Serif', 'Tahoma', sans-serif !important;
+    font-size: 11px !important;
+    margin: 0;
+    padding: 0;
 }
 
-@keyframes retroGrid {
-    0% { background-position: 0px 0px, 0px 0px; }
-    100% { background-position: 40px 40px, 40px 40px; }
+/* Windows 95 Inset/Outset Border Mixins */
+.win95-inset {
+    border: 2px inset #c0c0c0 !important;
+    background: #c0c0c0 !important;
+}
+
+.win95-outset {
+    border: 2px outset #c0c0c0 !important;
+    background: #c0c0c0 !important;
+}
+
+.win95-sunken {
+    border: 2px inset #c0c0c0 !important;
+    background: #ffffff !important;
 }
 
 /* Classic Mode Header */
 body.classic-mode .header {
-    background: linear-gradient(90deg, #0000FF, #4169E1, #0000FF) !important;
-    border: 3px solid #FFFF00;
-    border-radius: 0;
-    box-shadow: 0 4px 8px rgba(255, 255, 0, 0.5);
-    backdrop-filter: none;
+    background: linear-gradient(90deg, #008080, #008080) !important; /* Windows 95 title bar blue */
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    padding: 4px 8px !important;
+    height: auto !important;
 }
 
 body.classic-mode .header h1 {
-    color: #FFFF00 !important;
-    text-shadow: 2px 2px 0px #FF0000, 4px 4px 0px #000000;
-    font-weight: bold;
-    letter-spacing: 2px;
-    animation: pacmanGlow 2s ease-in-out infinite alternate;
-}
-
-@keyframes pacmanGlow {
-    0% { text-shadow: 2px 2px 0px #FF0000, 4px 4px 0px #000000; }
-    100% { text-shadow: 2px 2px 0px #FF0000, 4px 4px 0px #000000, 0 0 20px #FFFF00; }
+    color: #ffffff !important;
+    text-shadow: none !important;
+    font-weight: bold !important;
+    font-size: 12px !important;
+    letter-spacing: normal !important;
+    animation: none !important;
+    margin: 0 !important;
 }
 
 body.classic-mode .header-info span,
 body.classic-mode .header span {
-    color: #FFFFFF !important;
-    font-weight: bold;
-    text-shadow: 1px 1px 0px #000000;
+    color: #ffffff !important;
+    font-weight: normal !important;
+    text-shadow: none !important;
+    font-size: 11px !important;
 }
 
 /* Classic Mode Navigation */
 body.classic-mode .nav {
-    background: linear-gradient(90deg, #4169E1, #0000FF, #4169E1) !important;
-    border: 2px solid #FFFF00;
-    border-top: none;
-    backdrop-filter: none;
+    background: #c0c0c0 !important;
+    border: 1px solid #808080 !important;
+    border-radius: 0 !important;
+    backdrop-filter: none !important;
+    padding: 2px !important;
 }
 
 body.classic-mode .nav-link {
-    color: #FFFF00 !important;
-    font-weight: bold;
-    text-shadow: 1px 1px 0px #000000;
-    border-bottom: 3px solid transparent;
-    transition: all 0.3s ease;
+    color: #000000 !important;
+    font-weight: normal !important;
+    text-shadow: none !important;
+    border: 1px outset #c0c0c0 !important;
+    background: #c0c0c0 !important;
+    transition: none !important;
     position: relative;
+    padding: 4px 8px !important;
+    margin: 1px !important;
+    font-size: 11px !important;
 }
 
 body.classic-mode .nav-link:hover {
-    background: rgba(255, 255, 0, 0.2) !important;
-    color: #FFFFFF !important;
-    transform: none;
-    box-shadow: inset 0 0 10px rgba(255, 255, 0, 0.5);
+    background: #c0c0c0 !important;
+    color: #000000 !important;
+    transform: none !important;
+    box-shadow: none !important;
+    border: 1px inset #c0c0c0 !important;
 }
 
 body.classic-mode .nav-link.active {
-    color: #FFFFFF !important;
-    border-bottom-color: #FF00FF;
-    background: rgba(255, 0, 255, 0.3) !important;
+    color: #000000 !important;
+    border: 1px inset #c0c0c0 !important;
+    background: #c0c0c0 !important;
 }
 
-/* Add Pac-Man dots to navigation */
 body.classic-mode .nav-link::before {
-    content: '●';
-    color: #FFFF00;
-    margin-right: 8px;
-    animation: pacmanDot 1.5s ease-in-out infinite;
-}
-
-body.classic-mode .nav-link.active::before {
-    content: '◉';
-    color: #FF00FF;
-    animation: powerPellet 0.8s ease-in-out infinite alternate;
-}
-
-@keyframes pacmanDot {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(0.8); opacity: 0.8; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-@keyframes powerPellet {
-    0% { transform: scale(1); opacity: 1; }
-    100% { transform: scale(1.3); opacity: 0.7; }
+    display: none !important;
 }
 
 /* Classic Mode Cards */
 body.classic-mode .card {
-    background: linear-gradient(135deg, #000080, #0000CD) !important;
-    border: 2px solid #FFFF00 !important;
+    background: #c0c0c0 !important;
+    border: 2px outset #c0c0c0 !important;
     border-radius: 0 !important;
     backdrop-filter: none !important;
-    box-shadow: 4px 4px 0px #FF00FF, 8px 8px 0px #000000 !important;
+    box-shadow: none !important;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+    padding: 8px !important;
 }
 
 body.classic-mode .card:hover {
     transform: none !important;
-    box-shadow: 6px 6px 0px #FF00FF, 12px 12px 0px #000000 !important;
+    box-shadow: none !important;
+    border: 2px outset #c0c0c0 !important;
 }
 
 body.classic-mode .card h2,
 body.classic-mode .card h3,
 body.classic-mode .card h4 {
-    color: #FFFF00 !important;
-    text-shadow: 2px 2px 0px #000000;
-    font-weight: bold;
-    margin-bottom: 1rem;
+    color: #000000 !important;
+    text-shadow: none !important;
+    font-weight: bold !important;
+    margin-bottom: 8px !important;
+    font-size: 12px !important;
 }
 
 /* Classic Mode Form Elements */
@@ -138,13 +130,15 @@ body.classic-mode .form-select,
 body.classic-mode input,
 body.classic-mode select,
 body.classic-mode textarea {
-    background: #000080 !important;
-    color: #FFFF00 !important;
-    border: 2px solid #FFFF00 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 2px inset #c0c0c0 !important;
     border-radius: 0 !important;
-    text-shadow: 1px 1px 0px #000000;
-    font-weight: bold;
-    font-family: 'Courier New', monospace !important;
+    text-shadow: none !important;
+    font-weight: normal !important;
+    font-family: 'MS Sans Serif', 'Tahoma', sans-serif !important;
+    font-size: 11px !important;
+    padding: 2px 4px !important;
 }
 
 body.classic-mode .form-input:focus,
@@ -152,195 +146,293 @@ body.classic-mode .form-select:focus,
 body.classic-mode input:focus,
 body.classic-mode select:focus,
 body.classic-mode textarea:focus {
-    background: #000080 !important;
-    border-color: #FF00FF !important;
-    box-shadow: 0 0 10px #FF00FF !important;
-    outline: none;
+    background: #ffffff !important;
+    border: 2px inset #c0c0c0 !important;
+    box-shadow: none !important;
+    outline: 1px dotted #000000 !important;
+    outline-offset: -3px !important;
 }
 
 body.classic-mode .form-label,
 body.classic-mode label {
-    color: #FFFF00 !important;
-    text-shadow: 1px 1px 0px #000000;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    color: #000000 !important;
+    text-shadow: none !important;
+    font-weight: normal !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    font-size: 11px !important;
 }
 
 /* Classic Mode Buttons */
 body.classic-mode .btn {
-    background: linear-gradient(135deg, #0000FF, #4169E1) !important;
-    color: #FFFF00 !important;
-    border: 2px solid #FFFF00 !important;
+    background: #c0c0c0 !important;
+    color: #000000 !important;
+    border: 2px outset #c0c0c0 !important;
     border-radius: 0 !important;
-    text-shadow: 1px 1px 0px #000000;
-    font-weight: bold;
-    box-shadow: 2px 2px 0px #FF00FF !important;
-    backdrop-filter: none;
-    font-family: 'Courier New', monospace !important;
+    text-shadow: none !important;
+    font-weight: normal !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    font-family: 'MS Sans Serif', 'Tahoma', sans-serif !important;
+    font-size: 11px !important;
+    padding: 4px 12px !important;
+    min-width: 75px !important;
 }
 
 body.classic-mode .btn:hover {
-    background: linear-gradient(135deg, #FF00FF, #FF1493) !important;
-    color: #FFFFFF !important;
+    background: #c0c0c0 !important;
+    color: #000000 !important;
     transform: none !important;
-    box-shadow: 4px 4px 0px #FFFF00 !important;
+    box-shadow: none !important;
+    border: 2px outset #c0c0c0 !important;
+}
+
+body.classic-mode .btn:active {
+    border: 2px inset #c0c0c0 !important;
 }
 
 body.classic-mode .btn-primary {
-    background: linear-gradient(135deg, #FFFF00, #FFA500) !important;
+    background: #c0c0c0 !important;
     color: #000000 !important;
-    border-color: #FF0000 !important;
-    text-shadow: none;
+    border: 2px outset #c0c0c0 !important;
+    text-shadow: none !important;
+    font-weight: bold !important;
 }
 
 body.classic-mode .btn-secondary {
-    background: linear-gradient(135deg, #FF00FF, #FF1493) !important;
-    color: #FFFFFF !important;
+    background: #c0c0c0 !important;
+    color: #000000 !important;
+    border: 2px outset #c0c0c0 !important;
 }
 
 /* Classic Mode Tables */
 body.classic-mode table {
-    border: 3px solid #FFFF00 !important;
+    border: 2px inset #c0c0c0 !important;
     border-radius: 0 !important;
-    background: #000080 !important;
+    background: #ffffff !important;
+    font-size: 11px !important;
 }
 
 body.classic-mode table th {
-    background: linear-gradient(90deg, #FF00FF, #FF1493) !important;
-    color: #FFFF00 !important;
-    text-shadow: 1px 1px 0px #000000;
-    border-bottom: 2px solid #FFFF00 !important;
-    font-weight: bold;
-    text-transform: uppercase;
+    background: #c0c0c0 !important;
+    color: #000000 !important;
+    text-shadow: none !important;
+    border: 1px outset #c0c0c0 !important;
+    font-weight: bold !important;
+    text-transform: none !important;
+    padding: 4px 8px !important;
+    font-size: 11px !important;
 }
 
 body.classic-mode table td {
-    color: #FFFFFF !important;
-    border-bottom: 1px solid #FFFF00 !important;
-    text-shadow: 1px 1px 0px #000000;
+    color: #000000 !important;
+    border: 1px solid #c0c0c0 !important;
+    text-shadow: none !important;
+    padding: 4px 8px !important;
+    font-size: 11px !important;
 }
 
 body.classic-mode table tr:hover {
-    background: rgba(255, 255, 0, 0.1) !important;
+    background: #0000ff !important;
+    color: #ffffff !important;
+}
+
+body.classic-mode table tr:hover td {
+    color: #ffffff !important;
 }
 
 /* Classic Mode Stats/Metrics */
 body.classic-mode .stat-value,
 body.classic-mode .metric-value {
-    color: #FFFF00 !important;
-    text-shadow: 2px 2px 0px #FF0000, 4px 4px 0px #000000;
-    font-family: 'Courier New', monospace;
-    font-weight: bold;
-    animation: scoreFlash 1s ease-in-out infinite alternate;
-}
-
-@keyframes scoreFlash {
-    0% { color: #FFFF00; }
-    100% { color: #FFFFFF; }
+    color: #000000 !important;
+    text-shadow: none !important;
+    font-family: 'MS Sans Serif', 'Tahoma', sans-serif !important;
+    font-weight: bold !important;
+    animation: none !important;
+    font-size: 14px !important;
 }
 
 body.classic-mode .stat-label,
 body.classic-mode .metric-label {
-    color: #FFFFFF !important;
-    text-shadow: 1px 1px 0px #000000;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    color: #000000 !important;
+    text-shadow: none !important;
+    font-weight: normal !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    font-size: 11px !important;
 }
 
 /* Classic Mode Container */
 body.classic-mode .container {
-    border-left: 4px solid #0000FF;
-    border-right: 4px solid #0000FF;
+    border: none !important;
+    background: #c0c0c0 !important;
+    padding: 8px !important;
 }
 
 /* Classic Mode Text Elements */
 body.classic-mode p,
 body.classic-mode span,
 body.classic-mode div {
-    color: #FFFFFF !important;
-    text-shadow: 1px 1px 0px #000000;
+    color: #000000 !important;
+    text-shadow: none !important;
+    font-size: 11px !important;
 }
 
 /* Classic Mode Links */
 body.classic-mode a {
-    color: #FFFF00 !important;
-    text-shadow: 1px 1px 0px #000000;
-    text-decoration: underline;
+    color: #0000ff !important;
+    text-shadow: none !important;
+    text-decoration: underline !important;
 }
 
 body.classic-mode a:hover {
-    color: #FF00FF !important;
-    text-decoration: none;
+    color: #0000ff !important;
+    text-decoration: underline !important;
 }
 
-/* Game Over effect for empty states */
-body.classic-mode .no-data::after,
-body.classic-mode .empty-state::after {
-    content: "GAME OVER";
-    display: block;
-    color: #FF0000;
-    font-size: 2rem;
-    font-weight: bold;
-    text-align: center;
-    text-shadow: 2px 2px 0px #000000;
-    animation: gameOver 1s ease-in-out infinite alternate;
-    margin-top: 1rem;
+body.classic-mode a:visited {
+    color: #800080 !important;
 }
 
-@keyframes gameOver {
-    0% { opacity: 1; }
-    100% { opacity: 0.3; }
+/* Windows 95 Dialog Boxes */
+body.classic-mode .modal,
+body.classic-mode .dialog {
+    background: #c0c0c0 !important;
+    border: 2px outset #c0c0c0 !important;
+    border-radius: 0 !important;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3) !important;
 }
 
-/* Responsive adjustments for classic mode */
-@media (max-width: 768px) {
-    body.classic-mode .header {
-        padding: 1rem;
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    body.classic-mode .header h1 {
-        font-size: 1.5rem;
-    }
-    
-    body.classic-mode .nav {
-        flex-direction: column;
-        padding: 0;
-    }
-    
-    body.classic-mode .nav-link {
-        padding: 0.75rem 1rem;
-    }
-    
-    body.classic-mode .card {
-        margin-bottom: 1rem;
-    }
+body.classic-mode .modal-header,
+body.classic-mode .dialog-header {
+    background: linear-gradient(90deg, #008080, #008080) !important;
+    color: #ffffff !important;
+    border: none !important;
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+    font-weight: bold !important;
 }
 
-/* Remove star field effect in classic mode */
-body.classic-mode::before {
-    display: none;
+/* Windows 95 Progress Bars */
+body.classic-mode .progress-bar {
+    background: #c0c0c0 !important;
+    border: 2px inset #c0c0c0 !important;
+    border-radius: 0 !important;
+    height: 20px !important;
+}
+
+body.classic-mode .progress-fill {
+    background: #0000ff !important;
+    border-radius: 0 !important;
+    height: 100% !important;
+}
+
+/* Windows 95 Menus */
+body.classic-mode .dropdown-menu,
+body.classic-mode .context-menu {
+    background: #c0c0c0 !important;
+    border: 2px outset #c0c0c0 !important;
+    border-radius: 0 !important;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.classic-mode .dropdown-item,
+body.classic-mode .menu-item {
+    color: #000000 !important;
+    background: #c0c0c0 !important;
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+    border: none !important;
+}
+
+body.classic-mode .dropdown-item:hover,
+body.classic-mode .menu-item:hover {
+    background: #0000ff !important;
+    color: #ffffff !important;
 }
 
 /* Success/Error messages in classic mode */
 body.classic-mode .success,
 body.classic-mode .alert-success {
-    background: linear-gradient(135deg, #00FF00, #32CD32) !important;
+    background: #c0c0c0 !important;
     color: #000000 !important;
-    border: 2px solid #FFFF00 !important;
-    text-shadow: none;
-    font-weight: bold;
+    border: 2px inset #c0c0c0 !important;
+    text-shadow: none !important;
+    font-weight: normal !important;
+    border-radius: 0 !important;
+    padding: 8px !important;
+    font-size: 11px !important;
 }
 
 body.classic-mode .error,
 body.classic-mode .alert-error,
 body.classic-mode .alert-danger {
-    background: linear-gradient(135deg, #FF0000, #DC143C) !important;
-    color: #FFFF00 !important;
-    border: 2px solid #FFFFFF !important;
-    text-shadow: 1px 1px 0px #000000;
-    font-weight: bold;
+    background: #c0c0c0 !important;
+    color: #000000 !important;
+    border: 2px inset #c0c0c0 !important;
+    text-shadow: none !important;
+    font-weight: bold !important;
+    border-radius: 0 !important;
+    padding: 8px !important;
+    font-size: 11px !important;
+}
+
+/* Windows 95 Scrollbars */
+body.classic-mode ::-webkit-scrollbar {
+    width: 16px !important;
+    height: 16px !important;
+}
+
+body.classic-mode ::-webkit-scrollbar-track {
+    background: #c0c0c0 !important;
+    border: 1px inset #c0c0c0 !important;
+}
+
+body.classic-mode ::-webkit-scrollbar-thumb {
+    background: #c0c0c0 !important;
+    border: 1px outset #c0c0c0 !important;
+}
+
+body.classic-mode ::-webkit-scrollbar-button {
+    background: #c0c0c0 !important;
+    border: 1px outset #c0c0c0 !important;
+}
+
+/* Remove all animations and transitions in classic mode */
+body.classic-mode * {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+}
+
+/* Responsive adjustments for classic mode */
+@media (max-width: 768px) {
+    body.classic-mode .header {
+        padding: 4px !important;
+        flex-direction: column;
+        gap: 4px !important;
+    }
+    
+    body.classic-mode .header h1 {
+        font-size: 12px !important;
+    }
+    
+    body.classic-mode .nav {
+        flex-direction: column;
+        padding: 2px !important;
+    }
+    
+    body.classic-mode .nav-link {
+        padding: 4px 8px !important;
+    }
+    
+    body.classic-mode .card {
+        margin-bottom: 8px !important;
+    }
+}
+
+/* Remove any modern effects */
+body.classic-mode::before,
+body.classic-mode::after {
+    display: none !important;
 }
