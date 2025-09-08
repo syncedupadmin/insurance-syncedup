@@ -86,9 +86,12 @@ function applyTheme(themeName = 'professional') {
     });
     
     // Apply new theme using the format that matches existing CSS
-    const themeClass = `${themeName}-mode`;
-    document.documentElement.classList.add(themeClass);
-    document.body.classList.add(themeClass);
+    // Only add theme classes for non-professional themes
+    if (themeName !== 'professional') {
+        const themeClass = `${themeName}-mode`;
+        document.documentElement.classList.add(themeClass);
+        document.body.classList.add(themeClass);
+    }
     
     // Load theme CSS file dynamically
     loadThemeCSS(themeName);
