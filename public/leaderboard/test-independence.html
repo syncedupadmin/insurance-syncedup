@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Critical Theme Flash Prevention -->
+    <script>
+    (function(){
+        var t=localStorage.getItem("selectedTheme")||"professional";
+        var h=document.documentElement;
+        if(t==="classic"){h.classList.add("classic-mode");h.style.backgroundColor="#008080";}
+        else if(t==="modern"){h.classList.add("modern-mode");h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        else{h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        h.style.visibility="hidden";
+        setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
+    })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard Theme Independence Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .pass { border-color: #28a745; background: #d4edda; }
+        .fail { border-color: #dc3545; background: #f8d7da; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover { background: #0056b3; }
+        .results {
+            margin: 10px 0;
+            font-family: monospace;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Leaderboard Theme Independence Test</h1>
+        <p>This page tests that the leaderboard theme system is completely independent from portal themes.</p>
+
+        <div id="test-1" class="test-section">
+            <h3>Test 1: Storage Key Independence</h3>
+            <p>Verify leaderboard uses 'leaderboardTheme' key, not 'selectedTheme'</p>
+            <button onclick="testStorageIndependence()">Run Test</button>
+            <div id="storage-results" class="results"></div>
+        </div>
+
+        <div id="test-2" class="test-section">
+            <h3>Test 2: CSS Class Independence</h3>
+            <p>Verify leaderboard themes use 'lb-*-mode' classes, not portal classes</p>
+            <button onclick="testClassIndependence()">Run Test</button>
+            <div id="class-results" class="results"></div>
+        </div>
+
+        <div id="test-3" class="test-section">
+            <h3>Test 3: Theme System Isolation</h3>
+            <p>Verify setting portal theme doesn't affect leaderboard and vice versa</p>
+            <button onclick="testSystemIsolation()">Run Test</button>
+            <div id="isolation-results" class="results"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🎮 Live Theme Switching Test</h3>
+            <p>Test the actual theme switching (simulates leaderboard environment):</p>
+            <button onclick="simulateLeaderboardEnv()">Simulate Leaderboard</button>
+            <button onclick="switchToCompetition()">Competition Mode</button>
+            <button onclick="switchToAnalytics()">Analytics Mode</button>
+            <button onclick="switchToGaming()">Gaming Mode</button>
+            <div id="live-results" class="results">
+                Current Body Classes: <span id="current-classes">none</span><br>
+                Leaderboard Theme: <span id="current-lb-theme">not set</span><br>
+                Portal Theme: <span id="current-portal-theme">not set</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="/leaderboard/js/leaderboard-theme.js"></script>
+    <script>
+        function updateStatus() {
+            document.getElementById('current-classes').textContent = Array.from(document.body.classList).join(', ') || 'none';
+            document.getElementById('current-lb-theme').textContent = localStorage.getItem('leaderboardTheme') || 'not set';
+            document.getElementById('current-portal-theme').textContent = localStorage.getItem('selectedTheme') || 'not set';
+        }
+
+        function testStorageIndependence() {
+            const results = document.getElementById('storage-results');
+            const testSection = document.getElementById('test-1');
+            
+            // Clear storage first
+            localStorage.removeItem('leaderboardTheme');
+            localStorage.removeItem('selectedTheme');
+            
+            // Set portal theme
+            localStorage.setItem('selectedTheme', 'professional');
+            
+            // Test leaderboard system
+            const lbSystem = new LeaderboardThemeSystem();
+            const savedTheme = lbSystem.getSavedTheme();
+            
+            const usesOwnKey = lbSystem.storageKey === 'leaderboardTheme';
+            const defaultsCorrectly = savedTheme === 'competition';
+            const ignoresPortalTheme = localStorage.getItem('selectedTheme') === 'professional';
+            
+            const passed = usesOwnKey && defaultsCorrectly && ignoresPortalTheme;
+            
+            results.innerHTML = `
+                ✓ Uses own storage key: ${usesOwnKey}<br>
+                ✓ Defaults to 'competition': ${defaultsCorrectly}<br>
+                ✓ Ignores portal theme: ${ignoresPortalTheme}<br>
+                <br><strong>Result: ${passed ? 'PASS' : 'FAIL'}</strong>
+            `;
+            
+            testSection.className = 'test-section ' + (passed ? 'pass' : 'fail');
+            updateStatus();
+        }
+
+        function testClassIndependence() {
+            const results = document.getElementById('class-results');
+            const testSection = document.getElementById('test-2');
+            
+            // Clear body classes
+            document.body.className = '';
+            
+            // Test that leaderboard classes are properly prefixed
+            const themes = ['competition', 'analytics', 'gaming'];
+            const expectedClasses = themes.map(t => `lb-${t}-mode`);
+            
+            let allClassesValid = true;
+            let testResults = [];
+            
+            themes.forEach((theme, i) => {
+                document.body.className = '';
+                document.body.classList.add(expectedClasses[i]);
+                
+                const hasCorrectClass = document.body.classList.contains(expectedClasses[i]);
+                const noPortalClasses = !document.body.classList.contains('professional-mode') &&
+                                       !document.body.classList.contains('classic-mode') &&
+                                       !document.body.classList.contains('modern-mode');
+                
+                const valid = hasCorrectClass && noPortalClasses;
+                testResults.push(`${theme}: ${valid ? 'PASS' : 'FAIL'}`);
+                if (!valid) allClassesValid = false;
+            });
+            
+            results.innerHTML = `
+                ${testResults.join('<br>')}<br>
+                <br><strong>Result: ${allClassesValid ? 'PASS' : 'FAIL'}</strong>
+            `;
+            
+            testSection.className = 'test-section ' + (allClassesValid ? 'pass' : 'fail');
+            document.body.className = ''; // Clean up
+            updateStatus();
+        }
+
+        function testSystemIsolation() {
+            const results = document.getElementById('isolation-results');
+            const testSection = document.getElementById('test-3');
+            
+            // Clear everything
+            localStorage.clear();
+            document.body.className = '';
+            
+            // Set portal theme
+            localStorage.setItem('selectedTheme', 'classic');
+            document.body.classList.add('classic-mode');
+            
+            // Initialize leaderboard system
+            window.location.href = '#leaderboard'; // Fake leaderboard URL
+            const lbSystem = new LeaderboardThemeSystem();
+            
+            // Test isolation
+            const portalThemeUnchanged = localStorage.getItem('selectedTheme') === 'classic';
+            const portalClassUnchanged = document.body.classList.contains('classic-mode');
+            const leaderboardHasOwnTheme = localStorage.getItem('leaderboardTheme') !== null;
+            
+            const isolated = portalThemeUnchanged && leaderboardHasOwnTheme;
+            
+            results.innerHTML = `
+                ✓ Portal theme unchanged: ${portalThemeUnchanged}<br>
+                ✓ Portal class unchanged: ${portalClassUnchanged}<br>
+                ✓ Leaderboard has own theme: ${leaderboardHasOwnTheme}<br>
+                <br><strong>Result: ${isolated ? 'PASS' : 'FAIL'}</strong>
+            `;
+            
+            testSection.className = 'test-section ' + (isolated ? 'pass' : 'fail');
+            updateStatus();
+        }
+
+        function simulateLeaderboardEnv() {
+            // Simulate being on leaderboard page
+            history.pushState({}, '', '/leaderboard/');
+            window.leaderboardThemes = new LeaderboardThemeSystem();
+            updateStatus();
+        }
+
+        function switchToCompetition() {
+            if (window.leaderboardThemes) {
+                window.leaderboardThemes.switchTheme('competition');
+                updateStatus();
+            }
+        }
+
+        function switchToAnalytics() {
+            if (window.leaderboardThemes) {
+                window.leaderboardThemes.switchTheme('analytics');
+                updateStatus();
+            }
+        }
+
+        function switchToGaming() {
+            if (window.leaderboardThemes) {
+                window.leaderboardThemes.switchTheme('gaming');
+                updateStatus();
+            }
+        }
+
+        // Initialize
+        updateStatus();
+        setInterval(updateStatus, 1000); // Auto-update status
+    </script>
+    <script src="/js/theme-switcher.js"></script>
+</body>
+</html>

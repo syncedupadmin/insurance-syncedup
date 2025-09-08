@@ -1,10 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Critical Theme Flash Prevention -->
+    <script>
+    (function(){
+        var t=localStorage.getItem("selectedTheme")||"professional";
+        var h=document.documentElement;
+        if(t==="classic"){h.classList.add("classic-mode");h.style.backgroundColor="#008080";}
+        else if(t==="modern"){h.classList.add("modern-mode");h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        else{h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        h.style.visibility="hidden";
+        setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
+    })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Global Sales Leaderboard - SyncedUp Insurance</title>
-    <link rel="stylesheet" href="/leaderboard/leaderboard-global.css">
+    <link rel="stylesheet" href="/leaderboard/css/leaderboard-base.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
     <!-- Auth Guard Script -->
@@ -51,267 +63,26 @@
         })();
     </script>
     
-    <style>
-        /* Leaderboard Specific Professional Styles */
-        .leaderboard-header {
-            background: var(--header-bg);
-            padding: var(--spacing-lg);
-            border-bottom: 2px solid var(--border-color);
-            position: relative;
-        }
-        
-        .leaderboard-title {
-            font-size: 28px;
-            font-weight: var(--font-weight-normal);
-            color: var(--text-primary);
-            margin: 0;
-        }
-        
-        .leaderboard-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: var(--spacing-md) var(--spacing-lg);
-            background: var(--secondary-bg);
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .leaderboard-tabs {
-            display: flex;
-            gap: var(--spacing-xs);
-        }
-        
-        .leaderboard-tab {
-            padding: var(--spacing-sm) var(--spacing-lg);
-            background: transparent;
-            border: 1px solid transparent;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 13px;
-            font-weight: var(--font-weight-medium);
-            border-radius: var(--border-radius);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-xs);
-        }
-        
-        .leaderboard-tab.active {
-            background: var(--card-bg);
-            border-color: var(--border-color);
-            color: var(--text-primary);
-        }
-        
-        .leaderboard-filters {
-            display: flex;
-            gap: var(--spacing-md);
-            align-items: center;
-        }
-        
-        .filter-select {
-            min-width: 150px;
-        }
-        
-        .leaderboard-metrics {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: var(--spacing-lg);
-            padding: var(--spacing-lg);
-        }
-        
-        .leaderboard-metric {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            padding: var(--spacing-lg);
-            text-align: center;
-            min-height: var(--card-height-sm);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        
-        .leaderboard-metric-value {
-            font-size: 36px;
-            font-weight: 300;
-            color: var(--primary-color);
-            margin: var(--spacing-sm) 0;
-            line-height: 1;
-        }
-        
-        .leaderboard-metric-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-secondary);
-            font-weight: var(--font-weight-medium);
-        }
-        
-        .rankings-container {
-            padding: var(--spacing-lg);
-        }
-        
-        .rankings-podium {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: var(--spacing-lg);
-            margin-bottom: var(--spacing-xl);
-        }
-        
-        .podium-place {
-            background: var(--card-bg);
-            border: 2px solid var(--border-color);
-            border-radius: var(--border-radius-lg);
-            padding: var(--spacing-lg);
-            text-align: center;
-            position: relative;
-            min-height: 200px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        
-        .podium-place.gold { border-color: var(--gold); }
-        .podium-place.silver { border-color: var(--silver); }
-        .podium-place.bronze { border-color: var(--bronze); }
-        
-        .podium-medal {
-            width: 48px;
-            height: 48px;
-            margin: 0 auto var(--spacing-md);
-            background: var(--card-bg);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
-        }
-        
-        .podium-place.gold .podium-medal { 
-            background: var(--gold); 
-            color: var(--primary-bg);
-        }
-        .podium-place.silver .podium-medal { 
-            background: var(--silver); 
-            color: var(--primary-bg);
-        }
-        .podium-place.bronze .podium-medal { 
-            background: var(--bronze); 
-            color: var(--primary-bg);
-        }
-        
-        .podium-name {
-            font-size: 18px;
-            font-weight: var(--font-weight-semibold);
-            margin-bottom: var(--spacing-sm);
-            color: var(--text-primary);
-        }
-        
-        .podium-office {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: var(--spacing-md);
-        }
-        
-        .podium-amount {
-            font-size: 24px;
-            color: var(--primary-color);
-        }
-        
-        .rankings-table {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-        }
-        
-        .system-status {
-            position: absolute;
-            top: var(--spacing-md);
-            right: var(--spacing-md);
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            padding: var(--spacing-sm) var(--spacing-md);
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-        }
-        
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--success);
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        .rank-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: var(--secondary-bg);
-            color: var(--text-primary);
-            font-size: 12px;
-            font-weight: var(--font-weight-semibold);
-        }
-        
-        .rank-badge.gold { background: var(--gold); color: var(--primary-bg); }
-        .rank-badge.silver { background: var(--silver); color: var(--primary-bg); }
-        .rank-badge.bronze { background: var(--bronze); color: var(--primary-bg); }
-        
-        .trend-indicator {
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        
-        .trend-up { color: var(--success); }
-        .trend-down { color: var(--error); }
-        .trend-flat { color: var(--text-secondary); }
-        
-        @media (max-width: 1024px) {
-            .leaderboard-metrics {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .rankings-podium {
-                grid-template-columns: 1fr;
-                gap: var(--spacing-md);
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .leaderboard-metrics {
-                grid-template-columns: 1fr;
-            }
-            .leaderboard-controls {
-                flex-direction: column;
-                gap: var(--spacing-md);
-            }
-            .leaderboard-filters {
-                width: 100%;
-                justify-content: space-between;
-            }
-        }
-    </style>
 </head>
 <body>
     <div class="dashboard-container">
         <!-- Header -->
         <header class="leaderboard-header">
             <h1 class="leaderboard-title">Global Sales Leaderboard</h1>
+            <div class="theme-switcher">
+                <button class="theme-btn" data-theme="competition" title="Dark theme with neon accents and animations">
+                    <span class="theme-icon">🏆</span>
+                    <span class="theme-name">Competition</span>
+                </button>
+                <button class="theme-btn" data-theme="analytics" title="Clean design focused on data visualization">
+                    <span class="theme-icon">📊</span>
+                    <span class="theme-name">Analytics</span>
+                </button>
+                <button class="theme-btn" data-theme="gaming" title="Retro arcade aesthetic with 8-bit styling">
+                    <span class="theme-icon">🎮</span>
+                    <span class="theme-name">Gaming</span>
+                </button>
+            </div>
             <div class="system-status">
                 <span class="status-indicator"></span>
                 <span>Live Updates Active</span>
@@ -425,18 +196,12 @@
         </div>
     </div>
     
+    <!-- Load leaderboard theme system -->
+    <script src="/leaderboard/js/leaderboard-theme.js"></script>
+    
     <script>
         // Initialize Lucide icons
         lucide.createIcons();
-        
-        // Auto-detect portal and apply theme
-        function detectPortal() {
-            const path = window.location.pathname;
-            if (path.includes('/leaderboard')) {
-                document.documentElement.classList.add('portal-leaderboard');
-                document.body.classList.add('portal-leaderboard');
-            }
-        }
         
         // Load leaderboard data
         async function loadLeaderboardData() {
@@ -566,9 +331,17 @@
         
         // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
-            detectPortal();
             loadLeaderboardData();
+            
+            // Theme system is auto-initialized by leaderboard-theme.js
+            // Listen for theme changes to update display if needed
+            window.addEventListener('leaderboardThemeChange', (e) => {
+                console.log('Theme changed to:', e.detail.theme);
+                // Re-initialize Lucide icons after theme change
+                setTimeout(() => lucide.createIcons(), 100);
+            });
         });
     </script>
+    <script src="/js/theme-switcher.js"></script>
 </body>
 </html>
