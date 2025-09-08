@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Global Leaderboard Demo - SyncedUp</title>
-    <link rel="stylesheet" href="/css/pro.css">
+    <link rel="stylesheet" href="/leaderboard/css/leaderboard-base.css">
+    <link rel="stylesheet" href="/leaderboard/leaderboard-global.css">
     <style>
         /* Demo-specific styles */
         .demo-hero {
@@ -200,6 +201,12 @@
                 <a href="/global-leaderboard-demo">Global Leaderboard</a>
                 <a href="/pricing">Pricing</a>
                 <a href="/signup" class="nav-cta">Sign Up</a>
+                <!-- Theme Controls -->
+                <div class="theme-controls" style="display: flex; gap: 5px; margin-left: 10px;">
+                    <button class="btn btn-sm" onclick="switchLeaderboardTheme('competition')" style="padding: 5px 10px; font-size: 12px;">Competition</button>
+                    <button class="btn btn-sm" onclick="switchLeaderboardTheme('analytics')" style="padding: 5px 10px; font-size: 12px;">Analytics</button>
+                    <button class="btn btn-sm" onclick="switchLeaderboardTheme('gaming')" style="padding: 5px 10px; font-size: 12px;">Gaming</button>
+                </div>
             </div>
         </div>
     </nav>
@@ -359,5 +366,8 @@
             row.style.animationDelay = `${index * 0.1}s`;
         });
     </script>
+    
+    <!-- Leaderboard Theme System -->
+    <script src="/leaderboard/js/leaderboard-theme.js"></script>
 </body>
 </html>
