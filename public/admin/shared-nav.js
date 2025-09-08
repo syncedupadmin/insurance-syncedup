@@ -7,6 +7,7 @@ function createAdminNavigation() {
         { href: '/admin/', icon: 'layout-dashboard', text: 'Dashboard' },
         { href: '/admin/agent-performance', icon: 'trending-up', text: 'Agent Performance' },
         { href: '/admin/users', icon: 'users', text: 'Users' },
+        { href: '/admin/licenses', icon: 'shield-check', text: 'Licenses' },
         { href: '/admin/convoso-leads', icon: 'users', text: 'Leads' },
         { href: '/admin/vendors', icon: 'building-2', text: 'Vendors' },
         { href: '/admin/commissions', icon: 'dollar-sign', text: 'Commissions' },

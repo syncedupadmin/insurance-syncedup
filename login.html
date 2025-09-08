@@ -42,35 +42,6 @@
             <h2 class="text-3xl font-bold text-center mb-2 text-white">Welcome Back</h2>
             <p class="text-center text-white/70 mb-8">Sign in to continue to your dashboard</p>
             
-            <!-- Test Accounts Dropdown -->
-            <div class="mb-4 p-3 bg-blue-500/20 border border-blue-500/30 rounded-xl">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-white/90 text-sm font-medium">
-                        <i class="fas fa-flask mr-2"></i>Quick Test Login
-                    </span>
-                    <button 
-                        type="button"
-                        onclick="toggleTestAccounts()"
-                        class="text-white/70 hover:text-white text-xs"
-                    >
-                        <i id="testToggleIcon" class="fas fa-chevron-down"></i>
-                    </button>
-                </div>
-                <div id="testAccountsContainer" class="hidden">
-                    <select 
-                        id="testAccountSelect" 
-                        onchange="fillTestCredentials()"
-                        class="w-full p-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:bg-white/20 focus:border-white/40 outline-none"
-                    >
-                        <option value="">Select a test account...</option>
-                        <option value="test-admin@test.com">Admin - Test Admin User</option>
-                        <option value="test-manager@test.com">Manager - Test Manager User</option>
-                        <option value="test-agent@test.com">Agent - Test Agent User</option>
-                        <option value="test-cs@test.com">Customer Service - Test CS User</option>
-                        <option value="test-super@test.com">Super Admin - Test Super Admin</option>
-                    </select>
-                </div>
-            </div>
 
             <form id="loginFormElement" class="space-y-6">
                 <div class="relative">
@@ -173,34 +144,6 @@
     </div>
 
     <script>
-        // Test accounts functionality
-        function toggleTestAccounts() {
-            const container = document.getElementById('testAccountsContainer');
-            const icon = document.getElementById('testToggleIcon');
-            
-            if (container.classList.contains('hidden')) {
-                container.classList.remove('hidden');
-                icon.className = 'fas fa-chevron-up';
-            } else {
-                container.classList.add('hidden');
-                icon.className = 'fas fa-chevron-down';
-            }
-        }
-
-        function fillTestCredentials() {
-            const select = document.getElementById('testAccountSelect');
-            const emailInput = document.getElementById('email');
-            const passwordInput = document.getElementById('password');
-            
-            if (select.value) {
-                emailInput.value = select.value;
-                passwordInput.value = 'TestPass123!';
-                
-                // Add visual feedback
-                emailInput.focus();
-                setTimeout(() => passwordInput.focus(), 100);
-            }
-        }
 
         // Form switching with smooth transitions
         function showResetForm() {

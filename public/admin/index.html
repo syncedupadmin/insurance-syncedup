@@ -341,6 +341,9 @@
         <a href="/admin/users">
             <i data-lucide="users" class="icon"></i>Users
         </a>
+        <a href="/admin/licenses">
+            <i data-lucide="shield-check" class="icon"></i>Licenses
+        </a>
         <a href="/admin/convoso-leads">
             <i data-lucide="users" class="icon"></i>Leads
         </a>
@@ -464,8 +467,7 @@
         </div>
     </div>
     <script>
-        let currentUser = null;
-        let dashboardData = null;
+        // Variables already declared above - no need to redeclare
         
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication
@@ -544,14 +546,14 @@
         function updateAdminDashboardUI() {
             if (!dashboardData) return;
             
-            // Update quick stats with admin-specific metrics
-            document.getElementById('activeAgents').textContent = dashboardData.user_stats?.summary?.agents || dashboardData.quick_stats?.active_agents || '0';
-            document.getElementById('mtdRevenue').textContent = `$${(dashboardData.quick_stats?.total_sales_mtd || dashboardData.agency_overview?.total_sales || 0).toLocaleString()}`;
-            document.getElementById('policiesSold').textContent = dashboardData.agency_overview?.sales_count || '0';
-            document.getElementById('activeLeads').textContent = dashboardData.quick_stats?.pending_leads || '0';
-            document.getElementById('conversionRate').textContent = `${(dashboardData.quick_stats?.avg_conversion_rate || 0).toFixed(1)}%`;
-            document.getElementById('totalCommissions').textContent = `$${(dashboardData.commission_stats?.total_commissions || 0).toLocaleString()}`;
-            document.getElementById('systemStatus').textContent = '98%';
+            // Update quick stats with admin-specific metrics using safe function
+            safeUpdateElement('activeAgents', dashboardData.user_stats?.summary?.agents || dashboardData.quick_stats?.active_agents || '0');
+            safeUpdateElement('mtdRevenue', `$${(dashboardData.quick_stats?.total_sales_mtd || dashboardData.agency_overview?.total_sales || 0).toLocaleString()}`);
+            safeUpdateElement('policiesSold', dashboardData.agency_overview?.sales_count || '0');
+            safeUpdateElement('activeLeads', dashboardData.quick_stats?.pending_leads || '0');
+            safeUpdateElement('conversionRate', `${(dashboardData.quick_stats?.avg_conversion_rate || 0).toFixed(1)}%`);
+            safeUpdateElement('totalCommissions', `$${(dashboardData.commission_stats?.total_commissions || 0).toLocaleString()}`);
+            safeUpdateElement('systemStatus', '98%');
             
             // Load simplified dashboard sections
             loadTopPerformersTable();
@@ -967,13 +969,13 @@
         }
         
         function loadFallbackData() {
-            // Load empty states when APIs are unavailable
-            document.getElementById('activeAgents').textContent = '0';
-            document.getElementById('mtdRevenue').textContent = '$0';
-            document.getElementById('activeLeads').textContent = '0';
-            document.getElementById('conversionRate').textContent = '0%';
-            document.getElementById('totalCommissions').textContent = '$0';
-            document.getElementById('systemStatus').textContent = '100%';
+            // Load empty states when APIs are unavailable using safe function
+            safeUpdateElement('activeAgents', '0');
+            safeUpdateElement('mtdRevenue', '$0');
+            safeUpdateElement('activeLeads', '0');
+            safeUpdateElement('conversionRate', '0%');
+            safeUpdateElement('totalCommissions', '$0');
+            safeUpdateElement('systemStatus', '100%');
             
             // Load empty state for team table
             const tableBody = document.getElementById('agentOverviewTable');
@@ -1152,18 +1154,12 @@
             }, 100);
         }
         
-        // Call initializeIcons after loading dashboard data
-        const originalUpdateAdminDashboardUI = updateAdminDashboardUI;
-        updateAdminDashboardUI = function() {
-            originalUpdateAdminDashboardUI();
-            initializeIcons();
-        };
-        
-        const originalLoadFallbackData = loadFallbackData;
-        loadFallbackData = function() {
-            originalLoadFallbackData();
-            initializeIcons();
-        };
+        // Initialize icons after page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                initializeIcons();
+            }, 500);
+        });
     </script>
     
     <!-- Simple Theme Loading -->

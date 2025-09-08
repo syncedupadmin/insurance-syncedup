@@ -11,37 +11,22 @@ export function getUserContext(req) {
       token = req.cookies.token;
     }
     
-    // TODO: Remove test bypass before production
     if (!token) {
-      console.log('No token found, using test values');
-      return {
-        userId: 'test',
-        agencyId: 'AGENCY001', 
-        agentId: 'AGENT001',
-        role: 'admin'
-      };
+      throw new Error('No authentication token provided');
     }
     
-    // Verify and decode JWT token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    // Verify JWT token - PRODUCTION ONLY, NO BYPASSES
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || process.env.AUTH_SECRET);
     
     return {
-      userId: decoded.userId || decoded.id,
-      agencyId: decoded.agency_id,
-      agentId: decoded.agent_id,
+      userId: decoded.userId || decoded.id || decoded.user_id,
+      agencyId: decoded.agency_id || decoded.agencyId,
+      agentId: decoded.agent_id || decoded.agentId,
       role: decoded.role
     };
     
   } catch (error) {
-    console.error('JWT verification failed:', error.message);
-    
-    // TODO: Remove test bypass before production
-    console.log('JWT verification failed, using test values');
-    return {
-      userId: 'test',
-      agencyId: 'AGENCY001',
-      agentId: 'AGENT001', 
-      role: 'admin'
-    };
+    console.error('Auth verification failed:', error.message);
+    throw new Error('Authentication required');
   }
 }

@@ -297,11 +297,106 @@
             background: #4a5568;
             color: white;
         }
+        
+        /* Agent Table Styling */
+        .agent-table {
+            width: 100%;
+            overflow-x: auto;
+            background: white;
+            border-radius: 8px;
+            margin-top: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .agent-table table {
+            width: 100%;
+            min-width: 1200px;
+            border-collapse: collapse;
+        }
+
+        .agent-table td {
+            padding: 12px;
+            color: #333 !important;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        
+        .agent-table th {
+            padding: 12px;
+            color: #333 !important;
+            background: #f8f9fa;
+            border-bottom: 2px solid #eee;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        /* Match Convoso's exact colors */
+        .status-ready {
+            background: #2bb673 !important;  /* Green like Convoso */
+            color: white !important;
+        }
+
+        .status-in-call {
+            background: #f5a623 !important;  /* Orange/yellow like Convoso */
+            color: white !important;
+        }
+
+        .status-disposition {
+            background: #f8d71c !important;  /* Yellow like Convoso */
+            color: #333 !important;
+        }
+
+        .status-break,
+        .status-restroom {
+            background: #d0021b !important;  /* Red like Convoso */
+            color: white !important;
+        }
+
+        .status-paused {
+            background: #bd8e3b !important;  /* Brown like Convoso */
+            color: white !important;
+        }
+
+        .status-dead {
+            background: #4a4a4a !important;  /* Dark gray like Convoso */
+            color: white !important;
+        }
+        
+        .agent-name {
+            font-weight: 600;
+            color: #2d3748 !important;
+        }
+        
+        .agent-extension {
+            font-family: monospace;
+            background: #f7fafc;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .call-count {
+            font-weight: bold;
+            color: #2b6cb0 !important;
+        }
     </style>
 </head>
 <body>
+    <!-- Floating particles effect -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-10 -left-10 w-40 h-40 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce"></div>
+        <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce" style="animation-delay: 2s;"></div>
+        <div class="absolute top-1/2 left-1/2 w-40 h-40 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce" style="animation-delay: 4s;"></div>
+    </div>
+    
+    <div class="header">
+        <h1 class="neon-text">Agent Monitor - Convoso Dashboard</h1>
+        <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">Logout</button>
+    </div>
+    
     <!-- Navigation -->
-        <nav class="nav">
+    <nav class="nav">
         <a href="/admin/">
             <i data-lucide="layout-dashboard" class="icon"></i>Dashboard
         </a>
@@ -310,6 +405,9 @@
         </a>
         <a href="/admin/users">
             <i data-lucide="users" class="icon"></i>Users
+        </a>
+        <a href="/admin/licenses">
+            <i data-lucide="shield-check" class="icon"></i>Licenses
         </a>
         <a href="/admin/convoso-leads">
             <i data-lucide="users" class="icon"></i>Leads
@@ -408,7 +506,7 @@
                 <div class="performance-label">Leads in Hopper: <span id="leads-hopper">-</span></div>
             </div>
             <div class="performance-card">
-                <div class="performance-label">Dial Level: -</div>
+                <div class="performance-label">Dial Level: <span id="dial-level">-</span></div>
             </div>
             <div class="performance-card">
                 <div class="performance-label">Avg Agents: <span id="avg-agents">-</span></div>
@@ -456,16 +554,16 @@
         
         <div class="performance-grid">
             <div class="performance-card">
-                <div class="performance-label">Avg Agent Wait:</div>
+                <div class="performance-label">Avg Agent Wait: <span id="avg-wait-time">-</span></div>
             </div>
             <div class="performance-card">
-                <div class="performance-label">Avg Agent Talk:</div>
+                <div class="performance-label">Avg Agent Talk: <span id="avg-talk-time">-</span></div>
             </div>
             <div class="performance-card">
-                <div class="performance-label">Avg Agent Dispo:</div>
+                <div class="performance-label">Avg Agent Dispo: <span id="avg-dispo-time">-</span></div>
             </div>
             <div class="performance-card">
-                <div class="performance-label">Avg Agent Pause:</div>
+                <div class="performance-label">Avg Agent Pause: <span id="avg-pause-time">-</span></div>
             </div>
         </div>
         
@@ -517,7 +615,6 @@
                 <thead>
                     <tr>
                         <th>Extension</th>
-                        <th>Virtual Agent</th>
                         <th>Agent Name</th>
                         <th>Lead</th>
                         <th>Listen</th>
@@ -537,7 +634,7 @@
                 </thead>
                 <tbody id="agents-table-body">
                     <tr>
-                        <td colspan="17" style="text-align: center; padding: 2rem; color: #718096;">
+                        <td colspan="16" style="text-align: center; padding: 2rem; color: #718096;">
                             Loading agent data...
                         </td>
                     </tr>
@@ -614,12 +711,19 @@
         
         async function loadAgentData() {
             try {
-                const response = await fetch('/api/admin/convoso-agent-monitor');
+                const token = localStorage.getItem('syncedup_token');
+                const response = await fetch('/api/admin/convoso-agent-monitor', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
                 if (response.ok) {
                     const data = await response.json();
                     updateDashboard(data);
                 } else {
-                    console.error('Failed to load agent data');
+                    console.error('Failed to load agent data:', response.status, response.statusText);
                     showSampleData();
                 }
             } catch (error) {
@@ -629,22 +733,77 @@
         }
         
         function updateDashboard(data) {
-            // Update call statistics
-            document.getElementById('total-calls').textContent = data.stats?.totalCalls || 0;
-            document.getElementById('calls-ringing').textContent = data.stats?.callsRinging || 0;
-            document.getElementById('outbound-waiting').textContent = data.stats?.outboundWaiting || 0;
-            document.getElementById('inbound-waiting').textContent = data.stats?.inboundWaiting || 1;
-            document.getElementById('messages-playing').textContent = data.stats?.messagesPlaying || 0;
+            // Store current data for filtering
+            window.currentAgentData = data.agentList || [];
+            
+            // Update top call stats
+            const updateStat = (selector, value) => {
+                const el = document.querySelector(selector);
+                if (el) {
+                    // Handle different types of values
+                    if (value === null || value === undefined) {
+                        el.textContent = '-';
+                    } else if (value === 0) {
+                        el.textContent = '0';
+                    } else {
+                        el.textContent = value.toString();
+                    }
+                }
+            };
+            
+            updateStat('[data-stat="total-calls"]', data.stats?.totalCalls);
+            updateStat('[data-stat="calls-ringing"]', data.stats?.callsRinging);
+            updateStat('[data-stat="outbound-waiting"]', data.stats?.outboundWaiting);
+            updateStat('[data-stat="inbound-waiting"]', data.stats?.inboundWaiting);
+            updateStat('[data-stat="messages-playing"]', data.stats?.messagesPlaying);
+            updateStat('[data-stat="dialable-leads"]', data.stats?.dialableLeads);
+            updateStat('[data-stat="leads-hopper"]', data.stats?.leadsInHopper);
+            updateStat('[data-stat="dial-level"]', data.stats?.dialLevel);
+            updateStat('[data-stat="avg-agents"]', data.stats?.avgAgents);
+            
+            // Update all stats with ID-based selectors
+            updateStat('#total-calls', data.stats?.totalCalls);
+            updateStat('#calls-ringing', data.stats?.callsRinging);
+            updateStat('#outbound-waiting', data.stats?.outboundWaiting);
+            updateStat('#inbound-waiting', data.stats?.inboundWaiting);
+            updateStat('#messages-playing', data.stats?.messagesPlaying);
+            
+            // Update performance metrics
+            updateStat('#dialable-leads', data.stats?.dialableLeads);
+            updateStat('#leads-hopper', data.stats?.leadsInHopper);
+            updateStat('#dial-level', data.stats?.dialLevel);
+            updateStat('#avg-agents', data.stats?.avgAgents);
+            updateStat('#outbound-today', data.stats?.outboundToday);
+            updateStat('#manual-today', data.stats?.manualToday);
+            updateStat('#outbound-dropped', data.stats?.outboundDropped ? data.stats.outboundDropped + '%' : '-');
+            updateStat('#inbound-answered', data.stats?.inboundAnswered);
+            updateStat('#inbound-answered-percent', data.stats?.inboundAnsweredPercent ? data.stats.inboundAnsweredPercent + '%' : '-');
+            updateStat('#inbound-abandoned', data.stats?.inboundAbandoned ? data.stats.inboundAbandoned + '%' : '-');
+            
+            // Update average agent time stats
+            updateStat('#avg-wait-time', data.stats?.avgWaitTime || '-');
+            updateStat('#avg-talk-time', data.stats?.avgTalkTime || '-');
+            updateStat('#avg-dispo-time', data.stats?.avgDispoTime || '-');
+            updateStat('#avg-pause-time', data.stats?.avgPauseTime || '-');
+            
+            // Update ratio displays
+            if (data.stats?.outboundRatio) {
+                updateStat('#outbound-ratio', `${data.stats.outboundRatio.dropped || 0} / ${data.stats.outboundRatio.answered || 0}`);
+            }
+            if (data.stats?.inboundRatio) {
+                updateStat('#inbound-ratio', `${data.stats.inboundRatio.abandoned || 0} / ${data.stats.inboundRatio.received || 0}`);
+            }
             
             // Update agent counts
-            document.getElementById('agents-logged-in').textContent = data.agents?.loggedIn || 0;
-            document.getElementById('agents-waiting').textContent = data.agents?.waiting || 0;
-            document.getElementById('agents-in-call').textContent = data.agents?.inCall || 0;
-            document.getElementById('agents-in-dispo').textContent = data.agents?.inDispo || 0;
-            document.getElementById('agents-paused').textContent = data.agents?.paused || 0;
-            document.getElementById('agents-dead-call').textContent = data.agents?.deadCall || 0;
+            updateStat('#agents-logged-in', data.agents?.loggedIn);
+            updateStat('#agents-waiting', data.agents?.waiting);
+            updateStat('#agents-in-call', data.agents?.inCall);
+            updateStat('#agents-in-dispo', data.agents?.inDispo);
+            updateStat('#agents-paused', data.agents?.paused);
+            updateStat('#agents-dead-call', data.agents?.deadCall);
             
-            // Update agent table
+            // Setup filters and render table
+            setupFilters(data);
             renderAgentTable(data.agentList || []);
         }
         
@@ -677,7 +836,7 @@
             if (agents.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="17" style="text-align: center; padding: 2rem; color: #718096;">
+                        <td colspan="16" style="text-align: center; padding: 2rem; color: #718096;">
                             No agents currently logged in
                         </td>
                     </tr>
@@ -686,52 +845,129 @@
             }
             
             tbody.innerHTML = agents.map(agent => `
-                <tr>
-                    <td>${agent.extension || '-'}</td>
-                    <td>${agent.virtualAgent || '-'}</td>
-                    <td style="font-weight: 500;">${agent.name || 'Unknown'}</td>
-                    <td>${agent.currentLead || '-'}</td>
-                    <td>
-                        ${agent.canListen ? '<button class="btn btn-sm">👂 Listen</button>' : '-'}
-                    </td>
-                    <td>${agent.callType || '-'}</td>
+                <tr class="${getStatusRowClass(agent.status)}">
+                    <td><span class="agent-extension">${agent.extension || '-'}</span></td>
+                    <td class="agent-name">${agent.name || 'Unknown'}</td>
+                    <td>${agent.currentCall || '-'}</td>
+                    <td>-</td>
+                    <td>-</td>
                     <td>
                         <span class="agent-status-badge ${getStatusClass(agent.status)}">
                             ${agent.status || 'Unknown'}
                         </span>
                     </td>
-                    <td>${formatTime(agent.statusTime)}</td>
-                    <td>
-                        ${agent.currentCall ? `
-                            <div class="current-call">
-                                <span class="call-duration">${formatDuration(agent.currentCall.duration)}</span>
-                            </div>
-                        ` : '-'}
-                    </td>
-                    <td>${formatTime(agent.readyTime)}</td>
-                    <td>${formatTime(agent.sinceLast)}</td>
-                    <td>${agent.totalCalls || 0}</td>
+                    <td>${agent.statusTime || '-'}</td>
+                    <td>${agent.currentCall || '-'}</td>
+                    <td>${agent.statusDuration || '-'}</td>
+                    <td>-</td>
+                    <td class="call-count">${agent.totalCalls || 0}</td>
                     <td>${formatDuration(agent.sessionTime)}</td>
                     <td>${agent.campaign || '-'}</td>
-                    <td>${agent.queue || '-'}</td>
-                    <td>${agent.list || '-'}</td>
+                    <td style="font-size: 12px;">${agent.queue === 'Multiple Queues' ? 'Multi' : (agent.queue || '-')}</td>
+                    <td style="font-size: 12px;">${agent.list || '-'}</td>
                     <td>
-                        ${agent.canLogout ? '<button class="btn btn-danger btn-sm">🚪 Logout</button>' : '-'}
+                        <button class="btn logout-btn" style="background: #f56565; color: white; font-size: 11px;">
+                            Logout
+                        </button>
                     </td>
                 </tr>
             `).join('');
         }
         
+        function getStatusRowClass(status) {
+            switch (status?.toLowerCase()) {
+                case 'ready': return 'status-ready';
+                case 'in call': return 'status-in-call';
+                case 'break':
+                case 'restroom': return 'status-break';
+                case 'disposition': return 'status-disposition';
+                default: return '';
+            }
+        }
+        
+        // Populate and handle campaign dropdown
+        function setupFilters(data) {
+            const campaignSelect = document.querySelector('#campaign-filter');
+            const queueSelect = document.querySelector('#queue-filter');
+            
+            if (!campaignSelect || !queueSelect || !data.agentList) return;
+            
+            // Get unique campaigns and queues
+            const campaigns = [...new Set(data.agentList.map(a => a.campaign).filter(Boolean))];
+            const queues = [...new Set(data.agentList.map(a => a.queue).filter(Boolean))];
+            
+            campaignSelect.innerHTML = '<option value="">-- All Campaigns --</option>' + 
+                campaigns.map(c => `<option value="${c}">${c}</option>`).join('');
+                
+            queueSelect.innerHTML = '<option value="">-- All Queues --</option>' + 
+                queues.map(q => `<option value="${q}">${q === 'Multiple Queues' ? 'Multi-Queue Agents' : q}</option>`).join('');
+            
+            // Remove existing listeners and add new ones
+            campaignSelect.removeEventListener('change', filterAgents);
+            queueSelect.removeEventListener('change', filterAgents);
+            campaignSelect.addEventListener('change', filterAgents);
+            queueSelect.addEventListener('change', filterAgents);
+        }
+
+        function filterAgents() {
+            const campaign = document.querySelector('#campaign-filter')?.value || '';
+            const queue = document.querySelector('#queue-filter')?.value || '';
+            
+            if (!window.currentAgentData) return;
+            
+            // Filter agents based on selected criteria
+            const filtered = window.currentAgentData.filter(agent => {
+                const campaignMatch = !campaign || agent.campaign === campaign;
+                const queueMatch = !queue || agent.queue === queue;
+                return campaignMatch && queueMatch;
+            });
+            
+            renderAgentTable(filtered);
+            
+            // Update filtered count
+            const totalCount = window.currentAgentData.length;
+            const filteredCount = filtered.length;
+            console.log(`Showing ${filteredCount} of ${totalCount} agents`);
+        }
+        
+        function formatTimeAgo(timeString) {
+            if (!timeString) return '-';
+            try {
+                const date = new Date(timeString);
+                const now = new Date();
+                const diffInSeconds = Math.floor((now - date) / 1000);
+                
+                if (diffInSeconds < 60) return `${diffInSeconds}s ago`;
+                if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+                return `${Math.floor(diffInSeconds / 3600)}h ago`;
+            } catch {
+                return '-';
+            }
+        }
+        
+        function formatDuration(seconds) {
+            if (!seconds || seconds === 0) return '00:00:00';
+            
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
         function getStatusClass(status) {
             switch (status?.toLowerCase()) {
-                case 'logged in':
                 case 'ready':
-                    return 'status-logged-in';
-                case 'waiting':
-                    return 'status-waiting';
+                    return 'status-ready';
                 case 'in call':
                 case 'incall':
                     return 'status-in-call';
+                case 'disposition':
+                    return 'status-disposition';
+                case 'break':
+                    return 'status-break';
+                case 'restroom':
+                    return 'status-restroom';
                 case 'paused':
                 case 'pause':
                     return 'status-paused';
@@ -821,6 +1057,13 @@
                 String(now.getHours()).padStart(2, '0') + ':' + 
                 String(now.getMinutes()).padStart(2, '0') + ':' + 
                 String(now.getSeconds()).padStart(2, '0');
+        }
+        
+        // Logout function
+        function logout() {
+            localStorage.removeItem('syncedup_token');
+            localStorage.removeItem('syncedup_user');
+            window.location.href = '/login';
         }
     </script>
 </body>

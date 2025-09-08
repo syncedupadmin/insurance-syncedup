@@ -151,8 +151,18 @@ export default async function handler(req, res) {
           is_active: true
         };
         
-        // Generate secure token for production
-        const token = `prod-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        // Generate JWT token for production accounts (same as database users)
+        const token = signJWT(
+          { 
+            sub: safeUser.id, 
+            email: safeUser.email, 
+            role: account.role, 
+            agency_id: safeUser.agency_id,
+            isProduction: true
+          },
+          AUTH_SECRET,
+          8 * 60 * 60
+        );
         
         // Log production login
         console.log(`PRODUCTION LOGIN: ${normalizedEmail} (${account.role}) at ${new Date().toISOString()}`);

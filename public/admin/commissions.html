@@ -38,6 +38,9 @@
         <a href="/admin/users">
             <i data-lucide="users" class="icon"></i>Users
         </a>
+        <a href="/admin/licenses">
+            <i data-lucide="shield-check" class="icon"></i>Licenses
+        </a>
         <a href="/admin/convoso-leads">
             <i data-lucide="users" class="icon"></i>Leads
         </a>
@@ -496,30 +499,31 @@
         // Load commission stats
         async function loadCommissionStats() {
             try {
-                const response = await fetch('/api/admin/commission-settings', {
+                const response = await fetch('/api/admin/commission-summary', {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
                 });
                 
                 if (response.ok) {
-                    const data = await response.json();
-                    document.getElementById('totalCommissions').textContent = `$${(data.totalCommissions || 45832).toLocaleString()}`;
-                    document.getElementById('activeAgents').textContent = data.activeAgents || '34';
-                    document.getElementById('avgCommission').textContent = `$${(data.avgCommission || 1348).toLocaleString()}`;
-                    document.getElementById('pendingPayouts').textContent = `$${(data.pendingPayouts || 12450).toLocaleString()}`;
+                    const result = await response.json();
+                    const data = result.data || {};
+                    document.getElementById('totalCommissions').textContent = `$${(data.monthly_total || 0).toLocaleString()}`;
+                    document.getElementById('activeAgents').textContent = data.agents_with_commissions || '0';
+                    document.getElementById('avgCommission').textContent = `$${(data.average_rate || 0).toLocaleString()}`;
+                    document.getElementById('pendingPayouts').textContent = `$${(data.pending_count || 0).toLocaleString()}`;
                 } else {
-                    // Fallback data
-                    document.getElementById('totalCommissions').textContent = '$45,832';
-                    document.getElementById('activeAgents').textContent = '34';
-                    document.getElementById('avgCommission').textContent = '$1,348';
-                    document.getElementById('pendingPayouts').textContent = '$12,450';
+                    // Use empty data instead of fake data
+                    document.getElementById('totalCommissions').textContent = '$0';
+                    document.getElementById('activeAgents').textContent = '0';
+                    document.getElementById('avgCommission').textContent = '$0';
+                    document.getElementById('pendingPayouts').textContent = '$0';
                 }
             } catch (error) {
                 console.error('Error loading stats:', error);
-                // Use fallback data
-                document.getElementById('totalCommissions').textContent = '$45,832';
-                document.getElementById('activeAgents').textContent = '34';
-                document.getElementById('avgCommission').textContent = '$1,348';
-                document.getElementById('pendingPayouts').textContent = '$12,450';
+                // Use empty data instead of fake data
+                document.getElementById('totalCommissions').textContent = '$0';
+                document.getElementById('activeAgents').textContent = '0';
+                document.getElementById('avgCommission').textContent = '$0';
+                document.getElementById('pendingPayouts').textContent = '$0';
             }
         }
 
@@ -535,13 +539,13 @@
                 
                 if (response.ok) {
                     const data = await response.json();
-                    currentRates = data.rates || getFallbackRates();
+                    currentRates = data.rates || [];
                 } else {
-                    currentRates = getFallbackRates();
+                    currentRates = [];
                 }
             } catch (error) {
                 console.error('Error loading rates:', error);
-                currentRates = getFallbackRates();
+                currentRates = [];
             }
 
             renderRatesTable();
@@ -549,50 +553,9 @@
             document.getElementById('ratesTable').classList.remove('hidden');
         }
 
-        // Get fallback rates data
+        // No fallback data - use empty arrays for production
         function getFallbackRates() {
-            return [
-                {
-                    id: 1,
-                    productType: 'auto',
-                    baseRate: 8.5,
-                    bonusTier1: 2.0,
-                    bonusTier2: 3.5,
-                    volumeReq: 10,
-                    status: 'active',
-                    lastUpdated: '2025-01-15'
-                },
-                {
-                    id: 2,
-                    productType: 'home',
-                    baseRate: 12.0,
-                    bonusTier1: 3.0,
-                    bonusTier2: 5.0,
-                    volumeReq: 5,
-                    status: 'active',
-                    lastUpdated: '2025-01-15'
-                },
-                {
-                    id: 3,
-                    productType: 'life',
-                    baseRate: 25.0,
-                    bonusTier1: 10.0,
-                    bonusTier2: 15.0,
-                    volumeReq: 3,
-                    status: 'active',
-                    lastUpdated: '2025-01-10'
-                },
-                {
-                    id: 4,
-                    productType: 'health',
-                    baseRate: 15.0,
-                    bonusTier1: 5.0,
-                    bonusTier2: 8.0,
-                    volumeReq: 8,
-                    status: 'active',
-                    lastUpdated: '2025-01-12'
-                }
-            ];
+            return [];
         }
 
         // Render rates table
@@ -646,13 +609,13 @@
                 
                 if (response.ok) {
                     const data = await response.json();
-                    currentOverrides = data.overrides || getFallbackOverrides();
+                    currentOverrides = data.overrides || [];
                 } else {
-                    currentOverrides = getFallbackOverrides();
+                    currentOverrides = [];
                 }
             } catch (error) {
                 console.error('Error loading overrides:', error);
-                currentOverrides = getFallbackOverrides();
+                currentOverrides = [];
             }
 
             renderOverridesTable();
@@ -660,43 +623,9 @@
             document.getElementById('overridesTable').classList.remove('hidden');
         }
 
-        // Get fallback overrides data
+        // No fallback data - use empty arrays for production  
         function getFallbackOverrides() {
-            return [
-                {
-                    id: 1,
-                    agentId: 1,
-                    agentName: 'Sample Agent',
-                    productType: 'auto',
-                    customRate: 10.5,
-                    effectiveDate: '2025-01-01',
-                    endDate: null,
-                    monthlyVolume: 25,
-                    ytdCommission: 8450
-                },
-                {
-                    id: 2,
-                    agentId: 2,
-                    agentName: 'Sample Agent',
-                    productType: 'life',
-                    customRate: 30.0,
-                    effectiveDate: '2025-01-15',
-                    endDate: '2025-12-31',
-                    monthlyVolume: 8,
-                    ytdCommission: 12750
-                },
-                {
-                    id: 3,
-                    agentId: 3,
-                    agentName: 'Jennifer Davis',
-                    productType: 'home',
-                    customRate: 15.0,
-                    effectiveDate: '2024-12-01',
-                    endDate: null,
-                    monthlyVolume: 12,
-                    ytdCommission: 5680
-                }
-            ];
+            return [];
         }
 
         // Render overrides table
@@ -767,26 +696,20 @@
                 
                 if (response.ok) {
                     const data = await response.json();
-                    const agents = (data.users || getFallbackAgents()).filter(user => user.role === 'agent');
+                    const agents = (data.users || []).filter(user => user.role === 'agent');
                     populateAgentDropdown(agents);
                 } else {
-                    populateAgentDropdown(getFallbackAgents().filter(user => user.role === 'agent'));
+                    populateAgentDropdown([]);
                 }
             } catch (error) {
                 console.error('Error loading agents:', error);
-                populateAgentDropdown(getFallbackAgents().filter(user => user.role === 'agent'));
+                populateAgentDropdown([]);
             }
         }
 
-        // Get fallback agents data
+        // No fallback data - use empty arrays for production
         function getFallbackAgents() {
-            return [
-                { id: 1, firstName: 'Sarah', lastName: 'Johnson', role: 'agent' },
-                { id: 2, firstName: 'Mike', lastName: 'Chen', role: 'agent' },
-                { id: 3, firstName: 'Jennifer', lastName: 'Davis', role: 'agent' },
-                { id: 4, firstName: 'Robert', lastName: 'Wilson', role: 'agent' },
-                { id: 5, firstName: 'Emily', lastName: 'Brown', role: 'agent' }
-            ];
+            return [];
         }
 
         // Populate agent dropdown
@@ -896,9 +819,7 @@
                 }
             } catch (error) {
                 console.error('Error deleting rate:', error);
-                // For demo purposes, delete locally
-                currentRates = currentRates.filter(r => r.id !== rateId);
-                renderRatesTable();
+                alert('Failed to delete commission rate due to connection error');
             }
         }
 
@@ -919,9 +840,7 @@
                 }
             } catch (error) {
                 console.error('Error deleting override:', error);
-                // For demo purposes, delete locally
-                currentOverrides = currentOverrides.filter(o => o.id !== overrideId);
-                renderOverridesTable();
+                alert('Failed to delete override due to connection error');
             }
         }
 
@@ -960,22 +879,7 @@
                 }
             } catch (error) {
                 console.error('Error saving rate:', error);
-                // For demo purposes, add/update locally
-                if (editingRateId) {
-                    const rate = currentRates.find(r => r.id === editingRateId);
-                    if (rate) {
-                        Object.assign(rate, formData, { lastUpdated: new Date().toISOString().split('T')[0] });
-                    }
-                } else {
-                    const newRate = {
-                        id: Math.max(...currentRates.map(r => r.id)) + 1,
-                        ...formData,
-                        lastUpdated: new Date().toISOString().split('T')[0]
-                    };
-                    currentRates.push(newRate);
-                }
-                renderRatesTable();
-                closeRateModal();
+                alert('Failed to save commission rate due to connection error');
             }
         });
 
@@ -1016,24 +920,7 @@
                 }
             } catch (error) {
                 console.error('Error saving override:', error);
-                // For demo purposes, add/update locally
-                if (editingOverrideId) {
-                    const override = currentOverrides.find(o => o.id === editingOverrideId);
-                    if (override) {
-                        Object.assign(override, formData, { agentName: agentName });
-                    }
-                } else {
-                    const newOverride = {
-                        id: Math.max(...currentOverrides.map(o => o.id)) + 1,
-                        ...formData,
-                        agentName: agentName,
-                        monthlyVolume: 0,
-                        ytdCommission: 0
-                    };
-                    currentOverrides.push(newOverride);
-                }
-                renderOverridesTable();
-                closeOverrideModal();
+                alert('Failed to save override due to connection error');
             }
         });
 

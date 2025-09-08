@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 Encrypted Document Upload</title>
+    
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+        
+        .security-info {
+            background: #e8f5e8;
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .security-info h3 {
+            margin-top: 0;
+            color: #2e7d32;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area:hover {
+            border-color: #667eea;
+            background-color: #f8f9ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: #667eea;
+            background-color: #f0f8ff;
+            transform: scale(1.02);
+        }
+        
+        input[type="file"] {
+            margin-bottom: 20px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            width: 100%;
+            max-width: 350px;
+        }
+        
+        .file-info {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .upload-btn {
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .upload-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-weight: 500;
+        }
+        
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            border: 1px solid #bbdefb;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background-color: #e9ecef;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 6px;
+        }
+        
+        .key-vault {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .key-vault h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+        
+        .key-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .key-item {
+            background: white;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border-left: 3px solid #667eea;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Encrypted Document Upload</h1>
+        <p class="subtitle">Files are encrypted client-side before upload. Only you have the decryption keys.</p>
+        
+        <div class="security-info">
+            <h3>🛡️ Security Features</h3>
+            <ul>
+                <li><strong>Client-side encryption:</strong> Files are encrypted in your browser using AES-256-GCM</li>
+                <li><strong>Zero-knowledge storage:</strong> The server never sees your unencrypted files</li>
+                <li><strong>Unique keys:</strong> Each file gets its own encryption key</li>
+                <li><strong>Secure key storage:</strong> Keys are stored separately from encrypted files</li>
+            </ul>
+        </div>
+        
+        <div class="upload-area" id="uploadArea">
+            <p>🔒 Select a file to encrypt and upload</p>
+            <input
+                type="file"
+                id="fileInput"
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.txt,.csv"
+            />
+            
+            <div id="fileInfo" class="file-info" style="display: none;">
+                <p id="fileName"></p>
+                <p id="fileSize"></p>
+                <p id="fileType"></p>
+            </div>
+            
+            <button
+                id="uploadBtn"
+                class="upload-btn"
+                onclick="handleEncryptedUpload()"
+                disabled
+            >
+                🔐 Encrypt & Upload Document
+            </button>
+            
+            <div id="progressBar" class="progress-bar" style="display: none;">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+        </div>
+
+        <div id="status"></div>
+        
+        <div class="key-vault">
+            <h3>🔑 Key Vault (Demo - Stored in Browser)</h3>
+            <p style="font-size: 0.85rem; color: #666;">In production, keys would be stored in a secure backend vault.</p>
+            <div id="keyList" class="key-list">
+                <div style="color: #666; font-style: italic;">No encrypted files yet...</div>
+            </div>
+            <button onclick="clearKeyVault()" style="margin-top: 10px; padding: 5px 15px; border: 1px solid #ccc; background: white; border-radius: 4px; cursor: pointer;">Clear Vault</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+        let uploading = false;
+
+        // File input handling
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const fileInfo = document.getElementById('fileInfo');
+        const uploadArea = document.getElementById('uploadArea');
+
+        fileInput.addEventListener('change', handleFileSelect);
+
+        // Drag and drop handling
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileSelect({ target: { files } });
+            }
+        });
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            selectedFile = file;
+
+            if (file) {
+                document.getElementById('fileName').textContent = `File: ${file.name}`;
+                document.getElementById('fileSize').textContent = `Size: ${(file.size / 1024).toFixed(2)} KB`;
+                document.getElementById('fileType').textContent = `Type: ${file.type || 'Unknown'}`;
+                
+                fileInfo.style.display = 'block';
+                uploadBtn.disabled = false;
+            } else {
+                fileInfo.style.display = 'none';
+                uploadBtn.disabled = true;
+            }
+        }
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function showProgress(show, percentage = 0) {
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            
+            if (show) {
+                progressBar.style.display = 'block';
+                progressFill.style.width = percentage + '%';
+            } else {
+                progressBar.style.display = 'none';
+            }
+        }
+
+        // Encryption utilities
+        async function encryptFile(file) {
+            showStatus('🔐 Encrypting file with AES-256-GCM...', 'info');
+            showProgress(true, 15);
+            
+            // Generate encryption key for this file
+            const encryptionKey = await crypto.subtle.generateKey(
+                { name: 'AES-GCM', length: 256 },
+                true,
+                ['encrypt', 'decrypt']
+            );
+            
+            showProgress(true, 25);
+            
+            // Generate random IV
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            
+            // Encrypt file content
+            const fileBuffer = await file.arrayBuffer();
+            const encrypted = await crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv: iv },
+                encryptionKey,
+                fileBuffer
+            );
+            
+            showProgress(true, 40);
+            
+            // Export key for storage
+            const exportedKey = await crypto.subtle.exportKey('jwk', encryptionKey);
+            
+            return {
+                encryptedData: encrypted,
+                key: exportedKey,
+                iv: Array.from(iv), // Convert to array for JSON storage
+                originalName: file.name,
+                originalType: file.type,
+                originalSize: file.size
+            };
+        }
+
+        async function storeKeyInVault(keyData, fileName) {
+            showStatus('🔑 Storing encryption key in secure vault...', 'info');
+            showProgress(true, 45);
+            
+            // Store in localStorage for demo (in production, use secure backend)
+            const keyVault = JSON.parse(localStorage.getItem('keyVault') || '{}');
+            keyVault[fileName] = {
+                key: keyData.key,
+                iv: keyData.iv,
+                originalName: keyData.originalName,
+                originalType: keyData.originalType,
+                originalSize: keyData.originalSize,
+                encryptedFileName: fileName,
+                created: new Date().toISOString()
+            };
+            localStorage.setItem('keyVault', JSON.stringify(keyVault));
+            
+            updateKeyVaultDisplay();
+        }
+
+        async function handleEncryptedUpload() {
+            if (!selectedFile) {
+                showStatus('Please select a file first.', 'error');
+                return;
+            }
+
+            if (uploading) return;
+
+            uploading = true;
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = 'Encrypting & Uploading...';
+            showProgress(true, 5);
+
+            try {
+                // Step 1: Encrypt the file
+                const encryptionData = await encryptFile(selectedFile);
+                
+                // Step 2: Get upload URL to get correct filename
+                showStatus('📡 Getting upload URL...', 'info');
+                showProgress(true, 50);
+
+                // Get upload URL from API
+                const response = await fetch('/api/storage/encrypted-upload-url', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        fileName: selectedFile.name // Send original filename, API will add .enc extension
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+
+                const { uploadUrl, token, fileName: apiFileName } = await response.json();
+                
+                // Step 3: Store encryption key with correct filename
+                showStatus('🔑 Storing encryption key securely...', 'info');
+                showProgress(true, 60);
+                
+                const keyVault = JSON.parse(localStorage.getItem('keyVault') || '{}');
+                keyVault[apiFileName] = {
+                    key: encryptionData.key,
+                    iv: encryptionData.iv,
+                    originalName: encryptionData.originalName,
+                    originalType: encryptionData.originalType,
+                    originalSize: encryptionData.originalSize,
+                    encryptedFileName: apiFileName,
+                    created: new Date().toISOString()
+                };
+                localStorage.setItem('keyVault', JSON.stringify(keyVault));
+                updateKeyVaultDisplay();
+
+                // Step 4: Upload encrypted file
+                showStatus('🔒 Uploading encrypted file to R2...', 'info');
+                showProgress(true, 70);
+
+                // Upload encrypted data to R2
+                const uploadResponse = await fetch(uploadUrl, {
+                    method: 'PUT',
+                    body: encryptionData.encryptedData,
+                    headers: {
+                        'Content-Type': 'application/octet-stream',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                showProgress(true, 90);
+
+                if (!uploadResponse.ok) {
+                    const errorText = await uploadResponse.text().catch(() => 'Unknown error');
+                    throw new Error(`Upload failed: ${uploadResponse.status} ${uploadResponse.statusText}. Error: ${errorText}`);
+                }
+
+                showProgress(true, 100);
+                
+                showStatus(`✅ File encrypted and uploaded successfully! 
+                <br><strong>Original:</strong> ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(2)} KB)
+                <br><strong>Encrypted:</strong> ${apiFileName}
+                <br><strong>Security:</strong> AES-256-GCM encryption with unique key`, 'success');
+                
+                // Reset form after successful upload
+                setTimeout(() => {
+                    fileInput.value = '';
+                    selectedFile = null;
+                    fileInfo.style.display = 'none';
+                    showProgress(false);
+                }, 3000);
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                showStatus(`❌ Encrypted upload failed: ${error.message}`, 'error');
+                showProgress(false);
+            } finally {
+                uploading = false;
+                uploadBtn.disabled = !selectedFile;
+                uploadBtn.textContent = '🔐 Encrypt & Upload Document';
+            }
+        }
+
+        // Key vault management
+        function updateKeyVaultDisplay() {
+            const keyVault = JSON.parse(localStorage.getItem('keyVault') || '{}');
+            const keyList = document.getElementById('keyList');
+            
+            if (Object.keys(keyVault).length === 0) {
+                keyList.innerHTML = '<div style="color: #666; font-style: italic;">No encrypted files yet...</div>';
+                return;
+            }
+            
+            let html = '';
+            for (const [fileName, keyData] of Object.entries(keyVault)) {
+                html += `
+                    <div class="key-item">
+                        <strong>${keyData.originalName}</strong><br>
+                        <small>Encrypted: ${new Date(keyData.created).toLocaleString()}</small><br>
+                        <small>Size: ${(keyData.originalSize / 1024).toFixed(2)} KB | Type: ${keyData.originalType}</small>
+                    </div>
+                `;
+            }
+            keyList.innerHTML = html;
+        }
+
+        function clearKeyVault() {
+            if (confirm('⚠️ This will delete all encryption keys! You will not be able to decrypt your uploaded files. Are you sure?')) {
+                localStorage.removeItem('keyVault');
+                updateKeyVaultDisplay();
+                showStatus('🗑️ Key vault cleared. All encryption keys deleted.', 'info');
+            }
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            showStatus('🔐 Ready for secure upload. Files will be encrypted before leaving your device.', 'info');
+            updateKeyVaultDisplay();
+        });
+    </script>
+</body>
+</html>

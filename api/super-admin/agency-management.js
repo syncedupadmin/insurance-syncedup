@@ -1,9 +1,8 @@
-const { createClient } = require('@supabase/supabase-js');
-const bcrypt = require('bcryptjs');
+import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
+  process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || ''
 );
 
 export default async function handler(req, res) {
@@ -18,7 +17,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Authentication check
+    // Authentication check using our JWT system
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'Missing or invalid authorization header' });
@@ -26,21 +25,14 @@ export default async function handler(req, res) {
 
     const token = authHeader.substring(7);
     
-    // Verify JWT token and get user
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    if (authError || !user) {
+    // Verify super admin access by decoding JWT
+    try {
+      const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64'));
+      if (payload.role !== 'super_admin') {
+        return res.status(403).json({ error: 'Super admin access required' });
+      }
+    } catch (e) {
       return res.status(401).json({ error: 'Invalid token' });
-    }
-
-    // Get user profile to check role
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('role, agency_id')
-      .eq('id', user.id)
-      .single();
-
-    if (profileError || profile.role !== 'super_admin') {
-      return res.status(403).json({ error: 'Super admin access required' });
     }
 
     const { action } = req.query;

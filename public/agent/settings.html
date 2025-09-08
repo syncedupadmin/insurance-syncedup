@@ -543,72 +543,65 @@ Bob Wilson,bob@email.com,(555) 345-6789,${timestamp},$234.00,Prospect`;
             }, 3000);
         }
 
-        // Professional Mode functionality
-        function toggleProfessionalMode() {
-            const isProfessional = localStorage.getItem('professionalMode') === 'true';
-            localStorage.setItem('professionalMode', (!isProfessional).toString());
-            updateProfessionalModeButton();
+        // Theme Mode functionality - integrated with theme-switcher.js
+        function showThemeSuccess(themeName) {
+            showSuccess(`${themeName} Mode enabled! Theme applied instantly.`);
+        }
+
+        function updateThemeButtons() {
+            const currentTheme = localStorage.getItem('selectedTheme') || 'professional';
             
-            if (!isProfessional) {
-                // Disable classic mode when enabling professional mode
-                localStorage.setItem('classicMode', 'false');
-                updateClassicModeButton();
-                showSuccess('Professional Mode enabled! Page will reload to apply changes.');
-            } else {
-                showSuccess('Professional Mode disabled! Page will reload to apply changes.');
+            // Update professional mode button
+            const professionalButton = document.getElementById('professionalModeToggle');
+            const professionalText = document.getElementById('professionalModeText');
+            if (professionalButton && professionalText) {
+                if (currentTheme === 'professional') {
+                    professionalButton.classList.remove('btn-secondary');
+                    professionalButton.classList.add('btn-primary');
+                    professionalText.textContent = 'Professional Mode (Active)';
+                } else {
+                    professionalButton.classList.remove('btn-primary');
+                    professionalButton.classList.add('btn-secondary');
+                    professionalText.textContent = 'Professional Mode';
+                }
             }
             
-            // Reload page to apply theme changes
-            setTimeout(() => {
-                window.location.reload();
-            }, 1000);
+            // Update classic mode button
+            const classicButton = document.getElementById('classicModeToggle');
+            const classicText = document.getElementById('classicModeText');
+            if (classicButton && classicText) {
+                if (currentTheme === 'classic') {
+                    classicButton.classList.remove('btn-secondary');
+                    classicButton.classList.add('btn-primary');
+                    classicText.textContent = 'Classic Mode (Active)';
+                } else {
+                    classicButton.classList.remove('btn-primary');
+                    classicButton.classList.add('btn-secondary');
+                    classicText.textContent = 'Classic Mode';
+                }
+            }
+        }
+
+        // Override theme toggle functions to integrate with new theme system
+        function toggleProfessionalMode() {
+            if (window.themeSystem && window.themeSystem.applyTheme) {
+                window.themeSystem.applyTheme('professional');
+                showThemeSuccess('Professional');
+                setTimeout(updateThemeButtons, 100); // Update button states after theme change
+            } else {
+                console.error('Theme system not loaded');
+                showError('Theme system not available. Please refresh the page.');
+            }
         }
 
         function toggleClassicMode() {
-            const isClassic = localStorage.getItem('classicMode') === 'true';
-            localStorage.setItem('classicMode', (!isClassic).toString());
-            updateClassicModeButton();
-            
-            if (!isClassic) {
-                localStorage.setItem('professionalMode', 'false');
-                updateProfessionalModeButton();
-                showSuccess('Classic Mode enabled! Page will reload to apply changes.');
+            if (window.themeSystem && window.themeSystem.applyTheme) {
+                window.themeSystem.applyTheme('classic');
+                showThemeSuccess('Classic');
+                setTimeout(updateThemeButtons, 100); // Update button states after theme change
             } else {
-                showSuccess('Classic Mode disabled! Page will reload to apply changes.');
-            }
-            
-            setTimeout(() => { window.location.reload(); }, 1000);
-        }
-
-        function updateProfessionalModeButton() {
-            const isProfessional = localStorage.getItem('professionalMode') === 'true';
-            const button = document.getElementById('professionalModeToggle');
-            const text = document.getElementById('professionalModeText');
-            
-            if (isProfessional) {
-                button.classList.remove('btn-secondary');
-                button.classList.add('btn-primary');
-                text.textContent = 'Disable Professional';
-            } else {
-                button.classList.remove('btn-primary');
-                button.classList.add('btn-secondary');
-                text.textContent = 'Enable Professional';
-            }
-        }
-
-        function updateClassicModeButton() {
-            const isClassic = localStorage.getItem('classicMode') === 'true';
-            const button = document.getElementById('classicModeToggle');
-            const text = document.getElementById('classicModeText');
-            
-            if (isClassic) {
-                button.classList.remove('btn-secondary');
-                button.classList.add('btn-primary');
-                text.textContent = 'Disable Classic';
-            } else {
-                button.classList.remove('btn-primary');
-                button.classList.add('btn-secondary');
-                text.textContent = 'Enable Classic';
+                console.error('Theme system not loaded');
+                showError('Theme system not available. Please refresh the page.');
             }
         }
 
@@ -616,9 +609,15 @@ Bob Wilson,bob@email.com,(555) 345-6789,${timestamp},$234.00,Prospect`;
         document.addEventListener('DOMContentLoaded', () => {
             initializePage();
             
-            // Initialize button states
-            updateProfessionalModeButton();
-            updateClassicModeButton();
+            // Initialize theme button states after theme system loads
+            setTimeout(() => {
+                updateThemeButtons();
+            }, 500);
+            
+            // Listen for theme change events to update button states
+            document.addEventListener('themeChanged', () => {
+                updateThemeButtons();
+            });
         });
     </script>
 

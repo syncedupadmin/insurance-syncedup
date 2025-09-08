@@ -352,8 +352,20 @@
     </style>
 </head>
 <body>
+    <!-- Floating particles effect -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-10 -left-10 w-40 h-40 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce"></div>
+        <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce" style="animation-delay: 2s;"></div>
+        <div class="absolute top-1/2 left-1/2 w-40 h-40 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce" style="animation-delay: 4s;"></div>
+    </div>
+    
+    <div class="header">
+        <h1 class="neon-text">Lead Management - Convoso Dashboard</h1>
+        <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">Logout</button>
+    </div>
+    
     <!-- Navigation -->
-        <nav class="nav">
+    <nav class="nav">
         <a href="/admin/">
             <i data-lucide="layout-dashboard" class="icon"></i>Dashboard
         </a>
@@ -362,6 +374,9 @@
         </a>
         <a href="/admin/users">
             <i data-lucide="users" class="icon"></i>Users
+        </a>
+        <a href="/admin/licenses">
+            <i data-lucide="shield-check" class="icon"></i>Licenses
         </a>
         <a href="/admin/convoso-leads" class="active">
             <i data-lucide="users" class="icon"></i>Leads
@@ -1119,6 +1134,13 @@
             alert('Update functionality would be implemented here');
             hideEditModal();
         });
+        
+        // Logout function
+        function logout() {
+            localStorage.removeItem('syncedup_token');
+            localStorage.removeItem('syncedup_user');
+            window.location.href = '/login';
+        }
     </script>
 </body>
 </html>

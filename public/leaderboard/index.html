@@ -10,12 +10,44 @@
     <!-- Auth Guard Script -->
     <script>
         (function () {
-          const token = localStorage.getItem('syncedup_token');
-          const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
-          const role = normalize(u.role || '');
-          const allowed = ['agent','manager','admin','super_admin','customer_service'];
-          if (!token || !role || !allowed.includes(role)) { window.location.href = '/login'; return; }
+          try {
+            const token = localStorage.getItem('syncedup_token');
+            const userStr = localStorage.getItem('syncedup_user');
+            
+            console.log('Auth check - Token exists:', !!token);
+            console.log('Auth check - User data:', userStr);
+            
+            if (!token) {
+              console.log('No token found, redirecting to login');
+              window.location.href = '/login';
+              return;
+            }
+            
+            if (!userStr) {
+              console.log('No user data found, redirecting to login');
+              window.location.href = '/login';
+              return;
+            }
+            
+            const u = JSON.parse(userStr);
+            const role = u.role || '';
+            // Allow both formats: underscore (super_admin) and hyphen (super-admin)
+            const allowed = ['agent','manager','admin','super_admin','customer_service','super-admin','customer-service'];
+            
+            console.log('Auth check - User role:', u.role, 'Normalized:', role);
+            console.log('Auth check - Role allowed:', allowed.includes(role));
+            
+            if (!role || !allowed.includes(role)) {
+              console.log('Invalid role, redirecting to login');
+              window.location.href = '/login';
+              return;
+            }
+            
+            console.log('Auth check passed');
+          } catch (error) {
+            console.error('Auth check error:', error);
+            window.location.href = '/login';
+          }
         })();
     </script>
     
@@ -409,23 +441,38 @@
         // Load leaderboard data
         async function loadLeaderboardData() {
             try {
+                const token = localStorage.getItem('syncedup_token');
+                if (!token) {
+                    console.error('No authentication token found');
+                    showErrorState('Authentication required. Please log in.');
+                    return;
+                }
+
                 const response = await fetch('/api/leaderboard/global', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
                     }
                 });
                 
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('Leaderboard data loaded:', data);
                     updateMetrics(data.metrics || {});
                     updatePodium(data.topThree || []);
                     updateRankingsTable(data.rankings || []);
+                } else if (response.status === 401) {
+                    console.error('Authentication failed - redirecting to login');
+                    localStorage.removeItem('syncedup_token');
+                    localStorage.removeItem('syncedup_user');
+                    window.location.href = '/login';
                 } else {
-                    throw new Error('Failed to load leaderboard data');
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `HTTP ${response.status}: Failed to load leaderboard data`);
                 }
             } catch (error) {
                 console.error('Error loading leaderboard:', error);
-                showErrorState();
+                showErrorState(error.message);
             }
         }
         
@@ -497,14 +544,20 @@
             }
         }
         
-        function showErrorState() {
+        function showErrorState(message = 'Error loading rankings data. Please refresh the page.') {
             document.getElementById('rankings-tbody').innerHTML = `
                 <tr>
                     <td colspan="7" style="text-align: center; padding: 40px; color: var(--error);">
-                        Error loading rankings data. Please refresh the page.
+                        ${message}
                     </td>
                 </tr>
             `;
+            
+            // Also show error in metrics
+            document.getElementById('active-agents').textContent = '--';
+            document.getElementById('total-sales').textContent = '--';
+            document.getElementById('commissions-paid').textContent = '--';
+            document.getElementById('offices-competing').textContent = '--';
         }
         
         function refreshData() {

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Upload Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #f7fafc;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0.5rem;
+        }
+        pre {
+            background: #f1f5f9;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simple Upload API Test</h1>
+        <p>Testing the simplified upload API endpoint</p>
+        
+        <button onclick="testAPI()">Test API Endpoint</button>
+        <button onclick="testCORS()">Test CORS</button>
+        <button onclick="clearResults()">Clear</button>
+        
+        <h3>Results:</h3>
+        <pre id="results">Click "Test API Endpoint" to begin...</pre>
+    </div>
+
+    <script>
+        function updateResults(content) {
+            document.getElementById('results').textContent = content;
+        }
+        
+        function clearResults() {
+            updateResults('Results cleared. Click "Test API Endpoint" to test...');
+        }
+
+        async function testAPI() {
+            updateResults('Testing API endpoint...');
+            
+            try {
+                const response = await fetch('/api/storage/upload-simple', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        fileName: 'test-file.pdf'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                const result = {
+                    status: response.status,
+                    statusText: response.statusText,
+                    ok: response.ok,
+                    data: data,
+                    timestamp: new Date().toISOString()
+                };
+                
+                updateResults(JSON.stringify(result, null, 2));
+                
+            } catch (error) {
+                updateResults(`Error: ${error.message}\n\nStack: ${error.stack}`);
+            }
+        }
+
+        async function testCORS() {
+            updateResults('Testing CORS headers...');
+            
+            try {
+                const response = await fetch('/api/storage/upload-simple', {
+                    method: 'OPTIONS'
+                });
+                
+                const corsHeaders = {
+                    'access-control-allow-origin': response.headers.get('access-control-allow-origin'),
+                    'access-control-allow-methods': response.headers.get('access-control-allow-methods'),
+                    'access-control-allow-headers': response.headers.get('access-control-allow-headers')
+                };
+                
+                updateResults(`CORS Test Results:\nStatus: ${response.status}\nHeaders:\n${JSON.stringify(corsHeaders, null, 2)}`);
+                
+            } catch (error) {
+                updateResults(`CORS Test Error: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>

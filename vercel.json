@@ -17,8 +17,12 @@
     { "source": "/global-leaderboard", "destination": "/leaderboard/index.html" },
     { "source": "/global-leaderboard-demo", "destination": "/global-leaderboard-demo.html" },
     { "source": "/pricing", "destination": "/pricing.html" },
-    { "source": "/demo", "destination": "/demo.html" },
-    { "source": "/trial", "destination": "/trial.html" }
+    { "source": "/trial", "destination": "/signup.html" },
+    { "source": "/signup", "destination": "/signup.html" },
+    { "source": "/test-upload-simple", "destination": "/test-upload-simple.html" },
+    { "source": "/document-upload", "destination": "/document-upload.html" },
+    { "source": "/test-worker-url", "destination": "/test-worker-url.html" },
+    { "source": "/encrypted-upload", "destination": "/encrypted-upload.html" }
   ],
   "redirects": [
     { "source": "/public/:path*", "destination": "/:path*", "permanent": true },
@@ -31,7 +35,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; font-src 'self' data: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co https://api.openai.com https://unpkg.com https://cdn.jsdelivr.net; upgrade-insecure-requests;"
+          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; frame-src https://js.stripe.com https://hooks.stripe.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://unpkg.com https://cdn.jsdelivr.net https://js.stripe.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; font-src 'self' data: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co https://api.openai.com https://unpkg.com https://cdn.jsdelivr.net https://api.stripe.com https://hooks.stripe.com https://*.workers.dev; upgrade-insecure-requests;"
         },
         {
           "key": "X-Frame-Options",

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Upload System</title>
+    
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background-color: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .upload-area:hover {
+            border-color: #007bff;
+        }
+        
+        .upload-area.dragover {
+            border-color: #007bff;
+            background-color: #f0f8ff;
+        }
+        
+        input[type="file"] {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .file-info {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .upload-btn {
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .upload-btn:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+        
+        .upload-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-weight: 500;
+        }
+        
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #007bff;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📁 Document Upload System</h1>
+        
+        <div class="upload-area" id="uploadArea">
+            <p>📤 Select a file or drag & drop here</p>
+            <input
+                type="file"
+                id="fileInput"
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.txt,.csv"
+            />
+            
+            <div id="fileInfo" class="file-info" style="display: none;">
+                <p id="fileName"></p>
+                <p id="fileSize"></p>
+                <p id="fileType"></p>
+            </div>
+            
+            <button
+                id="uploadBtn"
+                class="upload-btn"
+                onclick="handleFileUpload()"
+                disabled
+            >
+                Upload Document
+            </button>
+            
+            <div id="progressBar" class="progress-bar" style="display: none;">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+        </div>
+
+        <div id="status"></div>
+    </div>
+
+    <script>
+        // Initialize Supabase (you'll need to set these environment variables)
+        const supabaseUrl = 'YOUR_SUPABASE_URL'; // Replace with your actual URL
+        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY'; // Replace with your actual key
+        
+        let supabase;
+        try {
+            if (supabaseUrl !== 'YOUR_SUPABASE_URL' && supabaseKey !== 'YOUR_SUPABASE_ANON_KEY') {
+                supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+            }
+        } catch (error) {
+            console.log('Supabase not configured, will skip database operations');
+        }
+
+        let selectedFile = null;
+        let uploading = false;
+
+        // File input handling
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const fileInfo = document.getElementById('fileInfo');
+        const uploadArea = document.getElementById('uploadArea');
+
+        fileInput.addEventListener('change', handleFileSelect);
+
+        // Drag and drop handling
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileSelect({ target: { files } });
+            }
+        });
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            selectedFile = file;
+
+            if (file) {
+                document.getElementById('fileName').textContent = `File: ${file.name}`;
+                document.getElementById('fileSize').textContent = `Size: ${(file.size / 1024).toFixed(2)} KB`;
+                document.getElementById('fileType').textContent = `Type: ${file.type || 'Unknown'}`;
+                
+                fileInfo.style.display = 'block';
+                uploadBtn.disabled = false;
+            } else {
+                fileInfo.style.display = 'none';
+                uploadBtn.disabled = true;
+            }
+        }
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function showProgress(show, percentage = 0) {
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            
+            if (show) {
+                progressBar.style.display = 'block';
+                progressFill.style.width = percentage + '%';
+            } else {
+                progressBar.style.display = 'none';
+            }
+        }
+
+        async function handleFileUpload() {
+            if (!selectedFile) {
+                showStatus('Please select a file', 'error');
+                return;
+            }
+
+            if (uploading) return;
+
+            uploading = true;
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = 'Uploading...';
+            showProgress(true, 10);
+
+            try {
+                showStatus('Step 1: Generating upload URL...', 'info');
+                
+                // Generate unique filename
+                const timestamp = Date.now();
+                const fileName = `${timestamp}-${selectedFile.name}`;
+
+                // Get upload URL from API
+                const response = await fetch('/api/storage/upload-worker', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        fileName,
+                        fileType: selectedFile.type 
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+
+                const { uploadUrl, token } = await response.json();
+                showProgress(true, 30);
+
+                showStatus('Step 2: Uploading to R2 storage...', 'info');
+
+                // Upload to R2
+                const uploadResponse = await fetch(uploadUrl, {
+                    method: 'PUT',
+                    body: selectedFile,
+                    headers: {
+                        'Content-Type': selectedFile.type || 'application/octet-stream',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                showProgress(true, 70);
+
+                if (!uploadResponse.ok) {
+                    const errorText = await uploadResponse.text().catch(() => 'Unknown error');
+                    throw new Error(`Upload failed: ${uploadResponse.status} ${uploadResponse.statusText}. 
+                    
+Possible solutions:
+1. Check R2 bucket CORS settings
+2. Verify R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME environment variables
+3. Ensure R2 bucket exists and has correct permissions
+
+Error details: ${errorText}`);
+                }
+
+                showStatus('Step 3: Saving to database...', 'info');
+                showProgress(true, 90);
+
+                // Save record to Supabase (if configured)
+                if (supabase) {
+                    try {
+                        const { error: dbError } = await supabase
+                            .from('documents')
+                            .insert({
+                                user_id: 'test-user', // Replace with actual user ID from authentication
+                                file_name: selectedFile.name,
+                                file_key: fileName,
+                                file_type: selectedFile.type,
+                                file_size: selectedFile.size,
+                                status: 'completed',
+                                created_at: new Date().toISOString()
+                            });
+
+                        if (dbError) {
+                            console.error('Database error:', dbError);
+                            showStatus(`✅ File uploaded successfully to R2, but database save failed: ${dbError.message}`, 'success');
+                        } else {
+                            showStatus(`✅ File uploaded successfully! File: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(2)} KB)`, 'success');
+                        }
+                    } catch (dbError) {
+                        showStatus(`✅ File uploaded successfully to R2, but database not configured: ${dbError.message}`, 'success');
+                    }
+                } else {
+                    showStatus(`✅ File uploaded successfully to R2! File: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(2)} KB)`, 'success');
+                }
+
+                showProgress(true, 100);
+                
+                // Reset form after successful upload
+                setTimeout(() => {
+                    fileInput.value = '';
+                    selectedFile = null;
+                    fileInfo.style.display = 'none';
+                    showProgress(false);
+                }, 2000);
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                showStatus(`❌ Upload failed: ${error.message}`, 'error');
+                showProgress(false);
+            } finally {
+                uploading = false;
+                uploadBtn.disabled = !selectedFile;
+                uploadBtn.textContent = 'Upload Document';
+            }
+        }
+
+        // Show initial instructions
+        window.addEventListener('load', () => {
+            showStatus('Ready to upload. Select a file to begin.', 'info');
+        });
+    </script>
+</body>
+</html>

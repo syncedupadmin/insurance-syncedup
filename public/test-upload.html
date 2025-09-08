@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Upload - R2 Storage</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #f7fafc;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        input[type="file"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px dashed #cbd5e0;
+            border-radius: 6px;
+            background: #f7fafc;
+        }
+        button {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+        .message {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        .success {
+            background: #f0fff4;
+            color: #22543d;
+            border: 1px solid #68d391;
+        }
+        .error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #f56565;
+        }
+        .info {
+            background: #ebf4ff;
+            color: #2a4365;
+            border: 1px solid #63b3ed;
+        }
+        .upload-info {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>R2 Storage Upload Test</h1>
+        
+        <div class="upload-info">
+            <strong>Testing:</strong> Your existing upload system<br>
+            <strong>Storage:</strong> Cloudflare R2<br>
+            <strong>API:</strong> /api/storage/upload-url → /api/storage/complete-upload
+        </div>
+        
+        <div class="form-group">
+            <label for="fileInput">Select File to Upload:</label>
+            <input type="file" id="fileInput" accept="*/*">
+        </div>
+        
+        <button id="uploadBtn" onclick="testUpload()">Test Upload</button>
+        
+        <div id="message"></div>
+    </div>
+
+    <script>
+        let uploading = false;
+
+        function showMessage(text, type = 'info') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="message ${type}">${text}</div>`;
+        }
+
+        async function testUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showMessage('Please select a file first.', 'error');
+                return;
+            }
+            
+            if (uploading) return;
+            
+            const uploadBtn = document.getElementById('uploadBtn');
+            uploading = true;
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = 'Uploading...';
+            
+            try {
+                showMessage('Step 1: Getting upload URL...', 'info');
+                
+                // Step 1: Get upload URL from your existing API
+                const response = await fetch('/api/storage/upload-url', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token') || 'test-token'}`
+                    },
+                    body: JSON.stringify({
+                        fileName: file.name,
+                        fileType: file.type,
+                        fileSize: file.size
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Upload URL API failed: ${response.status} ${response.statusText}`);
+                }
+                
+                const { uploadUrl, fileId, fileKey } = await response.json();
+                
+                showMessage(`Step 2: Uploading to R2 (File ID: ${fileId})...`, 'info');
+                
+                // Step 2: Upload directly to R2 using presigned URL
+                const uploadResponse = await fetch(uploadUrl, {
+                    method: 'PUT',
+                    body: file,
+                    headers: {
+                        'Content-Type': file.type,
+                    }
+                });
+                
+                if (!uploadResponse.ok) {
+                    throw new Error(`R2 upload failed: ${uploadResponse.status} ${uploadResponse.statusText}`);
+                }
+                
+                showMessage('Step 3: Marking upload as complete...', 'info');
+                
+                // Step 3: Mark upload as completed
+                const completeResponse = await fetch('/api/storage/complete-upload', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token') || 'test-token'}`
+                    },
+                    body: JSON.stringify({
+                        fileId: fileId
+                    })
+                });
+                
+                if (!completeResponse.ok) {
+                    throw new Error(`Complete upload API failed: ${completeResponse.status} ${completeResponse.statusText}`);
+                }
+                
+                const completeResult = await completeResponse.json();
+                
+                showMessage(`✅ Upload successful!<br>
+                    <strong>File:</strong> ${file.name}<br>
+                    <strong>Size:</strong> ${(file.size / 1024).toFixed(1)} KB<br>
+                    <strong>File ID:</strong> ${fileId}<br>
+                    <strong>File Key:</strong> ${fileKey}<br>
+                    <strong>Status:</strong> ${completeResult.status}`, 'success');
+                
+            } catch (error) {
+                showMessage(`❌ Upload failed: ${error.message}<br><br>
+                    <strong>Possible issues:</strong><br>
+                    • R2 credentials not configured (R2_ENDPOINT, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME)<br>
+                    • CORS not configured on R2 bucket<br>
+                    • JWT_SECRET not set for token verification<br>
+                    • Documents table missing in Supabase`, 'error');
+            } finally {
+                uploading = false;
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = 'Test Upload';
+            }
+        }
+
+        // Check if user is logged in
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('syncedup_token');
+            if (!token) {
+                showMessage('⚠️ No authentication token found. Using test token for upload test.', 'info');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -166,21 +166,24 @@ export class ConvosoService {
 
   async getAgentList() {
     try {
-      const response = await fetch(`${this.baseURL}/agents/search`, {
+      const response = await fetch(`${this.baseURL}/agent-monitor/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({ 
-          auth_token: this.authToken,
-          limit: 500
+          auth_token: this.authToken
         })
       });
       
       if (!response.ok) {
-        return { success: false, error: `HTTP ${response.status}` };
+        console.error(`Convoso API error: HTTP ${response.status} ${response.statusText}`);
+        const errorText = await response.text();
+        console.error('Response body:', errorText);
+        return { success: false, error: `HTTP ${response.status}: ${response.statusText}` };
       }
       
       return await response.json();
     } catch (error) {
+      console.error('Convoso getAgentList error:', error);
       return { success: false, error: error.message };
     }
   }

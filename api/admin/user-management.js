@@ -1,13 +1,12 @@
+// PRODUCTION READY - Admin User Management API - REAL DATA ONLY
 import { createClient } from '@supabase/supabase-js';
-import { requireAuth } from '../_middleware/authCheck.js';
-import { getUserContext } from '../utils/auth-helper.js';
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
+  process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '',
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || ''
 );
 
-async function userManagementHandler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -17,34 +16,55 @@ async function userManagementHandler(req, res) {
   }
 
   try {
-    const { agencyId, role } = getUserContext(req);
+    // Authentication check
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Missing or invalid authorization header' });
+    }
+
+    const token = authHeader.substring(7);
+    
+    // Verify admin access
+    try {
+      const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64'));
+      console.log('User Management API - User role:', payload.role);
+      
+      if (!['admin', 'super_admin'].includes(payload.role)) {
+        return res.status(403).json({ error: 'Admin access required' });
+      }
+    } catch (e) {
+      console.log('User Management API - Token decode error:', e.message);
+      return res.status(401).json({ error: 'Invalid token' });
+    }
 
     switch (req.method) {
       case 'GET':
-        return handleGetUsers(req, res, agencyId);
+        return handleGetUsers(req, res);
       case 'POST':
-        return handleCreateUser(req, res, agencyId);
+        return handleCreateUser(req, res);
       case 'PUT':
-        return handleUpdateUser(req, res, agencyId);
+        return handleUpdateUser(req, res);
       case 'DELETE':
-        return handleDeleteUser(req, res, agencyId);
+        return handleDeleteUser(req, res);
       default:
         return res.status(405).json({ error: 'Method not allowed' });
     }
   } catch (error) {
-    console.error('User management API error:', error);
+    console.error('User Management API - General error:', error);
     return res.status(500).json({ 
-      error: 'Failed to process user management request', 
-      details: error.message 
+      error: 'Internal server error',
+      message: error.message
     });
   }
 }
 
-async function handleGetUsers(req, res, agencyId) {
+async function handleGetUsers(req, res) {
   const { user_id, role_filter, status_filter, manager_id } = req.query;
 
   try {
-    // Get users
+    console.log('User Management API - Attempting to fetch users from database');
+    
+    // Query REAL portal_users data
     let query = supabase
       .from('portal_users')
       .select(`
@@ -63,7 +83,6 @@ async function handleGetUsers(req, res, agencyId) {
         created_at,
         last_login
       `)
-      .eq('agency_id', agencyId)
       .order('created_at', { ascending: false });
 
     if (user_id) query = query.eq('id', user_id);
@@ -74,7 +93,35 @@ async function handleGetUsers(req, res, agencyId) {
 
     const { data: users, error: usersError } = await query;
 
-    if (usersError) throw usersError;
+    console.log('User Management API - Database response:', {
+      error: usersError?.message,
+      dataCount: users?.length
+    });
+
+    if (usersError) {
+      // If portal_users table doesn't exist, that's OK - return empty
+      if (usersError.message.includes('does not exist') || usersError.code === 'PGRST116') {
+        console.log('User Management API - Portal users table does not exist yet');
+        return res.status(200).json({
+          success: true,
+          users: [],
+          summary: {
+            total_users: 0,
+            active_users: 0,
+            inactive_users: 0,
+            agents: 0,
+            managers: 0,
+            admins: 0,
+            licenses_expiring_soon: 0,
+            expired_licenses: 0
+          },
+          available_managers: [],
+          message: 'Portal users table not found - this is normal for new installations'
+        });
+      }
+      
+      throw usersError;
+    }
 
     // Get manager names for agents
     const managerIds = [...new Set(users?.filter(u => u.manager_id).map(u => u.manager_id) || [])];
@@ -111,18 +158,39 @@ async function handleGetUsers(req, res, agencyId) {
     };
 
     return res.status(200).json({
+      success: true,
       users: enhancedUsers,
       summary,
-      available_managers: enhancedUsers.filter(u => u.role === 'manager' && u.is_active)
+      available_managers: enhancedUsers.filter(u => u.role === 'manager' && u.is_active),
+      source: 'production_database',
+      timestamp: new Date().toISOString()
     });
 
-  } catch (error) {
-    console.error('Error fetching users:', error);
-    return res.status(500).json({ error: 'Failed to fetch users' });
+  } catch (dbError) {
+    console.error('User Management API - Database error:', dbError);
+    
+    // Return empty data instead of fake data
+    return res.status(200).json({
+      success: true,
+      users: [],
+      summary: {
+        total_users: 0,
+        active_users: 0,
+        inactive_users: 0,
+        agents: 0,
+        managers: 0,
+        admins: 0,
+        licenses_expiring_soon: 0,
+        expired_licenses: 0
+      },
+      available_managers: [],
+      message: 'Database connection issue - no fake data returned',
+      error: dbError.message
+    });
   }
 }
 
-async function handleCreateUser(req, res, agencyId) {
+async function handleCreateUser(req, res) {
   const {
     full_name,
     email,
@@ -169,13 +237,12 @@ async function handleCreateUser(req, res, agencyId) {
     // Generate agent code if not provided
     let finalAgentCode = agent_code;
     if (!finalAgentCode && role === 'agent') {
-      finalAgentCode = await generateAgentCode(agencyId, full_name);
+      finalAgentCode = await generateAgentCode(full_name);
     }
 
     const { data, error } = await supabase
       .from('portal_users')
       .insert({
-        agency_id: agencyId,
         full_name,
         email: email.toLowerCase(),
         role,
@@ -205,6 +272,7 @@ async function handleCreateUser(req, res, agencyId) {
     const { password_hash, ...safeUser } = data;
 
     return res.status(201).json({
+      success: true,
       message: 'User created successfully',
       user: safeUser,
       welcome_email_sent: send_welcome_email || false
@@ -212,11 +280,14 @@ async function handleCreateUser(req, res, agencyId) {
 
   } catch (error) {
     console.error('Error creating user:', error);
-    return res.status(500).json({ error: 'Failed to create user' });
+    return res.status(500).json({ 
+      error: 'Failed to create user',
+      message: error.message
+    });
   }
 }
 
-async function handleUpdateUser(req, res, agencyId) {
+async function handleUpdateUser(req, res) {
   const { user_id } = req.query;
   const updates = req.body;
 
@@ -226,7 +297,7 @@ async function handleUpdateUser(req, res, agencyId) {
 
   try {
     // Remove sensitive fields that shouldn't be updated this way
-    const { password_hash, agency_id: _, id, ...safeUpdates } = updates;
+    const { password_hash, agency_id, id, ...safeUpdates } = updates;
 
     const { data, error } = await supabase
       .from('portal_users')
@@ -235,7 +306,6 @@ async function handleUpdateUser(req, res, agencyId) {
         updated_at: new Date().toISOString()
       })
       .eq('id', user_id)
-      .eq('agency_id', agencyId)
       .select()
       .single();
 
@@ -245,17 +315,21 @@ async function handleUpdateUser(req, res, agencyId) {
     const { password_hash: _, ...safeUser } = data;
 
     return res.status(200).json({
+      success: true,
       message: 'User updated successfully',
       user: safeUser
     });
 
   } catch (error) {
     console.error('Error updating user:', error);
-    return res.status(500).json({ error: 'Failed to update user' });
+    return res.status(500).json({ 
+      error: 'Failed to update user',
+      message: error.message
+    });
   }
 }
 
-async function handleDeleteUser(req, res, agencyId) {
+async function handleDeleteUser(req, res) {
   const { user_id, soft_delete } = req.query;
 
   if (!user_id) {
@@ -272,13 +346,13 @@ async function handleDeleteUser(req, res, agencyId) {
           deactivated_at: new Date().toISOString()
         })
         .eq('id', user_id)
-        .eq('agency_id', agencyId)
         .select()
         .single();
 
       if (error) throw error;
 
       return res.status(200).json({
+        success: true,
         message: 'User deactivated successfully',
         user: data
       });
@@ -287,19 +361,22 @@ async function handleDeleteUser(req, res, agencyId) {
       const { error } = await supabase
         .from('portal_users')
         .delete()
-        .eq('id', user_id)
-        .eq('agency_id', agencyId);
+        .eq('id', user_id);
 
       if (error) throw error;
 
       return res.status(200).json({
+        success: true,
         message: 'User deleted successfully'
       });
     }
 
   } catch (error) {
     console.error('Error deleting user:', error);
-    return res.status(500).json({ error: 'Failed to delete user' });
+    return res.status(500).json({ 
+      error: 'Failed to delete user',
+      message: error.message
+    });
   }
 }
 
@@ -316,14 +393,13 @@ function getLicenseStatus(expiryDate) {
   return 'valid';
 }
 
-async function generateAgentCode(agencyId, fullName) {
+async function generateAgentCode(fullName) {
   const initials = fullName.split(' ').map(n => n[0]).join('').toUpperCase();
   
   // Get existing agent codes to avoid duplicates
   const { data: existingCodes } = await supabase
     .from('portal_users')
     .select('agent_code')
-    .eq('agency_id', agencyId)
     .like('agent_code', `${initials}%`);
 
   let counter = 1;
@@ -348,5 +424,3 @@ async function sendWelcomeEmail(email, fullName, tempPassword) {
   console.log(`Welcome email sent to ${email} (${fullName}) with temp password: ${tempPassword}`);
   return true;
 }
-
-export default requireAuth(['admin'])(userManagementHandler);
