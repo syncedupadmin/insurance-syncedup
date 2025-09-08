@@ -203,9 +203,9 @@
                 <a href="/signup" class="nav-cta">Sign Up</a>
                 <!-- Theme Controls -->
                 <div class="theme-controls" style="display: flex; gap: 5px; margin-left: 10px;">
-                    <button class="btn btn-sm" onclick="switchLeaderboardTheme('competition')" style="padding: 5px 10px; font-size: 12px;">Competition</button>
-                    <button class="btn btn-sm" onclick="switchLeaderboardTheme('analytics')" style="padding: 5px 10px; font-size: 12px;">Analytics</button>
-                    <button class="btn btn-sm" onclick="switchLeaderboardTheme('gaming')" style="padding: 5px 10px; font-size: 12px;">Gaming</button>
+                    <button class="btn btn-sm" onclick="window.leaderboardTheme?.switchTheme('competition')" style="padding: 5px 10px; font-size: 12px;">Competition</button>
+                    <button class="btn btn-sm" onclick="window.leaderboardTheme?.switchTheme('analytics')" style="padding: 5px 10px; font-size: 12px;">Analytics</button>
+                    <button class="btn btn-sm" onclick="window.leaderboardTheme?.switchTheme('gaming')" style="padding: 5px 10px; font-size: 12px;">Gaming</button>
                 </div>
             </div>
         </div>
@@ -369,5 +369,12 @@
     
     <!-- Leaderboard Theme System -->
     <script src="/leaderboard/js/leaderboard-theme.js"></script>
+    <script>
+        // Initialize leaderboard theme system
+        document.addEventListener('DOMContentLoaded', function() {
+            window.leaderboardTheme = new LeaderboardThemeSystem();
+            console.log('Leaderboard theme system initialized');
+        });
+    </script>
 </body>
 </html>
