@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - SyncedUp Insurance Platform</title>
+    <link rel="stylesheet" href="/css/pro.css">
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        .signup-hero {
+            padding: 140px 20px 80px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .signup-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .signup-steps {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 4rem;
+            align-items: start;
+        }
+        
+        .step-sidebar {
+            position: sticky;
+            top: 120px;
+        }
+        
+        .step-indicator {
+            background: var(--glass);
+            backdrop-filter: var(--blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .step-item:last-child {
+            border-bottom: none;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s;
+        }
+        
+        .step-item.active .step-number {
+            background: var(--primary-gradient);
+        }
+        
+        .step-item.completed .step-number {
+            background: #10b981;
+        }
+        
+        .step-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+        
+        .step-item.active .step-text {
+            color: white;
+        }
+        
+        .signup-form-container {
+            background: var(--glass);
+            backdrop-filter: var(--blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .step-content {
+            display: none;
+        }
+        
+        .step-content.active {
+            display: block;
+        }
+        
+        .pricing-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .pricing-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .pricing-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px);
+        }
+        
+        .pricing-card.selected {
+            border: 2px solid #4facfe;
+            background: rgba(79, 172, 254, 0.1);
+            transform: translateY(-5px);
+        }
+        
+        .pricing-card.selected::before {
+            content: 'Selected';
+            position: absolute;
+            top: -1px;
+            right: -1px;
+            background: #4facfe;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 0 20px 0 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .pricing-card.selected {
+            border-color: #4facfe;
+            background: rgba(79, 172, 254, 0.1);
+        }
+        
+        .pricing-card.popular {
+            position: relative;
+            border-color: #fbbf24;
+        }
+        
+        .pricing-card.popular::before {
+            content: 'Most Popular';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #0b142b;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        
+        .plan-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #4facfe;
+            margin-bottom: 0.5rem;
+        }
+        
+        .plan-period {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1rem;
+        }
+        
+        .plan-features {
+            list-style: none;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .plan-features li {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .plan-features li::before {
+            content: '✓';
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .form-section {
+            margin-bottom: 2rem;
+        }
+        
+        .form-section h3 {
+            color: white;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            color: white;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .payment-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stripe-element {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        
+        .step-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+        }
+        
+        .btn-step {
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: var(--glass);
+            color: white;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .btn-step:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(118, 75, 162, 0.5);
+        }
+        
+        .order-summary {
+            background: var(--glass);
+            backdrop-filter: var(--blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .summary-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #4facfe;
+        }
+        
+        .trust-signals {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .signup-steps {
+                grid-template-columns: 1fr;
+            }
+            
+            .step-sidebar {
+                position: static;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .pricing-selection {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .step-buttons {
+                flex-direction: column;
+            }
+            
+            .trust-signals {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body data-theme="agent">
+    <a class="skip-link" href="#main">Skip to content</a>
+    
+    <!-- Floating Orbs -->
+    <div class="floating-orb orb-1"></div>
+    <div class="floating-orb orb-2"></div>
+    
+    <nav>
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>SyncedUp</h2>
+            </div>
+            <div class="nav-links">
+                <a href="/login">Login</a>
+                <a href="/">Home</a>
+                <a href="/global-leaderboard-demo">Global Leaderboard</a>
+                <a href="/pricing">Pricing</a>
+                <a href="/signup" class="nav-cta">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Brand Stripe -->
+    <div class="header-stripe"></div>
+
+    <main id="main">
+        <section class="signup-hero">
+            <div class="container">
+                <h1 style="font-size: 3rem; margin-bottom: 1rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Get Started with SyncedUp</h1>
+                <p style="font-size: 1.2rem; color: rgba(255,255,255,0.8); margin-bottom: 2rem;">Join elite insurance agencies dominating the Global Leaderboard</p>
+            </div>
+        </section>
+
+        <section style="padding: 3rem 0 6rem;">
+            <div class="signup-container">
+                <div class="signup-steps">
+                    <div class="step-sidebar">
+                        <div class="step-indicator">
+                            <h3 style="color: white; margin-bottom: 1.5rem;">Setup Progress</h3>
+                            <div class="step-item active" data-step="1">
+                                <div class="step-number">1</div>
+                                <div class="step-text">Choose Your Plan</div>
+                            </div>
+                            <div class="step-item" data-step="2">
+                                <div class="step-number">2</div>
+                                <div class="step-text">Agency Details</div>
+                            </div>
+                            <div class="step-item" data-step="3">
+                                <div class="step-number">3</div>
+                                <div class="step-text">Account Setup</div>
+                            </div>
+                            <div class="step-item" data-step="4">
+                                <div class="step-number">4</div>
+                                <div class="step-text">Payment Information</div>
+                            </div>
+                        </div>
+                        
+                        <div class="order-summary" id="orderSummary" style="display: none;">
+                            <h3 style="color: white; margin-bottom: 1rem;">Order Summary</h3>
+                            <div class="summary-item">
+                                <span>Plan:</span>
+                                <span id="selectedPlanName">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>Monthly Price:</span>
+                                <span id="selectedPlanPrice">$0</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>Setup Fee:</span>
+                                <span style="color: #10b981;">FREE</span>
+                            </div>
+                            <div class="summary-item">
+                                <span>Total Today:</span>
+                                <span id="totalPrice">$0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="signup-form-container">
+                        <form id="signupForm">
+                            <!-- Step 1: Plan Selection -->
+                            <div class="step-content active" data-step="1">
+                                <h2 style="color: white; margin-bottom: 2rem;">Choose Your Plan</h2>
+                                
+                                <div class="pricing-selection">
+                                    <div class="pricing-card" data-plan="agent_only" data-price="199.99" data-agents="1">
+                                        <div class="plan-name">Agent Only</div>
+                                        <div class="plan-price">$199</div>
+                                        <div class="plan-period">per month</div>
+                                        <ul class="plan-features">
+                                            <li>Single agent access</li>
+                                            <li>Basic leaderboard</li>
+                                            <li>Commission tracking</li>
+                                            <li>Email support</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="pricing-card" data-plan="starter" data-price="299.99" data-agents="5">
+                                        <div class="plan-name">Starter</div>
+                                        <div class="plan-price">$299</div>
+                                        <div class="plan-period">per month</div>
+                                        <ul class="plan-features">
+                                            <li>Up to 5 agents</li>
+                                            <li>Global leaderboard access</li>
+                                            <li>Commission tracking</li>
+                                            <li>Basic analytics</li>
+                                            <li>Email support</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="pricing-card popular" data-plan="professional" data-price="799.99" data-agents="25">
+                                        <div class="plan-name">Professional</div>
+                                        <div class="plan-price">$799</div>
+                                        <div class="plan-period">per month</div>
+                                        <ul class="plan-features">
+                                            <li>Up to 25 agents</li>
+                                            <li>Advanced leaderboard features</li>
+                                            <li>Real-time analytics</li>
+                                            <li>API integrations</li>
+                                            <li>Custom reporting</li>
+                                            <li>Priority support</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="pricing-card" data-plan="enterprise" data-price="1999.99" data-agents="unlimited">
+                                        <div class="plan-name">Enterprise</div>
+                                        <div class="plan-price">$1,999</div>
+                                        <div class="plan-period">per month</div>
+                                        <ul class="plan-features">
+                                            <li>Unlimited agents</li>
+                                            <li>White-label solution</li>
+                                            <li>Custom integrations</li>
+                                            <li>Dedicated success manager</li>
+                                            <li>Priority support</li>
+                                            <li>Training sessions</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="step-buttons">
+                                    <div></div>
+                                    <button type="button" class="btn-step btn-primary" id="selectPlanBtn" disabled>Continue with Plan</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 2: Agency Details -->
+                            <div class="step-content" data-step="2">
+                                <h2 style="color: white; margin-bottom: 2rem;">Agency Information</h2>
+                                
+                                <div class="form-section">
+                                    <div class="form-group">
+                                        <label for="agencyName">Agency Name *</label>
+                                        <input type="text" id="agencyName" name="agency_name" required placeholder="Your Insurance Agency LLC">
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="agencyPhone">Phone Number *</label>
+                                            <input type="tel" id="agencyPhone" name="agency_phone" required placeholder="(555) 123-4567">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="agencyState">State *</label>
+                                            <input type="text" id="agencyState" name="agency_state" required placeholder="TX">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="agencyAddress">Address</label>
+                                        <input type="text" id="agencyAddress" name="agency_address" placeholder="123 Main Street, City, State 12345">
+                                    </div>
+                                </div>
+                                
+                                <div class="step-buttons">
+                                    <button type="button" class="btn-step btn-secondary" onclick="previousStep()">Back</button>
+                                    <button type="button" class="btn-step btn-primary" onclick="nextStep()">Continue</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 3: Account Setup -->
+                            <div class="step-content" data-step="3">
+                                <h2 style="color: white; margin-bottom: 2rem;">Admin Account</h2>
+                                
+                                <div class="form-section">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="firstName">First Name *</label>
+                                            <input type="text" id="firstName" name="first_name" required placeholder="John">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="lastName">Last Name *</label>
+                                            <input type="text" id="lastName" name="last_name" required placeholder="Smith">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="adminEmail">Admin Email *</label>
+                                        <input type="email" id="adminEmail" name="admin_email" required placeholder="admin@youragency.com">
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="adminPassword">Password *</label>
+                                            <input type="password" id="adminPassword" name="admin_password" required placeholder="Minimum 8 characters">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="confirmPassword">Confirm Password *</label>
+                                            <input type="password" id="confirmPassword" name="confirm_password" required placeholder="Confirm your password">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="step-buttons">
+                                    <button type="button" class="btn-step btn-secondary" onclick="previousStep()">Back</button>
+                                    <button type="button" class="btn-step btn-primary" onclick="nextStep()">Continue</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 4: Payment -->
+                            <div class="step-content" data-step="4">
+                                <h2 style="color: white; margin-bottom: 2rem;">Payment Information</h2>
+                                
+                                <div class="payment-section">
+                                    <h3 style="color: white; margin-bottom: 1rem;">Credit Card Details</h3>
+                                    <div class="stripe-element" id="card-element">
+                                        <!-- Stripe Elements will create form elements here -->
+                                    </div>
+                                    <div id="card-errors" role="alert" style="color: #f56565; margin-top: 0.5rem;"></div>
+                                </div>
+                                
+                                <div style="margin-bottom: 2rem;">
+                                    <label style="display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.9);">
+                                        <input type="checkbox" id="termsAccept" required>
+                                        I agree to the <a href="/terms" style="color: #4facfe;">Terms of Service</a> and <a href="/privacy" style="color: #4facfe;">Privacy Policy</a>
+                                    </label>
+                                </div>
+                                
+                                <div class="step-buttons">
+                                    <button type="button" class="btn-step btn-secondary" onclick="previousStep()">Back</button>
+                                    <button type="submit" class="btn-step btn-primary" id="submitBtn">
+                                        Start Subscription - <span id="finalPrice">$0</span>/month
+                                    </button>
+                                </div>
+                                
+                                <div class="trust-signals">
+                                    <div class="trust-item">
+                                        <span>🔒</span> Secure payment via Stripe
+                                    </div>
+                                    <div class="trust-item">
+                                        <span>💳</span> No setup fees
+                                    </div>
+                                    <div class="trust-item">
+                                        <span>🚫</span> Cancel anytime
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Wait for page to load before initializing
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing signup page...');
+            
+            // Initialize Stripe - use environment variable or fallback test key
+            const stripe = Stripe(
+                window.STRIPE_PUBLISHABLE_KEY || 
+                'pk_test_51HvKjN2eZvKYlo2CSfuHhZ8Ct7jQqOGwHaZ5l5rK5wVgYi8yJ1Q5xQ5xQ5xQ5xQ5xQ5xQ5xQ5xQ5xQ5xQ5xQ5xQ5xQ5xQ5xQ5xQ5xQ'
+            );
+        const elements = stripe.elements();
+        
+        // Create card element
+        const cardElement = elements.create('card', {
+            style: {
+                base: {
+                    fontSize: '16px',
+                    color: '#fff',
+                    '::placeholder': {
+                        color: 'rgba(255,255,255,0.5)',
+                    },
+                },
+            },
+        });
+        
+        let selectedPlan = null;
+        let currentStep = 1;
+        
+        // Plan selection
+        document.querySelectorAll('.pricing-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove previous selection
+                document.querySelectorAll('.pricing-card').forEach(c => c.classList.remove('selected'));
+                
+                // Add selection to clicked card
+                this.classList.add('selected');
+                
+                // Store selected plan data
+                selectedPlan = {
+                    id: this.dataset.plan,
+                    price: parseFloat(this.dataset.price),
+                    agents: this.dataset.agents,
+                    name: this.querySelector('.plan-name').textContent
+                };
+                
+                // Update order summary
+                updateOrderSummary();
+                
+                // Enable continue button
+                document.getElementById('selectPlanBtn').disabled = false;
+            });
+        });
+        
+        // Handle URL parameter after everything is set up
+        function handleURLParameters() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const preselectedPlan = urlParams.get('plan');
+            console.log('URL parameter plan:', preselectedPlan);
+            
+            if (preselectedPlan) {
+                const planCard = document.querySelector(`[data-plan="${preselectedPlan}"]`);
+                console.log('Plan card found:', planCard);
+                
+                if (planCard) {
+                    planCard.click();
+                    console.log('Plan card clicked, selectedPlan:', selectedPlan);
+                    
+                    // Auto-advance to Agency Details step after a brief delay
+                    setTimeout(() => {
+                        console.log('Checking for auto-advance, selectedPlan:', selectedPlan);
+                        if (selectedPlan && selectedPlan.id === preselectedPlan) {
+                            console.log('Auto-advancing to step 2');
+                            nextStep(); // Go to step 2: Agency Details
+                        }
+                    }, 1500); // Increased delay to 1.5 seconds
+                }
+            }
+        }
+        
+        // Step navigation
+        document.getElementById('selectPlanBtn').addEventListener('click', function() {
+            if (selectedPlan) {
+                nextStep();
+            }
+        });
+        
+        // Define functions globally so they're available for onclick handlers
+        window.nextStep = function() {
+            if (currentStep < 4) {
+                // Hide current step
+                document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.remove('active');
+                document.querySelector(`.step-item[data-step="${currentStep}"]`).classList.remove('active');
+                document.querySelector(`.step-item[data-step="${currentStep}"]`).classList.add('completed');
+                
+                // Show next step
+                currentStep++;
+                document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.add('active');
+                document.querySelector(`.step-item[data-step="${currentStep}"]`).classList.add('active');
+                
+                // Mount Stripe element when reaching payment step
+                if (currentStep === 4) {
+                    cardElement.mount('#card-element');
+                    
+                    // Handle real-time validation errors from the card Element
+                    cardElement.addEventListener('change', ({error}) => {
+                        const displayError = document.getElementById('card-errors');
+                        if (error) {
+                            displayError.textContent = error.message;
+                        } else {
+                            displayError.textContent = '';
+                        }
+                    });
+                }
+                
+                // Scroll to top
+                document.querySelector('.signup-form-container').scrollIntoView({behavior: 'smooth'});
+            }
+        }
+        
+        window.previousStep = function() {
+            if (currentStep > 1) {
+                // Hide current step
+                document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.remove('active');
+                document.querySelector(`.step-item[data-step="${currentStep}"]`).classList.remove('active');
+                
+                // Show previous step
+                currentStep--;
+                document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.add('active');
+                document.querySelector(`.step-item[data-step="${currentStep}"]`).classList.remove('completed');
+                document.querySelector(`.step-item[data-step="${currentStep}"]`).classList.add('active');
+                
+                // Scroll to top
+                document.querySelector('.signup-form-container').scrollIntoView({behavior: 'smooth'});
+            }
+        }
+        
+        function updateOrderSummary() {
+            if (selectedPlan) {
+                document.getElementById('selectedPlanName').textContent = selectedPlan.name;
+                document.getElementById('selectedPlanPrice').textContent = `$${selectedPlan.price}`;
+                document.getElementById('totalPrice').textContent = `$${selectedPlan.price}`;
+                document.getElementById('finalPrice').textContent = `$${selectedPlan.price}`;
+                document.getElementById('orderSummary').style.display = 'block';
+            }
+        }
+        
+        // Form submission
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!selectedPlan) {
+                alert('Please select a plan');
+                return;
+            }
+            
+            // Validate required fields
+            const requiredFields = ['agencyName', 'agencyPhone', 'agencyState', 'firstName', 'lastName', 'adminEmail', 'adminPassword'];
+            for (let field of requiredFields) {
+                if (!document.getElementById(field).value.trim()) {
+                    alert(`Please fill in ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
+                    return;
+                }
+            }
+            
+            // Check passwords match
+            const password = document.getElementById('adminPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+            
+            // Check terms acceptance
+            if (!document.getElementById('termsAccept').checked) {
+                alert('Please accept the terms of service');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = 'Processing...';
+            submitBtn.disabled = true;
+            
+            try {
+                // Create payment method
+                const {error, paymentMethod} = await stripe.createPaymentMethod({
+                    type: 'card',
+                    card: cardElement,
+                    billing_details: {
+                        name: `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`,
+                        email: document.getElementById('adminEmail').value,
+                    },
+                });
+                
+                if (error) {
+                    throw new Error(error.message);
+                }
+                
+                // Collect form data
+                const formData = {
+                    // Plan details
+                    plan_id: selectedPlan.id,
+                    plan_price: selectedPlan.price,
+                    
+                    // Agency details
+                    agency_name: document.getElementById('agencyName').value,
+                    agency_phone: document.getElementById('agencyPhone').value,
+                    agency_state: document.getElementById('agencyState').value,
+                    agency_address: document.getElementById('agencyAddress').value,
+                    
+                    // Admin details
+                    admin_first_name: document.getElementById('firstName').value,
+                    admin_last_name: document.getElementById('lastName').value,
+                    admin_email: document.getElementById('adminEmail').value,
+                    admin_password: document.getElementById('adminPassword').value,
+                    
+                    // Payment
+                    payment_method_id: paymentMethod.id
+                };
+                
+                // Create subscription
+                const response = await fetch('/api/create-subscription', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Redirect to success page or dashboard
+                    window.location.href = `/admin?welcome=true&agency=${result.agency_id}`;
+                } else {
+                    throw new Error(result.error || 'Subscription creation failed');
+                }
+                
+            } catch (error) {
+                console.error('Subscription error:', error);
+                document.getElementById('card-errors').textContent = error.message;
+                
+                // Reset button
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+        
+        // Initialize URL parameter handling
+        handleURLParameters();
+        
+        // Auto-select Professional plan as most popular (only if no URL parameter)
+        setTimeout(() => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const preselectedPlan = urlParams.get('plan');
+            if (!selectedPlan && !preselectedPlan) {
+                document.querySelector('[data-plan="professional"]').click();
+            }
+        }, 2000); // Increased delay to run after URL parameter handling
+        
+        }); // End DOMContentLoaded
+    </script>
+</body>
+</html>
