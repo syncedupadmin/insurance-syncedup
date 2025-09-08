@@ -6,6 +6,7 @@
     <title>Sign Up - SyncedUp Insurance Platform</title>
     <link rel="stylesheet" href="/css/pro.css">
     <script src="https://js.stripe.com/v3/"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places"></script>
     <style>
         .signup-hero {
             padding: 140px 20px 80px;
@@ -632,6 +633,173 @@
         // Wait for page to load before initializing
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, initializing signup page...');
+            
+            // Auto-formatting functions
+            function capitalizeWords(str) {
+                return str.replace(/\b\w/g, l => l.toUpperCase());
+            }
+            
+            function formatPhoneNumber(value) {
+                const cleaned = value.replace(/\D/g, '');
+                if (cleaned.length === 0) return '';
+                if (cleaned.length <= 3) return cleaned;
+                if (cleaned.length <= 6) return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3)}`;
+                return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`;
+            }
+            
+            function formatStateCode(value) {
+                return value.toUpperCase().replace(/[^A-Z]/g, '').substring(0, 2);
+            }
+            
+            // Auto-capitalization for name fields
+            ['firstName', 'lastName', 'agencyName'].forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('blur', function() {
+                        this.value = capitalizeWords(this.value.trim());
+                    });
+                    
+                    // Real-time formatting for names (first letter of each word)
+                    field.addEventListener('input', function(e) {
+                        const cursorPos = e.target.selectionStart;
+                        const formatted = this.value.replace(/\b\w/g, l => l.toUpperCase());
+                        if (formatted !== this.value) {
+                            this.value = formatted;
+                            this.setSelectionRange(cursorPos, cursorPos);
+                        }
+                    });
+                }
+            });
+            
+            // Phone number formatting
+            const phoneField = document.getElementById('agencyPhone');
+            if (phoneField) {
+                phoneField.addEventListener('input', function(e) {
+                    const cursorPos = e.target.selectionStart;
+                    const oldLength = this.value.length;
+                    this.value = formatPhoneNumber(this.value);
+                    const newLength = this.value.length;
+                    
+                    // Adjust cursor position
+                    const diff = newLength - oldLength;
+                    this.setSelectionRange(cursorPos + diff, cursorPos + diff);
+                });
+            }
+            
+            // State code formatting
+            const stateField = document.getElementById('agencyState');
+            if (stateField) {
+                stateField.addEventListener('input', function() {
+                    this.value = formatStateCode(this.value);
+                });
+            }
+            
+            // Email formatting (lowercase and trim)
+            const emailField = document.getElementById('adminEmail');
+            if (emailField) {
+                emailField.addEventListener('blur', function() {
+                    this.value = this.value.toLowerCase().trim();
+                });
+                
+                // Real-time email validation feedback
+                emailField.addEventListener('input', function() {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    const isValid = emailRegex.test(this.value);
+                    
+                    if (this.value.length > 0) {
+                        if (isValid) {
+                            this.style.borderColor = '#28a745';
+                        } else {
+                            this.style.borderColor = '#dc3545';
+                        }
+                    } else {
+                        this.style.borderColor = '';
+                    }
+                });
+            }
+            
+            // Password strength validation
+            const passwordField = document.getElementById('adminPassword');
+            const confirmPasswordField = document.getElementById('confirmPassword');
+            
+            if (passwordField) {
+                passwordField.addEventListener('input', function() {
+                    const password = this.value;
+                    let strength = 0;
+                    
+                    // Check password strength
+                    if (password.length >= 8) strength++;
+                    if (password.match(/[a-z]/)) strength++;
+                    if (password.match(/[A-Z]/)) strength++;
+                    if (password.match(/[0-9]/)) strength++;
+                    if (password.match(/[^a-zA-Z0-9]/)) strength++;
+                    
+                    // Visual feedback
+                    if (password.length > 0) {
+                        if (strength >= 4) {
+                            this.style.borderColor = '#28a745';
+                        } else if (strength >= 2) {
+                            this.style.borderColor = '#ffc107';
+                        } else {
+                            this.style.borderColor = '#dc3545';
+                        }
+                    } else {
+                        this.style.borderColor = '';
+                    }
+                });
+            }
+            
+            if (confirmPasswordField) {
+                confirmPasswordField.addEventListener('input', function() {
+                    const password = passwordField ? passwordField.value : '';
+                    const confirmPassword = this.value;
+                    
+                    if (confirmPassword.length > 0) {
+                        if (password === confirmPassword) {
+                            this.style.borderColor = '#28a745';
+                        } else {
+                            this.style.borderColor = '#dc3545';
+                        }
+                    } else {
+                        this.style.borderColor = '';
+                    }
+                });
+            }
+            
+            // Address auto-completion using Google Places API
+            function initAddressAutocomplete() {
+                const addressField = document.getElementById('agencyAddress');
+                if (addressField && window.google && window.google.maps) {
+                    const autocomplete = new google.maps.places.Autocomplete(addressField, {
+                        types: ['address'],
+                        componentRestrictions: { country: 'us' }
+                    });
+                    
+                    autocomplete.addListener('place_changed', function() {
+                        const place = autocomplete.getPlace();
+                        if (place.address_components) {
+                            // Auto-fill state if available
+                            const stateComponent = place.address_components.find(
+                                component => component.types.includes('administrative_area_level_1')
+                            );
+                            if (stateComponent && stateField) {
+                                stateField.value = stateComponent.short_name;
+                            }
+                        }
+                    });
+                } else {
+                    // Fallback: basic address formatting
+                    const addressField = document.getElementById('agencyAddress');
+                    if (addressField) {
+                        addressField.addEventListener('blur', function() {
+                            this.value = capitalizeWords(this.value.trim());
+                        });
+                    }
+                }
+            }
+            
+            // Initialize address autocomplete after a delay to ensure Google Maps is loaded
+            setTimeout(initAddressAutocomplete, 1000);
             
             // Initialize Stripe - use environment variable or fallback test key
             const stripe = Stripe(
