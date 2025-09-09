@@ -182,7 +182,7 @@ export default async function handler(req, res) {
       res.setHeader("Set-Cookie", [authCookie, roleCookie, rolesCookie]);
       res.setHeader("Cache-Control", "no-store");
 
-      // One authoritative redirect. No client script needed.
+      // Return JSON with redirect URL for client-side navigation
       const role = String(safeUser.role || "").toLowerCase();
       
       // Normalize role to match portal guard expectations
@@ -194,9 +194,9 @@ export default async function handler(req, res) {
                   : normalizedRole === "customer_service" ? "/customer-service/"
                   : "/agent/";
 
-      res.statusCode = 302;
-      res.setHeader("Location", portal);
-      res.end();
+      res.setHeader("Content-Type", "application/json");
+      res.statusCode = 200;
+      res.end(JSON.stringify({ success: true, redirect: portal }));
       
     } catch (e) {
       console.error('LOGIN_FATAL', {

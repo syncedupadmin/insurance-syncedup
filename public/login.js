@@ -18,22 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'POST',
         headers: { 'Content-Type':'application/json' },
         body: JSON.stringify({ email, password }),
-        credentials: 'include',
-        // IMPORTANT: don't auto-follow, so we can read Location and navigate
-        redirect: 'manual'
+        credentials: 'include'
       });
 
-      // If server sends 3xx, grab Location and navigate the page
-      const loc = res.headers.get('Location');
-      if (res.status >= 300 && res.status < 400 && loc) {
-        window.location.assign(loc);
-        return;
-      }
-
-      // Some browsers still set redirected+final url — handle just in case
-      if (res.redirected && res.url) {
-        window.location.assign(res.url);
-        return;
+      // Handle successful response
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.redirect) {
+          window.location.href = data.redirect;
+          return;
+        }
       }
 
       // If we get here, there was an error (server didn't redirect)
