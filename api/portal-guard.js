@@ -78,10 +78,11 @@ module.exports = async (req, res) => {
       return;
     }
 
-    // Auth OK; send to pretty URL (trailing slash)
-    // e.g. "/manager/" — the rewrite below will serve /_manager/index.html
+    // Auth OK; send to the actual index.html file
+    // The rewrite system will handle pretty URLs for sub-pages
+    const portal = url.replace(/\/$/, ''); // remove trailing slash if present
     res.statusCode = 302;
-    res.setHeader("Location", url.endsWith("/") ? url : `${url}/`);
+    res.setHeader("Location", `/_${portal.substring(1)}/index.html`);
     res.end();
   } catch (e) {
     res.statusCode = 302;
