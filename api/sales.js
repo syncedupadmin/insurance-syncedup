@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { requireAuth } from './_middleware/authCheck.js';
-import { getUserContext } from './utils/auth-helper.js';
+import { getUserContext, applyDataIsolation } from './utils/auth-helper.js';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -9,42 +9,45 @@ const supabase = createClient(
 
 async function salesHandler(req, res) {
   // CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', req.headers.origin || 'https://insurance.syncedupsolutions.com');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
   
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
   try {
-    const { agencyId, agentId, role } = getUserContext(req);
+    const userContext = getUserContext(req);
+    console.log(`🔐 Sales API access: ${userContext.role} (${userContext.email})`);
 
     if (req.method === 'GET') {
-      return await handleGetSales(req, res, agencyId, agentId, role);
+      return await handleGetSales(req, res, userContext);
     }
     
     if (req.method === 'POST') {
-      return await handleCreateSale(req, res, agencyId, agentId);
+      return await handleCreateSale(req, res, userContext);
     }
     
     if (req.method === 'PUT') {
-      return await handleUpdateSale(req, res, agencyId, agentId, role);
+      return await handleUpdateSale(req, res, userContext);
     }
     
     return res.status(405).json({ error: 'Method not allowed' });
 
   } catch (error) {
     console.error('Sales API error:', error);
-    res.status(500).json({ 
-      error: 'Internal server error', 
-      details: error.message 
-    });
+    if (error.message.includes('Authentication failed')) {
+      res.status(401).json({ error: 'Authentication required' });
+    } else {
+      res.status(500).json({ error: 'Internal server error' });
+    }
   }
 }
 
-// GET /api/sales - Retrieve sales data
-async function handleGetSales(req, res, agencyId, agentId, role) {
+// GET /api/sales - Retrieve sales data with proper data isolation
+async function handleGetSales(req, res, userContext) {
   try {
     const { 
       agent_id: queryAgentId, 
@@ -55,19 +58,16 @@ async function handleGetSales(req, res, agencyId, agentId, role) {
       offset = 0 
     } = req.query;
 
-    // Build query with joins to get commission data
+    // Build base query 
     let query = supabase.from('portal_sales').select('*');
 
-    // Role-based filtering
-    if (role === 'agent') {
-      query = query.eq('agent_id', agentId);
-    } else if (['manager', 'admin'].includes(role)) {
-      query = query.eq('agency_id', agencyId);
-      if (queryAgentId) {
-        query = query.eq('agent_id', queryAgentId);
-      }
+    // Apply data isolation based on user role and agency
+    query = applyDataIsolation(query, userContext);
+
+    // Additional filtering for specific agent (if user has permission)
+    if (queryAgentId && ['super_admin', 'admin', 'manager'].includes(userContext.role)) {
+      query = query.eq('agent_id', queryAgentId);
     }
-    // admin and super_admin see all
 
     // Date filtering
     if (date_from) {
@@ -472,4 +472,4 @@ function getFirstEnrollDemoProducts() {
   ];
 }
 
-export default requireAuth(['agent', 'admin', 'manager', 'super_admin'])(salesHandler);
+export default requireAuth(['agent', 'admin', 'manager', 'super_admin', 'customer_service'])(salesHandler);

@@ -1,0 +1,150 @@
+/**
+ * VERCEL EDGE FUNCTION - EMERGENCY PORTAL ACCESS CONTROL
+ * Server-side route protection for static sites
+ * CRITICAL: Prevents unauthorized portal access at server level
+ */
+
+// Simple JWT decode (Edge runtime compatible)
+function decodeJWT(token) {
+  try {
+    if (!token) return null;
+    
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    
+    // Decode payload (base64url)
+    const payload = parts[1]
+      .replace(/-/g, '+')
+      .replace(/_/g, '/');
+    
+    const decoded = JSON.parse(atob(payload));
+    
+    // Check expiration
+    if (decoded.exp && decoded.exp < Date.now() / 1000) {
+      return null;
+    }
+    
+    return decoded;
+  } catch (error) {
+    console.error('JWT decode error:', error);
+    return null;
+  }
+}
+
+// Role-based portal access matrix
+const PORTAL_ACCESS = {
+  '/super-admin': ['super_admin'],
+  '/admin': ['super_admin', 'admin'],
+  '/manager': ['super_admin', 'admin', 'manager'],
+  '/agent': ['super_admin', 'admin', 'manager', 'agent'],
+  '/customer-service': ['super_admin', 'admin', 'customer_service'],
+  '/leaderboard': ['super_admin', 'admin', 'manager', 'agent', 'customer_service']
+};
+
+// Default portals for redirect
+const DEFAULT_PORTALS = {
+  'super_admin': '/super-admin',
+  'admin': '/admin',
+  'manager': '/manager',
+  'agent': '/agent',
+  'customer_service': '/customer-service'
+};
+
+export default function handler(request) {
+  const { pathname } = new URL(request.url);
+  
+  console.log(`🔒 Edge Function: Checking access to ${pathname}`);
+  
+  // Skip protection for public routes
+  if (
+    pathname === '/' ||
+    pathname === '/login' ||
+    pathname === '/signup' ||
+    pathname === '/pricing' ||
+    pathname.startsWith('/api/') ||
+    pathname.startsWith('/js/') ||
+    pathname.startsWith('/css/') ||
+    pathname.startsWith('/images/') ||
+    pathname.includes('.') ||
+    pathname.startsWith('/_')
+  ) {
+    console.log(`✅ Public route: ${pathname}`);
+    return;
+  }
+  
+  // Check if this is a protected portal
+  const protectedRoute = Object.keys(PORTAL_ACCESS).find(route => 
+    pathname.startsWith(route)
+  );
+  
+  if (!protectedRoute) {
+    console.log(`✅ Unprotected route: ${pathname}`);
+    return;
+  }
+  
+  // Get token from request
+  let token = null;
+  
+  // Try Authorization header
+  const authHeader = request.headers.get('authorization');
+  if (authHeader?.startsWith('Bearer ')) {
+    token = authHeader.substring(7);
+  }
+  
+  // Try cookies
+  if (!token) {
+    const cookies = request.headers.get('cookie') || '';
+    const cookieMatch = cookies.match(/auth-token=([^;]+)/);
+    if (cookieMatch) {
+      token = cookieMatch[1];
+    }
+  }
+  
+  if (!token) {
+    console.log(`❌ No token found for ${pathname} - redirecting to login`);
+    return Response.redirect(new URL('/login', request.url), 302);
+  }
+  
+  // Decode and validate token
+  const payload = decodeJWT(token);
+  if (!payload || !payload.role || !payload.email) {
+    console.log(`❌ Invalid token for ${pathname} - redirecting to login`);
+    return Response.redirect(new URL('/login', request.url), 302);
+  }
+  
+  const userRole = payload.role;
+  const userEmail = payload.email;
+  
+  console.log(`👤 User: ${userEmail} (${userRole}) accessing ${pathname}`);
+  
+  // Check access permissions
+  const allowedRoles = PORTAL_ACCESS[protectedRoute];
+  if (!allowedRoles?.includes(userRole)) {
+    console.log(`❌ ACCESS DENIED: ${userRole} cannot access ${protectedRoute}`);
+    
+    // Redirect to user's default portal
+    const defaultPortal = DEFAULT_PORTALS[userRole] || '/login';
+    const redirectUrl = new URL(defaultPortal, request.url);
+    redirectUrl.searchParams.set('access_denied', 'true');
+    redirectUrl.searchParams.set('attempted_route', protectedRoute);
+    
+    console.log(`🔄 Redirecting to: ${defaultPortal}`);
+    return Response.redirect(redirectUrl, 302);
+  }
+  
+  console.log(`✅ ACCESS GRANTED: ${userRole} can access ${protectedRoute}`);
+  
+  // Allow the request to continue
+  return;
+}
+
+export const config = {
+  matcher: [
+    '/super-admin/:path*',
+    '/admin/:path*', 
+    '/manager/:path*',
+    '/agent/:path*',
+    '/customer-service/:path*',
+    '/leaderboard/:path*'
+  ]
+};

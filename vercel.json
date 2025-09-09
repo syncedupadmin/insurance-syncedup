@@ -1,33 +1,33 @@
 {
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
+    
+    { "source": "/super-admin", "destination": "/api/portal-guard?portal=super-admin&file=/portal-files/super-admin/index.html" },
+    { "source": "/admin", "destination": "/api/portal-guard?portal=admin&file=/portal-files/admin/index.html" },
+    { "source": "/admin/(.*)", "destination": "/api/portal-guard?portal=admin&file=/portal-files/admin/$1.html" },
+    { "source": "/manager", "destination": "/api/portal-guard?portal=manager&file=/portal-files/manager/index.html" },
+    { "source": "/manager/(.*)", "destination": "/api/portal-guard?portal=manager&file=/portal-files/manager/$1.html" },
+    { "source": "/agent", "destination": "/api/portal-guard?portal=agent&file=/portal-files/agent/index.html" },
+    { "source": "/agent/(.*)", "destination": "/api/portal-guard?portal=agent&file=/portal-files/agent/$1.html" },
+    { "source": "/customer-service", "destination": "/api/portal-guard?portal=customer-service&file=/portal-files/customer-service/index.html" },
+    { "source": "/customer-service/(.*)", "destination": "/api/portal-guard?portal=customer-service&file=/portal-files/customer-service/$1.html" },
+    { "source": "/leaderboard", "destination": "/api/portal-guard?portal=leaderboard&file=/portal-files/leaderboard/index.html" },
+    
     { "source": "/", "destination": "/index.html" },
     { "source": "/login", "destination": "/login.html" },
-    { "source": "/admin", "destination": "/admin/index.html" },
-    { "source": "/admin/(.*)", "destination": "/admin/$1.html" },
-    { "source": "/super-admin", "destination": "/super-admin.html" },
-    { "source": "/dashboard", "destination": "/dashboard.html" },
-    { "source": "/manager", "destination": "/manager/index.html" },
-    { "source": "/manager/(.*)", "destination": "/manager/$1.html" },
-    { "source": "/agent", "destination": "/agent/index.html" },
-    { "source": "/agent/(.*)", "destination": "/agent/$1.html" },
-    { "source": "/customer-service", "destination": "/customer-service/index.html" },
-    { "source": "/customer-service/(.*)", "destination": "/customer-service/$1.html" },
-    { "source": "/leaderboard", "destination": "/leaderboard/index.html" },
-    { "source": "/global-leaderboard", "destination": "/leaderboard/index.html" },
-    { "source": "/global-leaderboard-demo", "destination": "/global-leaderboard-demo.html" },
     { "source": "/pricing", "destination": "/pricing.html" },
     { "source": "/trial", "destination": "/signup.html" },
     { "source": "/signup", "destination": "/signup.html" },
+    { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/global-leaderboard", "destination": "/leaderboard/index.html" },
+    { "source": "/global-leaderboard-demo", "destination": "/global-leaderboard-demo.html" },
     { "source": "/test-upload-simple", "destination": "/test-upload-simple.html" },
     { "source": "/document-upload", "destination": "/document-upload.html" },
     { "source": "/test-worker-url", "destination": "/test-worker-url.html" },
     { "source": "/encrypted-upload", "destination": "/encrypted-upload.html" }
   ],
   "redirects": [
-    { "source": "/public/:path*", "destination": "/:path*", "permanent": true },
-    { "source": "/:page.html", "destination": "/:page", "permanent": true },
-    { "source": "/:section/index.html", "destination": "/:section", "permanent": true }
+    { "source": "/public/:path*", "destination": "/:path*", "permanent": true }
   ],
   "headers": [
     {
