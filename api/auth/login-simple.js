@@ -1,7 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  throw new Error('PRODUCTION ERROR: JWT_SECRET environment variable is required. System cannot operate securely.');
+}
 const JWT_EXPIRES_IN = '1h';
 
 export default async function handler(req, res) {

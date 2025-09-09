@@ -1,6 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { setCORSHeaders, handleCORSPreflight } from '../_utils/cors.js';
+
+// Validate required environment variables
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY || !process.env.JWT_SECRET) {
+  throw new Error('PRODUCTION ERROR: Missing critical environment variables (SUPABASE_URL, SUPABASE_SERVICE_KEY, JWT_SECRET). System cannot operate securely.');
+}
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -8,14 +14,11 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
-  // CORS headers
-  const origin = req.headers.origin || '*';
-  res.setHeader('Access-Control-Allow-Origin', origin);
-  res.setHeader('Vary', 'Origin');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-  if (req.method === 'OPTIONS') return res.status(200).end();
+  // Handle CORS preflight  
+  if (handleCORSPreflight(req, res)) return;
+  
+  // Set secure CORS headers
+  setCORSHeaders(req, res);
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }

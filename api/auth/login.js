@@ -4,11 +4,12 @@
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { createClient } from '@supabase/supabase-js';
+import { setCORSHeaders, handleCORSPreflight } from '../_utils/cors.js';
 
 // Required env vars in Vercel project settings
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY; // needs RLS bypass for password_hash read
-const AUTH_SECRET = process.env.AUTH_SECRET; // for JWT signing
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_KEY; // needs RLS bypass for password_hash read
+const AUTH_SECRET = process.env.JWT_SECRET; // for JWT signing - REQUIRED, NO FALLBACK
 
 // Normalize role helper
 const normalizeRole = (r) => String(r || '')
@@ -17,11 +18,11 @@ const normalizeRole = (r) => String(r || '')
 
 function failIfMissingEnv() {
   const missing = [];
-  if (!SUPABASE_URL) missing.push('SUPABASE_URL');
-  if (!SUPABASE_SERVICE_ROLE_KEY) missing.push('SUPABASE_SERVICE_ROLE_KEY');
-  if (!AUTH_SECRET) missing.push('AUTH_SECRET');
+  if (!SUPABASE_URL) missing.push('NEXT_PUBLIC_SUPABASE_URL');
+  if (!SUPABASE_SERVICE_ROLE_KEY) missing.push('SUPABASE_SERVICE_KEY');
+  if (!AUTH_SECRET) missing.push('JWT_SECRET');
   if (missing.length) {
-    const msg = `Missing required env: ${missing.join(', ')}`;
+    const msg = `PRODUCTION ERROR: Missing critical environment variables: ${missing.join(', ')}. System cannot operate securely.`;
     const err = new Error(msg);
     err.statusCode = 500;
     throw err;
@@ -53,6 +54,12 @@ function bad(res, code, msg) {
 }
 
 export default async function handler(req, res) {
+  // Handle CORS preflight
+  if (handleCORSPreflight(req, res)) return;
+  
+  // Set secure CORS headers
+  setCORSHeaders(req, res);
+  
   if (req.method !== 'POST') return bad(res, 405, 'Method Not Allowed');
 
   try {
@@ -63,12 +70,7 @@ export default async function handler(req, res) {
     
     const normalizedEmail = email.toLowerCase().trim();
 
-    // Try production Supabase login if demo fails and env vars are available
-    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !AUTH_SECRET) {
-      console.log('No Supabase env vars, demo login failed for:', email);
-      return bad(res, 401, 'Invalid credentials');
-    }
-    
+    // Ensure all required env vars are present
     failIfMissingEnv();
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
 

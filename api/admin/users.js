@@ -4,6 +4,8 @@ import { Resend } from 'resend';
 import { EMAIL_CONFIG } from '../email/config.js';
 import speakeasy from 'speakeasy';
 import QRCode from 'qrcode';
+import { setCORSHeaders, handleCORSPreflight } from '../_utils/cors.js';
+import { validateUserContext, createAgencySecureQuery, logSecurityViolation } from '../_utils/agency-isolation.js';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -27,6 +29,12 @@ async function logAudit(userId, action, details, ipAddress, userAgent = 'API') {
 }
 
 export default async function handler(req, res) {
+  // Handle CORS preflight  
+  if (handleCORSPreflight(req, res)) return;
+  
+  // Set secure CORS headers
+  setCORSHeaders(req, res);
+
   const token = req.headers.authorization?.replace('Bearer ', '');
   if (!token) {
     return res.status(401).json({ error: 'No authorization token' });
@@ -65,6 +73,7 @@ export default async function handler(req, res) {
   // GET /api/admin/users - Get all users with pagination and filtering
   if (req.method === 'GET') {
     try {
+      const userContext = validateUserContext(req);
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 50;
       const search = req.query.search || '';
@@ -72,9 +81,9 @@ export default async function handler(req, res) {
       const status = req.query.status || '';
       const offset = (page - 1) * limit;
 
-      let query = supabase
-        .from('portal_users')
-        .select('id, email, name, role, agent_code, is_active, last_login, created_at, two_factor_enabled, login_attempts', { count: 'exact' });
+      // Create agency-filtered query
+      let query = createAgencySecureQuery(supabase, 'portal_users', userContext)
+        .select('id, email, name, role, agent_code, is_active, last_login, created_at, two_factor_enabled, login_attempts, agency_id', { count: 'exact' });
 
       // Apply filters
       if (search) {
