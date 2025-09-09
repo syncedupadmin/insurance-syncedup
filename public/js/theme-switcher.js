@@ -31,13 +31,16 @@
         },
 
         detectPortal: function() {
-            const path = window.location.pathname;
+            // Path normalization to handle /_admin -> /admin conversion
+            const normalizePath = p => p.replace(/^\/_/, '/');
+            const path = normalizePath(window.location.pathname || '/');
             let portalClass = '';
 
             if (path.includes('/manager/')) portalClass = 'portal-manager';
             else if (path.includes('/agent/')) portalClass = 'portal-agent';
             else if (path.includes('/customer-service/')) portalClass = 'portal-customer-service';
             else if (path.includes('/admin/')) portalClass = 'portal-admin';
+            else if (path.includes('/super-admin/')) portalClass = 'portal-super-admin';
 
             if (portalClass) {
                 document.body.classList.add(portalClass);

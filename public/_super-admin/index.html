@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Administrator Console - SyncedUp Insurance</title>
     
+    <!-- Critical Theme Flash Prevention -->
+    <script>
+    (function(){
+      var t = localStorage.getItem('selectedTheme') || 'professional';
+      var h = document.documentElement;
+      if (t === 'classic') { h.classList.add('classic-mode'); h.style.backgroundColor = '#008080'; }
+      else if (t === 'modern') { h.classList.add('modern-mode'); h.style.background = 'linear-gradient(135deg,#667eea 0%,#764ba2 100%)'; }
+      else { h.style.background = 'linear-gradient(-45deg,#c2410c,#ea580c,#fb923c,#fed7aa)'; }
+      h.style.visibility = 'hidden';
+      setTimeout(function(){ h.style.visibility='visible'; h.style.transition='opacity .2s'; h.style.opacity='1'; }, 50);
+    })();
+    </script>
+    
     <!-- Server-side portal-guard.js already verified super-admin access -->
     
     <style>
@@ -667,6 +680,7 @@
         <header class="console-header">
             <h1>System Administrator Console</h1>
             <div class="header-meta">
+                <div id="roleSwitcherMount"></div>
                 <div class="session-info">
                     <span>Administrator: <span id="admin-email" class="loading">Loading...</span></span>
                     <span>Session: <span id="session-time">00:00</span></span>
@@ -912,9 +926,9 @@
                 const response = await fetch(`${API_BASE}/audit/log`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     },
+                    credentials: 'include',
                     body: JSON.stringify(auditEntry)
                 });
 
@@ -1332,7 +1346,7 @@
                 console.log('Testing JWT token...');
                 const jwtResponse = await fetch('/api/test/jwt-debug', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
+                        'Content-Type': 'application/json'
                         'Content-Type': 'application/json'
                     }
                 });
@@ -1343,7 +1357,7 @@
                 // Then load agencies with working endpoint
                 const response = await fetch('/api/test/agencies-simple', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
+                        'Content-Type': 'application/json'
                         'Content-Type': 'application/json'
                     }
                 });
@@ -1480,9 +1494,9 @@
                 const response = await fetch('/api/super-admin/agency-management?action=create_agency', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     },
+                    credentials: 'include',
                     body: JSON.stringify(formData)
                 });
 
@@ -1512,9 +1526,9 @@
                 const response = await fetch('/api/super-admin/agency-management?action=delete_agency&agency_id=' + agencyId, {
                     method: 'DELETE',
                     headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('syncedup_token'),
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    credentials: 'include'
                 });
 
                 const result = await response.json();
@@ -1552,9 +1566,9 @@
                 const response = await fetch('/api/super-admin/agency-management?action=' + action, {
                     method: 'PUT',
                     headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('syncedup_token'),
                         'Content-Type': 'application/json'
                     },
+                    credentials: 'include',
                     body: JSON.stringify(requestBody)
                 });
 
@@ -1764,5 +1778,7 @@
             }
         }, 500);
     </script>
+    <script src="/js/theme-switcher.js"></script>
+    <script src="/js/role-switcher.js"></script>
 </body>
 </html>
