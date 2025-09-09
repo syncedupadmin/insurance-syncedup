@@ -5,7 +5,7 @@
     { "source": "/(admin|manager|agent|customer-service|super-admin)$", "destination": "/api/portal-guard" },
     { "source": "/(admin|manager|agent|customer-service|super-admin)/$", "destination": "/api/portal-guard" },
 
-    { "source": "/(admin|manager|agent|customer-service|super-admin)/(.+\\.(css|js|mjs|map|png|jpg|jpeg|gif|svg|webp|ico|json|woff|woff2|ttf))", "destination": "/_$1/$2" },
+    { "source": "/(admin|manager|agent|customer-service|super-admin)/(.*)\\.(css|js|mjs|map|png|jpg|jpeg|gif|svg|webp|ico|json|woff|woff2|ttf)$", "destination": "/_$1/$2.$3" },
 
     { "source": "/(admin|manager|agent|customer-service|super-admin)/([^./]+)$", "destination": "/_$1/$2.html" },
 
