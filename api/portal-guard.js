@@ -78,9 +78,10 @@ module.exports = async (req, res) => {
       return;
     }
 
-    // OK – redirect to static file
+    // Auth OK; send to pretty URL (trailing slash)
+    // e.g. "/manager/" — the rewrite below will serve /_manager/index.html
     res.statusCode = 302;
-    res.setHeader("Location", routes[url]);
+    res.setHeader("Location", url.endsWith("/") ? url : `${url}/`);
     res.end();
   } catch (e) {
     res.statusCode = 302;

@@ -1,16 +1,27 @@
 {
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/login", "destination": "/login.html" },
-    { "source": "/", "destination": "/index.html" },
-    
-    { "source": "/super-admin", "destination": "/api/portal-guard" },
+
     { "source": "/admin", "destination": "/api/portal-guard" },
     { "source": "/manager", "destination": "/api/portal-guard" },
     { "source": "/agent", "destination": "/api/portal-guard" },
     { "source": "/customer-service", "destination": "/api/portal-guard" },
-    
-    { "source": "/_(admin|manager|agent|customer-service|super-admin)/(.*)", "destination": "/api/portal-guard" },
+    { "source": "/super-admin", "destination": "/api/portal-guard" },
+
+    { "source": "/admin/", "destination": "/_admin/index.html" },
+    { "source": "/manager/", "destination": "/_manager/index.html" },
+    { "source": "/agent/", "destination": "/_agent/index.html" },
+    { "source": "/customer-service/", "destination": "/_customer-service/index.html" },
+    { "source": "/super-admin/", "destination": "/_super-admin/index.html" },
+
+    { "source": "/admin/(.*)", "destination": "/_admin/$1" },
+    { "source": "/manager/(.*)", "destination": "/_manager/$1" },
+    { "source": "/agent/(.*)", "destination": "/_agent/$1" },
+    { "source": "/customer-service/(.*)", "destination": "/_customer-service/$1" },
+    { "source": "/super-admin/(.*)", "destination": "/_super-admin/$1" },
+
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/login", "destination": "/login.html" },
     { "source": "/pricing", "destination": "/pricing.html" },
     { "source": "/trial", "destination": "/signup.html" },
     { "source": "/signup", "destination": "/signup.html" },
