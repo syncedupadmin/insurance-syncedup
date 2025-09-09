@@ -77,8 +77,12 @@ module.exports = async (req, res) => {
                   (raw.startsWith('[') ? JSON.parse(raw).map(normalize) : 
                    String(raw).split(",").map(normalize));
 
+    // Check for current_role override (for role switching)
+    const currentRole = getCookie(req, "current_role");
+    const activeRoles = currentRole ? [normalize(currentRole)] : roles;
+
     const path = url.toLowerCase();
-    const allowed = new Set(roles.flatMap(r => ACCESS[normalize(r)] || []));
+    const allowed = new Set(activeRoles.flatMap(r => ACCESS[normalize(r)] || []));
 
     if (!Array.from(allowed).some(p => path.startsWith(p))) {
       // Hard block instead of "page loads then APIs 401"
