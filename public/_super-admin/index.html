@@ -1372,7 +1372,6 @@
                 const jwtResponse = await fetch('/api/test/jwt-debug', {
                     headers: {
                         'Content-Type': 'application/json'
-                        'Content-Type': 'application/json'
                     }
                 });
                 
@@ -1636,34 +1635,6 @@
         async function loadMonitoring() {
             await logAdminAction('NAVIGATION', 'Accessed System Monitoring');
             alert('System Monitoring module will be loaded here');
-        }
-
-        async function loadUserManagement() {
-            await logAdminAction('NAVIGATION', 'Accessed User Management');
-            
-            // Load user management content into the main dashboard area
-            const mainContent = document.querySelector('.dashboard-grid');
-            if (mainContent) {
-                try {
-                    const response = await fetch('/super-admin/user-management');
-                    const html = await response.text();
-                    
-                    // Extract the content from the body of the user-management page
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const userManagementContent = doc.body.innerHTML;
-                    
-                    // Replace the dashboard content with user management content
-                    mainContent.innerHTML = userManagementContent;
-                    
-                    // Update navigation active state
-                    document.querySelectorAll('.admin-navigation a').forEach(a => a.classList.remove('active'));
-                    event.target.classList.add('active');
-                } catch (error) {
-                    console.error('Failed to load user management:', error);
-                    mainContent.innerHTML = '<div class="error">Failed to load User Management module</div>';
-                }
-            }
         }
 
         async function loadTransactionLedger() {
