@@ -74,45 +74,49 @@ export default async function handler(req, res) {
     failIfMissingEnv();
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
 
-    // Fetch exact user from portal_users; email_norm or email
-    // We select password_hash for server-side bcrypt check. Requires service role or a secure RPC.
+    // Fetch exact user from portal_users with explicit error handling
     const { data: users, error } = await supabase
       .from('portal_users')
       .select('id, email, email_norm, full_name, name, role, agency_id, is_active, password_hash')
       .or(`email.eq.${email},email_norm.eq.${email}`)
-      .limit(1);
+      .maybeSingle();
 
+    // Sharp failure states - no leaky 500s
     if (error) {
       console.error('Database error during login:', error);
-      return bad(res, 500, 'Database error');
+      return bad(res, 500, 'db_error');
     }
     
-    const userRow = users?.[0];
-    if (!userRow) {
+    if (!users) {
       console.log(`Login attempt failed - no user found for email: ${email}`);
-      res.setHeader('Content-Type', 'application/json');
-      return res.status(401).end(JSON.stringify({ error: 'invalid_credentials', reason: 'no_user' }));
+      return bad(res, 401, 'invalid_credentials');
     }
     
-    if (userRow.is_active === false) {
+    if (users.is_active === false) {
       console.log(`Login attempt failed - inactive user: ${email}`);
-      res.setHeader('Content-Type', 'application/json');
-      return res.status(401).end(JSON.stringify({ error: 'invalid_credentials', reason: 'inactive_user' }));
+      return bad(res, 403, 'inactive');
     }
 
-    const hash = userRow.password_hash;
-    if (!hash || hash.length < 20) {
+    if (!users.password_hash || users.password_hash.length < 20) {
       console.log(`Login attempt failed - no valid password hash for user: ${email}`);
-      res.setHeader('Content-Type', 'application/json');
-      return res.status(401).end(JSON.stringify({ error: 'invalid_credentials', reason: 'no_user' }));
+      return bad(res, 401, 'invalid_credentials');
     }
 
-    const okPass = await bcrypt.compare(password, hash);
-    if (!okPass) {
-      console.log(`Login attempt failed - wrong password for user: ${email}`);
-      res.setHeader('Content-Type', 'application/json');
-      return res.status(401).end(JSON.stringify({ error: 'invalid_credentials', reason: 'wrong_password' }));
+    let okPw = false;
+    try {
+      okPw = await bcrypt.compare(password, users.password_hash);
+    } catch (bcryptError) {
+      console.error('Bcrypt comparison error:', bcryptError);
+      return bad(res, 500, 'auth_error');
     }
+    
+    if (!okPw) {
+      console.log(`Login attempt failed - wrong password for user: ${email}`);
+      return bad(res, 401, 'invalid_credentials');
+    }
+
+    // User authenticated successfully - use users instead of userRow
+    const userRow = users;
 
     // Handle both database formats and normalize to underscore style
     const rawRole = String(userRow.role || '');
