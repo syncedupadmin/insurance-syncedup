@@ -6,9 +6,29 @@
     (function(){
         var t=localStorage.getItem("selectedTheme")||"professional";
         var h=document.documentElement;
-        if(t==="classic"){h.classList.add("classic-mode");h.style.backgroundColor="#008080";}
-        else if(t==="modern"){h.classList.add("modern-mode");h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        h.classList.add(t+"-mode");
+        
+        // Load theme CSS immediately
+        var existingTheme = document.querySelector('link[data-theme-css]');
+        if(existingTheme) existingTheme.remove();
+        
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = '/css/themes/' + t + '.css';
+        link.setAttribute('data-theme-css', t);
+        document.head.appendChild(link);
+        
+        // Add body class when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            if(document.body) document.body.classList.add(t+"-mode");
+        });
+        
+        // Set background for immediate visual feedback
+        if(t==="classic"){h.style.backgroundColor="#008080";}
+        else if(t==="modern"){h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        else if(t==="professional"){h.style.background="linear-gradient(-45deg,#f8fafc,#e2e8f0,#cbd5e1,#94a3b8)";}
         else{h.style.background="linear-gradient(-45deg,#059669,#10b981,#34d399,#a7f3d0)";}
+        
         h.style.visibility="hidden";
         setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
     })();
@@ -632,8 +652,13 @@
 
         // Logout function
         function logout() {
+            // Remove all possible authentication keys
+            localStorage.removeItem('syncedup_token');
+            localStorage.removeItem('syncedup_user');
             localStorage.removeItem('authToken');
+            localStorage.removeItem('token');
             localStorage.removeItem('user');
+            localStorage.removeItem('currentUser');
             window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
         }
 

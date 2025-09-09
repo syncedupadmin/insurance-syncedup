@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Test</title>
+    <style>
+        body { padding: 20px; font-family: Arial, sans-serif; }
+        .theme-info { 
+            background: rgba(255,255,255,0.1); 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 8px;
+        }
+        button { 
+            padding: 10px 20px; 
+            margin: 5px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+        }
+        .status { 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-left: 4px solid #4CAF50; 
+            background: #f1f8ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Agent Portal Theme Test</h1>
+    
+    <div class="status" id="status">
+        Loading theme system...
+    </div>
+    
+    <div class="theme-info">
+        <h3>Current Theme Status:</h3>
+        <p><strong>Selected Theme:</strong> <span id="current-theme">Loading...</span></p>
+        <p><strong>Body Classes:</strong> <span id="body-classes">Loading...</span></p>
+        <p><strong>HTML Classes:</strong> <span id="html-classes">Loading...</span></p>
+        <p><strong>Loaded CSS Files:</strong> <span id="loaded-css">Loading...</span></p>
+    </div>
+    
+    <div>
+        <h3>Theme Switch Tests:</h3>
+        <button onclick="testProfessional()">Switch to Professional</button>
+        <button onclick="testClassic()">Switch to Classic</button>
+        <button onclick="testModern()">Switch to Modern</button>
+        <button onclick="clearStorage()">Clear Storage</button>
+    </div>
+    
+    <div class="theme-info">
+        <h3>Test Results:</h3>
+        <div id="test-results">Ready for testing...</div>
+    </div>
+    
+    <script>
+        function updateStatus() {
+            const currentTheme = localStorage.getItem('selectedTheme') || 'none';
+            const bodyClasses = document.body.className || 'none';
+            const htmlClasses = document.documentElement.className || 'none';
+            const cssLinks = Array.from(document.querySelectorAll('link[data-theme-css]')).map(l => l.href);
+            
+            document.getElementById('current-theme').textContent = currentTheme;
+            document.getElementById('body-classes').textContent = bodyClasses;
+            document.getElementById('html-classes').textContent = htmlClasses;
+            document.getElementById('loaded-css').textContent = cssLinks.length > 0 ? cssLinks.join(', ') : 'none';
+            
+            document.getElementById('status').innerHTML = `
+                <strong>Theme System Status:</strong> ${window.themeSystem ? 'Loaded' : 'Not Loaded'}<br>
+                <strong>Current Theme:</strong> ${currentTheme}<br>
+                <strong>Classes Applied:</strong> ${bodyClasses !== 'none' ? 'Yes' : 'No'}
+            `;
+        }
+        
+        function logResult(message, success = true) {
+            const resultsDiv = document.getElementById('test-results');
+            const timestamp = new Date().toLocaleTimeString();
+            resultsDiv.innerHTML += `<div style="color: ${success ? 'green' : 'red'}; margin: 2px 0;">[${timestamp}] ${message}</div>`;
+        }
+        
+        function testProfessional() {
+            logResult('Testing professional theme...');
+            if (window.themeSystem) {
+                window.themeSystem.applyTheme('professional');
+                setTimeout(() => {
+                    updateStatus();
+                    const hasClass = document.body.classList.contains('professional-mode');
+                    logResult(`Professional theme applied: ${hasClass ? 'SUCCESS' : 'FAILED'}`, hasClass);
+                }, 100);
+            } else {
+                logResult('Theme system not loaded!', false);
+            }
+        }
+        
+        function testClassic() {
+            logResult('Testing classic theme...');
+            if (window.themeSystem) {
+                window.themeSystem.applyTheme('classic');
+                setTimeout(() => {
+                    updateStatus();
+                    const hasClass = document.body.classList.contains('classic-mode');
+                    logResult(`Classic theme applied: ${hasClass ? 'SUCCESS' : 'FAILED'}`, hasClass);
+                }, 100);
+            } else {
+                logResult('Theme system not loaded!', false);
+            }
+        }
+        
+        function testModern() {
+            logResult('Testing modern theme...');
+            if (window.themeSystem) {
+                window.themeSystem.applyTheme('modern');
+                setTimeout(() => {
+                    updateStatus();
+                    const hasClass = document.body.classList.contains('modern-mode');
+                    logResult(`Modern theme applied: ${hasClass ? 'SUCCESS' : 'FAILED'}`, hasClass);
+                }, 100);
+            } else {
+                logResult('Theme system not loaded!', false);
+            }
+        }
+        
+        function clearStorage() {
+            localStorage.clear();
+            logResult('Storage cleared');
+            updateStatus();
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStatus();
+            
+            // Wait for theme system to load
+            setTimeout(() => {
+                updateStatus();
+                if (window.themeSystem) {
+                    logResult('Theme system loaded successfully!');
+                } else {
+                    logResult('Theme system failed to load!', false);
+                }
+            }, 1000);
+        });
+        
+        // Update status periodically
+        setInterval(updateStatus, 2000);
+    </script>
+    
+    <!-- Load theme system -->
+    <script src="/js/theme-switcher.js"></script>
+</body>
+</html>

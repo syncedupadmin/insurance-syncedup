@@ -24,11 +24,9 @@
             this.loadSavedTheme();
             this.setupEventListeners();
             
-            // Remove any inline styles after theme is loaded
+            // Remove visibility inline style only (keep theme backgrounds)
             setTimeout(() => {
                 document.documentElement.style.removeProperty('visibility');
-                document.documentElement.style.removeProperty('background');
-                document.documentElement.style.removeProperty('backgroundColor');
             }, 100);
         },
 
@@ -51,8 +49,8 @@
         loadSavedTheme: function() {
             const savedTheme = localStorage.getItem('selectedTheme') || 'professional';
             
-            // Classes already set by critical script, just load CSS if needed
-            if (savedTheme !== 'professional' && !document.querySelector(`link[data-theme-css="${savedTheme}"]`)) {
+            // Always ensure theme CSS is loaded (critical script may have already loaded it)
+            if (!document.querySelector(`link[data-theme-css="${savedTheme}"]`)) {
                 this.loadThemeCSS(savedTheme);
             }
             
@@ -75,17 +73,12 @@
             // Remove any existing theme CSS
             document.querySelectorAll('link[data-theme-css]').forEach(link => link.remove());
 
-            // Apply new theme
-            if (themeName === 'professional') {
-                // Professional uses base styles, no class needed
-            } else {
-                // Add theme class to both for compatibility
-                document.documentElement.classList.add(themeName + '-mode');
-                document.body.classList.add(themeName + '-mode');
-                
-                // Load theme CSS
-                this.loadThemeCSS(themeName);
-            }
+            // Apply new theme - all themes get classes and CSS
+            document.documentElement.classList.add(themeName + '-mode');
+            document.body.classList.add(themeName + '-mode');
+            
+            // Load theme CSS for all themes
+            this.loadThemeCSS(themeName);
 
             this.currentTheme = themeName;
             localStorage.setItem('selectedTheme', themeName);

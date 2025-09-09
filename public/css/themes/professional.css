@@ -1,33 +1,174 @@
-/* PROFESSIONAL THEME - SIMPLE VERSION */
+/* PROFESSIONAL THEME - Agent Portal Compatible */
+
+/* Override body background with professional gradient */
 body.professional-mode {
-    background: #ffffff !important;
-    color: #000000 !important;
-    font-family: Arial, sans-serif !important;
+    background: linear-gradient(-45deg, #f8fafc, #e2e8f0, #cbd5e1, #94a3b8) !important;
+    background-size: 400% 400% !important;
+    animation: gradient 15s ease infinite !important;
+    color: #1e293b !important;
 }
 
-body.professional-mode .sidebar {
-    background: #f0f0f0 !important;
-    border-right: 1px solid #ddd !important;
+/* Override floating particles with subtle professional pattern */
+body.professional-mode::before {
+    background: 
+        radial-gradient(circle at 20% 50%, rgba(148, 163, 184, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(203, 213, 225, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(226, 232, 240, 0.1) 0%, transparent 50%) !important;
 }
 
+/* Professional header styling */
+body.professional-mode .header {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+    color: #1e293b !important;
+    box-shadow: 0 4px 16px rgba(148, 163, 184, 0.2) !important;
+}
+
+/* Professional navigation */
+body.professional-mode .nav {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(148, 163, 184, 0.25) !important;
+}
+
+body.professional-mode .nav-link {
+    color: #475569 !important;
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+}
+
+body.professional-mode .nav-link:hover {
+    background: rgba(248, 250, 252, 0.9) !important;
+    color: #1e293b !important;
+    border-color: rgba(148, 163, 184, 0.4) !important;
+}
+
+body.professional-mode .nav-link.active {
+    background: rgba(59, 130, 246, 0.1) !important;
+    color: #1d4ed8 !important;
+    border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Professional cards and containers */
 body.professional-mode .card,
-body.professional-mode .dashboard-card {
-    background: #ffffff !important;
-    border: 1px solid #ddd !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
+body.professional-mode .dashboard-card,
+body.professional-mode .stat-card,
+body.professional-mode .agent-notice {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(148, 163, 184, 0.25) !important;
+    box-shadow: 0 4px 16px rgba(148, 163, 184, 0.15) !important;
+    color: #1e293b !important;
 }
 
-/* Remove all glassmorphism effects */
-body.professional-mode * {
-    backdrop-filter: none !important;
-    background: transparent !important;
+/* Professional buttons */
+body.professional-mode .btn {
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+    backdrop-filter: blur(8px) !important;
 }
 
-body.professional-mode .sidebar {
-    background: #2c3e50 !important;
+body.professional-mode .btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+    color: white !important;
+    border-color: rgba(59, 130, 246, 0.5) !important;
 }
 
-body.professional-mode .main-content {
-    background: #ecf0f1 !important;
+body.professional-mode .btn-secondary {
+    background: rgba(148, 163, 184, 0.8) !important;
+    color: white !important;
+    border-color: rgba(148, 163, 184, 0.5) !important;
+}
+
+body.professional-mode .btn-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: white !important;
+    border-color: rgba(245, 158, 11, 0.5) !important;
+}
+
+/* Professional table styling */
+body.professional-mode table {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(148, 163, 184, 0.25) !important;
+}
+
+body.professional-mode th {
+    background: rgba(248, 250, 252, 0.9) !important;
+    color: #475569 !important;
+    border-bottom: 2px solid rgba(148, 163, 184, 0.3) !important;
+}
+
+body.professional-mode td {
+    color: #1e293b !important;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.15) !important;
+}
+
+/* Professional form elements */
+body.professional-mode .form-input,
+body.professional-mode .form-select,
+body.professional-mode select {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+    color: #1e293b !important;
+}
+
+body.professional-mode .form-input:focus,
+body.professional-mode .form-select:focus {
+    border-color: rgba(59, 130, 246, 0.5) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Professional stats and metrics */
+body.professional-mode .stat-value {
+    color: #1d4ed8 !important;
+}
+
+body.professional-mode .stat-label {
+    color: #475569 !important;
+}
+
+/* Professional progress bars */
+body.professional-mode .progress {
+    background: rgba(148, 163, 184, 0.2) !important;
+}
+
+body.professional-mode .progress-bar {
+    background: linear-gradient(90deg, #3b82f6, #1d4ed8) !important;
+}
+
+/* Professional text colors */
+body.professional-mode h1,
+body.professional-mode h2,
+body.professional-mode h3 {
+    color: #1e293b !important;
+}
+
+body.professional-mode p,
+body.professional-mode span,
+body.professional-mode div {
+    color: #475569 !important;
+}
+
+/* Icons in professional mode */
+body.professional-mode .icon {
+    color: inherit !important;
+}
+
+/* Professional theme button states */
+body.professional-mode .theme-btn {
+    background: rgba(255, 255, 255, 0.8) !important;
+    color: #475569 !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+}
+
+body.professional-mode .theme-btn:hover {
+    background: rgba(248, 250, 252, 0.95) !important;
+    color: #1e293b !important;
+}
+
+body.professional-mode .theme-btn.active {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+    color: white !important;
+    border-color: rgba(59, 130, 246, 0.5) !important;
 }

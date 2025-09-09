@@ -52,58 +52,32 @@ export default async function handler(req, res) {
 
     let user;
     if (userError || !userData) {
-      // Fallback for demo users
-      const demoUsers = {
-        'admin@syncedupsolutions.com': { 
-          id: 'super-admin-main', 
-          email: 'admin@syncedupsolutions.com', 
-          name: 'Super Administrator', 
-          role: 'super-admin', 
-          agency_id: 'SYSTEM', 
-          is_active: true, 
-          active: true,
-          must_change_password: false, 
-          login_count: 0 
-        }
-      };
-      
-      user = demoUsers[email.toLowerCase()];
-      if (!user) {
-        return res.status(401).json({ error: 'Invalid email or password' });
-      }
+      // No fallback users - all authentication must go through database
+      return res.status(401).json({ error: 'Invalid email or password' });
     } else {
       user = userData;
       // Normalize the active field (portal_users uses 'active', users uses 'is_active')
       user.is_active = user.is_active || user.active;
     }
 
-    // Special override for admin@syncedupsolutions.com
-    if (email.toLowerCase() === 'admin@syncedupsolutions.com') {
+    // Role normalization
+    if (user.role === 'super_admin') {
       user.role = 'super-admin';
-      user.agency_id = user.agency_id || 'SYSTEM';
     }
 
     if (!user.is_active) return res.status(401).json({ error: 'Account is not active' });
 
-    // Password verification
+    // Password verification using bcrypt only
     let isValidPassword = false;
     
-    if (email.toLowerCase() === 'admin@syncedupsolutions.com') {
-      const validPasswords = ['TestPassword123!', 'superadmin123', 'Admin123!'];
-      isValidPassword = validPasswords.includes(password);
-    } else if (user.password_hash) {
-      // Try bcrypt verification for hashed passwords
+    if (user.password_hash) {
       try {
         const bcrypt = await import('bcrypt');
         isValidPassword = await bcrypt.compare(password, user.password_hash);
       } catch (bcryptError) {
-        console.log('Bcrypt verification failed, trying plain text');
-        isValidPassword = password === user.password_hash;
+        console.log('Bcrypt verification failed:', bcryptError.message);
+        isValidPassword = false;
       }
-    } else {
-      // Fallback for test accounts with TestPass123!
-      const testPasswords = ['TestPass123!', 'demo123', 'password', 'demo', '123456'];
-      isValidPassword = testPasswords.includes(password);
     }
     
     if (!isValidPassword) return res.status(401).json({ error: 'Invalid email or password' });
