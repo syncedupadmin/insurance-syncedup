@@ -702,7 +702,7 @@
             
             <div class="nav-section">
                 <h3>User Administration</h3>
-                <a href="/super-admin/user-management" target="_blank">User Management</a>
+                <a href="#" onclick="loadUserManagement()">User Management</a>
                 <a href="#" onclick="loadAgencyControl()">Agency Control</a>
                 <a href="#" onclick="loadAccessControl()">Access Control</a>
                 <a href="#" onclick="loadActiveSessions()">Active Sessions</a>
@@ -1219,7 +1219,30 @@
 
         async function loadUserManagement() {
             await logAdminAction('NAVIGATION', 'Accessed User Management');
-            alert('User Management module will be loaded here');
+            
+            // Load user management content into the main dashboard area
+            const mainContent = document.querySelector('.dashboard-grid');
+            if (mainContent) {
+                try {
+                    const response = await fetch('/super-admin/user-management');
+                    const html = await response.text();
+                    
+                    // Extract the content from the body of the user-management page
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const userManagementContent = doc.body.innerHTML;
+                    
+                    // Replace the dashboard content with user management content
+                    mainContent.innerHTML = userManagementContent;
+                    
+                    // Update navigation active state
+                    document.querySelectorAll('.admin-navigation a').forEach(a => a.classList.remove('active'));
+                    event.target.classList.add('active');
+                } catch (error) {
+                    console.error('Failed to load user management:', error);
+                    mainContent.innerHTML = '<div class="error">Failed to load User Management module</div>';
+                }
+            }
         }
 
         async function loadAgencyControl() {
@@ -1617,7 +1640,30 @@
 
         async function loadUserManagement() {
             await logAdminAction('NAVIGATION', 'Accessed User Management');
-            alert('User Management module will be loaded here');
+            
+            // Load user management content into the main dashboard area
+            const mainContent = document.querySelector('.dashboard-grid');
+            if (mainContent) {
+                try {
+                    const response = await fetch('/super-admin/user-management');
+                    const html = await response.text();
+                    
+                    // Extract the content from the body of the user-management page
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const userManagementContent = doc.body.innerHTML;
+                    
+                    // Replace the dashboard content with user management content
+                    mainContent.innerHTML = userManagementContent;
+                    
+                    // Update navigation active state
+                    document.querySelectorAll('.admin-navigation a').forEach(a => a.classList.remove('active'));
+                    event.target.classList.add('active');
+                } catch (error) {
+                    console.error('Failed to load user management:', error);
+                    mainContent.innerHTML = '<div class="error">Failed to load User Management module</div>';
+                }
+            }
         }
 
         async function loadTransactionLedger() {
