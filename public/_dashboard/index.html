@@ -617,10 +617,8 @@
                 currentAgent = JSON.parse(userData);
                 console.log('Logged in as:', currentAgent.name, '- ID:', currentAgent.id);
                 
-                // Allow agents, admin, and super-admin to access this dashboard
-                if (!['agent', 'admin', 'super-admin'].includes(currentAgent.role)) {
-                    window.location.href = '/login.html';
-                }
+                // Dashboard is now accessible to any authenticated user
+                console.log(`Dashboard accessed by ${currentAgent.role}: ${currentAgent.name}`);
             } else {
                 // Redirect to login if not authenticated
                 window.location.href = '/login.html';

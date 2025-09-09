@@ -16,7 +16,8 @@ module.exports = async (req, res) => {
     "/manager": "manager", 
     "/agent": "agent",
     "/customer-service": "customer-service",
-    "/super-admin": "super-admin"
+    "/super-admin": "super-admin",
+    "/dashboard": "dashboard"
   };
   
   const portal = portals[url];

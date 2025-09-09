@@ -7,6 +7,7 @@
     { "source": "/agent", "destination": "/api/portal-guard" },
     { "source": "/customer-service", "destination": "/api/portal-guard" },
     { "source": "/super-admin", "destination": "/api/portal-guard" },
+    { "source": "/dashboard", "destination": "/api/portal-guard" },
 
     { "source": "/admin/(\\w[\\w-]*)", "destination": "/_admin/$1.html" },
     { "source": "/manager/(\\w[\\w-]*)", "destination": "/_manager/$1.html" },

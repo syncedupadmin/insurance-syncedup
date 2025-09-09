@@ -1,11 +1,11 @@
 const HIERARCHY = ["agent","customer_service","manager","admin","super_admin"];
 
 const ACCESS = {
-  super_admin: ["/super-admin","/admin","/manager","/agent","/customer-service"],
-  admin:       ["/admin","/manager","/agent","/customer-service"],
-  manager:     ["/manager","/agent"],
-  agent:       ["/agent"],
-  customer_service: ["/customer-service"]
+  super_admin: ["/super-admin","/admin","/manager","/agent","/customer-service","/dashboard"],
+  admin:       ["/admin","/manager","/agent","/customer-service","/dashboard"],
+  manager:     ["/manager","/agent","/dashboard"],
+  agent:       ["/agent","/dashboard"],
+  customer_service: ["/customer-service","/dashboard"]
 };
 
 const DOWNGRADE = {
