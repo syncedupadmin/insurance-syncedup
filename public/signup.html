@@ -809,63 +809,42 @@
             // Address auto-completion using Google Places API
             function initAddressAutocomplete() {
                 const addressField = document.getElementById('agencyAddress');
+                const stateField = document.getElementById('agencyState');
+                
                 if (addressField && window.google && window.google.maps && window.google.maps.places) {
                     try {
-                        // Use the newer PlaceAutocompleteElement if available
-                        if (window.google.maps.places.PlaceAutocompleteElement) {
-                            const autocompleteElement = new google.maps.places.PlaceAutocompleteElement();
-                            autocompleteElement.setAttribute('placeholder', '123 Main Street, City, State 12345');
-                            autocompleteElement.setAttribute('componentRestrictions', JSON.stringify({ country: 'us' }));
-                            autocompleteElement.setAttribute('types', 'address');
+                        console.log('Setting up Google Places autocomplete...');
+                        
+                        // Use the reliable legacy Autocomplete for now
+                        const autocomplete = new google.maps.places.Autocomplete(addressField, {
+                            types: ['address'],
+                            componentRestrictions: { country: 'us' },
+                            fields: ['formatted_address', 'address_components', 'geometry']
+                        });
+                        
+                        autocomplete.addListener('place_changed', function() {
+                            const place = autocomplete.getPlace();
+                            console.log('Place selected:', place);
                             
-                            // Replace the input field with the autocomplete element
-                            addressField.parentNode.insertBefore(autocompleteElement, addressField);
-                            addressField.style.display = 'none';
-                            
-                            // Copy styling to the new element
-                            autocompleteElement.style.cssText = addressField.style.cssText;
-                            autocompleteElement.className = addressField.className;
-                            
-                            autocompleteElement.addEventListener('place_changed', function() {
-                                const place = autocompleteElement.place;
-                                if (place && place.address_components) {
-                                    // Update the hidden field with the formatted address
-                                    addressField.value = place.formatted_address;
-                                    
-                                    // Auto-fill state if available
-                                    const stateComponent = place.address_components.find(
-                                        component => component.types.includes('administrative_area_level_1')
-                                    );
-                                    if (stateComponent && stateField) {
-                                        stateField.value = stateComponent.short_name;
-                                    }
+                            if (place.address_components) {
+                                // Auto-fill state if available
+                                const stateComponent = place.address_components.find(
+                                    component => component.types.includes('administrative_area_level_1')
+                                );
+                                if (stateComponent && stateField) {
+                                    stateField.value = stateComponent.short_name;
+                                    console.log('Auto-filled state:', stateComponent.short_name);
                                 }
-                            });
-                        } else {
-                            // Fallback to legacy Autocomplete
-                            const autocomplete = new google.maps.places.Autocomplete(addressField, {
-                                types: ['address'],
-                                componentRestrictions: { country: 'us' }
-                            });
-                            
-                            autocomplete.addListener('place_changed', function() {
-                                const place = autocomplete.getPlace();
-                                if (place.address_components) {
-                                    // Auto-fill state if available
-                                    const stateComponent = place.address_components.find(
-                                        component => component.types.includes('administrative_area_level_1')
-                                    );
-                                    if (stateComponent && stateField) {
-                                        stateField.value = stateComponent.short_name;
-                                    }
-                                }
-                            });
-                        }
+                            }
+                        });
+                        
+                        console.log('Google Places autocomplete setup complete');
                     } catch (error) {
-                        console.log('Google Places autocomplete setup failed:', error);
+                        console.error('Google Places autocomplete setup failed:', error);
                         initBasicAddressFormatting();
                     }
                 } else {
+                    console.log('Google Maps/Places not available, using basic formatting');
                     initBasicAddressFormatting();
                 }
             }
