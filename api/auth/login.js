@@ -1,6 +1,9 @@
 // api/auth/login.js
 // Production login: Supabase only. No fallbacks. No fairy dust.
 
+// Ensure Node.js runtime (jsonwebtoken doesn't work on Edge)
+export const config = { runtime: 'nodejs' };
+
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { createClient } from '@supabase/supabase-js';
@@ -74,126 +77,134 @@ export default async function handler(req, res) {
     failIfMissingEnv();
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
 
-    // Fetch exact user from portal_users with explicit error handling
-    const { data: users, error } = await supabase
-      .from('portal_users')
-      .select('id, email, email_norm, full_name, name, role, agency_id, is_active, password_hash')
-      .or(`email.eq.${email},email_norm.eq.${email}`)
-      .maybeSingle();
-
-    // Sharp failure states - no leaky 500s
-    if (error) {
-      console.error('Database error during login:', error);
-      return bad(res, 500, 'db_error');
-    }
-    
-    if (!users) {
-      console.log(`Login attempt failed - no user found for email: ${email}`);
-      return bad(res, 401, 'invalid_credentials');
-    }
-    
-    if (users.is_active === false) {
-      console.log(`Login attempt failed - inactive user: ${email}`);
-      return bad(res, 403, 'inactive');
-    }
-
-    if (!users.password_hash || users.password_hash.length < 20) {
-      console.log(`Login attempt failed - no valid password hash for user: ${email}`);
-      return bad(res, 401, 'invalid_credentials');
-    }
-
-    let okPw = false;
+    // Database operations with explicit error handling
     try {
-      okPw = await bcrypt.compare(password, users.password_hash);
-    } catch (bcryptError) {
-      console.error('Bcrypt comparison error:', bcryptError);
-      return bad(res, 500, 'auth_error');
+      const { data: user, error } = await supabase
+        .from('portal_users')
+        .select('id, email, email_norm, full_name, name, role, agency_id, is_active, password_hash')
+        .or(`email.eq.${email},email_norm.eq.${email}`)
+        .maybeSingle();
+
+      if (error) {
+        console.error('LOGIN_DB_ERROR', {
+          code: error.code,
+          message: error.message, 
+          details: error.details,
+          hint: error.hint,
+          email: email
+        });
+        return bad(res, 500, 'db_error');
+      }
+      
+      if (!user) {
+        console.log(`Login attempt failed - no user found for email: ${email}`);
+        return bad(res, 401, 'invalid_credentials');
+      }
+      
+      if (user.is_active === false) {
+        console.log(`Login attempt failed - inactive user: ${email}`);
+        return bad(res, 403, 'inactive');
+      }
+
+      if (!user.password_hash || user.password_hash.length < 20) {
+        console.log(`Login attempt failed - no valid password hash for user: ${email}`);
+        return bad(res, 401, 'invalid_credentials');
+      }
+
+      const okPw = await bcrypt.compare(password, user.password_hash);
+      if (!okPw) {
+        console.log(`Login attempt failed - wrong password for user: ${email}`);
+        return bad(res, 401, 'invalid_credentials');
+      }
+
+      // User authenticated successfully
+      const userRow = user;
+
+      // Handle both database formats and normalize to underscore style
+      const rawRole = String(userRow.role || '');
+      const dbRole = normalizeRole(rawRole);
+      
+      // Allow both original database format and normalized format
+      const allowed = new Set(['super_admin','admin','manager','agent','customer_service','super-admin','customer-service']);
+      if (!allowed.has(rawRole) && !allowed.has(dbRole)) {
+        console.log(`Login attempt failed - invalid role: ${rawRole}/${dbRole} for user: ${email}`);
+        return bad(res, 403, 'Invalid role');
+      }
+      
+      const displayName = userRow.full_name || userRow.name || userRow.email;
+
+      const safeUser = {
+        id: userRow.id,
+        email: userRow.email,
+        name: displayName,
+        role: dbRole,
+        agency_id: userRow.agency_id,
+        is_active: !!userRow.is_active
+      };
+
+      const token = signJWT(
+        { sub: safeUser.id, email: safeUser.email, role: dbRole, agency_id: safeUser.agency_id },
+        AUTH_SECRET,
+        8 * 60 * 60
+      );
+
+      const isProd = /syncedupsolutions\.com$/.test(req.headers.host || "");
+      const baseFlags = [
+        "Path=/",
+        "SameSite=Lax",
+        isProd ? "Secure" : "",
+        "Max-Age=28800"
+      ].filter(Boolean).join("; ");
+
+      const authCookie = [
+        `auth_token=${token}`,
+        baseFlags,
+        isProd ? "Domain=.syncedupsolutions.com" : "",
+        isProd ? "HttpOnly" : "HttpOnly=false"
+      ].filter(Boolean).join("; ");
+
+      const roleCookie = [
+        `user_role=${encodeURIComponent(safeUser.role || "unknown")}`,
+        baseFlags,
+        isProd ? "Domain=.syncedupsolutions.com" : ""
+      ].filter(Boolean).join("; ");
+
+      // Support multi-role users - for now single role but extensible
+      const userRoles = Array.isArray(safeUser.roles) ? safeUser.roles : [safeUser.role];
+      const rolesCookie = [
+        `user_roles=${encodeURIComponent(JSON.stringify(userRoles))}`,
+        "HttpOnly",
+        baseFlags,
+        isProd ? "Domain=.syncedupsolutions.com" : ""
+      ].filter(Boolean).join("; ");
+
+      res.setHeader("Set-Cookie", [authCookie, roleCookie, rolesCookie]);
+      res.setHeader("Cache-Control", "no-store");
+
+      // One authoritative redirect. No client script needed.
+      const role = String(safeUser.role || "").toLowerCase();
+      
+      // Normalize role to match portal guard expectations
+      const normalizedRole = role.replace(/[\s-]+/g, "_");
+      
+      const portal = normalizedRole === "super_admin" ? "/super-admin"
+                  : normalizedRole === "admin" ? "/admin"
+                  : normalizedRole === "manager" ? "/manager"
+                  : normalizedRole === "customer_service" ? "/customer-service"
+                  : "/agent";
+
+      res.statusCode = 302;
+      res.setHeader("Location", portal);
+      res.end();
+      
+    } catch (e) {
+      console.error('LOGIN_FATAL', {
+        error: e.message,
+        stack: e.stack,
+        email: email
+      });
+      return bad(res, 500, 'server_error');
     }
-    
-    if (!okPw) {
-      console.log(`Login attempt failed - wrong password for user: ${email}`);
-      return bad(res, 401, 'invalid_credentials');
-    }
-
-    // User authenticated successfully - use users instead of userRow
-    const userRow = users;
-
-    // Handle both database formats and normalize to underscore style
-    const rawRole = String(userRow.role || '');
-    const dbRole = normalizeRole(rawRole);
-    
-    // Allow both original database format and normalized format
-    const allowed = new Set(['super_admin','admin','manager','agent','customer_service','super-admin','customer-service']);
-    if (!allowed.has(rawRole) && !allowed.has(dbRole)) {
-      console.log(`Login attempt failed - invalid role: ${rawRole}/${dbRole} for user: ${email}`);
-      return bad(res, 403, 'Invalid role');
-    }
-    
-    const displayName = userRow.full_name || userRow.name || userRow.email;
-
-    const safeUser = {
-      id: userRow.id,
-      email: userRow.email,
-      name: displayName,
-      role: dbRole,
-      agency_id: userRow.agency_id,
-      is_active: !!userRow.is_active
-    };
-
-    const token = signJWT(
-      { sub: safeUser.id, email: safeUser.email, role: dbRole, agency_id: safeUser.agency_id },
-      AUTH_SECRET,
-      8 * 60 * 60
-    );
-
-    const isProd = /syncedupsolutions\.com$/.test(req.headers.host || "");
-    const baseFlags = [
-      "Path=/",
-      "SameSite=Lax",
-      isProd ? "Secure" : "",
-      "Max-Age=28800"
-    ].filter(Boolean).join("; ");
-
-    const authCookie = [
-      `auth_token=${token}`,
-      baseFlags,
-      isProd ? "Domain=.syncedupsolutions.com" : "",
-      isProd ? "HttpOnly" : "HttpOnly=false"
-    ].filter(Boolean).join("; ");
-
-    const roleCookie = [
-      `user_role=${encodeURIComponent(safeUser.role || "unknown")}`,
-      baseFlags,
-      isProd ? "Domain=.syncedupsolutions.com" : ""
-    ].filter(Boolean).join("; ");
-
-    // Support multi-role users - for now single role but extensible
-    const userRoles = Array.isArray(safeUser.roles) ? safeUser.roles : [safeUser.role];
-    const rolesCookie = [
-      `user_roles=${encodeURIComponent(JSON.stringify(userRoles))}`,
-      "HttpOnly",
-      baseFlags,
-      isProd ? "Domain=.syncedupsolutions.com" : ""
-    ].filter(Boolean).join("; ");
-
-    res.setHeader("Set-Cookie", [authCookie, roleCookie, rolesCookie]);
-    res.setHeader("Cache-Control", "no-store");
-
-    // One authoritative redirect. No client script needed.
-    const role = String(safeUser.role || "").toLowerCase();
-    
-    // Normalize role to match portal guard expectations
-    const normalizedRole = role.replace(/[\s-]+/g, "_");
-    
-    const portal = normalizedRole === "super_admin" ? "/super-admin"
-                : normalizedRole === "admin" ? "/admin"
-                : normalizedRole === "manager" ? "/manager"
-                : normalizedRole === "customer_service" ? "/customer-service"
-                : "/agent";
-
-    res.statusCode = 302;
-    res.setHeader("Location", portal);
-    res.end();
   } catch (err) {
     const code = err?.statusCode || 500;
     return bad(res, code, err?.message || 'Unexpected error');
