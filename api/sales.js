@@ -472,4 +472,4 @@ function getFirstEnrollDemoProducts() {
   ];
 }
 
-export default requireAuth(['agent', 'admin', 'manager'])(salesHandler);
+export default requireAuth(['agent', 'admin', 'manager', 'super_admin'])(salesHandler);
