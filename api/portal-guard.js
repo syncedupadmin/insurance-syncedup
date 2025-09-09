@@ -8,46 +8,17 @@ function getCookie(req, name) {
 }
 
 module.exports = async (req, res) => {
-  // Map pretty routes -> actual static dirs
-  const routes = {
-    "/admin": "/_admin/index.html",
-    "/manager": "/_manager/index.html", 
-    "/agent": "/_agent/index.html",
-    "/customer-service": "/_customer-service/index.html",
-    "/super-admin": "/_super-admin/index.html"
-  };
-
-  // Public routes
   const url = req.url.split("?")[0];
-  if (url === "/login" || url.startsWith("/api/auth/")) {
-    res.statusCode = 200;
-    res.end("OK");
+  
+  // Extract portal name from URL (remove trailing slash)
+  const portalMatch = url.match(/^\/(admin|manager|agent|customer-service|super-admin)\/?$/);
+  if (!portalMatch) {
+    res.statusCode = 404;
+    res.end("Not Found");
     return;
   }
-
-  // Protect portal assets from direct access without auth
-  const protectedAsset = /^\/_(admin|manager|agent|customer-service|super-admin)\/.+\.(css|js|png|jpg|svg|html)$/i;
-  if (protectedAsset.test(url)) {
-    const token = getCookie(req, "auth_token");
-    if (!token) {
-      res.statusCode = 302;
-      res.setHeader("Location", "/login?error=asset_protected");
-      res.end();
-      return;
-    }
-    // If they have a token, let them access the asset
-    res.statusCode = 200;
-    res.end("OK");
-    return;
-  }
-
-  // Only protect the known portals
-  if (!routes[url]) {
-    // Not a protected portal path; let Vercel serve the static file
-    res.statusCode = 200;
-    res.end("OK");
-    return;
-  }
+  
+  const portal = portalMatch[1];
 
   const token = getCookie(req, "auth_token");
   if (!token) {
@@ -79,10 +50,8 @@ module.exports = async (req, res) => {
     }
 
     // Auth OK; send to the actual index.html file
-    // The rewrite system will handle pretty URLs for sub-pages
-    const portal = url.replace(/\/$/, ''); // remove trailing slash if present
     res.statusCode = 302;
-    res.setHeader("Location", `/_${portal.substring(1)}/index.html`);
+    res.setHeader("Location", `/_${portal}/index.html`);
     res.end();
   } catch (e) {
     res.statusCode = 302;
