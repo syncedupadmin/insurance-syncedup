@@ -166,18 +166,8 @@ export default async function handler(req, res) {
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
 
-      // Return JSON with redirect URL for client-side navigation
-      const role = String(safeUser.role || "").toLowerCase();
-      
-      // Normalize role to match portal guard expectations
-      const normalizedRole = role.replace(/[\s-]+/g, "_");
-      
-      const portal = normalizedRole === "super_admin" ? "/super-admin/"
-                  : normalizedRole === "admin" ? "/admin/"
-                  : normalizedRole === "manager" ? "/manager/"
-                  : normalizedRole === "customer_service" ? "/customer-service/"
-                  : "/agent/";
-
+      // Return JSON with redirect URL for client-side navigation  
+      const portal = getPortalRedirect(safeUser.role);
       res.end(JSON.stringify({ success: true, redirect: portal }));
       
     } catch (e) {
