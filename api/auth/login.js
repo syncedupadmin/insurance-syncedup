@@ -142,6 +142,9 @@ export default async function handler(req, res) {
       8 * 60 * 60
     );
 
+    // Set token as cookie so it's sent automatically with redirects
+    res.setHeader('Set-Cookie', `auth-token=${token}; Path=/; HttpOnly=false; SameSite=Lax; Max-Age=28800`);
+    
     return ok(res, { token, user: safeUser });
   } catch (err) {
     const code = err?.statusCode || 500;

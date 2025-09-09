@@ -72,11 +72,23 @@ module.exports = async function handler(req, res) {
       return res.status(200).end();
     }
 
-    const { portal, file } = req.query;
+    const { portal, file, bypass_check } = req.query;
     
     if (!portal || !file) {
       console.error('❌ Portal guard: Missing portal or file parameter');
       return res.status(400).json({ error: 'Missing portal or file parameter' });
+    }
+    
+    // Allow temporary bypass for immediate post-login access
+    if (bypass_check === 'post_login') {
+      console.log(`🚀 Post-login bypass requested for ${portal} portal`);
+      
+      const baseUrl = req.headers.origin || 'https://' + req.headers.host;
+      const redirectUrl = `${baseUrl}${file}?post_login=true&timestamp=${Date.now()}`;
+      
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      console.log(`🔄 BYPASS GRANTED: Redirecting immediately to ${file}`);
+      return res.redirect(302, redirectUrl);
     }
     
     console.log(`🛡️ Portal Guard: Checking access to ${portal} portal`);
@@ -84,30 +96,98 @@ module.exports = async function handler(req, res) {
     // Extract JWT token from multiple sources
     let token = null;
     
-    // Try Authorization header first
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+    // Get token from cookie first (primary method after login)
+    const getCookie = (cookieString, name) => {
+      if (!cookieString) return null;
+      const match = cookieString.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      return match ? match[2] : null;
+    };
+    
+    // Try cookies first (main method for browser redirects)
+    token = getCookie(req.headers.cookie, 'auth-token') || getCookie(req.headers.cookie, 'syncedup_token');
+    
+    // Try Authorization header as fallback (for API calls)
+    if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
       token = req.headers.authorization.substring(7);
     }
     
-    // Try cookies as fallback
-    if (!token && req.headers.cookie) {
-      try {
-        const cookies = req.headers.cookie.split(';').reduce((acc, cookie) => {
-          const parts = cookie.trim().split('=');
-          if (parts.length === 2) {
-            acc[parts[0]] = parts[1];
-          }
-          return acc;
-        }, {});
-        
-        token = cookies['auth-token'] || cookies['syncedup_token'];
-      } catch (cookieError) {
-        console.error('Cookie parsing error:', cookieError.message);
-      }
-    }
+    console.log(`🔍 Token found via: ${token ? (req.headers.cookie?.includes('auth-token') ? 'cookie' : 'header') : 'none'}`);
     
-    // No token found - redirect to login
+    // No token found - check if this might be a fresh login attempt
     if (!token) {
+      // Check for recent login indicators
+      const referer = req.headers.referer || '';
+      const hasLoginReferer = referer.includes('/login') || referer.includes('/auth/login');
+      
+      // If coming from login, give a grace period for token to be set
+      if (hasLoginReferer) {
+        console.log(`⏳ No token but coming from login - serving authorization page with redirect delay`);
+        
+        const gracePeriodHTML = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Completing Login...</title>
+            <script>
+              console.log('🔄 Checking for stored authentication...');
+              
+              // Wait for token to be available
+              let checkCount = 0;
+              const maxChecks = 10;
+              
+              function checkForAuth() {
+                checkCount++;
+                console.log('Checking for auth, attempt:', checkCount);
+                
+                const token = localStorage.getItem('syncedup_token') || 
+                             localStorage.getItem('auth-token') ||
+                             getCookie('auth-token');
+                             
+                if (token) {
+                  console.log('✅ Token found, reloading page with auth');
+                  window.location.reload();
+                  return;
+                }
+                
+                if (checkCount < maxChecks) {
+                  setTimeout(checkForAuth, 500);
+                } else {
+                  console.log('❌ No token found after waiting, redirecting to login');
+                  window.location.href = '/login?error=auth_timeout';
+                }
+              }
+              
+              function getCookie(name) {
+                const value = '; ' + document.cookie;
+                const parts = value.split('; ' + name + '=');
+                if (parts.length === 2) return parts.pop().split(';').shift();
+                return null;
+              }
+              
+              // Start checking after a brief delay
+              setTimeout(checkForAuth, 100);
+            </script>
+          </head>
+          <body>
+            <div style="text-align: center; margin-top: 50px; font-family: Arial;">
+              <h2>🔄 Completing Login...</h2>
+              <p>Please wait while we finalize your authentication.</p>
+              <div style="margin-top: 20px;">
+                <div style="display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+              </div>
+            </div>
+            <style>
+              @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            </style>
+          </body>
+          </html>
+        `;
+        
+        res.setHeader('Content-Type', 'text/html');
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        return res.status(200).send(gracePeriodHTML);
+      }
+      
       console.log(`❌ No token found for ${portal} portal - redirecting to login`);
       const loginUrl = `${req.headers.origin || 'https://' + req.headers.host}/login?error=authentication_required`;
       return res.redirect(302, loginUrl);
@@ -161,7 +241,7 @@ module.exports = async function handler(req, res) {
     
     console.log(`✅ ACCESS GRANTED: ${userRole} authorized for ${portal} portal`);
     
-    // Set authorization headers and redirect directly to the portal file
+    // Set authorization headers and redirect directly to the portal file (now in public/)
     const baseUrl = req.headers.origin || 'https://' + req.headers.host;
     const redirectUrl = `${baseUrl}${file}?authorized=true&role=${userRole}&timestamp=${Date.now()}`;
     

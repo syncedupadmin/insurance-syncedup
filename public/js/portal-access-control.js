@@ -4,6 +4,55 @@
  * CRITICAL: Prevents data breaches by wrong portal access
  */
 
+// CRITICAL: Sync cookie token to localStorage for client-side access
+(function syncCookieToLocalStorage() {
+  try {
+    // Get token from cookie (set by server after login)
+    const getCookie = (name) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return null;
+    };
+    
+    const cookieToken = getCookie('auth-token');
+    
+    if (cookieToken) {
+      // Sync cookie token to localStorage for client-side access
+      localStorage.setItem('auth-token', cookieToken);
+      console.log('✅ Token synced from cookie to localStorage');
+      
+      // Also try to decode and set user data if not already present
+      if (!localStorage.getItem('syncedup_user')) {
+        try {
+          // Simple JWT decode for user info
+          const parts = cookieToken.split('.');
+          if (parts.length === 3) {
+            const payload = JSON.parse(atob(parts[1]));
+            const userData = {
+              email: payload.email,
+              role: payload.role,
+              agency_id: payload.agency_id,
+              authorized: true,
+              auth_time: new Date().toISOString()
+            };
+            localStorage.setItem('syncedup_user', JSON.stringify(userData));
+            console.log('✅ User data set from token');
+          }
+        } catch (decodeError) {
+          console.warn('⚠️ Could not decode token for user data:', decodeError);
+        }
+      }
+    } else if (localStorage.getItem('auth-token')) {
+      console.log('✅ Token already in localStorage');
+    } else {
+      console.log('⚠️ No authentication token found in cookie or localStorage');
+    }
+  } catch (error) {
+    console.error('❌ Error syncing cookie to localStorage:', error);
+  }
+})();
+
 class PortalAccessControl {
   constructor() {
     this.ACCESS_MATRIX = {
