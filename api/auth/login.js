@@ -16,6 +16,7 @@ const AUTH_SECRET = process.env.JWT_SECRET; // for JWT signing - REQUIRED, NO FA
 
 // Normalize role helper
 const normalizeRole = (r) => String(r || '')
+  .trim()
   .toLowerCase()
   .replace(/[\s-]+/g, '_');
 
@@ -137,13 +138,13 @@ export default async function handler(req, res) {
         id: userRow.id,
         email: userRow.email,
         name: displayName,
-        role: dbRole,
+        role: normalizeRole(userRow.role),
         agency_id: userRow.agency_id,
         is_active: !!userRow.is_active
       };
 
       const token = signJWT(
-        { sub: safeUser.id, email: safeUser.email, role: dbRole, agency_id: safeUser.agency_id },
+        { sub: safeUser.id, email: safeUser.email, role: safeUser.role, agency_id: safeUser.agency_id },
         AUTH_SECRET,
         8 * 60 * 60
       );

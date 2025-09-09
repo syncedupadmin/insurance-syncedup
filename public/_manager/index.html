@@ -28,6 +28,7 @@
     <!-- Server-side portal-guard.js already verified manager access -->
     
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/js/role-switcher.js"></script>
 </head>
 <body>
     <!-- Header -->
@@ -421,6 +422,11 @@
                 lucide.createIcons();
             }
         });
+
+        // Manager can assume Agent
+        window.RoleSwitcher.renderSwitcher('roleSwitcherMount', [
+            { value:'agent', label:'Agent' }
+        ]);
 
     </script>
     

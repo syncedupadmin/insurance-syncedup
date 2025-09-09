@@ -1,15 +1,10 @@
-// Clears the temporary override so guard falls back to highest role.
-export default async function handler(req, res) {
-  const isProd = /\.syncedupsolutions\.com$/i.test(req.headers.host || '');
-  const baseFlags = `Path=/; Secure; SameSite=Lax`;
-  const domain = isProd ? `; Domain=.syncedupsolutions.com` : '';
-  const expired = 'Thu, 01 Jan 1970 00:00:01 GMT';
-
-  res.setHeader('Set-Cookie', [
-    `current_role=; Expires=${expired}; HttpOnly; ${baseFlags}${domain}`,
-    `user_role=; Expires=${expired}; ${baseFlags}${domain}`
+module.exports = async (req, res) => {
+  const baseFlags = "Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT; SameSite=Lax";
+  const prodFlag = process.env.VERCEL ? "; Secure" : "";
+  res.setHeader("Set-Cookie", [
+    `assumed_role=; HttpOnly; ${baseFlags}${prodFlag}`,
+    `active_role=; ${baseFlags}${prodFlag}`
   ]);
-
-  res.writeHead(302, { Location: '/login' /* fallback if no highest role */ });
-  res.end();
-}
+  res.setHeader("Content-Type","application/json");
+  res.end(JSON.stringify({ ok:true, redirect: "/" }));
+};

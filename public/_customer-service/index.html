@@ -26,6 +26,7 @@
     
     <!-- Server-side portal-guard.js already verified customer-service access -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/js/role-switcher.js"></script>
 </head>
 <body>
     <!-- Header -->
@@ -563,6 +564,11 @@
 
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', initializePage);
+
+        // Customer service can assume Agent
+        window.RoleSwitcher.renderSwitcher('roleSwitcherMount', [
+            { value:'agent', label:'Agent' }
+        ]);
     </script>
 
     <!-- Classic Mode Toggle System -->

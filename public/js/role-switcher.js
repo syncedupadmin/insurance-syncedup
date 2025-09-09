@@ -1,81 +1,48 @@
-(function () {
-  const mount = document.getElementById('roleSwitcherMount');
-  if (!mount) return;
+async function getUser() {
+  try {
+    const r = await fetch('/api/auth/verify', { credentials: 'include' });
+    return r.ok ? r.json() : null;
+  } catch { return null; }
+}
 
-  const map = {
-    super_admin: '/super-admin',
-    admin: '/admin',
-    manager: '/manager',
-    customer_service: '/customer-service',
-    agent: '/agent'
-  };
-  const titleBy = {
-    super_admin: 'Super Admin', admin: 'Admin', manager: 'Manager',
-    customer_service: 'Customer Service', agent: 'Agent'
-  };
+function homeFor(role) {
+  switch (role) {
+    case 'super_admin': return '/super-admin';
+    case 'admin': return '/admin';
+    case 'manager': return '/manager';
+    case 'customer_service': return '/customer-service';
+    default: return '/agent';
+  }
+}
 
-  const getCookie = n => {
-    const m = document.cookie.match(new RegExp('(?:^|; )' + n + '=([^;]+)'));
-    return m ? decodeURIComponent(m[1]) : '';
-  };
-  const normalize = r => String(r||'').toLowerCase().replace(/[\s-]+/g,'_');
-
-  // roles can be JSON or comma list
-  let raw = getCookie('user_roles') || '[]';
-  let roles = [];
-  try { roles = Array.isArray(raw) ? raw : JSON.parse(raw); } catch { roles = String(raw).split(','); }
-  roles = roles.map(normalize).filter(r => map[r]);
-
-  if (!roles.length) roles = ['agent'];
-
-  const current = normalize(getCookie('user_role')) || roles[0];
-
-  // build UI
-  const wrap = document.createElement('div');
-  wrap.style.display = 'flex';
-  wrap.style.gap = '8px';
-  wrap.style.alignItems = 'center';
-
-  const label = document.createElement('span');
-  label.textContent = 'Log in as:';
-
-  const select = document.createElement('select');
-  roles.forEach(r => {
-    const o = document.createElement('option');
-    o.value = r; o.textContent = titleBy[r];
-    if (r === current) o.selected = true;
-    select.appendChild(o);
+async function assume(role) {
+  const r = await fetch('/api/auth/switch-role', {
+    method:'POST',
+    credentials:'include',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ role })
   });
+  try { const j = await r.json(); if (j.redirect) location.href = j.redirect; } catch {}
+}
 
-  const goBtn = document.createElement('button');
-  goBtn.textContent = 'Go';
-  goBtn.className = 'btn btn-sm';
+async function clearAssume() {
+  const r = await fetch('/api/auth/clear-role', { method:'POST', credentials:'include' });
+  try { const j = await r.json(); location.href = j.redirect || '/'; } catch { location.href = '/'; }
+}
 
-  const homeBtn = document.createElement('button');
-  homeBtn.textContent = 'Return to my home';
-  homeBtn.className = 'btn btn-sm';
+function renderSwitcher(containerId, options) {
+  const el = document.getElementById(containerId); if (!el) return;
+  el.innerHTML = `<div class="role-switcher" style="display:flex;align-items:center;gap:8px;">
+      <label>Log in as:</label>
+      <select id="roleSelect">
+        ${options.map(o =>`<option value="${o.value}">${o.label}</option>`).join('')}
+      </select>
+      <button id="roleGo">Go</button>
+      <button id="roleHome">Return to my dashboard</button>
+    </div>`;
+  document.getElementById('roleGo').onclick = () =>
+    assume(document.getElementById('roleSelect').value);
+  document.getElementById('roleHome').onclick = () => clearAssume();
+}
 
-  wrap.append(label, select, goBtn, homeBtn);
-  mount.innerHTML = '';
-  mount.appendChild(wrap);
-
-  goBtn.addEventListener('click', async () => {
-    const role = select.value;
-    const dest = map[role] || '/agent';
-    await fetch('/api/auth/switch-role', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ role, redirectTo: dest })
-    });
-    location.href = dest;
-  });
-
-  // highest role = last in hierarchy
-  const order = ['agent','customer_service','manager','admin','super_admin'];
-  const highest = roles.sort((a,b) => order.indexOf(a) - order.indexOf(b)).pop();
-  homeBtn.addEventListener('click', async () => {
-    await fetch('/api/auth/clear-role', { method: 'POST', credentials: 'include' });
-    location.href = map[highest] || '/agent';
-  });
-})();
+window.RoleSwitcher = { renderSwitcher, homeFor, assume, clearAssume, getUser };

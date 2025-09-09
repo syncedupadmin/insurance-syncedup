@@ -674,6 +674,8 @@
             border-top: 1px solid var(--border);
         }
     </style>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/js/role-switcher.js"></script>
 </head>
 <body>
     <div class="admin-console">
@@ -1759,6 +1761,14 @@
 
         // Initialize console when DOM is ready
         document.addEventListener('DOMContentLoaded', initializeAdminConsole);
+
+        // Super admin can assume all lower roles
+        window.RoleSwitcher.renderSwitcher('roleSwitcherMount', [
+            { value:'admin', label:'Admin' },
+            { value:'manager', label:'Manager' },
+            { value:'customer_service', label:'Customer Service' },
+            { value:'agent', label:'Agent' }
+        ]);
 
         // Log navigation away from console
         window.addEventListener('beforeunload', () => {

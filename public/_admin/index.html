@@ -340,6 +340,7 @@
     </script>
     
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/js/role-switcher.js"></script>
 </head>
 <body>
     <!-- Floating particles effect -->
@@ -1173,6 +1174,13 @@
                 initializeIcons();
             }, 500);
         });
+
+        // Admin can assume Manager, Customer Service, Agent
+        window.RoleSwitcher.renderSwitcher('roleSwitcherMount', [
+            { value:'manager', label:'Manager' },
+            { value:'customer_service', label:'Customer Service' },
+            { value:'agent', label:'Agent' }
+        ]);
     </script>
     
     <!-- Simple Theme Loading -->
