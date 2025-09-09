@@ -74,7 +74,7 @@ class LicenseWidget {
         try {
             const response = await fetch('/api/admin/dashboard-licenses', {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
+                    // Use credentials: 'include' instead of Authorization header
                     'Content-Type': 'application/json'
                 }
             });

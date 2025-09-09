@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="admin-global.css">
     <link rel="stylesheet" href="/css/themes/professional.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/js/auth-helper.js"></script>
 </head>
 <body>
     <!-- Floating Particles -->
@@ -488,37 +489,36 @@ Business City, ST 12345</textarea>
         let currentApiKeys = [];
         let editingApiKeyId = null;
 
-        // Authentication check
-        function checkAuth() {
-            const token = localStorage.getItem('syncedup_token');
-            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+        // Authentication check using auth-helper
+        async function checkAuth() {
+            const user = await SyncedUpAuth.getCurrentUser();
             
-            if (!token || !user.email) {
-                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+            if (!user) {
+                // Let portal-guard handle redirect
+                console.warn('No authenticated user found');
                 return false;
             }
 
             // Check if user has appropriate permissions (only admin for settings)
             if (!['admin', 'super-admin'].includes(user.role)) {
                 alert('Access denied. Only administrators can access system settings.');
-                window.location.href = 'https://insurance.syncedupsolutions.com/admin/';
+                window.location.href = '/admin/';
                 return false;
             }
 
-            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
+            SyncedUpAuth.safeUpdateElement('userDisplay', `${user.name || user.email} (${user.role})`);
             return true;
         }
 
-        // Logout function
+        // Logout function using auth-helper
         function logout() {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('user');
-            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+            SyncedUpAuth.logout();
         }
 
         // Initialize page
         async function initializePage() {
-            if (!checkAuth()) return;
+            const authResult = await checkAuth();
+            if (!authResult) return;
             
             await loadApiKeys();
             await loadSystemSettings();
@@ -539,9 +539,7 @@ Business City, ST 12345</textarea>
             document.getElementById('apiKeysTable').classList.add('hidden');
 
             try {
-                const response = await fetch('/api/admin/api-keys', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
-                });
+                const response = await SyncedUpAuth.authenticatedFetch('/api/admin/api-keys');
                 
                 if (response.ok) {
                     const data = await response.json();
@@ -638,9 +636,7 @@ Business City, ST 12345</textarea>
         // Load system settings
         async function loadSystemSettings() {
             try {
-                const response = await fetch('/api/admin/settings', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
-                });
+                const response = await SyncedUpAuth.authenticatedFetch('/api/admin/settings');
                 
                 if (response.ok) {
                     const data = await response.json();
@@ -729,12 +725,8 @@ Business City, ST 12345</textarea>
             };
 
             try {
-                const response = await fetch('/api/admin/settings/system', {
+                const response = await SyncedUpAuth.authenticatedFetch('/api/admin/settings/system', {
                     method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
-                        'Content-Type': 'application/json'
-                    },
                     body: JSON.stringify(formData)
                 });
                 
@@ -762,12 +754,8 @@ Business City, ST 12345</textarea>
             };
 
             try {
-                const response = await fetch('/api/admin/settings/branding', {
+                const response = await SyncedUpAuth.authenticatedFetch('/api/admin/settings/branding', {
                     method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
-                        'Content-Type': 'application/json'
-                    },
                     body: JSON.stringify(formData)
                 });
                 
@@ -796,12 +784,8 @@ Business City, ST 12345</textarea>
             };
 
             try {
-                const response = await fetch('/api/admin/settings/agency', {
+                const response = await SyncedUpAuth.authenticatedFetch('/api/admin/settings/agency', {
                     method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
-                        'Content-Type': 'application/json'
-                    },
                     body: JSON.stringify(formData)
                 });
                 
@@ -861,12 +845,8 @@ Business City, ST 12345</textarea>
                     `/api/admin/api-keys/${editingApiKeyId}` : 
                     '/api/admin/api-keys';
                 
-                const response = await fetch(url, {
+                const response = await SyncedUpAuth.authenticatedFetch(url, {
                     method: editingApiKeyId ? 'PUT' : 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
-                        'Content-Type': 'application/json'
-                    },
                     body: JSON.stringify(formData)
                 });
                 
@@ -917,9 +897,8 @@ Business City, ST 12345</textarea>
             if (!confirm('Are you sure you want to revoke this API key? This action cannot be undone.')) return;
 
             try {
-                const response = await fetch(`/api/admin/api-keys/${keyId}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
+                const response = await SyncedUpAuth.authenticatedFetch(`/api/admin/api-keys/${keyId}`, {
+                    method: 'DELETE'
                 });
                 
                 if (response.ok || response.status === 404) {
@@ -943,9 +922,8 @@ Business City, ST 12345</textarea>
             if (!key) return;
 
             try {
-                const response = await fetch(`/api/admin/api-keys/${keyId}/test`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
+                const response = await SyncedUpAuth.authenticatedFetch(`/api/admin/api-keys/${keyId}/test`, {
+                    method: 'POST'
                 });
                 
                 if (response.ok) {

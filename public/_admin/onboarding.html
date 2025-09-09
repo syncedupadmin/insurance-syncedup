@@ -16,6 +16,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Convoso Integration Onboarding - Admin Dashboard</title>
+    <script src="/js/auth-helper.js"></script>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
     <style>
@@ -365,13 +366,7 @@
         let validationData = null;
         let integrationConfig = null;
 
-        // Authentication check
-        const token = localStorage.getItem('authToken');
-        const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-        
-        if (!token || !['admin', 'super-admin'].includes(user.role)) {
-            window.location.href = '/login.html';
-        }
+        // Server-side portal-guard already verified access
 
         // Form submission handler
         document.getElementById('credentials-form-element').addEventListener('submit', async (e) => {
@@ -427,9 +422,9 @@
             try {
                 const response = await fetch('/api/integrations/convoso/validate', {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(credentials)
                 });
@@ -656,8 +651,9 @@
             try {
                 // Test campaigns endpoint
                 const response = await fetch(`/api/integrations/convoso/campaigns?agencyId=${validationData.agencyId}`, {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Content-Type': 'application/json'
                     }
                 });
                 

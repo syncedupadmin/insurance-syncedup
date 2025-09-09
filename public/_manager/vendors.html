@@ -16,6 +16,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vendor Management - Manager Portal</title>
+    <script src="/js/auth-helper.js"></script>
     <link rel="stylesheet" href="manager-global.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
@@ -305,21 +306,8 @@
         const emptyVendorsData = [];
         
         document.addEventListener('DOMContentLoaded', function() {
-            // Check authentication
-            const userData = localStorage.getItem('syncedup_user');
-            if (userData) {
-                currentUser = JSON.parse(userData);
-                
-                // Allow managers and admin to access this page
-                if (!['manager', 'admin', 'super-admin'].includes(currentUser.role)) {
-                    window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
-                    return;
-                }
-                
-                loadVendorManagement();
-            } else {
-                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
-            }
+            // Server-side portal-guard already verified access
+            loadVendorManagement();
             
             // Initialize Lucide icons
             if (typeof lucide !== 'undefined') {
@@ -333,9 +321,9 @@
                 // Try to fetch real data from API
                 const response = await fetch('/api/manager/vendors', {
                     method: 'GET',
+                    credentials: 'include',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+                        'Content-Type': 'application/json'
                     }
                 });
                 
@@ -518,9 +506,9 @@
                 
                 const response = await fetch('/api/manager/vendors', {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(vendorData)
                 });
@@ -597,9 +585,9 @@
             try {
                 const response = await fetch('/api/manager/vendors/boberdoo/sync', {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+                        'Content-Type': 'application/json'
                     }
                 });
                 
@@ -695,9 +683,9 @@
             try {
                 const response = await fetch(`/api/manager/vendors/${vendorId}/status`, {
                     method: 'PATCH',
+                    credentials: 'include',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         status: vendor.status === 'paused' ? 'active' : 'paused',
@@ -728,8 +716,8 @@
         }
         
         function logout() {
-            localStorage.clear();
-            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+            clearAuthCookies();
+            window.location.href = '/login';
         }
         
         function showLoadingState() {
@@ -787,9 +775,9 @@
             try {
                 const response = await fetch(`/api/manager/vendors/${vendorId}`, {
                     method: 'PUT',
+                    credentials: 'include',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         name,

@@ -31,22 +31,13 @@
         setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
     })();
     </script>
+    <script src="/js/auth-helper.js"></script>
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Customers - SyncedUp Insurance Agent</title>
     <link rel="stylesheet" href="agent-global.css">
     
-    <!-- Auth Guard Script - Must be loaded in HEAD before content renders -->
-    <script>
-        (function () {
-          const token = localStorage.getItem('syncedup_token');
-          const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
-          const role = normalize(u.role || '');
-          const allowed = ['agent','manager','admin','super_admin'];
-          if (!token || !role || !allowed.includes(role)) { window.location.href = '/login'; return; }
-        })();
-    </script>
     
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
@@ -197,23 +188,8 @@
 
         // Authentication check
         function checkAuth() {
-            const token = localStorage.getItem('syncedup_token');
-            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-            
-            if (!token || !user.email) {
-                window.location.href = '/login.html';
-                return false;
-            }
-
-            // Check if user has agent permissions
-            if (!['agent', 'manager', 'admin', 'super-admin'].includes(user.role)) {
-                alert('Access denied. Agent permissions required.');
-                window.location.href = '/login.html';
-                return false;
-            }
-
-            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
-            currentUser = user;
+            // Authentication is now handled server-side via portal-guard
+            // Just proceed with page initialization
             return true;
         }
 
@@ -335,11 +311,7 @@ No customers available,,,0,$0.00,N/A`;
 
         // Logout function
         function logout() {
-            // Remove all possible authentication keys
-            localStorage.removeItem('syncedup_token');
-            localStorage.removeItem('syncedup_user');
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('token');
+            clearAuthCookies();
             localStorage.removeItem('user');
             localStorage.removeItem('currentUser');
             window.location.href = '/login.html';

@@ -13,24 +13,11 @@
         setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
     })();
     </script>
+    <script src="/js/auth-helper.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agent Monitor - Convoso Dashboard</title>
     
-    <!-- Auth Guard Script -->
-    <script>
-        (function () {
-            const token = localStorage.getItem('syncedup_token');
-            const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-            const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
-            const role = normalize(u.role || '');
-            const allowed = ['manager','admin','super_admin'];
-            if (!token || !role || !allowed.includes(role)) { 
-                window.location.href = '/login'; 
-                return; 
-            }
-        })();
-    </script>
     
     <!-- Favicons - Blue for Manager Portal -->
     <link rel="icon" type="image/png" sizes="50x50" href="/favicons/manager-50x50.png">
@@ -578,7 +565,7 @@
         
         async function loadFilters() {
             try {
-                const response = await fetch('/api/admin/convoso-config');
+                const response = await fetch('/api/admin/convoso-config', { credentials: 'include' });
                 if (response.ok) {
                     const data = await response.json();
                     populateFilters(data);
@@ -615,7 +602,7 @@
         
         async function loadAgentData() {
             try {
-                const response = await fetch('/api/admin/convoso-agent-monitor');
+                const response = await fetch('/api/admin/convoso-agent-monitor', { credentials: 'include' });
                 if (response.ok) {
                     const data = await response.json();
                     updateDashboard(data);

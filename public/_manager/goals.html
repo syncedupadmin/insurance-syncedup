@@ -13,22 +13,12 @@
         setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
     })();
     </script>
+    <script src="/js/auth-helper.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Goals Management - Manager Portal</title>
     <link rel="stylesheet" href="manager-global.css">
     
-    <!-- Auth Guard Script - Must be loaded in HEAD before content renders -->
-    <script>
-        (function () {
-          const token = localStorage.getItem('syncedup_token');
-          const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
-          const role = normalize(u.role || '');
-          const allowed = ['manager','admin','super_admin'];
-          if (!token || !role || !allowed.includes(role)) { window.location.href = '/login'; return; }
-        })();
-    </script>
     
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
@@ -181,28 +171,7 @@
         let recentActivity = [];
         
         document.addEventListener('DOMContentLoaded', function() {
-            // Check authentication
-            const userData = localStorage.getItem('syncedup_user');
-            if (userData) {
-                currentUser = JSON.parse(userData);
-                
-                // Allow manager and super-admin roles to access this portal
-                if (!['manager', 'admin', 'super-admin'].includes(currentUser.role)) {
-                    // Redirect based on actual role
-                    if (currentUser.role === 'agent') {
-                        window.location.href = '/agent/';
-                    } else if (currentUser.role === 'customer-service') {
-                        window.location.href = '/customer-service/';
-                    } else {
-                        window.location.href = '/login';
-                    }
-                    return;
-                }
-                
-                initializeDashboard();
-            } else {
-                window.location.href = '/login';
-            }
+            initializeDashboard();
         });
         
         async function initializeDashboard() {
@@ -218,8 +187,6 @@
             const url = '/api/manager/dashboard?timeframe=month';
             try {
                 const headers = { 'Accept':'application/json' };
-                const token = (typeof localStorage !== 'undefined' && localStorage.getItem('authToken')) || '';
-                if (token) headers['Authorization'] = 'Bearer ' + token;
 
                 const resp = await fetch(url, { method:'GET', credentials:'include', headers });
                 const text = await resp.text();
@@ -433,7 +400,7 @@
         }
         
         function logout() {
-            localStorage.clear();
+            clearAuthCookies();
             window.location.href = '/login';
         }
         

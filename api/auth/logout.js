@@ -16,14 +16,20 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Clear the HTTP-only cookie
-    res.setHeader('Set-Cookie', cookie.serialize('auth-token', '', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 0,  // Expire immediately
-      path: '/'
-    }));
+    // Clear all authentication cookies with proper names
+    const cookiesToClear = ['auth_token', 'user_role', 'user_roles', 'assumed_role'];
+    const clearCookies = cookiesToClear.map(name => 
+      cookie.serialize(name, '', {
+        httpOnly: name === 'auth_token', // Only auth_token is httpOnly
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 0,
+        path: '/',
+        domain: process.env.NODE_ENV === 'production' ? '.syncedupsolutions.com' : undefined
+      })
+    );
+    
+    res.setHeader('Set-Cookie', clearCookies);
 
     return res.status(200).json({ 
       success: true, 

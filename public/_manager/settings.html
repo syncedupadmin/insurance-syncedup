@@ -16,6 +16,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - SyncedUp Insurance Manager</title>
+    <script src="/js/auth-helper.js"></script>
     <link rel="stylesheet" href="manager-global.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
@@ -234,35 +235,15 @@
     <script>
         let currentUser = null;
 
-        // Authentication check
-        function checkAuth() {
-            const token = localStorage.getItem('syncedup_token');
-            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-            
-            if (!token || !user.email) {
-                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
-                return false;
-            }
-
-            // Check if user has manager permissions
-            if (!['manager', 'admin', 'super-admin'].includes(user.role)) {
-                alert('Access denied. Manager permissions required.');
-                if (user.role === 'agent') {
-                    window.location.href = 'https://insurance.syncedupsolutions.com/agent/';
-                } else {
-                    window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
-                }
-                return false;
-            }
-
-            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
-            currentUser = user;
-            return true;
+        // Initialize user display
+        function initializeUserDisplay() {
+            // Server-side portal-guard already verified access
+            document.getElementById('userDisplay').textContent = 'Manager User';
         }
 
         // Initialize page
         async function initializePage() {
-            if (!checkAuth()) return;
+            initializeUserDisplay();
             
             // Load user profile data
             loadProfileData();
@@ -392,9 +373,8 @@ ${timestamp},--,0,$0,--`;
 
         // Logout function
         function logout() {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('user');
-            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+            clearAuthCookies();
+            window.location.href = '/login';
         }
 
         // Message functions

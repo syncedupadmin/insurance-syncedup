@@ -16,6 +16,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leads - SyncedUp Insurance Admin</title>
+    <script src="/js/auth-helper.js"></script>
     <link rel="stylesheet" href="admin-global.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
@@ -385,37 +386,21 @@
         let refreshInterval;
         let currentLeadId = null;
 
-        // Authentication check
-        function checkAuth() {
-            const token = localStorage.getItem('syncedup_token');
-            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-            
-            if (!token || !user.email) {
-                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
-                return false;
-            }
-
-            // Check if user has appropriate permissions
-            if (!['admin', 'super-admin', 'manager'].includes(user.role)) {
-                alert('Access denied. Insufficient permissions.');
-                if (user.role === 'manager') { window.location.href = 'https://insurance.syncedupsolutions.com/manager/'; } else { window.location.href = 'https://insurance.syncedupsolutions.com/agent/'; }
-                return false;
-            }
-
-            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
-            return true;
+        // Server-side portal-guard already verified access
+        function initializeUserDisplay() {
+            // User display will be handled by portal-guard
+            document.getElementById('userDisplay').textContent = 'Admin User';
         }
 
         // Logout function
         function logout() {
-            localStorage.removeItem('syncedup_token');
-            localStorage.removeItem('syncedup_user');
-            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+            clearAuthCookies();
+            window.location.href = '/login';
         }
 
         // Initialize page
         async function initializePage() {
-            if (!checkAuth()) return;
+            initializeUserDisplay();
             
             await loadLiveStats();
             await loadLiveFeed();
@@ -438,7 +423,8 @@
         async function loadLiveStats() {
             try {
                 const response = await fetch('/api/leads/convoso-data?type=stats&role=admin', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
                 });
                 
                 if (response.ok) {
@@ -474,7 +460,8 @@
         async function loadLiveFeed() {
             try {
                 const response = await fetch('/api/leads/convoso-data?type=live-feed&role=admin&limit=10', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
                 });
                 
                 if (response.ok) {
@@ -546,7 +533,8 @@
         async function loadAgentDistribution() {
             try {
                 const response = await fetch('/api/leads/convoso-data?type=agent-distribution&role=admin', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
                 });
                 
                 if (response.ok) {
@@ -622,7 +610,8 @@
             
             try {
                 const response = await fetch(`/api/leads/convoso-data?${queryParams}`, {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
                 });
                 
                 if (response.ok) {
@@ -819,7 +808,8 @@
             
             try {
                 const response = await fetch(`/api/leads/convoso-data?type=lead-details&leadId=${leadId}&role=admin`, {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
                 });
                 
                 let leadData;
@@ -984,8 +974,8 @@
             try {
                 const response = await fetch('/api/leads/convoso-data', {
                     method: 'PUT',
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
@@ -1014,7 +1004,8 @@
         async function loadAgentOptions() {
             try {
                 const response = await fetch('/api/leads/convoso-data?type=agents&role=admin', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
                 });
                 
                 let agents = [];
@@ -1106,7 +1097,8 @@
         async function loadAnalytics() {
             try {
                 const response = await fetch('/api/leads/convoso-data?type=analytics&role=admin', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
                 });
                 
                 if (response.ok) {

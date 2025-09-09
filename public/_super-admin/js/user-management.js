@@ -1,7 +1,7 @@
 class SuperAdminUserManagement {
     constructor() {
-        this.authToken = localStorage.getItem('syncedup_token');
-        this.currentUser = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+        // Authentication handled by portal-guard via cookies
+        // Authentication handled by portal-guard via cookies
         
         // Verify super admin access
         const role = this.normalizeRole(this.currentUser.role || '');

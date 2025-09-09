@@ -17,20 +17,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Test - Admin Portal</title>
     
-    <!-- Auth Guard Script -->
-    <script>
-        (function () {
-            const token = localStorage.getItem('syncedup_token');
-            const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-            const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
-            const role = normalize(u.role || '');
-            const allowed = ['admin','super_admin','manager'];
-            if (!token || !role || !allowed.includes(role)) { 
-                window.location.href = '/login'; 
-                return; 
-            }
-        })();
-    </script>
+    <script src="/js/auth-helper.js"></script>
     
     <!-- Admin Global Styles -->
     <link rel="stylesheet" href="admin-global.css">
@@ -128,6 +115,7 @@
 
         // File input handler
         document.addEventListener('DOMContentLoaded', function() {
+            // Server-side portal-guard already verified access
             const fileInput = document.getElementById('fileInput');
             const fileInfo = document.getElementById('fileInfo');
             
@@ -164,9 +152,9 @@
                 
                 const response = await fetch('/api/storage/upload-url', {
                     method: 'POST',
+                    credentials: 'include',
                     headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         fileName: file.name,
@@ -198,9 +186,9 @@
                 
                 const completeResponse = await fetch('/api/storage/complete-upload', {
                     method: 'POST',
+                    credentials: 'include',
                     headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ fileId: fileId })
                 });

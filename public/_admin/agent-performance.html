@@ -16,6 +16,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agent Performance - SyncedUp Insurance Admin</title>
+    <script src="/js/auth-helper.js"></script>
     <link rel="stylesheet" href="admin-global.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
@@ -226,19 +227,10 @@
         let goalsData = null;
         let currentUser = null;
 
-        // Authentication Check
+        // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
-            const userData = localStorage.getItem('syncedup_user');
-            if (userData) {
-                currentUser = JSON.parse(userData);
-                if (!['admin', 'manager', 'super-admin'].includes(currentUser.role)) {
-                    window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
-                    return;
-                }
-                initializePage();
-            } else {
-                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
-            }
+            // Server-side portal-guard already verified access
+            initializePage();
         });
 
         async function initializePage() {
@@ -258,8 +250,8 @@
         async function loadPerformanceData() {
             try {
                 const response = await fetch('/api/admin/analytics?analytics_type=team_performance', {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -278,8 +270,8 @@
         async function loadGoalsData() {
             try {
                 const response = await fetch('/api/manager/goals', {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -298,8 +290,8 @@
         async function loadAgentsList() {
             try {
                 const response = await fetch('/api/admin/user-management?role=agent', {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -550,8 +542,8 @@
             try {
                 const response = await fetch('/api/manager/goals', {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(goalData)
@@ -703,8 +695,8 @@
         }
 
         function logout() {
-            localStorage.clear();
-            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+            clearAuthCookies();
+            window.location.href = '/login';
         }
 
         // Modal styling

@@ -17,7 +17,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Member Profile - SyncedUp Insurance</title>
     <link rel="stylesheet" href="customer-service-global.css">
-    <script src="/auth-check.js" defer></script>
+    <script src="/js/auth-helper.js"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
@@ -275,8 +275,8 @@
 
         // Authentication check
         function checkAuth() {
-            const token = localStorage.getItem('syncedup_token');
-            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+            // Authentication handled by portal-guard
+            // Authentication handled by portal-guard
             
             if (!token || !user.email) {
                 window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
@@ -333,8 +333,8 @@
         async function loadMemberBasicInfo() {
             try {
                 const response = await fetch(`/api/customer-service/member-profile?memberId=${currentMemberId}`, {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`
                     }
                 });
 
@@ -653,10 +653,9 @@
 
         // Logout function
         function logout() {
-            localStorage.removeItem('syncedup_token');
-            localStorage.removeItem('syncedup_user');
+            clearAuthCookies();
             localStorage.removeItem('selectedMemberId');
-            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+            window.location.href = '/login';
         }
 
         // Initialize when page loads

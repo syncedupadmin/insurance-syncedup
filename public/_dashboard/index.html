@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SyncedUp Insurance Portal</title>
+    <script src="/js/auth-helper.js"></script>
     <style>
         * {
             margin: 0;
@@ -611,18 +612,8 @@
         
         // Check for logged in user on page load
         document.addEventListener('DOMContentLoaded', function() {
-            // Get agent data from localStorage (set during login)
-            const userData = localStorage.getItem('syncedup_user');
-            if (userData) {
-                currentAgent = JSON.parse(userData);
-                console.log('Logged in as:', currentAgent.name, '- ID:', currentAgent.id);
-                
-                // Dashboard is now accessible to any authenticated user
-                console.log(`Dashboard accessed by ${currentAgent.role}: ${currentAgent.name}`);
-            } else {
-                // Redirect to login if not authenticated
-                window.location.href = '/login.html';
-            }
+            // Authentication is now handled server-side via portal-guard
+            // Just proceed with dashboard initialization
         });
 
         // Product database with real FirstEnroll products
@@ -836,7 +827,7 @@
             
             try {
                 // Call API with agent's ID from session
-                const response = await fetch(`/api/dashboard?agentId=${agentId}&timeframe=${timeframe}`);
+                const response = await fetch(`/api/dashboard?agentId=${agentId}&timeframe=${timeframe}`, { credentials: 'include' });
                 const performanceData = await response.json();
                 
                 document.getElementById('totalSales').textContent = performanceData.totalSales || 0;

@@ -10,20 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Convoso Management - Admin Dashboard</title>
     
-    <!-- Auth Guard Script - Must be loaded in HEAD before content renders -->
-    <script>
-        (function () {
-            const token = localStorage.getItem('syncedup_token');
-            const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-            const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
-            const role = normalize(u.role || '');
-            const allowed = ['admin','super_admin'];
-            if (!token || !role || !allowed.includes(role)) { 
-                window.location.href = '/login'; 
-                return; 
-            }
-        })();
-    </script>
+    <script src="/js/auth-helper.js"></script>
     
     <!-- Favicons - Purple for Admin Portal -->
     <link rel="icon" type="image/png" sizes="50x50" href="/favicons/admin-50x50.png">
@@ -238,6 +225,7 @@
         
         // Load agencies on page load
         document.addEventListener('DOMContentLoaded', function() {
+            // Server-side portal-guard already verified access
             loadAgencies();
         });
         

@@ -13,6 +13,7 @@
         setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
     })();
     </script>
+    <script src="/js/auth-helper.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Convoso Lead Management - Manager Portal</title>
@@ -552,21 +553,7 @@
         let refreshInterval = null;
         
         document.addEventListener('DOMContentLoaded', function() {
-            // Check authentication
-            const userData = localStorage.getItem('syncedup_user');
-            if (userData) {
-                currentUser = JSON.parse(userData);
-                
-                // Only managers can access this page
-                if (!['manager', 'admin', 'super-admin'].includes(currentUser.role)) {
-                    window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
-                    return;
-                }
-                
-                initializeLeadManagement();
-            } else {
-                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
-            }
+            initializeLeadManagement();
             
             // Initialize Lucide icons
             if (typeof lucide !== 'undefined') {
@@ -601,8 +588,8 @@
         async function loadLiveStats() {
             try {
                 const response = await fetch('/api/leads/convoso-data?type=live-stats', {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`,
                         'Content-Type': 'application/json',
                         'x-user-role': currentUser.role,
                         'x-user-id': currentUser.user_id
@@ -654,8 +641,8 @@
         async function loadAgentPerformance() {
             try {
                 const response = await fetch(`/api/leads/convoso-data?type=agent-performance&timeframe=${currentFilters.timeframe}`, {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`,
                         'Content-Type': 'application/json',
                         'x-user-role': currentUser.role,
                         'x-user-id': currentUser.user_id
@@ -721,8 +708,8 @@
         async function loadSourcePerformance() {
             try {
                 const response = await fetch(`/api/leads/convoso-data?type=source-performance&timeframe=${currentFilters.timeframe}`, {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`,
                         'Content-Type': 'application/json',
                         'x-user-role': currentUser.role,
                         'x-user-id': currentUser.user_id
@@ -794,8 +781,8 @@
                 }
                 
                 const response = await fetch(`/api/leads/convoso-data?${params}`, {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`,
                         'Content-Type': 'application/json',
                         'x-user-role': currentUser.role,
                         'x-user-id': currentUser.user_id
@@ -878,8 +865,8 @@
         async function loadLiveFeed() {
             try {
                 const response = await fetch('/api/leads/convoso-data?type=live-stats', {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`,
                         'Content-Type': 'application/json',
                         'x-user-role': currentUser.role,
                         'x-user-id': currentUser.user_id
@@ -1097,8 +1084,8 @@
             try {
                 const response = await fetch('/api/leads/convoso-data', {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`,
                         'Content-Type': 'application/json',
                         'x-user-role': currentUser.role,
                         'x-user-id': currentUser.user_id
@@ -1221,8 +1208,8 @@
             if (refreshInterval) {
                 clearInterval(refreshInterval);
             }
-            localStorage.clear();
-            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+            clearAuthCookies();
+            window.location.href = '/login';
         }
         
         // Close modals when clicking outside

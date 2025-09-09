@@ -5,27 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Security Dashboard - Super Admin Console</title>
     
-    <!-- Super Admin Security Check -->
-    <script>
-        (function () {
-          const token = localStorage.getItem('syncedup_token');
-          const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
-          const role = normalize(u.role || '');
-          
-          // Only allow super_admin role
-          if (!token || role !== 'super_admin') {
-            alert('Unauthorized access. Super Admin privileges required.');
-            window.location.href = '/login';
-            return;
-          }
-          
-          // Log super admin access
-          console.log(`SUPER ADMIN SECURITY ACCESS: ${u.email} at ${new Date().toISOString()}`);
-          sessionStorage.setItem('superAdminAccess', 'true');
-          sessionStorage.setItem('superAdminUser', u.email);
-        })();
-    </script>
+    <script src="/js/auth-helper.js"></script>
     
     <style>
         :root {

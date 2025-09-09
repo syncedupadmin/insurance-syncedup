@@ -18,6 +18,7 @@
     <title>Commissions - SyncedUp Insurance Admin</title>
     <link rel="stylesheet" href="admin-global.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/js/auth-helper.js"></script>
 </head>
 <body>
     <!-- Floating Particles -->
@@ -464,21 +465,10 @@
         let editingRateId = null;
         let editingOverrideId = null;
 
-        // Authentication check
+        // Server-side portal-guard already verified access
+        // Use auth-helper for any needed user data
         function checkAuth() {
-            const token = localStorage.getItem('syncedup_token');
-            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-            
-            if (!token || !user.email) {
-                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
-                return false;
-            }
-
-            // Check if user has appropriate permissions
-            if (!['admin', 'super-admin', 'manager'].includes(user.role)) {
-                alert('Access denied. Insufficient permissions.');
-                if (user.role === 'manager') { window.location.href = 'https://insurance.syncedupsolutions.com/manager/'; } else { window.location.href = 'https://insurance.syncedupsolutions.com/agent/'; }
-                return false;
+            // Portal-guard already verified - just return true
             }
 
             document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
@@ -487,9 +477,8 @@
 
         // Logout function
         function logout() {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('user');
-            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+            clearAuthCookies(); // from auth-helper.js
+            window.location.href = '/login';
         }
 
         // Initialize page
@@ -512,7 +501,8 @@
         async function loadCommissionStats() {
             try {
                 const response = await fetch('/api/admin/commission-summary', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
                 });
                 
                 if (response.ok) {
@@ -546,7 +536,8 @@
 
             try {
                 const response = await fetch('/api/admin/commission-settings', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
                 });
                 
                 if (response.ok) {
@@ -616,7 +607,8 @@
 
             try {
                 const response = await fetch('/api/admin/commission-overrides', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
                 });
                 
                 if (response.ok) {
@@ -703,7 +695,8 @@
         async function loadAgentsForOverride() {
             try {
                 const response = await fetch('/api/admin/user-management', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
                 });
                 
                 if (response.ok) {
@@ -820,7 +813,8 @@
             try {
                 const response = await fetch(`/api/admin/commission-settings/${rateId}`, {
                     method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
                 });
                 
                 if (response.ok || response.status === 404) {
@@ -841,7 +835,8 @@
             try {
                 const response = await fetch(`/api/admin/commission-overrides/${overrideId}`, {
                     method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}` }
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
                 });
                 
                 if (response.ok || response.status === 404) {
@@ -877,7 +872,7 @@
                 const response = await fetch(url, {
                     method: editingRateId ? 'PUT' : 'POST',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
+                        credentials: 'include',
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(formData)
@@ -918,7 +913,7 @@
                 const response = await fetch(url, {
                     method: editingOverrideId ? 'PUT' : 'POST',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
+                        credentials: 'include',
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(formData)

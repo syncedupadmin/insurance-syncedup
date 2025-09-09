@@ -17,21 +17,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>License Management - SyncedUp Insurance Admin</title>
     
-    <!-- Enhanced Admin Security Check -->
-    <script>
-        (function () {
-          const token = localStorage.getItem('syncedup_token');
-          const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
-          const role = normalize(u.role || '');
-          
-          if (!token || !['admin', 'super_admin', 'manager'].includes(role)) {
-            alert('Unauthorized access. Admin privileges required.');
-            window.location.href = '/login';
-            return;
-          }
-        })();
-    </script>
+    <script src="/js/auth-helper.js"></script>
     
     <link href="admin-global.css" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -665,6 +651,7 @@
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', async function() {
+            // Server-side portal-guard already verified access
             await initializeLicensePage();
             lucide.createIcons();
         });
@@ -695,8 +682,8 @@
         async function loadLicenseSummary() {
             try {
                 const response = await fetch('/api/admin/licenses?action=summary', {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -728,8 +715,8 @@
         async function loadLicenseTypes() {
             try {
                 const response = await fetch('/api/admin/license-types', {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -778,8 +765,8 @@
                 });
 
                 const response = await fetch(`/api/admin/licenses?${params}`, {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -1086,8 +1073,8 @@
 
                 const response = await fetch('/api/admin/licenses?action=sync', {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ force_sync: true })
@@ -1195,8 +1182,7 @@
         }
 
         function logout() {
-            localStorage.removeItem('syncedup_token');
-            localStorage.removeItem('syncedup_user');
+            clearAuthCookies();
             window.location.href = '/login';
         }
     </script>

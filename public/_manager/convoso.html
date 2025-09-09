@@ -13,22 +13,12 @@
         setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
     })();
     </script>
+    <script src="/js/auth-helper.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Convoso Dashboard - Manager Portal</title>
     <link rel="stylesheet" href="manager-global.css">
     
-    <!-- Auth Guard Script - Must be loaded in HEAD before content renders -->
-    <script>
-        (function () {
-          const token = localStorage.getItem('syncedup_token');
-          const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
-          const role = normalize(u.role || '');
-          const allowed = ['manager','admin','super_admin'];
-          if (!token || !role || !allowed.includes(role)) { window.location.href = '/login'; return; }
-        })();
-    </script>
     
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
@@ -202,7 +192,7 @@
         
         async function fetchConvosoStats() {
             try {
-                const response = await fetch(`/api/manager/convoso-stats?range=${selectedTimeRange}`);
+                const response = await fetch(`/api/manager/convoso-stats?range=${selectedTimeRange}`, { credentials: 'include' });
                 if (response.ok) {
                     const data = await response.json();
                     stats = data.stats || stats;
@@ -215,7 +205,7 @@
         
         async function fetchRecentCalls() {
             try {
-                const response = await fetch(`/api/manager/recent-calls?range=${selectedTimeRange}&limit=10`);
+                const response = await fetch(`/api/manager/recent-calls?range=${selectedTimeRange}&limit=10`, { credentials: 'include' });
                 if (response.ok) {
                     const data = await response.json();
                     renderRecentCalls(data.calls || []);
@@ -232,7 +222,7 @@
         
         async function fetchLeadActivity() {
             try {
-                const response = await fetch(`/api/manager/lead-activity?range=${selectedTimeRange}`);
+                const response = await fetch(`/api/manager/lead-activity?range=${selectedTimeRange}`, { credentials: 'include' });
                 if (response.ok) {
                     const data = await response.json();
                     renderLeadActivity(data.activity || []);
@@ -354,7 +344,7 @@
         async function viewAllLeads() {
             showLeadsModal();
             try {
-                const response = await fetch(`/api/admin/convoso-leads?limit=50`);
+                const response = await fetch(`/api/admin/convoso-leads?limit=50`, { credentials: 'include' });
                 if (response.ok) {
                     const data = await response.json();
                     renderLeads(data.leads || []);
@@ -477,7 +467,7 @@
         }
         
         function logout() {
-            localStorage.clear();
+            clearAuthCookies();
             window.location.href = '/login';
         }
         
@@ -489,7 +479,7 @@
             }
             
             // Display user info
-            const userData = localStorage.getItem('syncedup_user');
+            // Authentication handled by portal-guard
             if (userData) {
                 const user = JSON.parse(userData);
                 document.getElementById('userDisplay').textContent = user.name || user.email || 'Manager';

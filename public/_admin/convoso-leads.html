@@ -10,20 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lead Management - Convoso Dashboard</title>
     
-    <!-- Auth Guard Script -->
-    <script>
-        (function () {
-            const token = localStorage.getItem('syncedup_token');
-            const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-            const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
-            const role = normalize(u.role || '');
-            const allowed = ['admin','super_admin','manager'];
-            if (!token || !role || !allowed.includes(role)) { 
-                window.location.href = '/login'; 
-                return; 
-            }
-        })();
-    </script>
+    <script src="/js/auth-helper.js"></script>
     
     <!-- Favicons - Purple for Admin Portal -->
     <link rel="icon" type="image/png" sizes="50x50" href="/favicons/admin-50x50.png">
@@ -709,6 +696,7 @@
         
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
+            // Server-side portal-guard already verified access
             initializePage();
             loadInitialData();
             
@@ -1151,8 +1139,7 @@
         
         // Logout function
         function logout() {
-            localStorage.removeItem('syncedup_token');
-            localStorage.removeItem('syncedup_user');
+            clearAuthCookies();
             window.location.href = '/login';
         }
     </script>

@@ -16,6 +16,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Performance - Manager Dashboard</title>
+    <script src="/js/auth-helper.js"></script>
     <link rel="stylesheet" href="manager-global.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
@@ -173,34 +174,15 @@
         // Sales data will be loaded from API - no fake data
         let salesData = [];
         
-        // Authentication check
-        function checkAuth() {
-            const token = localStorage.getItem('syncedup_token');
-            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-            
-            if (!token || !user.email) {
-                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
-                return false;
-            }
-
-            // Check if user has manager permissions
-            if (!['manager', 'admin', 'super-admin'].includes(user.role)) {
-                alert('Access denied. Manager permissions required.');
-                if (user.role === 'agent') {
-                    window.location.href = 'https://insurance.syncedupsolutions.com/agent/';
-                } else {
-                    window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
-                }
-                return false;
-            }
-
-            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
-            currentUser = user;
-            return true;
+        // Initialize user display
+        function initializeUserDisplay() {
+            // Server-side portal-guard already verified access
+            document.getElementById('userDisplay').textContent = 'Manager User';
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            if (!checkAuth()) return;
+            // Server-side portal-guard already verified access
+            initializeUserDisplay();
             
             populateAgentSelect();
             
@@ -382,8 +364,8 @@
         }
         
         function logout() {
-            localStorage.clear();
-            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+            clearAuthCookies();
+            window.location.href = '/login';
         }
         
     </script>

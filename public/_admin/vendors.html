@@ -18,6 +18,7 @@
     <title>Vendor Management - SyncedUp Insurance Admin</title>
     <link rel="stylesheet" href="admin-global.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/js/auth-helper.js"></script>
 </head>
 <body>
     <!-- Floating particles effect -->
@@ -308,25 +309,9 @@
         const mockVendorsData = [];
         
         document.addEventListener('DOMContentLoaded', function() {
-            // Check authentication
-            const userData = localStorage.getItem('syncedup_user');
-            if (userData) {
-                currentUser = JSON.parse(userData);
-                
-                // Only admin and super-admin can access this page
-                if (!['admin', 'super-admin'].includes(currentUser.role)) {
-                    if (currentUser.role === 'manager') {
-                        window.location.href = 'https://insurance.syncedupsolutions.com/manager/vendors.html';
-                    } else {
-                        window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
-                    }
-                    return;
-                }
-                
-                loadVendorManagement();
-            } else {
-                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
-            }
+            // Server-side portal-guard already verified access
+            // Just initialize the page
+            loadVendorManagement();
             
             // Initialize Lucide icons
             if (typeof lucide !== 'undefined') {
@@ -743,8 +728,8 @@
         }
         
         function logout() {
-            localStorage.clear();
-            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+            clearAuthCookies(); // from auth-helper.js
+            window.location.href = '/login';
         }
         
         function showLoadingState() {
