@@ -498,45 +498,45 @@
         
         async function loadDashboardData() {
             try {
-                // Load admin dashboard data (includes all manager capabilities)
+                // Load admin dashboard data - try admin endpoints but gracefully handle manager users
                 const [dashboardResponse, analyticsResponse, userStatsResponse, commissionStatsResponse, apiKeysResponse] = await Promise.all([
                     fetch('/api/manager/dashboard', {
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         credentials: 'include'
-                    }),
+                    }).catch(() => ({ ok: false })),
                     fetch('/api/admin/analytics?analytics_type=overview', {
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         credentials: 'include'
-                    }),
+                    }).catch(() => ({ ok: false })),
                     fetch('/api/admin/user-management', {
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         credentials: 'include'
-                    }),
+                    }).catch(() => ({ ok: false })),
                     fetch('/api/admin/commission-settings', {
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         credentials: 'include'
-                    }),
+                    }).catch(() => ({ ok: false })),
                     fetch('/api/admin/api-keys', {
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         credentials: 'include'
-                    })
+                    }).catch(() => ({ ok: false }))
                 ]);
                 
-                dashboardData = await dashboardResponse.json();
-                const analyticsData = await analyticsResponse.json();
-                const userStats = await userStatsResponse.json();
-                const commissionStats = await commissionStatsResponse.json();
-                const apiKeysData = await apiKeysResponse.json();
+                dashboardData = dashboardResponse.ok ? await dashboardResponse.json() : { ok: false };
+                const analyticsData = analyticsResponse.ok ? await analyticsResponse.json() : { ok: false };
+                const userStats = userStatsResponse.ok ? await userStatsResponse.json() : { ok: false };
+                const commissionStats = commissionStatsResponse.ok ? await commissionStatsResponse.json() : { ok: false };
+                const apiKeysData = apiKeysResponse.ok ? await apiKeysResponse.json() : { ok: false };
                 
                 // Merge admin data with manager data
                 dashboardData.admin_analytics = analyticsData;
@@ -605,9 +605,9 @@
             try {
                 const response = await fetch('/api/admin/leads?recent=true&limit=10', {
                     headers: {
-                        'Authorization': `Bearer ${getCookie('auth_token')}`,
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    credentials: 'include'
                 });
                 
                 if (!response.ok) {
@@ -679,9 +679,9 @@
             try {
                 const response = await fetch('/api/admin/commission-summary', {
                     headers: {
-                        'Authorization': `Bearer ${getCookie('auth_token')}`,
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    credentials: 'include'
                 });
                 
                 let commissionData = {
