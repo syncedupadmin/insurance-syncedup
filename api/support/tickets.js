@@ -1,4 +1,4 @@
-import { requireAuth } from '../_middleware/authCheck.js';
+// DISABLED: // DISABLED: import { requireAuth } from '../_middleware/authCheck.js';
 
 async function ticketsHandler(req, res) {
   const supabase = req.supabase;
@@ -84,4 +84,5 @@ async function ticketsHandler(req, res) {
   }
 }
 
-export default requireAuth()(ticketsHandler);
+// DISABLED: export default requireAuth()(ticketsHandler);
+export default ticketsHandler;

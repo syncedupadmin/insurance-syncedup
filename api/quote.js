@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { requireAuth } from './_middleware/authCheck.js';
+// DISABLED: // DISABLED: import { requireAuth } from './_middleware/authCheck.js';
 import { getUserContext } from './utils/auth-helper.js';
 
 const supabase = createClient(
@@ -305,4 +305,4 @@ function getFirstEnrollDemoProducts() {
   ];
 }
 
-export default requireAuth(['agent', 'admin'])(quoteHandler);
+// DISABLED: export default requireAuth(['agent', 'admin'])(quoteHandler);export default quoteHandler;

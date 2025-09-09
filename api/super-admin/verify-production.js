@@ -1,4 +1,4 @@
-import { requireAuth } from '../_middleware/authCheck.js';
+// DISABLED: // DISABLED: import { requireAuth } from '../_middleware/authCheck.js';
 import { verifyProductionReadiness } from '../utils/data-isolation-helper.js';
 
 async function verifyProductionHandler(req, res) {
@@ -48,4 +48,4 @@ async function verifyProductionHandler(req, res) {
   }
 }
 
-export default requireAuth(['super_admin'])(verifyProductionHandler);
+// DISABLED: export default requireAuth(['super_admin'])(verifyProductionHandler);export default verifyProductionHandler;

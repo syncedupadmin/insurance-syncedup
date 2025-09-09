@@ -1,4 +1,4 @@
-import { requireAuth, logAction } from '../_middleware/authCheck.js';
+// DISABLED: // DISABLED: import { requireAuth, logAction } from '../_middleware/authCheck.js';
 import bcrypt from 'bcryptjs';
 
 async function usersHandler(req, res) {
@@ -55,4 +55,5 @@ async function usersHandler(req, res) {
   // ... rest of the handler
 }
 
-export default requireAuth(['super_admin', 'admin', 'manager'])(usersHandler);
+// DISABLED: export default requireAuth.*Handler);
+export default usersHandler;

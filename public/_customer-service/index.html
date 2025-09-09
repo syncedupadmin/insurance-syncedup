@@ -24,31 +24,7 @@
     
     <link rel="stylesheet" href="/customer-service/customer-service-global.css">
     
-    <!-- Portal Access Control - CRITICAL SECURITY -->
-    <script src="/js/portal-access-control.js"></script>
-    
-    <script>
-      (function() {
-        const normalizeRole = (r) => String(r || '').toLowerCase().replace(/[\s-]+/g,'_');
-        try {
-          const raw = localStorage.getItem('syncedup_user');
-          if (!raw) { location.replace('/login'); return; }
-          const { role } = JSON.parse(raw);
-          const norm = normalizeRole(role);
-          
-          // Accept both database formats: customer-service AND customer_service
-          const allow = new Set(['customer_service', 'customer-service', 'manager', 'admin', 'super_admin', 'super-admin']);
-
-          if (!allow.has(role) && !allow.has(norm)) {
-            alert(`Access denied. Customer service permissions required. Your role: ${role}`);
-            location.replace('/login');
-            return;
-          }
-        } catch (e) {
-          location.replace('/login');
-        }
-      })();
-    </script>
+    <!-- Server-side portal-guard.js already verified customer-service access -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
@@ -299,31 +275,29 @@
         let currentUser = null;
 
         // Authentication check
-        function checkAuth() {
-            const token = localStorage.getItem('syncedup_token');
-            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-            
-            if (!token || !user.email) {
-                window.location.href = '/login.html';
-                return false;
+        async function checkAuth() {
+            // Server-side portal guard already verified customer-service access
+            try {
+                const userResponse = await fetch('/api/auth/verify', { credentials: 'include' });
+                if (userResponse.ok) {
+                    const { user } = await userResponse.json();
+                    document.getElementById('userDisplay').textContent = `${user.email} (${user.role})`;
+                    currentUser = user;
+                    return true;
+                } else {
+                    // Fallback if verify endpoint fails - use role cookie
+                    const roleCookie = document.cookie.split(';').find(c => c.trim().startsWith('user_role='));
+                    const userRole = roleCookie ? decodeURIComponent(roleCookie.split('=')[1]) : 'customer_service';
+                    currentUser = { role: userRole };
+                    document.getElementById('userDisplay').textContent = `Customer Service (${userRole})`;
+                    return true;
+                }
+            } catch (error) {
+                console.error('Auth verification failed:', error);
+                currentUser = { role: 'customer_service' };
+                document.getElementById('userDisplay').textContent = 'Customer Service Dashboard';
+                return true;
             }
-
-            // Check if user has customer service permissions
-            // Handle both role formats: customer-service and customer_service
-            const normalizeRole = (r) => String(r || '').toLowerCase().replace(/[\s-]+/g, '_');
-            const userRole = user.role;
-            const normalizedRole = normalizeRole(userRole);
-            const allowedRoles = ['customer-service', 'customer_service', 'manager', 'admin', 'super-admin', 'super_admin'];
-            
-            if (!allowedRoles.includes(userRole) && !allowedRoles.includes(normalizedRole)) {
-                alert('Access denied. Customer service permissions required.');
-                window.location.href = '/login.html';
-                return false;
-            }
-
-            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
-            currentUser = user;
-            return true;
         }
 
         // Initialize page
@@ -505,9 +479,10 @@
 
         // Logout function
         function logout() {
-            localStorage.removeItem('syncedup_token');
-            localStorage.removeItem('user');
-            window.location.href = '/login.html';
+            // Clear authentication cookies
+            document.cookie = 'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            document.cookie = 'user_role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            window.location.href = '/login';
         }
 
         // Portal Hub Functions

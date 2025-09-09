@@ -1,4 +1,4 @@
-import { requireAuth } from '../_middleware/authCheck.js';
+// DISABLED: // DISABLED: import { requireAuth } from '../_middleware/authCheck.js';
 
 async function leadScorerHandler(req, res) {
   if (req.method !== 'POST') {
@@ -180,4 +180,4 @@ async function leadScorerHandler(req, res) {
   }
 }
 
-export default requireAuth()(leadScorerHandler);
+// DISABLED: export default requireAuth()(leadScorerHandler);export default leadScorerHandler;

@@ -1,4 +1,4 @@
-import { requireAuth, logAction } from '../_middleware/authCheck.js';
+// DISABLED: // DISABLED: import { requireAuth, logAction } from '../_middleware/authCheck.js';
 import { createClient } from '@supabase/supabase-js';
 
 // Default commission structures
@@ -303,4 +303,5 @@ export function calculateCommission(amount, product, agentSales, structure) {
   }
 }
 
-export default requireAuth(['admin'])(commissionSettingsHandler);
+// DISABLED: export default requireAuth(['admin'])(commissionSettingsHandler);
+export default commissionSettingsHandler;

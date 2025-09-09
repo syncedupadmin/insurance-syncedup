@@ -142,10 +142,45 @@ export default async function handler(req, res) {
       8 * 60 * 60
     );
 
-    // Set token as cookie so it's sent automatically with redirects
-    res.setHeader('Set-Cookie', `auth-token=${token}; Path=/; HttpOnly=false; SameSite=Lax; Max-Age=28800`);
+    const isProd = /syncedupsolutions\.com$/.test(req.headers.host || "");
+    const baseFlags = [
+      "Path=/",
+      "SameSite=Lax",
+      isProd ? "Secure" : "",
+      "Max-Age=28800"
+    ].filter(Boolean).join("; ");
+
+    const authCookie = [
+      `auth_token=${token}`,
+      baseFlags,
+      isProd ? "Domain=.syncedupsolutions.com" : "",
+      isProd ? "HttpOnly" : "HttpOnly=false"
+    ].filter(Boolean).join("; ");
+
+    const roleCookie = [
+      `user_role=${encodeURIComponent(safeUser.role || "unknown")}`,
+      baseFlags,
+      isProd ? "Domain=.syncedupsolutions.com" : ""
+    ].filter(Boolean).join("; ");
+
+    res.setHeader("Set-Cookie", [authCookie, roleCookie]);
+    res.setHeader("Cache-Control", "no-store");
+
+    // One authoritative redirect. No client script needed.
+    const role = String(safeUser.role || "").toLowerCase();
     
-    return ok(res, { token, user: safeUser });
+    // Normalize role to match portal guard expectations
+    const normalizedRole = role.replace(/[\s-]+/g, "_");
+    
+    const portal = normalizedRole === "super_admin" ? "/super-admin"
+                : normalizedRole === "admin" ? "/admin"
+                : normalizedRole === "manager" ? "/manager"
+                : normalizedRole === "customer_service" ? "/customer-service"
+                : "/agent";
+
+    res.statusCode = 302;
+    res.setHeader("Location", portal);
+    res.end();
   } catch (err) {
     const code = err?.statusCode || 500;
     return bad(res, code, err?.message || 'Unexpected error');

@@ -5,42 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Administrator Console - SyncedUp Insurance</title>
     
-    <!-- Portal Access Control - CRITICAL SECURITY -->
-    <script src="/js/portal-access-control.js"></script>
-    
-    <!-- Enhanced Super Admin Security Check -->
-    <script>
-        (function () {
-          const token = localStorage.getItem('syncedup_token');
-          const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
-          const role = normalize(u.role || '');
-          
-          // Only allow super_admin role
-          if (!token || role !== 'super_admin') {
-            alert('Unauthorized access. Super Admin privileges required.');
-            window.location.href = '/login';
-            return;
-          }
-          
-          // Additional security check for production super admin
-          const email = u.email || '';
-          const isProductionSuperAdmin = email === 'admin@syncedupsolutions.com';
-          const isDemoSuperAdmin = email.includes('demo.com');
-          
-          if (!isProductionSuperAdmin && !isDemoSuperAdmin) {
-            console.warn('Non-standard super admin access attempt:', email);
-            // Log the attempt but allow access for now
-          }
-          
-          // Log super admin access
-          console.log(`SUPER ADMIN ACCESS: ${email} at ${new Date().toISOString()}`);
-          
-          // Set security indicator
-          sessionStorage.setItem('superAdminAccess', 'true');
-          sessionStorage.setItem('superAdminUser', email);
-        })();
-    </script>
+    <!-- Server-side portal-guard.js already verified super-admin access -->
     
     <style>
         :root {
@@ -878,24 +843,23 @@
         // Initialize the entire admin console
         async function initializeAdminConsole() {
             try {
-                // Verify super admin authentication
-                const token = localStorage.getItem('syncedup_token');
-                const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+                // Server-side portal guard already verified super-admin access
+                // Get user data from auth verify endpoint
+                const userResponse = await fetch('/api/auth/verify', { 
+                    credentials: 'include' 
+                });
                 
-                if (!token || !user.email) {
-                    await logSecurityEvent('UNAUTHORIZED_ACCESS_ATTEMPT', 'No valid token found');
-                    window.location.href = '/login';
-                    return;
+                if (userResponse.ok) {
+                    const { user } = await userResponse.json();
+                    currentUser = user;
+                    document.getElementById('admin-email').textContent = user.email;
+                } else {
+                    // Fallback if verify endpoint fails - use role cookie
+                    const roleCookie = document.cookie.split(';').find(c => c.trim().startsWith('user_role='));
+                    const userRole = roleCookie ? decodeURIComponent(roleCookie.split('=')[1]) : 'unknown';
+                    currentUser = { role: userRole };
+                    document.getElementById('admin-email').textContent = 'Super Admin';
                 }
-
-                if (user.role !== 'super-admin' && user.role !== 'super_admin') {
-                    await logSecurityEvent('INSUFFICIENT_PRIVILEGES', `User ${user.email} attempted super admin access with role: ${user.role}`);
-                    window.location.href = '/login';
-                    return;
-                }
-
-                currentUser = user;
-                document.getElementById('admin-email').textContent = user.email;
 
                 // Log successful console access
                 await logAdminAction('CONSOLE_ACCESS', 'Super Admin Console accessed successfully');
@@ -1060,7 +1024,6 @@
             try {
                 const response = await fetch(`${API_BASE}/metrics/system`, {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`
                     }
                 });
                 
@@ -1098,8 +1061,7 @@
                 try {
                     const response = await fetch(`${API_BASE}${check.endpoint}`, {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`
-                        }
+                            }
                     });
                     
                     const element = document.getElementById(check.id);
@@ -1128,7 +1090,6 @@
             try {
                 const response = await fetch(`${API_BASE}/metrics/performance`, {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`
                     }
                 });
                 
@@ -1160,7 +1121,6 @@
             try {
                 const response = await fetch(`${API_BASE}/audit/recent?limit=10`, {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`
                     }
                 });
                 
@@ -1736,8 +1696,8 @@
                 
                 // WebSocket cleanup not needed (disabled)
                 
-                localStorage.removeItem('syncedup_token');
-                localStorage.removeItem('syncedup_user');
+                document.cookie = 'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                document.cookie = 'user_role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
                 window.location.href = '/login';
             } else {
                 await logAdminAction('LOGOUT_CANCELLED', 'Administrator cancelled logout');

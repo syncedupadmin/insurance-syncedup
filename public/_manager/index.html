@@ -25,20 +25,7 @@
     <link rel="stylesheet" href="/manager/manager-global.css">
     <link rel="stylesheet" href="/css/themes/professional.css">
     
-    <!-- Portal Access Control - CRITICAL SECURITY -->
-    <script src="/js/portal-access-control.js"></script>
-    
-    <!-- Auth Guard Script - Must be loaded in HEAD before content renders -->
-    <script>
-        (function () {
-          const token = localStorage.getItem('syncedup_token');
-          const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
-          const role = normalize(u.role || '');
-          const allowed = ['manager','admin','super_admin'];
-          if (!token || !role || !allowed.includes(role)) { window.location.href = '/login'; return; }
-        })();
-    </script>
+    <!-- Server-side portal-guard.js already verified manager access -->
     
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
@@ -191,28 +178,8 @@
         let recentActivity = [];
         
         document.addEventListener('DOMContentLoaded', function() {
-            // Check authentication
-            const userData = localStorage.getItem('syncedup_user');
-            if (userData) {
-                currentUser = JSON.parse(userData);
-                
-                // Allow manager and super-admin roles to access this portal
-                if (!['manager', 'admin', 'super-admin'].includes(currentUser.role)) {
-                    // Redirect based on actual role
-                    if (currentUser.role === 'agent') {
-                        window.location.href = '/agent/';
-                    } else if (currentUser.role === 'customer-service') {
-                        window.location.href = '/customer-service/';
-                    } else {
-                        window.location.href = '/login';
-                    }
-                    return;
-                }
-                
-                initializeDashboard();
-            } else {
-                window.location.href = '/login';
-            }
+            // Server-side guard already verified manager access - just load data
+            initializeDashboard();
         });
         
         async function initializeDashboard() {
@@ -228,8 +195,6 @@
             const url = '/api/manager/dashboard?timeframe=month';
             try {
                 const headers = { 'Accept':'application/json' };
-                const token = (typeof localStorage !== 'undefined' && localStorage.getItem('authToken')) || '';
-                if (token) headers['Authorization'] = 'Bearer ' + token;
 
                 const resp = await fetch(url, { method:'GET', credentials:'include', headers });
                 const text = await resp.text();
@@ -443,7 +408,8 @@
         }
         
         function logout() {
-            localStorage.clear();
+            document.cookie = 'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            document.cookie = 'user_role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
             window.location.href = '/login';
         }
         

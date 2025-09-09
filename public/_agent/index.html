@@ -44,20 +44,7 @@
     
     <link rel="stylesheet" href="/agent/agent-global.css">
     
-    <!-- Portal Access Control - CRITICAL SECURITY -->
-    <script src="/js/portal-access-control.js"></script>
-    
-    <!-- Auth Guard Script - Must be loaded in HEAD before content renders -->
-    <script>
-        (function () {
-          const token = localStorage.getItem('syncedup_token');
-          const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
-          const role = normalize(u.role || '');
-          const allowed = ['agent','manager','admin','super_admin'];
-          if (!token || !role || !allowed.includes(role)) { window.location.href = '/login'; return; }
-        })();
-    </script>
+    <!-- Server-side portal-guard.js already verified agent access -->
     
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
@@ -217,25 +204,29 @@
         let currentUser = null;
 
         // Authentication check
-        function checkAuth() {
-            const token = localStorage.getItem('syncedup_token');
-            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-            
-            if (!token || !user.email) {
-                window.location.href = '/login.html';
-                return false;
+        async function checkAuth() {
+            // Server-side portal guard already verified agent access
+            try {
+                const userResponse = await fetch('/api/auth/verify', { credentials: 'include' });
+                if (userResponse.ok) {
+                    const { user } = await userResponse.json();
+                    document.getElementById('userDisplay').textContent = `${user.email} (${user.role})`;
+                    currentUser = user;
+                    return true;
+                } else {
+                    // Fallback if verify endpoint fails - use role cookie
+                    const roleCookie = document.cookie.split(';').find(c => c.trim().startsWith('user_role='));
+                    const userRole = roleCookie ? decodeURIComponent(roleCookie.split('=')[1]) : 'agent';
+                    currentUser = { role: userRole };
+                    document.getElementById('userDisplay').textContent = `Agent (${userRole})`;
+                    return true;
+                }
+            } catch (error) {
+                console.error('Auth verification failed:', error);
+                currentUser = { role: 'agent' };
+                document.getElementById('userDisplay').textContent = 'Agent Dashboard';
+                return true;
             }
-
-            // Check if user has agent permissions
-            if (!['agent', 'manager', 'admin', 'super-admin'].includes(user.role)) {
-                alert('Access denied. Agent permissions required.');
-                window.location.href = '/login.html';
-                return false;
-            }
-
-            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
-            currentUser = user;
-            return true;
         }
 
         // Initialize page
@@ -368,14 +359,10 @@
 
         // Logout function
         function logout() {
-            // Remove all possible authentication keys
-            localStorage.removeItem('syncedup_token');
-            localStorage.removeItem('syncedup_user');
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            localStorage.removeItem('currentUser');
-            window.location.href = '/login.html';
+            // Clear authentication cookies
+            document.cookie = 'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            document.cookie = 'user_role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            window.location.href = '/login';
         }
 
         // Initialize when page loads

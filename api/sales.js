@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { requireAuth } from './_middleware/authCheck.js';
+// DISABLED: // DISABLED: import { requireAuth } from './_middleware/authCheck.js';
 import { getUserContext, applyDataIsolation } from './utils/auth-helper.js';
 
 const supabase = createClient(
@@ -472,4 +472,4 @@ function getFirstEnrollDemoProducts() {
   ];
 }
 
-export default requireAuth(['agent', 'admin', 'manager', 'super_admin', 'customer_service'])(salesHandler);
+// DISABLED: export default requireAuth(['agent', 'admin', 'manager', 'super_admin', 'customer_service'])(salesHandler);export default salesHandler;

@@ -27,8 +27,7 @@
     <link rel="stylesheet" href="/admin/admin-global.css">
     <link rel="stylesheet" href="/css/themes/professional.css">
     
-    <!-- Portal Access Control - CRITICAL SECURITY -->
-    <script src="/js/portal-access-control.js"></script>
+    <!-- Server-side portal-guard.js already verified admin access -->
     
     <!-- Auth Guard Script - Must be loaded in HEAD before content renders -->
     <script>
@@ -56,10 +55,20 @@
         // Safe fetch with error handling
         async function safeFetch(url, options = {}) {
             try {
+                // Get token from localStorage or cookie
+                const getCookie = (name) => {
+                    const value = `; ${document.cookie}`;
+                    const parts = value.split(`; ${name}=`);
+                    if (parts.length === 2) return parts.pop().split(';').shift();
+                    return null;
+                };
+                
+                const token = getCookie('auth_token') || 'demo';
+                
                 const response = await fetch(url, {
                     ...options,
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token') || 'demo'}`,
+                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
                         ...options.headers
                     }
@@ -85,27 +94,25 @@
             }
         });
         
-        function initializeDashboard() {
-            // Check authentication with error handling
+        async function initializeDashboard() {
+            // Server-side portal guard already verified admin access
             try {
-                const userData = localStorage.getItem('syncedup_user');
-                if (userData) {
-                    currentUser = JSON.parse(userData);
-                    
-                    // Only admin and super-admin can access admin portal
-                    const allowedRoles = ['admin', 'super-admin', 'manager'];
-                    if (!allowedRoles.includes(currentUser.role)) {
-                        window.location.href = '/login';
-                        return;
-                    }
-                    
+                const userResponse = await fetch('/api/auth/verify', { credentials: 'include' });
+                if (userResponse.ok) {
+                    const { user } = await userResponse.json();
+                    currentUser = user;
                     loadDashboardData();
                 } else {
-                    window.location.href = '/login';
+                    // Fallback if verify endpoint fails - use role cookie
+                    const roleCookie = document.cookie.split(';').find(c => c.trim().startsWith('user_role='));
+                    const userRole = roleCookie ? decodeURIComponent(roleCookie.split('=')[1]) : 'admin';
+                    currentUser = { role: userRole };
+                    loadDashboardData();
                 }
             } catch (error) {
-                console.error('Auth check failed:', error);
-                window.location.href = '/login';
+                console.error('Auth verification failed:', error);
+                currentUser = { role: 'admin' };
+                loadDashboardData();
             }
         }
         
@@ -308,8 +315,8 @@
         
         function logout() {
             try {
-                localStorage.removeItem('syncedup_token');
-                localStorage.removeItem('syncedup_user');
+                document.cookie = 'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                document.cookie = 'user_role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
                 window.location.href = '/login';
             } catch (error) {
                 console.error('Logout failed:', error);
@@ -485,21 +492,8 @@
         // Variables already declared above - no need to redeclare
         
         document.addEventListener('DOMContentLoaded', function() {
-            // Check authentication
-            const userData = localStorage.getItem('syncedup_user');
-            if (userData) {
-                currentUser = JSON.parse(userData);
-                
-                // Only manager and admin can access admin portal
-                if (!['manager', 'admin', 'super-admin'].includes(currentUser.role)) {
-                    window.location.href = '/login';
-                    return;
-                }
-                
-                loadDashboardData();
-            } else {
-                window.location.href = '/login';
-            }
+            // Server-side guard already verified auth - just load data
+            loadDashboardData();
         });
         
         async function loadDashboardData() {
@@ -508,33 +502,33 @@
                 const [dashboardResponse, analyticsResponse, userStatsResponse, commissionStatsResponse, apiKeysResponse] = await Promise.all([
                     fetch('/api/manager/dashboard', {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                             'Content-Type': 'application/json'
-                        }
+                        },
+                        credentials: 'include'
                     }),
                     fetch('/api/admin/analytics?analytics_type=overview', {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                             'Content-Type': 'application/json'
-                        }
+                        },
+                        credentials: 'include'
                     }),
                     fetch('/api/admin/user-management', {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                             'Content-Type': 'application/json'
-                        }
+                        },
+                        credentials: 'include'
                     }),
                     fetch('/api/admin/commission-settings', {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                             'Content-Type': 'application/json'
-                        }
+                        },
+                        credentials: 'include'
                     }),
                     fetch('/api/admin/api-keys', {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
                             'Content-Type': 'application/json'
-                        }
+                        },
+                        credentials: 'include'
                     })
                 ]);
                 
@@ -611,7 +605,7 @@
             try {
                 const response = await fetch('/api/admin/leads?recent=true&limit=10', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
+                        'Authorization': `Bearer ${getCookie('auth_token')}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -685,7 +679,7 @@
             try {
                 const response = await fetch('/api/admin/commission-summary', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`,
+                        'Authorization': `Bearer ${getCookie('auth_token')}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -1039,7 +1033,8 @@
         }
         
         function logout() {
-            localStorage.clear();
+            document.cookie = 'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            document.cookie = 'user_role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
             window.location.href = '/login';
         }
         

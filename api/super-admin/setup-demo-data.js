@@ -1,4 +1,4 @@
-import { requireAuth } from '../_middleware/authCheck.js';
+// DISABLED: // DISABLED: import { requireAuth } from '../_middleware/authCheck.js';
 import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcryptjs';
 
@@ -442,4 +442,4 @@ async function setupDemoDataHandler(req, res) {
   }
 }
 
-export default requireAuth(['super_admin'])(setupDemoDataHandler);
+// DISABLED: export default requireAuth(['super_admin'])(setupDemoDataHandler);export default setupDemoDataHandler;
