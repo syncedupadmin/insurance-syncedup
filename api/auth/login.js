@@ -150,37 +150,21 @@ export default async function handler(req, res) {
       );
 
       const isProd = /syncedupsolutions\.com$/.test(req.headers.host || "");
-      const baseFlags = [
-        "Path=/",
-        "SameSite=Lax",
-        isProd ? "Secure" : "",
-        "Max-Age=28800"
-      ].filter(Boolean).join("; ");
+      const domain = isProd ? "Domain=.syncedupsolutions.com; " : "";
+      const secure = isProd ? "Secure; " : "";
+      const baseFlags = `${domain}Path=/; SameSite=Lax; ${secure}Max-Age=28800`;
 
-      const authCookie = [
-        `auth_token=${token}`,
-        baseFlags,
-        isProd ? "Domain=.syncedupsolutions.com" : "",
-        isProd ? "HttpOnly" : "HttpOnly=false"
-      ].filter(Boolean).join("; ");
-
-      const roleCookie = [
-        `user_role=${encodeURIComponent(safeUser.role || "unknown")}`,
-        baseFlags,
-        isProd ? "Domain=.syncedupsolutions.com" : ""
-      ].filter(Boolean).join("; ");
+      const authCookie = `auth_token=${token}; ${baseFlags} HttpOnly`;
+      const roleCookie = `user_role=${encodeURIComponent(safeUser.role || "unknown")}; ${baseFlags}`;
 
       // Support multi-role users - for now single role but extensible
       const userRoles = Array.isArray(safeUser.roles) ? safeUser.roles : [safeUser.role];
-      const rolesCookie = [
-        `user_roles=${encodeURIComponent(JSON.stringify(userRoles))}`,
-        "HttpOnly",
-        baseFlags,
-        isProd ? "Domain=.syncedupsolutions.com" : ""
-      ].filter(Boolean).join("; ");
+      const rolesCookie = `user_roles=${encodeURIComponent(JSON.stringify(userRoles))}; ${baseFlags}`;
 
-      res.setHeader("Set-Cookie", [authCookie, roleCookie, rolesCookie]);
-      res.setHeader("Cache-Control", "no-store");
+      res.setHeader('Set-Cookie', [authCookie, roleCookie, rolesCookie]);
+      res.setHeader('Cache-Control', 'no-store');
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
 
       // Return JSON with redirect URL for client-side navigation
       const role = String(safeUser.role || "").toLowerCase();
@@ -194,8 +178,6 @@ export default async function handler(req, res) {
                   : normalizedRole === "customer_service" ? "/customer-service/"
                   : "/agent/";
 
-      res.setHeader("Content-Type", "application/json");
-      res.statusCode = 200;
       res.end(JSON.stringify({ success: true, redirect: portal }));
       
     } catch (e) {

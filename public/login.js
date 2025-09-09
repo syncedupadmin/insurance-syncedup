@@ -2,16 +2,25 @@
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('loginFormElement') || document.querySelector('form');
   const emailInput = document.getElementById('email') || document.querySelector('input[type="email"]');
-  const passInput  = document.getElementById('password') || document.querySelector('input[type="password"]');
-  const errBox = document.getElementById('errorBox');
+  const passwordInput = document.getElementById('password') || document.querySelector('input[type="password"]');
+  const errBox = document.getElementById('errorMessage') || document.getElementById('errorBox');
 
-  const showError = (m) => { if (errBox) { errBox.textContent = m; errBox.style.display = 'block'; } };
+  const showError = (m) => { 
+    if (errBox) { 
+      errBox.textContent = m; 
+      errBox.style.display = 'block'; 
+      errBox.classList.remove('hidden');
+    } 
+  };
 
-  async function doLogin(e) {
-    e?.preventDefault();
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();                                  // ← important
     const email = emailInput.value.trim();
-    const password = passInput.value.trim();
-    if (!email || !password) return showError('Please enter email and password');
+    const password = passwordInput.value;
+
+    if (!email || !password) {
+      return showError('Please enter email and password');
+    }
 
     try {
       const res = await fetch('/api/auth/login', {
@@ -21,32 +30,20 @@ document.addEventListener('DOMContentLoaded', () => {
         credentials: 'include'
       });
 
-      // Handle successful response
       if (res.ok) {
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
         if (data.success && data.redirect) {
-          window.location.href = data.redirect;
+          window.location.assign(data.redirect);           // ← do the page navigation
           return;
         }
       }
 
-      // If we get here, there was an error (server didn't redirect)
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        return showError(errorData?.error || 'Login failed');
-      }
-
-      // Fallback - shouldn't reach here with proper server redirects
-      window.location.href = '/admin'; 
-      
+      // error UI
+      const err = await res.json().catch(() => ({}));
+      showError(err.error || 'Login failed');
     } catch (error) {
       console.error('Login error:', error);
       showError('Network error. Please try again.');
     }
-  }
-
-  form?.addEventListener('submit', async (e) => {
-    e.preventDefault();                             // ← don't let the form reload the page
-    await doLogin(e);
   });
 });
