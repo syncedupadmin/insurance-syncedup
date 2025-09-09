@@ -1,6 +1,18 @@
 const jwt = require("jsonwebtoken");
 const SECRET = process.env.JWT_SECRET;
 
+// Role enforcement + multi-role users
+const HIERARCHY = ["agent","customer_service","manager","admin","super_admin"];
+const ACCESS = {
+  super_admin: ["/super-admin","/admin","/manager","/agent","/customer-service"],
+  admin:       ["/admin","/manager","/agent","/customer-service"],
+  manager:     ["/manager","/agent"],
+  agent:       ["/agent"],
+  customer_service: ["/customer-service"]
+};
+
+const normalize = r => String(r||"").toLowerCase().replace(/[\s-]+/g,"_");
+
 function getCookie(req, name) {
   const m = (req.headers.cookie || "").match(new RegExp(`(?:^|; )${name}=([^;]+)`));
   return m ? decodeURIComponent(m[1]) : null;
@@ -10,7 +22,7 @@ module.exports = async (req, res) => {
   // Map pretty routes -> actual static dirs
   const routes = {
     "/admin": "/_admin/index.html",
-    "/manager": "/_manager/index.html",
+    "/manager": "/_manager/index.html", 
     "/agent": "/_agent/index.html",
     "/customer-service": "/_customer-service/index.html",
     "/super-admin": "/_super-admin/index.html"
@@ -58,26 +70,29 @@ module.exports = async (req, res) => {
 
   try {
     const payload = jwt.verify(token, SECRET);
-    const role = String(payload.role || "").toLowerCase();
+    
+    // Get user roles - support both single role and multi-role
+    const raw = getCookie(req, "user_roles") || getCookie(req, "user_role") || payload.role || "agent";
+    const roles = Array.isArray(raw) ? raw.map(normalize) : 
+                  (raw.startsWith('[') ? JSON.parse(raw).map(normalize) : 
+                   String(raw).split(",").map(normalize));
 
-    const allowed = {
-      "super_admin": ["/super-admin","/admin","/manager","/agent","/customer-service"],
-      "admin":       ["/admin","/manager","/agent","/customer-service"],
-      "manager":     ["/manager","/agent"],
-      "agent":       ["/agent"],
-      "customer_service": ["/customer-service"]
-    };
+    const path = url.toLowerCase();
+    const allowed = new Set(roles.flatMap(r => ACCESS[normalize(r)] || []));
 
-    // normalize role
-    const norm = role.replace(/[\s-]+/g, "_");
-    const can = allowed[norm] || [];
-
-    if (!can.includes(url)) {
+    if (!Array.from(allowed).some(p => path.startsWith(p))) {
+      // Hard block instead of "page loads then APIs 401"
       res.statusCode = 302;
-      res.setHeader("Location", "/login?error=access_denied");
+      res.setHeader("Location", `/login?access_denied=1&from=${encodeURIComponent(path)}`);
       res.end();
       return;
     }
+
+    // Attach roles so API routes can reuse them
+    req.user = { 
+      roles, 
+      highest: roles.sort((a,b) => HIERARCHY.indexOf(b) - HIERARCHY.indexOf(a))[0] || "agent" 
+    };
 
     // Auth OK; send to the static html in /public
     res.statusCode = 302;

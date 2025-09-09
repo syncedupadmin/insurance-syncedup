@@ -163,7 +163,16 @@ export default async function handler(req, res) {
       isProd ? "Domain=.syncedupsolutions.com" : ""
     ].filter(Boolean).join("; ");
 
-    res.setHeader("Set-Cookie", [authCookie, roleCookie]);
+    // Support multi-role users - for now single role but extensible
+    const userRoles = Array.isArray(safeUser.roles) ? safeUser.roles : [safeUser.role];
+    const rolesCookie = [
+      `user_roles=${encodeURIComponent(JSON.stringify(userRoles))}`,
+      "HttpOnly",
+      baseFlags,
+      isProd ? "Domain=.syncedupsolutions.com" : ""
+    ].filter(Boolean).join("; ");
+
+    res.setHeader("Set-Cookie", [authCookie, roleCookie, rolesCookie]);
     res.setHeader("Cache-Control", "no-store");
 
     // One authoritative redirect. No client script needed.
