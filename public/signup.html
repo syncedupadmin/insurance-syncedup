@@ -6,7 +6,7 @@
     <title>Sign Up - SyncedUp Insurance Platform</title>
     <link rel="stylesheet" href="/css/pro.css">
     <script src="https://js.stripe.com/v3/"></script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places"></script>
+    <!-- Google Maps script will be loaded dynamically -->
     <style>
         .signup-hero {
             padding: 140px 20px 80px;
@@ -630,9 +630,49 @@
     </main>
 
     <script>
+        // Load Google Maps API dynamically
+        async function loadGoogleMapsAPI() {
+            try {
+                const response = await fetch('/api/config/google-maps');
+                const config = await response.json();
+                
+                if (config.success && config.apiKey) {
+                    return new Promise((resolve, reject) => {
+                        window.initGoogleMaps = resolve;
+                        
+                        const script = document.createElement('script');
+                        script.async = true;
+                        script.defer = true;
+                        script.src = `https://maps.googleapis.com/maps/api/js?key=${config.apiKey}&libraries=places&callback=initGoogleMaps`;
+                        script.onerror = reject;
+                        document.head.appendChild(script);
+                    });
+                } else {
+                    console.warn('Google Maps API key not configured - address autocomplete disabled');
+                    return Promise.reject('No API key');
+                }
+            } catch (error) {
+                console.error('Failed to load Google Maps API configuration:', error);
+                return Promise.reject(error);
+            }
+        }
+
         // Wait for page to load before initializing
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             console.log('DOM loaded, initializing signup page...');
+            
+            // Load Google Maps API in the background
+            loadGoogleMapsAPI()
+                .then(() => {
+                    console.log('Google Maps API loaded successfully');
+                    // Initialize address autocomplete after Google Maps is loaded
+                    initAddressAutocomplete();
+                })
+                .catch(error => {
+                    console.log('Google Maps API not available, using fallback address formatting');
+                    // Initialize fallback address formatting
+                    initAddressAutocomplete();
+                });
             
             // Auto-formatting functions
             function capitalizeWords(str) {
@@ -798,8 +838,7 @@
                 }
             }
             
-            // Initialize address autocomplete after a delay to ensure Google Maps is loaded
-            setTimeout(initAddressAutocomplete, 1000);
+            // Address autocomplete is now initialized after Google Maps API loads
             
             // Initialize Stripe - use environment variable or fallback test key
             const stripe = Stripe(

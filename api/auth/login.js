@@ -188,11 +188,11 @@ export default async function handler(req, res) {
       // Normalize role to match portal guard expectations
       const normalizedRole = role.replace(/[\s-]+/g, "_");
       
-      const portal = normalizedRole === "super_admin" ? "/super-admin"
-                  : normalizedRole === "admin" ? "/admin"
-                  : normalizedRole === "manager" ? "/manager"
-                  : normalizedRole === "customer_service" ? "/customer-service"
-                  : "/agent";
+      const portal = normalizedRole === "super_admin" ? "/super-admin/"
+                  : normalizedRole === "admin" ? "/admin/"
+                  : normalizedRole === "manager" ? "/manager/"
+                  : normalizedRole === "customer_service" ? "/customer-service/"
+                  : "/agent/";
 
       res.statusCode = 302;
       res.setHeader("Location", portal);
