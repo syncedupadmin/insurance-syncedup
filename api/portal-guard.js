@@ -10,15 +10,21 @@ function getCookie(req, name) {
 module.exports = async (req, res) => {
   const url = req.url.split("?")[0];
   
-  // Extract portal name from URL (remove trailing slash)
-  const portalMatch = url.match(/^\/(admin|manager|agent|customer-service|super-admin)\/?$/);
-  if (!portalMatch) {
+  // Map portal routes
+  const portals = {
+    "/admin": "admin",
+    "/manager": "manager", 
+    "/agent": "agent",
+    "/customer-service": "customer-service",
+    "/super-admin": "super-admin"
+  };
+  
+  const portal = portals[url];
+  if (!portal) {
     res.statusCode = 404;
     res.end("Not Found");
     return;
   }
-  
-  const portal = portalMatch[1];
 
   const token = getCookie(req, "auth_token");
   if (!token) {
