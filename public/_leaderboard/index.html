@@ -14,33 +14,17 @@
     <script>
         (function () {
           try {
-            // Use auth-helper.js for authentication
-            // Server-side portal-guard handles authentication
             // Global leaderboard is accessible to all authenticated users
-            const user = getStoredUser();
-            const token = getCookie('auth_token');
+            // Simply check if we can get current user
+            console.log('Checking authentication for global leaderboard...');
             
-            console.log('Auth check - User exists:', !!user);
-            console.log('Auth check - Token exists:', !!token);
-            
-            if (user) {
-              console.log('Auth check - User role:', user.role);
-              console.log('Auth check - Email:', user.email);
-              
-              // Store user info globally for the page
-              window.currentUser = user;
-              window.authToken = token;
-              
-              console.log('Auth check passed for user:', user.email, 'with role:', user.role);
-            } else {
-              console.log('Global leaderboard - server will handle auth');
-              // Server-side portal-guard will handle redirect if not authenticated
-            }
+            // We'll verify auth when making API calls
+            // The API will use cookies automatically with credentials: 'include'
+            console.log('Global leaderboard ready - auth will be verified on API calls');
             
           } catch (error) {
-            console.error('Auth check error:', error);
-            alert('Authentication error: ' + error.message);
-            window.location.href = '/login';
+            console.error('Auth initialization error:', error);
+            // Don't redirect here - let the API calls handle auth
           }
         })();
     </script>
