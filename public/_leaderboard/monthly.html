@@ -245,8 +245,9 @@
             try {
                 const selectedMonth = document.getElementById('monthSelector').value;
                 const response = await fetch(`/api/leaderboard/monthly?month=${selectedMonth}`, {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('syncedup_token')}`
+                        'Content-Type': 'application/json'
                     }
                 });
                 

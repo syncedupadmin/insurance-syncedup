@@ -19,20 +19,13 @@
     <link rel="stylesheet" href="/leaderboard/leaderboard-global.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
-    <!-- Auth Guard Script -->
+    <!-- Authentication Helper -->
+    <script src="/js/auth-helper.js"></script>
+    <!-- Auth Check Script -->
     <script>
         (function () {
-          const token = localStorage.getItem('syncedup_token');
-          const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
-          const role = normalize(u.role || '');
-          const allowed = ['agent','manager','admin','super_admin','customer_service'];
-          
-          if (!token || !u.email || !allowed.includes(role)) {
-            alert('Access denied. Please log in with a valid SyncedUp account to access the leaderboard.');
-            window.location.href = '/agent';
-            return;
-          }
+          // Global leaderboard is accessible to all authenticated users
+          console.log('Teams leaderboard - accessible to all logged-in users');
         })();
     </script>
 </head>
