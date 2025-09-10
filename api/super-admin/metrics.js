@@ -2,11 +2,19 @@
 // Provides comprehensive system metrics for super admin dashboard
 
 const { createClient } = require('@supabase/supabase-js');
+const jwt = require('jsonwebtoken');
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL, 
   process.env.SUPABASE_SERVICE_KEY
 );
+
+// Helper to get cookie value
+function getCookie(req, name) {
+  const cookies = req.headers.cookie || '';
+  const match = cookies.match(new RegExp(`(?:^|; )${name}=([^;]+)`));
+  return match ? decodeURIComponent(match[1]) : null;
+}
 
 module.exports = async function handler(req, res) {
   // CORS headers
@@ -22,12 +30,23 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Allow access for testing - remove strict auth check
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  console.log('Metrics API called with token:', token ? 'present' : 'missing');
+  // Get token from cookie
+  const token = getCookie(req, 'auth_token');
+  
+  if (!token) {
+    return res.status(401).json({ error: 'Authorization required' });
+  }
 
   try {
-    // Skip auth for testing - return system metrics directly
+    // Verify JWT token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Verify super admin role
+    if (decoded.role !== 'super_admin') {
+      return res.status(403).json({ error: 'Super admin privileges required' });
+    }
+
+    // Return system metrics
     return await getSystemMetrics(req, res);
 
   } catch (error) {
@@ -79,14 +98,14 @@ async function getSystemMetrics(req, res) {
     const totalRevenue = monthlyRevenue * 12; // Annual revenue: $16,764
     
     // Active sessions (realistic number based on users)
-    const activeSessions = Math.min(totalUsers, 3); // Usually 3-4 users active
+    const activeSessionsCount = Math.min(totalUsers, 3); // Usually 3-4 users active
     
     // Calculate system uptime (realistic)
     const uptime = 99.97;
 
     const systemMetrics = {
       totalUsers: totalUsers,
-      activeSessions: activeSessions,
+      activeSessions: activeSessionsCount,
       uptime: uptime,
       uptimePercentage: uptime,
       totalRevenue: totalRevenue,
