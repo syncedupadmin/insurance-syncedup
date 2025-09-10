@@ -334,6 +334,70 @@
                 setTimeout(() => lucide.createIcons(), 100);
             });
         });
+        
+        // Theme System Implementation
+        function initializeThemeSystem() {
+            const themeButtons = document.querySelectorAll('.theme-btn');
+            
+            themeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const theme = button.getAttribute('data-theme');
+                    applyTheme(theme);
+                    
+                    // Update active state
+                    themeButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                });
+            });
+            
+            // Load saved theme or default
+            const savedTheme = localStorage.getItem('leaderboard-theme') || 'competition';
+            applyTheme(savedTheme);
+            
+            // Set active button
+            const activeBtn = document.querySelector(`[data-theme="${savedTheme}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+        
+        function applyTheme(theme) {
+            const container = document.querySelector('.dashboard-container');
+            
+            // Remove all theme classes
+            container.classList.remove('theme-competition', 'theme-analytics', 'theme-gaming');
+            
+            // Add new theme class
+            container.classList.add(`theme-${theme}`);
+            
+            // Save preference
+            localStorage.setItem('leaderboard-theme', theme);
+            
+            // Apply theme-specific styles
+            switch(theme) {
+                case 'competition':
+                    document.body.style.background = 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)';
+                    break;
+                case 'analytics':
+                    document.body.style.background = 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)';
+                    break;
+                case 'gaming':
+                    document.body.style.background = 'linear-gradient(135deg, #2d1b69 0%, #0f3443 100%)';
+                    break;
+            }
+            
+            // Fire event for other components
+            window.dispatchEvent(new CustomEvent('leaderboardThemeChange', { detail: { theme } }));
+        }
+        
+        // Logout function
+        function logout() {
+            if (typeof SyncedUpAuth !== 'undefined') {
+                SyncedUpAuth.logout();
+            } else {
+                // Fallback logout
+                document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                window.location.href = '/login';
+            }
+        }
     </script>
 </body>
 </html>
