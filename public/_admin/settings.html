@@ -16,10 +16,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - SyncedUp Insurance Admin</title>
-    <link rel="stylesheet" href="admin-global.css">
+    <link rel="stylesheet" href="/admin/admin-global.css">
     <link rel="stylesheet" href="/css/themes/professional.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="/js/auth-helper.js"></script>
+    <script src="/admin/shared-nav.js"></script>
 </head>
 <body>
     <!-- Floating Particles -->
@@ -42,38 +43,7 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="nav">
-        <a href="/admin/">
-            <i data-lucide="layout-dashboard" class="icon"></i>Dashboard
-        </a>
-        <a href="/admin/agent-performance">
-            <i data-lucide="trending-up" class="icon"></i>Agent Performance
-        </a>
-        <a href="/admin/users">
-            <i data-lucide="users" class="icon"></i>Users
-        </a>
-        <a href="/admin/licenses">
-            <i data-lucide="shield-check" class="icon"></i>Licenses
-        </a>
-        <a href="/admin/convoso-leads">
-            <i data-lucide="users" class="icon"></i>Leads
-        </a>
-        <a href="/admin/vendors">
-            <i data-lucide="building-2" class="icon"></i>Vendors
-        </a>
-        <a href="/admin/commissions">
-            <i data-lucide="dollar-sign" class="icon"></i>Commissions
-        </a>
-        <a href="/admin/settings" class="active">
-            <i data-lucide="settings" class="icon"></i>Settings
-        </a>
-        <a href="/admin/convoso-monitor">
-            <i data-lucide="monitor-speaker" class="icon"></i>Convoso
-        </a>
-        <a href="/global-leaderboard">
-            <i data-lucide="trophy" class="icon"></i>Global Leaderboard
-        </a>
-    </nav>
+    <div id="nav-placeholder"></div>
 
     <div class="container">
         <!-- API Key Management -->
@@ -529,8 +499,12 @@ Business City, ST 12345</textarea>
             // Set up service dropdown handler
             document.getElementById('apiService').addEventListener('change', toggleCustomService);
             
-            // Initialize Lucide icons
-            lucide.createIcons();
+            // Initialize Lucide icons with delay to allow navigation to load
+            setTimeout(() => {
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }, 200);
         }
 
         // Load API keys

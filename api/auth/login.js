@@ -4,7 +4,7 @@
 // Ensure Node.js runtime (jsonwebtoken doesn't work on Edge)
 export const config = { runtime: 'nodejs' };
 
-import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { createClient } from '@supabase/supabase-js';
 import { setCORSHeaders, handleCORSPreflight } from '../_utils/cors.js';
@@ -33,19 +33,16 @@ function failIfMissingEnv() {
   }
 }
 
-function base64url(buf) {
-  return Buffer.from(buf).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
-}
-
 function signJWT(payload, secret, expSeconds = 8 * 60 * 60) {
-  const header = { alg: 'HS256', typ: 'JWT' };
   const now = Math.floor(Date.now() / 1000);
-  const body = { iat: now, exp: now + expSeconds, ...payload };
-  const h = base64url(JSON.stringify(header));
-  const b = base64url(JSON.stringify(body));
-  const data = `${h}.${b}`;
-  const sig = crypto.createHmac('sha256', secret).update(data).digest();
-  return `${data}.${base64url(sig)}`;
+  const tokenPayload = {
+    ...payload,
+    iat: now,
+    exp: now + expSeconds
+  };
+  
+  // Use jsonwebtoken library for proper JWT generation
+  return jwt.sign(tokenPayload, secret, { algorithm: 'HS256' });
 }
 
 function ok(res, json) {
@@ -143,25 +140,37 @@ export default async function handler(req, res) {
         is_active: !!userRow.is_active
       };
 
+      // Generate clean JWT token without escape characters
       const token = signJWT(
-        { sub: safeUser.id, email: safeUser.email, role: safeUser.role, agency_id: safeUser.agency_id },
+        { 
+          id: safeUser.id,
+          sub: safeUser.id, 
+          email: safeUser.email, 
+          role: safeUser.role, 
+          agency_id: safeUser.agency_id 
+        },
         AUTH_SECRET,
-        8 * 60 * 60
+        7 * 24 * 60 * 60 // 7 days
       );
 
       const isProd = /syncedupsolutions\.com$/.test(req.headers.host || "");
       const domain = isProd ? "Domain=.syncedupsolutions.com; " : "";
       const secure = isProd ? "Secure; " : "";
-      const baseFlags = `${domain}Path=/; SameSite=Lax; ${secure}Max-Age=28800`;
+      const baseFlags = `${domain}Path=/; SameSite=Lax; ${secure}`;
 
-      const authCookie = `auth_token=${token}; ${baseFlags} HttpOnly`;
+      // Set clean auth token cookie without any escaping (7 days = 604800 seconds)
+      const authCookie = `auth_token=${token}; ${baseFlags}HttpOnly; Max-Age=604800`;
       const roleCookie = `user_role=${encodeURIComponent(safeUser.role || "unknown")}; ${baseFlags}`;
 
       // Support multi-role users - for now single role but extensible
       const userRoles = Array.isArray(safeUser.roles) ? safeUser.roles : [safeUser.role];
       const rolesCookie = `user_roles=${encodeURIComponent(JSON.stringify(userRoles))}; ${baseFlags}`;
 
-      res.setHeader('Set-Cookie', [authCookie, roleCookie, rolesCookie]);
+      // Clear any role overrides on login
+      const clearAssumedRole = `assumed_role=; ${baseFlags} HttpOnly; Max-Age=0`;
+      const clearActiveRole = `active_role=; ${baseFlags} Max-Age=0`;
+      
+      res.setHeader('Set-Cookie', [authCookie, roleCookie, rolesCookie, clearAssumedRole, clearActiveRole]);
       res.setHeader('Cache-Control', 'no-store');
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
@@ -187,11 +196,11 @@ export default async function handler(req, res) {
 // Helper function to determine portal redirect based on role
 function getPortalRedirect(role) {
   const redirects = {
-    'super_admin': '/super-admin',
-    'admin': '/admin',
-    'manager': '/manager',
-    'agent': '/agent',
-    'customer_service': '/customer-service'
+    'super_admin': '/super-admin/',
+    'admin': '/admin/',
+    'manager': '/manager/',
+    'agent': '/agent/',
+    'customer_service': '/customer-service/'
   };
-  return redirects[role] || '/admin';
+  return redirects[role] || '/admin/';
 }

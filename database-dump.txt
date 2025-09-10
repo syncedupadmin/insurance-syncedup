@@ -1,0 +1,402 @@
+[dotenv@17.2.1] injecting env (20) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+=== COMPLETE DATABASE DUMP ===
+
+
+========== PROFILES ==========
+Count: 0 records
+Table exists but is empty
+
+========== PORTAL_USERS ==========
+Count: 8 records
+
+Columns: id, email, password_hash, role, agency_id, agent_id, full_name, is_active, created_by, last_login, created_at, must_change_password, agent_code, name, classic_mode, auth_user_id, roles, updated_at, email_norm
+
+Data:
+Record 1: {
+  "id": "03906bb5-3d4f-45bc-92fa-b34bce666378",
+  "email": "admin@demo.com",
+  "password_hash": "$2b$10$mbjsmEzvwYjR.g4Opaz0reGgbYvSqcvdLGYSJWyxzM2YzxG56ziGK",
+  "role": "admin",
+  "agency_id": "a2222222-2222-2222-2222-222222222222",
+  "agent_id": null,
+  "full_name": "Demo Admin",
+  "is_active": true,
+  "created_by": null,
+  "last_login": null,
+  "created_at": "2025-09-09T00:11:04.037192",
+  "must_change_password": false,
+  "agent_code": null,
+  "name": "Demo Admin",
+  "classic_mode": false,
+  "auth_user_id": null,
+  "roles": [
+    "admin",
+    "manager",
+    "agent"
+  ],
+  "updated_at": "2025-09-09T15:25:50.483948+00:00",
+  "email_norm": "admin@demo.com"
+}
+Record 2: {
+  "id": "3913cd9d-0049-4be7-8915-5bb2d7cf9ac1",
+  "email": "manager@demo.com",
+  "password_hash": "$2b$10$6XLEdf9sJOAQ6g7ttwNmSebvQs9qt8kwu.TZQ.l8JwL1nr5VtAobG",
+  "role": "manager",
+  "agency_id": "a2222222-2222-2222-2222-222222222222",
+  "agent_id": null,
+  "full_name": "Demo Manager",
+  "is_active": true,
+  "created_by": null,
+  "last_login": null,
+  "created_at": "2025-09-09T00:11:04.037192",
+  "must_change_password": false,
+  "agent_code": null,
+  "name": "Demo Manager",
+  "classic_mode": false,
+  "auth_user_id": null,
+  "roles": [
+    "manager",
+    "agent"
+  ],
+  "updated_at": "2025-09-09T15:25:50.483948+00:00",
+  "email_norm": "manager@demo.com"
+}
+Record 3: {
+  "id": "33f3e604-1d34-4632-98e9-c07542300f55",
+  "email": "service@demo.com",
+  "password_hash": "$2b$10$J.iYzn0yEe6VfvUM0m4VOek6ml8qusmktwtXdOANsUy7eP.PZXTui",
+  "role": "customer_service",
+  "agency_id": "a2222222-2222-2222-2222-222222222222",
+  "agent_id": null,
+  "full_name": "Demo Service",
+  "is_active": true,
+  "created_by": null,
+  "last_login": null,
+  "created_at": "2025-09-09T00:11:04.037192",
+  "must_change_password": false,
+  "agent_code": null,
+  "name": "Demo Service",
+  "classic_mode": false,
+  "auth_user_id": null,
+  "roles": [
+    "customer_service"
+  ],
+  "updated_at": "2025-09-09T15:25:50.483948+00:00",
+  "email_norm": "service@demo.com"
+}
+Record 4: {
+  "id": "143199a3-56cf-4a51-a6c7-a3a45264ec76",
+  "email": "admin@phsagency.com",
+  "password_hash": "$2b$10$tzyfqNiguZwzHDQkKuh.JuQMP..HKqu5Vl0jT6e9PVBNkdJ4PSwDe",
+  "role": "agent",
+  "agency_id": "a3333333-3333-3333-3333-333333333333",
+  "agent_id": null,
+  "full_name": "PHS Administrator",
+  "is_active": true,
+  "created_by": null,
+  "last_login": null,
+  "created_at": "2025-09-09T00:11:04.037192",
+  "must_change_password": false,
+  "agent_code": null,
+  "name": "PHS Administrator",
+  "classic_mode": false,
+  "auth_user_id": null,
+  "roles": [
+    "agent"
+  ],
+  "updated_at": "2025-09-09T15:25:50.483948+00:00",
+  "email_norm": "admin@phsagency.com"
+}
+Record 5: {
+  "id": "ba5562cb-e6d0-411a-8956-4625cb4795df",
+  "email": "manager@phsagency.com",
+  "password_hash": "$2b$10$vdmuoRSSReQSLf44/x6wSu1EjispJGLcvcVQuKv0mi5g.VAGZCf3G",
+  "role": "agent",
+  "agency_id": "a3333333-3333-3333-3333-333333333333",
+  "agent_id": null,
+  "full_name": "PHS Manager",
+  "is_active": true,
+  "created_by": null,
+  "last_login": null,
+  "created_at": "2025-09-09T00:11:04.037192",
+  "must_change_password": false,
+  "agent_code": null,
+  "name": "PHS Manager",
+  "classic_mode": false,
+  "auth_user_id": null,
+  "roles": [
+    "agent"
+  ],
+  "updated_at": "2025-09-09T15:25:50.483948+00:00",
+  "email_norm": "manager@phsagency.com"
+}
+Record 6: {
+  "id": "2ad871b0-0bb2-4193-9c05-034233dff2c6",
+  "email": "agent1@phsagency.com",
+  "password_hash": "$2b$10$zIoM8qtjHzbR9f1H2Gukwe5wpCxMUhzD8aPrDP4AKsAOyy.IVBYDG",
+  "role": "agent",
+  "agency_id": "a3333333-3333-3333-3333-333333333333",
+  "agent_id": "AGENT047",
+  "full_name": "PHS Agent 1",
+  "is_active": true,
+  "created_by": null,
+  "last_login": null,
+  "created_at": "2025-09-09T00:11:04.037192",
+  "must_change_password": false,
+  "agent_code": null,
+  "name": "PHS Agent 1",
+  "classic_mode": false,
+  "auth_user_id": null,
+  "roles": [
+    "agent"
+  ],
+  "updated_at": "2025-09-09T15:25:50.483948+00:00",
+  "email_norm": "agent1@phsagency.com"
+}
+Record 7: {
+  "id": "e59950bc-06c9-456b-a5fc-b2371070c8ba",
+  "email": "admin@syncedupsolutions.com",
+  "password_hash": "$2b$10$tlmjrHbONT6tfNq9ojluW.DgFc6loYfwHVwfO1QMrLW5kNEoIunNq",
+  "role": "super_admin",
+  "agency_id": "a1111111-1111-1111-1111-111111111111",
+  "agent_id": null,
+  "full_name": "System Administrator",
+  "is_active": true,
+  "created_by": null,
+  "last_login": null,
+  "created_at": "2025-09-09T00:11:04.037192",
+  "must_change_password": false,
+  "agent_code": null,
+  "name": "System Administrator",
+  "classic_mode": false,
+  "auth_user_id": "41589ffb-5613-41ad-9251-03ca35ab9d89",
+  "roles": [
+    "agent"
+  ],
+  "updated_at": "2025-09-09T15:25:50.483948+00:00",
+  "email_norm": "admin@syncedupsolutions.com"
+}
+Record 8: {
+  "id": "91094853-5a4e-469c-8b74-c6499570de89",
+  "email": "agent@demo.com",
+  "password_hash": "$2b$10$9MTjjugkWeR/FYxJNJgbvO7Zt4mk9JPMROPVq8Zx13CmpK19gQ39u",
+  "role": "agent",
+  "agency_id": "a2222222-2222-2222-2222-222222222222",
+  "agent_id": "AGENT046",
+  "full_name": "Demo Agent",
+  "is_active": true,
+  "created_by": null,
+  "last_login": null,
+  "created_at": "2025-09-09T00:11:04.037192",
+  "must_change_password": false,
+  "agent_code": null,
+  "name": "Demo Agent",
+  "classic_mode": false,
+  "auth_user_id": null,
+  "roles": [
+    "agent"
+  ],
+  "updated_at": "2025-09-09T15:25:50.483948+00:00",
+  "email_norm": "agent@demo.com"
+}
+
+========== AGENCIES ==========
+Count: 3 records
+
+Columns: id, name, code, admin_email, api_credentials, features, settings, commission_split, is_active, created_at, participate_global_leaderboard, commission_structure, pay_period, pay_day, is_demo, stripe_customer_id, agency_id, subscription_plan, contact_email, updated_at
+
+Data:
+Record 1: {
+  "id": "a1111111-1111-1111-1111-111111111111",
+  "name": "SyncedUp Solutions",
+  "code": "SYSTEM",
+  "admin_email": "admin@syncedupsolutions.com",
+  "api_credentials": {},
+  "features": {
+    "super_admin": true
+  },
+  "settings": {},
+  "commission_split": 0,
+  "is_active": true,
+  "created_at": "2025-09-09T00:04:18.008714",
+  "participate_global_leaderboard": false,
+  "commission_structure": {
+    "rate": 0,
+    "type": "none"
+  },
+  "pay_period": "monthly",
+  "pay_day": 1,
+  "is_demo": false,
+  "stripe_customer_id": null,
+  "agency_id": null,
+  "subscription_plan": "starter",
+  "contact_email": null,
+  "updated_at": "2025-09-10T00:06:53.096211+00:00"
+}
+Record 2: {
+  "id": "a2222222-2222-2222-2222-222222222222",
+  "name": "Demo Insurance Agency",
+  "code": "DEMO001",
+  "admin_email": "admin@demo.com",
+  "api_credentials": {},
+  "features": {
+    "reports": true,
+    "dashboard": true,
+    "csv_upload": true
+  },
+  "settings": {},
+  "commission_split": 20,
+  "is_active": true,
+  "created_at": "2025-09-09T00:04:18.008714",
+  "participate_global_leaderboard": true,
+  "commission_structure": {
+    "rate": 80,
+    "type": "percentage",
+    "tiers": []
+  },
+  "pay_period": "monthly",
+  "pay_day": 1,
+  "is_demo": true,
+  "stripe_customer_id": null,
+  "agency_id": null,
+  "subscription_plan": "starter",
+  "contact_email": null,
+  "updated_at": "2025-09-10T00:06:53.096211+00:00"
+}
+Record 3: {
+  "id": "a3333333-3333-3333-3333-333333333333",
+  "name": "Phoenix Health Solutions",
+  "code": "PHS001",
+  "admin_email": "admin@phsagency.com",
+  "api_credentials": {},
+  "features": {
+    "reports": true,
+    "dashboard": true,
+    "api_access": true,
+    "csv_upload": true
+  },
+  "settings": {},
+  "commission_split": 20,
+  "is_active": true,
+  "created_at": "2025-09-09T00:04:18.008714",
+  "participate_global_leaderboard": true,
+  "commission_structure": {
+    "rate": 80,
+    "type": "percentage",
+    "tiers": []
+  },
+  "pay_period": "monthly",
+  "pay_day": 1,
+  "is_demo": false,
+  "stripe_customer_id": null,
+  "agency_id": null,
+  "subscription_plan": "starter",
+  "contact_email": null,
+  "updated_at": "2025-09-10T00:06:53.096211+00:00"
+}
+
+========== CUSTOMERS ==========
+Count: 3 records
+
+Columns: id, agency_id, first_name, last_name, email, phone, address, city, state, zip_code, created_at, updated_at
+
+Data:
+Record 1: {
+  "id": "c1111111-1111-1111-1111-111111111111",
+  "agency_id": "2f900aa0-603e-4164-9b0a-b92905304e5b",
+  "first_name": "John",
+  "last_name": "Smith",
+  "email": "john.smith@email.com",
+  "phone": "555-0101",
+  "address": "123 Main St",
+  "city": "Chicago",
+  "state": "IL",
+  "zip_code": "60601",
+  "created_at": "2025-09-06T02:57:10.823626+00:00",
+  "updated_at": "2025-09-06T02:57:10.823626+00:00"
+}
+Record 2: {
+  "id": "c2222222-2222-2222-2222-222222222222",
+  "agency_id": "2f900aa0-603e-4164-9b0a-b92905304e5b",
+  "first_name": "Jane",
+  "last_name": "Johnson",
+  "email": "jane.johnson@email.com",
+  "phone": "555-0102",
+  "address": "456 Oak Ave",
+  "city": "Chicago",
+  "state": "IL",
+  "zip_code": "60602",
+  "created_at": "2025-09-06T02:57:10.823626+00:00",
+  "updated_at": "2025-09-06T02:57:10.823626+00:00"
+}
+Record 3: {
+  "id": "c3333333-3333-3333-3333-333333333333",
+  "agency_id": "2f900aa0-603e-4164-9b0a-b92905304e5b",
+  "first_name": "Mike",
+  "last_name": "Williams",
+  "email": "mike.williams@email.com",
+  "phone": "555-0103",
+  "address": "789 Pine St",
+  "city": "Chicago",
+  "state": "IL",
+  "zip_code": "60603",
+  "created_at": "2025-09-06T02:57:10.823626+00:00",
+  "updated_at": "2025-09-06T02:57:10.823626+00:00"
+}
+
+========== QUOTES ==========
+Count: 0 records
+Table exists but is empty
+
+========== POLICIES ==========
+ERROR: Could not find the table 'public.policies' in the schema cache
+
+========== CLAIMS ==========
+ERROR: Could not find the table 'public.claims' in the schema cache
+
+========== PAYMENTS ==========
+ERROR: Could not find the table 'public.payments' in the schema cache
+
+========== COMMISSION_RECORDS ==========
+ERROR: Could not find the table 'public.commission_records' in the schema cache
+
+========== COMMISSIONS ==========
+Count: 0 records
+Table exists but is empty
+
+========== SYSTEM_METRICS ==========
+ERROR: Could not find the table 'public.system_metrics' in the schema cache
+
+========== ACTIVITIES ==========
+ERROR: Could not find the table 'public.activities' in the schema cache
+
+========== NOTIFICATIONS ==========
+ERROR: Could not find the table 'public.notifications' in the schema cache
+
+========== MESSAGES ==========
+ERROR: Could not find the table 'public.messages' in the schema cache
+
+========== AUDIT_LOGS ==========
+Count: 0 records
+Table exists but is empty
+
+========== AUTH.USERS ==========
+Count: 2 users
+
+User 1:
+  ID: 41589ffb-5613-41ad-9251-03ca35ab9d89
+  Email: admin@syncedupsolutions.com
+  Created: 2025-09-05T20:14:53.701663Z
+  Metadata: {
+  email_verified: true,
+  name: 'SyncedUp Super Admin',
+  role: 'super_admin'
+}
+
+User 2:
+  ID: c6dad962-c773-4ec9-8ac3-a6324fe8f889
+  Email: superadmin@demo.com
+  Created: 2025-09-05T20:08:58.989853Z
+  Metadata: { email_verified: true, name: 'Super Admin Demo', role: 'super_admin' }
+
+=== END OF DUMP ===

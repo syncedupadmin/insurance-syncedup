@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Force Clear Cache & Session</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        .success {
+            background: #48bb78;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .info {
+            background: #4299e1;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        code {
+            background: #f7fafc;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Force Clear Cache & Fix Login Issues</h1>
+        
+        <p>This page will help fix the login redirect issues by clearing all cached data and sessions.</p>
+        
+        <div id="status"></div>
+        
+        <button onclick="clearEverything()">🧹 Clear Everything & Fix Login</button>
+        <button onclick="testCurrentConfig()">🔍 Check Current Configuration</button>
+        <button onclick="window.location.href='/login'">🔐 Go to Login</button>
+        
+        <div id="results"></div>
+        
+        <h3>Manual Steps (if automatic doesn't work):</h3>
+        <ol>
+            <li>Press <code>Ctrl+Shift+Delete</code> (or <code>Cmd+Shift+Delete</code> on Mac)</li>
+            <li>Select "Cookies and other site data" and "Cached images and files"</li>
+            <li>Click "Clear data"</li>
+            <li>Close and reopen your browser</li>
+            <li>Try logging in again</li>
+        </ol>
+    </div>
+
+    <script>
+        function showMessage(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = message;
+            document.getElementById('status').appendChild(div);
+        }
+
+        async function clearEverything() {
+            showMessage('Starting cleanup...', 'info');
+            
+            // 1. Clear all cookies
+            document.cookie.split(";").forEach(function(c) { 
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/;domain=.syncedupsolutions.com");
+            });
+            showMessage('✓ Cookies cleared', 'success');
+            
+            // 2. Clear localStorage
+            localStorage.clear();
+            showMessage('✓ Local storage cleared', 'success');
+            
+            // 3. Clear sessionStorage
+            sessionStorage.clear();
+            showMessage('✓ Session storage cleared', 'success');
+            
+            // 4. Call logout API
+            try {
+                await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                showMessage('✓ Server session cleared', 'success');
+            } catch (e) {
+                showMessage('⚠ Could not clear server session', 'info');
+            }
+            
+            // 5. Call clear-role API
+            try {
+                await fetch('/api/auth/clear-role', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                showMessage('✓ Role overrides cleared', 'success');
+            } catch (e) {
+                showMessage('⚠ Could not clear role overrides', 'info');
+            }
+            
+            // 6. Force reload without cache
+            showMessage('✅ All cleared! Redirecting to login in 3 seconds...', 'success');
+            setTimeout(() => {
+                window.location.href = '/login?cache_cleared=' + Date.now();
+            }, 3000);
+        }
+        
+        async function testCurrentConfig() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h3>Current Configuration:</h3>';
+            
+            // Check debug endpoint
+            try {
+                const response = await fetch('/api/debug-info');
+                const data = await response.json();
+                results.innerHTML += '<div class="info"><strong>Server Config:</strong><br>' + 
+                    '<pre>' + JSON.stringify(data, null, 2) + '</pre></div>';
+            } catch (e) {
+                results.innerHTML += '<div class="info">Could not fetch server config</div>';
+            }
+            
+            // Check cookies
+            const cookies = document.cookie;
+            results.innerHTML += '<div class="info"><strong>Current Cookies:</strong><br>' + 
+                (cookies || 'No cookies set') + '</div>';
+            
+            // Check localStorage
+            const localData = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                localData[key] = localStorage.getItem(key);
+            }
+            results.innerHTML += '<div class="info"><strong>Local Storage:</strong><br>' + 
+                '<pre>' + JSON.stringify(localData, null, 2) + '</pre></div>';
+        }
+    </script>
+</body>
+</html>

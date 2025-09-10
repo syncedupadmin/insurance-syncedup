@@ -20,6 +20,7 @@
     { "source": "/agent/(.*)", "destination": "/_agent/$1" },
     { "source": "/customer-service/(.*)", "destination": "/_customer-service/$1" },
     { "source": "/super-admin/(.*)", "destination": "/_super-admin/$1" },
+    { "source": "/leaderboard/(.*)", "destination": "/_leaderboard/$1" },
 
     { "source": "/", "destination": "/index.html" },
     { "source": "/login", "destination": "/login.html" },

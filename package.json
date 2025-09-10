@@ -8,7 +8,12 @@
     "build:watch": "npx tailwindcss -i ./styles/tailwind.css -o ./public/css/main.css --watch",
     "start": "echo 'Static site - no server needed'",
     "dev": "http-server ./public -p 3001 -c-1 --cors",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "audit": "node tools/audit/crawler.js",
+    "audit:report": "node tools/audit/reporter.js",
+    "audit:full": "npm run audit && npm run audit:report",
+    "playwright:install": "npx playwright install chromium",
+    "playwright:test": "npx playwright test"
   },
   "keywords": [],
   "author": "",
@@ -36,9 +41,11 @@
     "ws": "^8.18.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.0",
     "@tailwindcss/forms": "^0.5.10",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
-    "http-server": "^14.1.1"
+    "http-server": "^14.1.1",
+    "playwright": "^1.55.0"
   }
 }

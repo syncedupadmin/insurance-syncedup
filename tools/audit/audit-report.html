@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insurance Portal Audit Report</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 { color: #d32f2f; border-bottom: 3px solid #d32f2f; padding-bottom: 10px; }
+        h2 { color: #1976d2; margin-top: 30px; }
+        h3 { color: #388e3c; }
+        .summary {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .stat {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #1976d2;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1976d2;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin-top: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        th {
+            background: #1976d2;
+            color: white;
+            text-align: left;
+            padding: 12px;
+        }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        tr:hover { background: #f5f5f5; }
+        .error-count { 
+            background: #d32f2f; 
+            color: white; 
+            padding: 2px 8px; 
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        .file-link {
+            font-family: 'Monaco', 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #d32f2f;
+            text-decoration: none;
+        }
+        .file-link:hover { background: #e0e0e0; }
+        .error-message {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+            color: #666;
+            max-width: 500px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .portal-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .portal-visited { background: #c8e6c9; color: #2e7d32; }
+        .portal-not-visited { background: #ffcdd2; color: #c62828; }
+        .no-errors { color: #4caf50; font-weight: bold; }
+        .timestamp { color: #666; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Insurance Portal Audit Report</h1>
+    
+    <div class="summary">
+        <p class="timestamp">Generated: 9/10/2025, 1:49:58 PM</p>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value">7</div>
+                <div class="stat-label">Portals Checked</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">7</div>
+                <div class="stat-label">URLs Visited</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">107</div>
+                <div class="stat-label">Total Errors</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Page Errors</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">40</div>
+                <div class="stat-label">Console Errors</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">62</div>
+                <div class="stat-label">Network Failures</div>
+            </div>
+        </div>
+    </div>
+
+    <h2>📍 Portal Status</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Portal</th>
+                <th>Path</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+                <tr>
+                    <td>Login Portal</td>
+                    <td><code>/login.html</code></td>
+                    <td>
+                        <span class="portal-status portal-visited">
+                            ✓ Visited
+                        </span>
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>Admin Portal</td>
+                    <td><code>/_admin/</code></td>
+                    <td>
+                        <span class="portal-status portal-visited">
+                            ✓ Visited
+                        </span>
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>Agent Portal</td>
+                    <td><code>/_agent/</code></td>
+                    <td>
+                        <span class="portal-status portal-visited">
+                            ✓ Visited
+                        </span>
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>Customer Service Portal</td>
+                    <td><code>/_customer-service/</code></td>
+                    <td>
+                        <span class="portal-status portal-visited">
+                            ✓ Visited
+                        </span>
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>Leaderboard Portal</td>
+                    <td><code>/_leaderboard/</code></td>
+                    <td>
+                        <span class="portal-status portal-visited">
+                            ✓ Visited
+                        </span>
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>Manager Portal</td>
+                    <td><code>/_manager/</code></td>
+                    <td>
+                        <span class="portal-status portal-visited">
+                            ✓ Visited
+                        </span>
+                    </td>
+                </tr>
+            
+                <tr>
+                    <td>Super Admin Portal</td>
+                    <td><code>/_super-admin/</code></td>
+                    <td>
+                        <span class="portal-status portal-visited">
+                            ✓ Visited
+                        </span>
+                    </td>
+                </tr>
+            
+        </tbody>
+    </table>
+
+    <h2>🔴 Suspect Files</h2>
+    
+        <table>
+            <thead>
+                <tr>
+                    <th>File</th>
+                    <th>Error Count</th>
+                    <th>Line Numbers</th>
+                    <th>File:Line References</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                    <tr>
+                        <td><code>api/super-admin/audit</code></td>
+                        <td><span class="error-count">7</span></td>
+                        <td></td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>_super-admin/</code></td>
+                        <td><span class="error-count">6</span></td>
+                        <td>949</td>
+                        <td>
+                            <span class="file-link">_super-admin/:949</span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/auth/verify</code></td>
+                        <td><span class="error-count">4</span></td>
+                        <td></td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/manager/dashboard</code></td>
+                        <td><span class="error-count">3</span></td>
+                        <td></td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/admin/analytics</code></td>
+                        <td><span class="error-count">2</span></td>
+                        <td></td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/admin/user-management</code></td>
+                        <td><span class="error-count">2</span></td>
+                        <td></td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/admin/commission-settings</code></td>
+                        <td><span class="error-count">2</span></td>
+                        <td></td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/admin/api-keys</code></td>
+                        <td><span class="error-count">2</span></td>
+                        <td></td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/admin/leads</code></td>
+                        <td><span class="error-count">2</span></td>
+                        <td></td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>_admin/</code></td>
+                        <td><span class="error-count">2</span></td>
+                        <td>655</td>
+                        <td>
+                            <span class="file-link">_admin/:655</span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/admin/commission-summary</code></td>
+                        <td><span class="error-count">2</span></td>
+                        <td></td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>leaderboard/css/leaderboard-base.css</code></td>
+                        <td><span class="error-count">1</span></td>
+                        <td></td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>leaderboard/js/leaderboard-theme.js</code></td>
+                        <td><span class="error-count">1</span></td>
+                        <td></td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>_manager/</code></td>
+                        <td><span class="error-count">1</span></td>
+                        <td>223</td>
+                        <td>
+                            <span class="file-link">_manager/:223</span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/super-admin/health</code></td>
+                        <td><span class="error-count">1</span></td>
+                        <td></td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/super-admin/performance</code></td>
+                        <td><span class="error-count">1</span></td>
+                        <td></td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/super-admin/metrics</code></td>
+                        <td><span class="error-count">1</span></td>
+                        <td></td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                
+            </tbody>
+        </table>
+    
+
+    <h2>❌ Console Errors</h2>
+    
+        <table>
+            <thead>
+                <tr>
+                    <th>File</th>
+                    <th>Line</th>
+                    <th>Error Message</th>
+                    <th>File:Line</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                    <tr>
+                        <td><code>api/auth/verify</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/manager/dashboard</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/admin/analytics</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/admin/user-management</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/admin/commission-settings</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/admin/api-keys</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/manager/dashboard</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/admin/analytics</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/admin/user-management</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/admin/commission-settings</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/admin/api-keys</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/admin/leads</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>_admin/</code></td>
+                        <td>655</td>
+                        <td class="error-message" title="Error loading recent leads: Error: Failed to fetch recent leads
+    at loadRecentLeads (http://localhost:3001/_admin/:618:27)">Error loading recent leads: Error: Failed to fetch recent leads
+    at loadRecentLeads (http://localhost:3001/_admin/:618:27)</td>
+                        <td>
+                            <span class="file-link">_admin/:655</span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/admin/commission-summary</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/admin/leads</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>_admin/</code></td>
+                        <td>655</td>
+                        <td class="error-message" title="Error loading recent leads: Error: Failed to fetch recent leads
+    at loadRecentLeads (http://localhost:3001/_admin/:618:27)">Error loading recent leads: Error: Failed to fetch recent leads
+    at loadRecentLeads (http://localhost:3001/_admin/:618:27)</td>
+                        <td>
+                            <span class="file-link">_admin/:655</span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/admin/commission-summary</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/auth/verify</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/auth/verify</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>leaderboard/css/leaderboard-base.css</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>leaderboard/js/leaderboard-theme.js</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/manager/dashboard</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>_manager/</code></td>
+                        <td>223</td>
+                        <td class="error-message" title="Dashboard API: non-JSON">Dashboard API: non-JSON</td>
+                        <td>
+                            <span class="file-link">_manager/:223</span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/auth/verify</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/super-admin/audit</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 405 (Method Not Allowed)">Failed to load resource: the server responded with a status of 405 (Method Not Allowed)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>_super-admin/</code></td>
+                        <td>949</td>
+                        <td class="error-message" title="CRITICAL: Audit logging failed: Error: Audit logging failed: 405
+    at logAdminAction (http://localhost:3001/_super-admin/:947:27)
+    at async HTMLDocument.initializeAdminConsole (http://localhost:3001/_super-admin/:889:17)">CRITICAL: Audit logging failed: Error: Audit logging failed: 405
+    at logAdminAction (http://localhost:3001/_super-admin/:947:27)
+    at async HTMLDocument.initializeAdminConsole (http://localhost:3001/_super-admin/:889:17)</td>
+                        <td>
+                            <span class="file-link">_super-admin/:949</span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/super-admin/audit</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 405 (Method Not Allowed)">Failed to load resource: the server responded with a status of 405 (Method Not Allowed)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>_super-admin/</code></td>
+                        <td>949</td>
+                        <td class="error-message" title="CRITICAL: Audit logging failed: Error: Audit logging failed: 405
+    at logAdminAction (http://localhost:3001/_super-admin/:947:27)
+    at async loadSystemMetrics (http://localhost:3001/_super-admin/:1078:13)
+    at async Promise.all (index 0)
+    at async HTMLDocument.initializeAdminConsole (http://localhost:3001/_super-admin/:895:17)">CRITICAL: Audit logging failed: Error: Audit logging failed: 405
+    at logAdminAction (http://localhost:3001/_super-admin/:947:27)
+    at async loadSystemMetrics (http://localhost:3001/_super-admin/:1078:13)
+    at async Promise.all (index 0)
+    at async HTMLDocument.initializeAdminConsole (http://localhost:3001/_super-admin/:895:17)</td>
+                        <td>
+                            <span class="file-link">_super-admin/:949</span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/super-admin/health</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/super-admin/performance</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/super-admin/audit</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/super-admin/audit</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 405 (Method Not Allowed)">Failed to load resource: the server responded with a status of 405 (Method Not Allowed)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>_super-admin/</code></td>
+                        <td>949</td>
+                        <td class="error-message" title="CRITICAL: Audit logging failed: Error: Audit logging failed: 405
+    at logAdminAction (http://localhost:3001/_super-admin/:947:27)
+    at async loadPerformanceMetrics (http://localhost:3001/_super-admin/:1186:17)
+    at async Promise.all (index 2)
+    at async HTMLDocument.initializeAdminConsole (http://localhost:3001/_super-admin/:895:17)">CRITICAL: Audit logging failed: Error: Audit logging failed: 405
+    at logAdminAction (http://localhost:3001/_super-admin/:947:27)
+    at async loadPerformanceMetrics (http://localhost:3001/_super-admin/:1186:17)
+    at async Promise.all (index 2)
+    at async HTMLDocument.initializeAdminConsole (http://localhost:3001/_super-admin/:895:17)</td>
+                        <td>
+                            <span class="file-link">_super-admin/:949</span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/super-admin/metrics</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 404 (Not Found)">Failed to load resource: the server responded with a status of 404 (Not Found)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/super-admin/audit</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 405 (Method Not Allowed)">Failed to load resource: the server responded with a status of 405 (Method Not Allowed)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>_super-admin/</code></td>
+                        <td>949</td>
+                        <td class="error-message" title="CRITICAL: Audit logging failed: Error: Audit logging failed: 405
+    at logAdminAction (http://localhost:3001/_super-admin/:947:27)
+    at async loadRecentAuditLogs (http://localhost:3001/_super-admin/:1232:17)
+    at async Promise.all (index 3)
+    at async HTMLDocument.initializeAdminConsole (http://localhost:3001/_super-admin/:895:17)">CRITICAL: Audit logging failed: Error: Audit logging failed: 405
+    at logAdminAction (http://localhost:3001/_super-admin/:947:27)
+    at async loadRecentAuditLogs (http://localhost:3001/_super-admin/:1232:17)
+    at async Promise.all (index 3)
+    at async HTMLDocument.initializeAdminConsole (http://localhost:3001/_super-admin/:895:17)</td>
+                        <td>
+                            <span class="file-link">_super-admin/:949</span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/super-admin/audit</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 405 (Method Not Allowed)">Failed to load resource: the server responded with a status of 405 (Method Not Allowed)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>_super-admin/</code></td>
+                        <td>949</td>
+                        <td class="error-message" title="CRITICAL: Audit logging failed: Error: Audit logging failed: 405
+    at logAdminAction (http://localhost:3001/_super-admin/:947:27)
+    at async loadSystemMetrics (http://localhost:3001/_super-admin/:1100:17)
+    at async Promise.all (index 0)
+    at async HTMLDocument.initializeAdminConsole (http://localhost:3001/_super-admin/:895:17)">CRITICAL: Audit logging failed: Error: Audit logging failed: 405
+    at logAdminAction (http://localhost:3001/_super-admin/:947:27)
+    at async loadSystemMetrics (http://localhost:3001/_super-admin/:1100:17)
+    at async Promise.all (index 0)
+    at async HTMLDocument.initializeAdminConsole (http://localhost:3001/_super-admin/:895:17)</td>
+                        <td>
+                            <span class="file-link">_super-admin/:949</span>
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>api/super-admin/audit</code></td>
+                        <td>-</td>
+                        <td class="error-message" title="Failed to load resource: the server responded with a status of 405 (Method Not Allowed)">Failed to load resource: the server responded with a status of 405 (Method Not Allowed)</td>
+                        <td>
+                            -
+                        </td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>_super-admin/</code></td>
+                        <td>949</td>
+                        <td class="error-message" title="CRITICAL: Audit logging failed: Error: Audit logging failed: 405
+    at logAdminAction (http://localhost:3001/_super-admin/:947:27)">CRITICAL: Audit logging failed: Error: Audit logging failed: 405
+    at logAdminAction (http://localhost:3001/_super-admin/:947:27)</td>
+                        <td>
+                            <span class="file-link">_super-admin/:949</span>
+                        </td>
+                    </tr>
+                
+            </tbody>
+        </table>
+    
+
+    <h2>🌐 Network Failures</h2>
+    
+        <table>
+            <thead>
+                <tr>
+                    <th>URL</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th>Error</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/auth/verify</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/manager/dashboard</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/analytics?analytics_type=overview</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/user-management</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/commission-settings</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/api-keys</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/auth/verify</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/manager/dashboard</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/manager/dashboard</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/analytics?analytics_type=overview</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/user-management</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/commission-settings</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/api-keys</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/analytics?analytics_type=overview</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/user-management</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/commission-settings</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/api-keys</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/manager/dashboard</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/analytics?analytics_type=overview</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/user-management</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/commission-settings</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/api-keys</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/leads?recent=true&limit=10</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/leads?recent=true&limit=10</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/commission-summary</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/commission-summary</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/leads?recent=true&limit=10</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/leads?recent=true&limit=10</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/commission-summary</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/admin/commission-summary</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/auth/verify</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/auth/verify</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/auth/verify</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/auth/verify</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/leaderboard/css/leaderboard-base.css</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/leaderboard/css/leaderboard-base.css</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/leaderboard/js/leaderboard-theme.js</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/leaderboard/js/leaderboard-theme.js</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.css</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_BLOCKED_BY_ORB</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/manager/dashboard?timeframe=month</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/auth/verify</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/auth/verify</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/super-admin/audit</code></td>
+                        <td>POST</td>
+                        <td>405</td>
+                        <td>Method Not Allowed</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/super-admin/audit</code></td>
+                        <td>POST</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/super-admin/audit</code></td>
+                        <td>POST</td>
+                        <td>405</td>
+                        <td>Method Not Allowed</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/super-admin/audit</code></td>
+                        <td>POST</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/super-admin/health</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/super-admin/health</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/super-admin/performance</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/super-admin/audit?limit=10</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/super-admin/performance</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/super-admin/audit?limit=10</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/super-admin/audit</code></td>
+                        <td>POST</td>
+                        <td>405</td>
+                        <td>Method Not Allowed</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/super-admin/metrics</code></td>
+                        <td>GET</td>
+                        <td>404</td>
+                        <td>Not Found</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/super-admin/audit</code></td>
+                        <td>POST</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/super-admin/metrics</code></td>
+                        <td>GET</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/super-admin/audit</code></td>
+                        <td>POST</td>
+                        <td>405</td>
+                        <td>Method Not Allowed</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/super-admin/audit</code></td>
+                        <td>POST</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/super-admin/audit</code></td>
+                        <td>POST</td>
+                        <td>405</td>
+                        <td>Method Not Allowed</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/super-admin/audit</code></td>
+                        <td>POST</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/super-admin/audit</code></td>
+                        <td>POST</td>
+                        <td>405</td>
+                        <td>Method Not Allowed</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>http://localhost:3001/api/super-admin/audit</code></td>
+                        <td>POST</td>
+                        <td>-</td>
+                        <td>net::ERR_ABORTED</td>
+                    </tr>
+                
+            </tbody>
+        </table>
+    
+
+    <h2>⚠️ Page Errors</h2>
+    <p class="no-errors">No page errors detected</p>
+
+    <h2>🖱️ Action Errors</h2>
+    
+        <table>
+            <thead>
+                <tr>
+                    <th>Portal</th>
+                    <th>Element</th>
+                    <th>Index</th>
+                    <th>Error</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                    <tr>
+                        <td>Admin Portal</td>
+                        <td>input</td>
+                        <td>0</td>
+                        <td class="error-message">elementHandle.fill: Error: Element is not an &lt;input&gt;, &lt;textarea&gt; or [contenteditable] element
+Call log:
+[2m    - fill(&quot;&quot;)[22m
+[2m  - attempting fill action[22m
+[2m    - waiting for element to be visible, enabled and editable[22m
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td>Customer Service Portal</td>
+                        <td>input</td>
+                        <td>0</td>
+                        <td class="error-message">elementHandle.fill: Error: Element is not an &lt;input&gt;, &lt;textarea&gt; or [contenteditable] element
+Call log:
+[2m    - fill(&quot;&quot;)[22m
+[2m  - attempting fill action[22m
+[2m    - waiting for element to be visible, enabled and editable[22m
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td>Customer Service Portal</td>
+                        <td>input</td>
+                        <td>2</td>
+                        <td class="error-message">elementHandle.fill: Error: Element is not an &lt;input&gt;, &lt;textarea&gt; or [contenteditable] element
+Call log:
+[2m    - fill(&quot;&quot;)[22m
+[2m  - attempting fill action[22m
+[2m    - waiting for element to be visible, enabled and editable[22m
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td>Manager Portal</td>
+                        <td>input</td>
+                        <td>0</td>
+                        <td class="error-message">elementHandle.fill: Error: Element is not an &lt;input&gt;, &lt;textarea&gt; or [contenteditable] element
+Call log:
+[2m    - fill(&quot;&quot;)[22m
+[2m  - attempting fill action[22m
+[2m    - waiting for element to be visible, enabled and editable[22m
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td>Super Admin Portal</td>
+                        <td>input</td>
+                        <td>0</td>
+                        <td class="error-message">elementHandle.fill: Error: Element is not an &lt;input&gt;, &lt;textarea&gt; or [contenteditable] element
+Call log:
+[2m    - fill(&quot;&quot;)[22m
+[2m  - attempting fill action[22m
+[2m    - waiting for element to be visible, enabled and editable[22m
+</td>
+                    </tr>
+                
+            </tbody>
+        </table>
+    
+
+</body>
+</html>

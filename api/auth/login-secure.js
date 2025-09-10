@@ -134,14 +134,14 @@ export default async function handler(req, res) {
     // Determine portal redirect
     const getPortalRedirect = (role) => {
       const redirects = {
-        'super_admin': '/super-admin',
-        'super-admin': '/super-admin',
-        'admin': '/admin',
-        'manager': '/manager',
-        'agent': '/agent',
-        'customer_service': '/customer-service'
+        'super_admin': '/super-admin/',
+        'super-admin': '/super-admin/',
+        'admin': '/admin/',
+        'manager': '/manager/',
+        'agent': '/agent/',
+        'customer_service': '/customer-service/'
       };
-      return redirects[role] || '/admin';
+      return redirects[role] || '/admin/';
     };
 
     console.log(`Successful login: ${email} (${user.role})`);

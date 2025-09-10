@@ -16,9 +16,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Commissions - SyncedUp Insurance Admin</title>
-    <link rel="stylesheet" href="admin-global.css">
+    <link rel="stylesheet" href="/admin/admin-global.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="/js/auth-helper.js"></script>
+    <!-- Shared Navigation -->
+    <script src="/admin/shared-nav.js"></script>
 </head>
 <body>
     <!-- Floating Particles -->
@@ -40,39 +42,8 @@
         </div>
     </div>
 
-    <!-- Navigation -->
-        <nav class="nav">
-        <a href="/admin/">
-            <i data-lucide="layout-dashboard" class="icon"></i>Dashboard
-        </a>
-        <a href="/admin/agent-performance">
-            <i data-lucide="trending-up" class="icon"></i>Agent Performance
-        </a>
-        <a href="/admin/users">
-            <i data-lucide="users" class="icon"></i>Users
-        </a>
-        <a href="/admin/licenses">
-            <i data-lucide="shield-check" class="icon"></i>Licenses
-        </a>
-        <a href="/admin/convoso-leads">
-            <i data-lucide="users" class="icon"></i>Leads
-        </a>
-        <a href="/admin/vendors">
-            <i data-lucide="building-2" class="icon"></i>Vendors
-        </a>
-        <a href="/admin/commissions" class="active">
-            <i data-lucide="dollar-sign" class="icon"></i>Commissions
-        </a>
-        <a href="/admin/settings">
-            <i data-lucide="settings" class="icon"></i>Settings
-        </a>
-        <a href="/admin/convoso-monitor">
-            <i data-lucide="monitor-speaker" class="icon"></i>Convoso
-        </a>
-        <a href="/global-leaderboard">
-            <i data-lucide="trophy" class="icon"></i>Global Leaderboard
-        </a>
-    </nav>
+    <!-- Navigation placeholder -->
+    <div id="nav-placeholder"></div>
 
     <div class="container">
         <!-- Commission Overview Stats -->
@@ -493,8 +464,12 @@
             // Set up pay period change handler
             document.getElementById('payPeriod').addEventListener('change', toggleCustomDateRange);
             
-            // Initialize Lucide icons
-            lucide.createIcons();
+            // Initialize Lucide icons after a short delay to ensure nav is loaded
+            setTimeout(() => {
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }, 200);
         }
 
         // Load commission stats
