@@ -28,7 +28,7 @@
     { "source": "/trial", "destination": "/signup.html" },
     { "source": "/signup", "destination": "/signup.html" },
     { "source": "/dashboard", "destination": "/dashboard.html" },
-    { "source": "/global-leaderboard", "destination": "/leaderboard/index.html" },
+    { "source": "/global-leaderboard", "destination": "/_leaderboard/index.html" },
     { "source": "/global-leaderboard-demo", "destination": "/global-leaderboard-demo.html" },
     { "source": "/test-upload-simple", "destination": "/test-upload-simple.html" },
     { "source": "/document-upload", "destination": "/document-upload.html" },
