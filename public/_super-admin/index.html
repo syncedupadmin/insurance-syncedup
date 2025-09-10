@@ -1260,31 +1260,81 @@
         async function loadUserManagement() {
             await logAdminAction('NAVIGATION', 'Accessed User Management');
             
-            // Load user management content into the main dashboard area
             const mainContent = document.querySelector('.dashboard-grid');
-            if (mainContent) {
-                try {
-                    // Create simple user management interface
-                    mainContent.innerHTML = `
-                        <div class="system-section">
-                            <h3 class="section-title">User Management</h3>
-                            <div id="user-list-container">
-                                <div class="loading">Loading users...</div>
-                            </div>
-                        </div>
+            if (!mainContent) return;
+            
+            // Show loading state
+            mainContent.innerHTML = `
+                <div class="system-section">
+                    <h3 class="section-title">User Management</h3>
+                    <div id="users-container">
+                        <p style="color: var(--text-secondary);">Loading users...</p>
+                    </div>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch('/api/super-admin/users', {
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch users');
+                }
+                
+                const data = await response.json();
+                const container = document.getElementById('users-container');
+                
+                if (!container) return;
+                
+                if (data.users && data.users.length > 0) {
+                    const tableHTML = `
+                        <table class="audit-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Email</th>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Agency</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.users.map(user => {
+                                    const email = user.email || 'N/A';
+                                    const name = user.name || user.full_name || 'N/A';
+                                    const role = user.role || 'agent';
+                                    const agency = user.agency_name || 'N/A';
+                                    const status = user.is_active ? 'Active' : 'Inactive';
+                                    const statusColor = user.is_active ? '#10b981' : '#ef4444';
+                                    
+                                    return `
+                                        <tr>
+                                            <td>${email}</td>
+                                            <td>${name}</td>
+                                            <td>${role}</td>
+                                            <td>${agency}</td>
+                                            <td style="color: ${statusColor};">${status}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
                     `;
-                    
-                    // Load users from API
-                    await loadUserList();
-                    
-                    // Update navigation active state
-                    document.querySelectorAll('.admin-navigation a').forEach(a => a.classList.remove('active'));
-                    if (event && event.target) {
-                        event.target.classList.add('active');
-                    }
-                } catch (error) {
-                    console.error('Failed to load user management:', error);
-                    mainContent.innerHTML = '<div class="error">Failed to load User Management module</div>';
+                    container.innerHTML = tableHTML;
+                } else {
+                    container.innerHTML = '<p>No users found</p>';
+                }
+                
+                // Update navigation
+                document.querySelectorAll('.admin-navigation a').forEach(a => a.classList.remove('active'));
+                if (event && event.target) {
+                    event.target.classList.add('active');
+                }
+            } catch (error) {
+                const container = document.getElementById('users-container');
+                if (container) {
+                    container.innerHTML = `<p style="color: var(--danger);">Error loading users: ${error.message}</p>`;
                 }
             }
         }
@@ -1811,65 +1861,7 @@
             }
         }
 
-        // Simple user list loader
-        async function loadUserList() {
-            try {
-                const response = await fetch('/api/super-admin/users', {
-                    headers: {
-                        'Authorization': `Bearer ${getCookie('auth_token')}`,
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include'
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Failed to fetch users');
-                }
-                
-                const data = await response.json();
-                const container = document.getElementById('user-list-container');
-                
-                if (!data.users || data.users.length === 0) {
-                    container.innerHTML = '<p>No users found</p>';
-                    return;
-                }
-                
-                // Create simple table
-                container.innerHTML = `
-                    <table class="audit-table" style="width: 100%;">
-                        <thead>
-                            <tr>
-                                <th>Email</th>
-                                <th>Name</th>
-                                <th>Role</th>
-                                <th>Agency</th>
-                                <th>Status</th>
-                                <th>Last Login</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${data.users.map(user => `
-                                <tr>
-                                    <td>${user.email || 'N/A'}</td>
-                                    <td>${user.full_name || user.name || 'N/A'}</td>
-                                    <td><span class="badge">${user.role || 'agent'}</span></td>
-                                    <td>${user.agency_name || 'N/A'}</td>
-                                    <td>${user.is_active ? '<span style="color: var(--success)">Active</span>' : '<span style="color: var(--danger)">Inactive</span>'}</td>
-                                    <td>${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
-            } catch (error) {
-                console.error('Error loading users:', error);
-                document.getElementById('user-list-container').innerHTML = `
-                    <div style="color: var(--danger);">
-                        Error loading users: ${error.message}
-                    </div>
-                `;
-            }
-        }
+        // Removed redundant loadUserList function - functionality is now in loadUserManagement
 
         // Secure logout with audit trail
         async function logout() {
