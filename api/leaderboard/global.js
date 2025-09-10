@@ -4,9 +4,10 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-change-in-production';
 
 export default async function handler(req, res) {
-  // CORS headers
+  // CORS headers with credentials support
   const origin = req.headers.origin || '*';
   res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -15,10 +16,20 @@ export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    // Auth check
+    // Auth check - support both Bearer tokens and cookies
     const auth = req.headers.authorization || '';
-    const token = auth.startsWith('Bearer ') ? auth.slice(7) : 
-                  req.query.token || req.headers['x-auth-token'];
+    let token = auth.startsWith('Bearer ') ? auth.slice(7) : 
+                req.query.token || req.headers['x-auth-token'];
+    
+    // Check for auth cookie if no token in headers
+    if (!token && req.headers.cookie) {
+      const cookies = req.headers.cookie.split(';').reduce((acc, cookie) => {
+        const [key, value] = cookie.trim().split('=');
+        acc[key] = value;
+        return acc;
+      }, {});
+      token = cookies.auth_token;
+    }
     
     if (!token) {
       return res.status(401).json({ error: 'Authentication required' });
