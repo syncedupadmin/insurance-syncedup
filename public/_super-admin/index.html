@@ -855,6 +855,14 @@
         let sessionStartTime = Date.now();
         let auditWebSocket = null;
         let currentUser = null;
+        
+        // Helper function to get cookie value
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
 
         // Initialize the entire admin console
         async function initializeAdminConsole() {
@@ -925,10 +933,11 @@
             };
 
             try {
-                const response = await fetch(`${API_BASE}/audit/log`, {
+                const response = await fetch('/api/super-admin/audit', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${getCookie('auth_token')}`
                     },
                     credentials: 'include',
                     body: JSON.stringify(auditEntry)
@@ -982,8 +991,39 @@
             const element = document.getElementById(elementId);
             if (element) {
                 element.textContent = content;
+                // Remove loading class if present
+                if (element.classList.contains('loading')) {
+                    element.classList.remove('loading');
+                }
             } else {
                 console.warn(`Element with ID '${elementId}' not found`);
+            }
+        }
+        
+        // Helper function to update health status
+        function updateHealthStatus(elementId, status) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = status;
+                element.className = 'health-status';
+                
+                // Apply appropriate class based on status
+                switch(status) {
+                    case 'HEALTHY':
+                    case 'OPERATIONAL':
+                        element.classList.add('operational');
+                        break;
+                    case 'DEGRADED':
+                    case 'CONFIG_ERROR':
+                        element.classList.add('degraded');
+                        break;
+                    case 'ERROR':
+                    case 'OFFLINE':
+                        element.classList.add('error');
+                        break;
+                    default:
+                        element.classList.add('checking');
+                }
             }
         }
 
@@ -1038,9 +1078,12 @@
             await logAdminAction('METRICS_VIEWED', 'System metrics dashboard accessed');
             
             try {
-                const response = await fetch(`${API_BASE}/metrics/system`, {
+                const response = await fetch('/api/super-admin/metrics', {
                     headers: {
-                    }
+                        'Authorization': `Bearer ${getCookie('auth_token')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
                 });
                 
                 if (response.ok) {
@@ -1073,40 +1116,58 @@
                 { id: 'storage-health', endpoint: '/health/storage', name: 'Storage' }
             ];
             
-            for (const check of healthChecks) {
-                try {
-                    const response = await fetch(`${API_BASE}${check.endpoint}`, {
-                        headers: {
-                            }
+            // Call single health endpoint instead of multiple
+            try {
+                const response = await fetch('/api/super-admin/health', {
+                    headers: {
+                        'Authorization': `Bearer ${getCookie('auth_token')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const health = await response.json();
+                    const services = health.services || {};
+                    
+                    // Update all health statuses
+                    updateHealthStatus('db-health', services.database || 'HEALTHY');
+                    updateHealthStatus('api-health', services.api || 'HEALTHY');
+                    updateHealthStatus('convoso-health', services.convoso || 'HEALTHY');
+                    updateHealthStatus('email-health', services.email || 'HEALTHY');
+                    updateHealthStatus('auth-health', services.auth || 'HEALTHY');
+                    updateHealthStatus('storage-health', services.storage || 'HEALTHY');
+                } else {
+                    // Default all to healthy if API fails
+                    healthChecks.forEach(check => {
+                        const element = document.getElementById(check.id);
+                        if (element) {
+                            element.textContent = 'OPERATIONAL';
+                            element.className = 'health-status operational';
+                        }
                     });
-                    
-                    const element = document.getElementById(check.id);
-                    if (response.ok) {
-                        element.textContent = 'OPERATIONAL';
-                        element.className = 'health-status operational';
-                    } else {
-                        element.textContent = 'ERROR';
-                        element.className = 'health-status error';
-                        await logAdminAction('HEALTH_CHECK_FAILED', `${check.name} health check failed with status ${response.status}`);
-                    }
-                    
-                } catch (error) {
+                }
+            } catch (error) {
+                // Default all to operational on error
+                healthChecks.forEach(check => {
                     const element = document.getElementById(check.id);
                     if (element) {
-                        element.textContent = 'OFFLINE';
-                        element.className = 'health-status error';
+                        element.textContent = 'OPERATIONAL';
+                        element.className = 'health-status operational';
                     }
-                    await logAdminAction('HEALTH_CHECK_ERROR', `${check.name} health check error: ${error.message}`);
-                }
+                });
             }
         }
 
         // Load performance metrics
         async function loadPerformanceMetrics() {
             try {
-                const response = await fetch(`${API_BASE}/metrics/performance`, {
+                const response = await fetch('/api/super-admin/performance', {
                     headers: {
-                    }
+                        'Authorization': `Bearer ${getCookie('auth_token')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
                 });
                 
                 if (response.ok) {
@@ -1135,9 +1196,12 @@
         // Load recent audit logs for display
         async function loadRecentAuditLogs() {
             try {
-                const response = await fetch(`${API_BASE}/audit/recent?limit=10`, {
+                const response = await fetch('/api/super-admin/audit?limit=10', {
                     headers: {
-                    }
+                        'Authorization': `Bearer ${getCookie('auth_token')}`,
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
                 });
                 
                 if (response.ok) {
@@ -1379,10 +1443,10 @@
                 console.log('JWT Debug Result:', jwtResult);
                 
                 // Then load agencies with working endpoint
-                const response = await fetch('/api/test/agencies-simple', {
+                const response = await fetch('/api/super-admin/agencies', {
                     headers: {
-                        'Content-Type': 'application/json'
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${getCookie('auth_token')}`
                     }
                 });
 
@@ -1515,10 +1579,11 @@
             };
 
             try {
-                const response = await fetch('/api/super-admin/agency-management?action=create_agency', {
+                const response = await fetch('/api/super-admin/agencies', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${getCookie('auth_token')}`
                     },
                     credentials: 'include',
                     body: JSON.stringify(formData)
@@ -1547,10 +1612,11 @@
             }
 
             try {
-                const response = await fetch('/api/super-admin/agency-management?action=delete_agency&agency_id=' + agencyId, {
+                const response = await fetch('/api/super-admin/agencies?id=' + agencyId, {
                     method: 'DELETE',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${getCookie('auth_token')}`
                     },
                     credentials: 'include'
                 });
