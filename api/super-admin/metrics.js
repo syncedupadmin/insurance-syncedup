@@ -89,13 +89,26 @@ async function getSystemMetrics(req, res) {
       .from('portal_users')
       .select('id, email, role, is_active, created_at');
     
-    const totalUsers = portalUsers?.length || 8; // We know we have 8 users
-    const activeUsers = portalUsers?.filter(u => u.is_active).length || 8;
+    const totalUsers = portalUsers?.length || 0;
+    const activeUsers = portalUsers?.filter(u => u.is_active).length || 0;
     
-    // Calculate real revenue from known agencies
-    // Demo Agency: $99/mo, PHS Agency: $299/mo, SyncedUp: $999/mo
-    const monthlyRevenue = 99 + 299 + 999; // $1,397/month
-    const totalRevenue = monthlyRevenue * 12; // Annual revenue: $16,764
+    // Calculate real MRR from agencies table
+    const { data: agencies, error: agencyError } = await supabase
+      .from('agencies')
+      .select('monthly_fee, status, name')
+      .eq('status', 'active');
+    
+    if (agencyError) {
+      console.error('Error fetching agencies:', agencyError);
+    }
+    
+    // Calculate total monthly revenue from active agencies
+    const monthlyRevenue = agencies?.reduce((sum, agency) => {
+      return sum + (parseFloat(agency.monthly_fee) || 0);
+    }, 0) || 0;
+    
+    const totalRevenue = monthlyRevenue * 12; // Annual revenue projection
+    const activeAgencies = agencies?.length || 0;
     
     // Active sessions (realistic number based on users)
     const activeSessionsCount = Math.min(totalUsers, 3); // Usually 3-4 users active
@@ -106,6 +119,7 @@ async function getSystemMetrics(req, res) {
     const systemMetrics = {
       totalUsers: totalUsers,
       activeSessions: activeSessionsCount,
+      activeAgencies: activeAgencies,
       uptime: uptime,
       uptimePercentage: uptime,
       totalRevenue: totalRevenue,
