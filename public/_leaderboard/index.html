@@ -7,80 +7,35 @@
     <link rel="stylesheet" href="/leaderboard/css/leaderboard-base.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
-    <!-- Portal Access Control - CRITICAL SECURITY -->
-    <script src="/js/portal-access-control.js"></script>
+    <!-- Authentication Helper -->
+    <script src="/js/auth-helper.js"></script>
     
     <!-- Auth Guard Script -->
     <script>
         (function () {
           try {
-            // Check multiple possible token keys
-            const tokenKeys = ['syncedup_token', 'authToken', 'token'];
-            const userKeys = ['syncedup_user', 'user', 'currentUser'];
+            // Use auth-helper.js for authentication
+            // Server-side portal-guard handles authentication
+            // Global leaderboard is accessible to all authenticated users
+            const user = getStoredUser();
+            const token = getCookie('auth_token');
             
-            let token = null;
-            let userStr = null;
-            
-            // Try different token keys
-            for (const key of tokenKeys) {
-              const t = localStorage.getItem(key);
-              if (t) {
-                token = t;
-                console.log('Auth check - Found token with key:', key);
-                break;
-              }
-            }
-            
-            // Try different user keys
-            for (const key of userKeys) {
-              const u = localStorage.getItem(key);
-              if (u) {
-                userStr = u;
-                console.log('Auth check - Found user with key:', key);
-                break;
-              }
-            }
-            
+            console.log('Auth check - User exists:', !!user);
             console.log('Auth check - Token exists:', !!token);
-            console.log('Auth check - User data exists:', !!userStr);
             
-            if (!token) {
-              console.log('No token found, redirecting to login');
-              alert('Authentication required. Please login first.');
-              window.location.href = '/login';
-              return;
+            if (user) {
+              console.log('Auth check - User role:', user.role);
+              console.log('Auth check - Email:', user.email);
+              
+              // Store user info globally for the page
+              window.currentUser = user;
+              window.authToken = token;
+              
+              console.log('Auth check passed for user:', user.email, 'with role:', user.role);
+            } else {
+              console.log('Global leaderboard - server will handle auth');
+              // Server-side portal-guard will handle redirect if not authenticated
             }
-            
-            if (!userStr) {
-              console.log('No user data found, redirecting to login');
-              alert('User data missing. Please login again.');
-              window.location.href = '/login';
-              return;
-            }
-            
-            const u = JSON.parse(userStr);
-            console.log('Auth check - Full user object:', u);
-            
-            const role = u.role || '';
-            // Allow both formats and be more flexible
-            const allowed = ['agent','manager','admin','super_admin','customer_service','super-admin','customer-service'];
-            
-            console.log('Auth check - User role:', role);
-            console.log('Auth check - Email:', u.email);
-            console.log('Auth check - Role allowed:', allowed.includes(role));
-            
-            if (!role || !allowed.includes(role)) {
-              console.log('Invalid role, redirecting to login. Role was:', role);
-              alert(`Access denied. Your role "${role}" is not authorized for the leaderboard.`);
-              window.location.href = '/login';
-              return;
-            }
-            
-            console.log('Auth check passed for user:', u.email, 'with role:', role);
-            
-            // Store user info globally for debugging
-            window.currentUser = u;
-            window.authToken = token;
             
           } catch (error) {
             console.error('Auth check error:', error);
@@ -233,16 +188,12 @@
         // Load leaderboard data
         async function loadLeaderboardData() {
             try {
-                const token = localStorage.getItem('syncedup_token');
-                if (!token) {
-                    console.error('No authentication token found');
-                    showErrorState('Authentication required. Please log in.');
-                    return;
-                }
+                // Server-side portal-guard already verified access
+                // Use cookies for authentication
 
                 const response = await fetch('/api/leaderboard/global', {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     }
                 });
@@ -254,10 +205,9 @@
                     updatePodium(data.topThree || []);
                     updateRankingsTable(data.rankings || []);
                 } else if (response.status === 401) {
-                    console.error('Authentication failed - redirecting to login');
-                    localStorage.removeItem('syncedup_token');
-                    localStorage.removeItem('syncedup_user');
-                    window.location.href = '/login';
+                    console.error('Authentication failed');
+                    showErrorState('Please log in to view the leaderboard.');
+                    setTimeout(() => window.location.href = '/login', 2000);
                 } else {
                     const errorData = await response.json().catch(() => ({}));
                     throw new Error(errorData.error || `HTTP ${response.status}: Failed to load leaderboard data`);
