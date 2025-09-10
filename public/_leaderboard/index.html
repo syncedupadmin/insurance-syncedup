@@ -74,11 +74,8 @@
             
             <div class="leaderboard-filters">
                 <select class="filter-select" id="office-filter">
-                    <option value="all">All Offices Worldwide</option>
-                    <option value="us-east">US East</option>
-                    <option value="us-west">US West</option>
-                    <option value="europe">Europe</option>
-                    <option value="asia">Asia Pacific</option>
+                    <option value="all">All Offices</option>
+                    <option value="my-office">My Office</option>
                 </select>
                 
                 <select class="filter-select" id="period-filter">
@@ -87,8 +84,6 @@
                     <option value="quarter">This Quarter</option>
                     <option value="year">This Year</option>
                 </select>
-                
-                <button class="btn btn-primary" onclick="refreshData()">Refresh Data</button>
             </div>
         </div>
         
@@ -350,8 +345,8 @@
                 });
             });
             
-            // Load saved theme or default
-            const savedTheme = localStorage.getItem('leaderboard-theme') || 'competition';
+            // Always default to competition theme
+            const savedTheme = 'competition';
             applyTheme(savedTheme);
             
             // Set active button
@@ -368,7 +363,7 @@
             // Add new theme class
             container.classList.add(`theme-${theme}`);
             
-            // Save preference
+            // Save preference (but competition is always default on load)
             localStorage.setItem('leaderboard-theme', theme);
             
             // Apply theme-specific styles
