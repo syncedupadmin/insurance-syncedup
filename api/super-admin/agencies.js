@@ -1,10 +1,10 @@
 const { createClient } = require('@supabase/supabase-js');
-const jwt = require('jsonwebtoken');
+const { verifySuperAdmin } = require('./auth-middleware');
 const bcrypt = require('bcryptjs');
 
 const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_KEY
+    process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
 module.exports = async function handler(req, res) {
@@ -17,28 +17,14 @@ module.exports = async function handler(req, res) {
         return res.status(200).end();
     }
 
+    // Verify super admin authentication
+    const user = await verifySuperAdmin(req, res);
+    if (!user) {
+        // verifySuperAdmin already sent the response
+        return;
+    }
+
     try {
-        // Authentication check
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ error: 'No token provided' });
-        }
-
-        const token = authHeader.substring(7);
-        let decoded;
-        
-        try {
-            // Try to verify as JWT token first
-            decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
-        } catch (jwtError) {
-            return res.status(403).json({ error: 'Invalid token' });
-        }
-        
-        // Check if user is super-admin (handle both 'super-admin' and 'super_admin')
-        if (decoded.role !== 'super-admin' && decoded.role !== 'super_admin') {
-            return res.status(403).json({ error: 'Insufficient permissions' });
-        }
-
         switch (req.method) {
             case 'GET':
                 return await getAgencies(req, res);

@@ -2,10 +2,11 @@
 // Provides comprehensive user administration with complete audit trail
 
 const { createClient } = require('@supabase/supabase-js');
+const { verifySuperAdmin } = require('./auth-middleware');
 
 const supabase = createClient(
-  process.env.SUPABASE_URL, 
-  process.env.SUPABASE_SERVICE_KEY
+  process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL, 
+  process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
 module.exports = async function handler(req, res) {
@@ -18,28 +19,14 @@ module.exports = async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // Verify super admin authorization
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  
-  if (!token) {
-    await logSecurityEvent('UNAUTHORIZED_USER_ADMIN_ACCESS', 'No token provided', req);
-    return res.status(401).json({ error: 'Authorization required' });
+  // Verify super admin authentication
+  const user = await verifySuperAdmin(req, res);
+  if (!user) {
+    // verifySuperAdmin already sent the response
+    return;
   }
 
   try {
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
-    if (authError || !user) {
-      await logSecurityEvent('INVALID_TOKEN_USER_ADMIN', 'Invalid token for user admin', req);
-      return res.status(403).json({ error: 'Invalid authorization' });
-    }
-
-    // Verify super admin role
-    if (user.user_metadata?.role !== 'super_admin' && user.app_metadata?.role !== 'super_admin') {
-      await logSecurityEvent('INSUFFICIENT_PRIVILEGES_USER_ADMIN', `${user.email} attempted user admin access`, req);
-      return res.status(403).json({ error: 'Super admin privileges required' });
-    }
-
     // Route to appropriate handler
     switch (req.method) {
       case 'GET':

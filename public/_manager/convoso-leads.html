@@ -46,9 +46,11 @@
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/manager/shared-nav.js"></script>
     
     <!-- Manager Global Styles -->
     <link rel="stylesheet" href="/manager/manager-global.css">
+    <link rel="stylesheet" href="/css/themes/professional.css">
     
     <style>
         /* Override font to match site fonts and ensure consistent styling */
@@ -371,27 +373,20 @@
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <div class="nav">
-        <a href="/manager" class="nav-link">
-            <i data-lucide="layout-dashboard" class="icon"></i>Dashboard
-        </a>
-        <a href="/manager/convoso-leads" class="nav-link active">
-            <i data-lucide="users" class="icon"></i>Leads
-        </a>
-        <a href="/manager/convoso-monitor" class="nav-link">
-            <i data-lucide="monitor-speaker" class="icon"></i>Convoso
-        </a>
-        <a href="/manager/team-management" class="nav-link">
-            <i data-lucide="users" class="icon"></i>Team Management
-        </a>
-        <a href="/manager/performance" class="nav-link">
-            <i data-lucide="trending-up" class="icon"></i>Team Performance
-        </a>
-        <a href="/manager/settings" class="nav-link">
-            <i data-lucide="settings" class="icon"></i>Settings
-        </a>
+    <!-- Header -->
+    <div class="header">
+        <h1>Lead Management</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
     </div>
+    
+    <!-- Navigation -->
+    <div id="nav-placeholder"></div>
     
     <!-- Leads Header -->
     <div class="leads-header">
@@ -1129,6 +1124,15 @@
             alert('Update functionality would be implemented here');
             hideEditModal();
         });
+        
+        // Logout function
+        function logout() {
+            localStorage.clear();
+            sessionStorage.clear();
+            document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'user_role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            window.location.href = '/login';
+        }
     </script>
     <script src="/js/theme-switcher.js"></script>
 </body>

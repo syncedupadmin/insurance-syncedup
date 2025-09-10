@@ -2,19 +2,12 @@
 // Provides real-time health status for all critical system components
 
 const { createClient } = require('@supabase/supabase-js');
-const jwt = require('jsonwebtoken');
+const { verifySuperAdmin } = require('./auth-middleware');
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL, 
   process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
 );
-
-// Helper to get cookie value
-function getCookie(req, name) {
-  const cookies = req.headers.cookie || '';
-  const match = cookies.match(new RegExp(`(?:^|; )${name}=([^;]+)`));
-  return match ? decodeURIComponent(match[1]) : null;
-}
 
 module.exports = async function handler(req, res) {
   // CORS headers
@@ -30,21 +23,14 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Get token from cookie
-  const token = getCookie(req, 'auth_token');
-  
-  if (!token) {
-    return res.status(401).json({ error: 'Authorization required' });
+  // Verify super admin authentication
+  const user = await verifySuperAdmin(req, res);
+  if (!user) {
+    // verifySuperAdmin already sent the response
+    return;
   }
 
   try {
-    // Verify JWT token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    // Verify super admin role
-    if (decoded.role !== 'super_admin') {
-      return res.status(403).json({ error: 'Super admin privileges required' });
-    }
 
     // Route to appropriate health check
     if (req.url.includes('/database')) {

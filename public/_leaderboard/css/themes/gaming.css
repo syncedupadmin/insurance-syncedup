@@ -136,8 +136,8 @@
 .lb-gaming-mode .insert-coin {
     position: absolute;
     top: 50%;
-    right: 20px;
-    transform: translateY(-50%);
+    left: 75%;
+    transform: translate(-50%, -50%);
     background: var(--lb-tertiary-bg);
     color: var(--lb-accent-secondary);
     padding: 8px 16px;

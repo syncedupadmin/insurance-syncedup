@@ -1,10 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Convoso Monitor - Theme System Disabled -->
+    <!-- Critical Theme Flash Prevention -->
     <script>
-    // Prevent theme system from applying backgrounds to Convoso pages
-    window.CONVOSO_PAGE = true;
+    (function(){
+        var t=localStorage.getItem("selectedTheme")||"professional";
+        var h=document.documentElement;
+        if(t==="classic"){h.classList.add("classic-mode");h.style.backgroundColor="#008080";}
+        else if(t==="modern"){h.classList.add("modern-mode");h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        else{h.style.background="linear-gradient(-45deg,#4c1d95,#5b21b6,#6d28d9,#7c3aed)";}
+        h.style.visibility="hidden";
+        setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
+    })();
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,6 +29,7 @@
     
     <!-- Admin Global Styles -->
     <link rel="stylesheet" href="/admin/admin-global.css">
+    <link rel="stylesheet" href="/css/themes/professional.css">
     
     <!-- Shared Navigation -->
     <script src="/admin/shared-nav.js"></script>
@@ -103,7 +111,9 @@
         }
         
         .stat-card {
-            background: white;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             padding: 1.5rem;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -113,12 +123,12 @@
         .stat-number {
             font-size: 2.5rem;
             font-weight: bold;
-            color: #2d3748;
+            color: white;
             margin-bottom: 0.5rem;
         }
         
         .stat-label {
-            color: #718096;
+            color: rgba(255, 255, 255, 0.8);
             font-size: 0.875rem;
             font-weight: 500;
         }
@@ -131,7 +141,9 @@
         }
         
         .performance-card {
-            background: white;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             padding: 1rem;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -139,7 +151,7 @@
         
         .performance-label {
             font-size: 0.75rem;
-            color: #718096;
+            color: rgba(255, 255, 255, 0.7);
             text-transform: uppercase;
             margin-bottom: 0.5rem;
         }
@@ -147,7 +159,7 @@
         .performance-value {
             font-size: 1.25rem;
             font-weight: 600;
-            color: #2d3748;
+            color: white;
             margin-bottom: 0.5rem;
         }
         
@@ -172,7 +184,9 @@
         }
         
         .agent-status-card {
-            background: white;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             padding: 1.5rem;
             text-align: center;
@@ -217,7 +231,7 @@
         .table-title {
             font-size: 1.125rem;
             font-weight: 600;
-            color: #2d3748;
+            color: white;
         }
         
         .agents-table table {
@@ -297,7 +311,9 @@
         .agent-table {
             width: 100%;
             overflow-x: auto;
-            background: white;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             margin-top: 20px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -311,15 +327,15 @@
 
         .agent-table td {
             padding: 12px;
-            color: #333 !important;
-            border-bottom: 1px solid #eee;
+            color: rgba(255, 255, 255, 0.9) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             font-size: 14px;
         }
         
         .agent-table th {
             padding: 12px;
-            color: #333 !important;
-            background: #f8f9fa;
+            color: rgba(255, 255, 255, 0.9) !important;
+            background: rgba(255, 255, 255, 0.1);
             border-bottom: 2px solid #eee;
             font-weight: 600;
             font-size: 14px;
@@ -407,15 +423,25 @@
     </style>
 </head>
 <body>
-    <!-- Convoso pages use clean, minimal design -->
-    
-    <div class="header">
-        <h1 class="neon-text">Agent Monitor - Convoso Dashboard</h1>
-        <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">Logout</button>
+    <!-- Floating particles effect -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
     </div>
     
-    <!-- Navigation placeholder -->
+    <!-- Header -->
+    <div class="header">
+        <h1>Agent Monitor - Convoso Dashboard</h1>
+        <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">
+            <i data-lucide="log-out" class="icon"></i>Logout
+        </button>
+    </div>
+    
+    <!-- Navigation -->
     <div id="nav-placeholder"></div>
+    
+    <div class="container">
     
     <!-- Monitor Header -->
     <div class="monitor-header">
@@ -630,6 +656,7 @@
             </table>
         </div>
     </div>
+    </div> <!-- .container -->
 
     <script>
         let refreshInterval;
@@ -1062,6 +1089,7 @@
             window.location.href = '/login';
         }
     </script>
-    <!-- Theme switcher disabled for Convoso pages -->
+    <script src="/js/theme-switcher.js"></script>
+    <script src="/assets/session-prod.js"></script>
 </body>
 </html>

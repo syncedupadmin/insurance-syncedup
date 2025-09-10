@@ -340,7 +340,12 @@ class LeaderboardThemeSystem {
      */
     removeThemeEffects() {
         // Remove gaming effects
-        document.querySelectorAll('.coin-effect, .sound-wave, .achievement').forEach(el => {
+        document.querySelectorAll('.coin-effect, .sound-wave, .achievement, .insert-coin').forEach(el => {
+            el.remove();
+        });
+
+        // Remove analytics effects
+        document.querySelectorAll('.export-btn').forEach(el => {
             el.remove();
         });
 
@@ -386,16 +391,6 @@ class LeaderboardThemeSystem {
      * Add analytics mode effects
      */
     addAnalyticsEffects() {
-        // Add export button
-        const header = document.querySelector('.leaderboard-header');
-        if (header && !document.querySelector('.export-btn')) {
-            const exportBtn = document.createElement('button');
-            exportBtn.className = 'export-btn';
-            exportBtn.innerHTML = '📤 Export Data';
-            exportBtn.onclick = () => this.exportLeaderboardData();
-            header.appendChild(exportBtn);
-        }
-
         // Add tooltips to metrics
         document.querySelectorAll('.leaderboard-metric').forEach(metric => {
             const label = metric.querySelector('.leaderboard-metric-label');
