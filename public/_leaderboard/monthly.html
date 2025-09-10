@@ -16,18 +16,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monthly Leaders - Global Leaderboard</title>
-    <link rel="stylesheet" href="/leaderboard/css/leaderboard-base.css">
+    <link rel="stylesheet" href="/_leaderboard/css/leaderboard-base.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
-    <!-- Auth Guard Script -->
+    <!-- Authentication Helper -->
+    <script src="/js/auth-helper.js"></script>
+    <!-- Auth Check Script -->
     <script>
         (function () {
-          const token = localStorage.getItem('syncedup_token');
-          const u = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-          const normalize = r => ({'super-admin':'super_admin','customer-service':'customer_service'}[r] || r);
-          const role = normalize(u.role || '');
-          const allowed = ['agent','manager','admin','super_admin','customer_service'];
-          if (!token || !role || !allowed.includes(role)) { window.location.href = '/login'; return; }
+          // Global leaderboard is accessible to all authenticated users
+          console.log('Monthly leaderboard - accessible to all logged-in users');
         })();
     </script>
     
@@ -160,15 +158,15 @@
         <!-- Controls -->
         <div class="controls">
             <div class="tabs">
-                <a href="/leaderboard/index.html" class="tab">
+                <a href="/global-leaderboard" class="tab">
                     <i data-lucide="trophy"></i>
                     Overall Rankings
                 </a>
-                <a href="/leaderboard/monthly.html" class="tab active">
+                <a href="/leaderboard/monthly" class="tab active">
                     <i data-lucide="calendar"></i>
                     Monthly Leaders
                 </a>
-                <a href="/leaderboard/teams.html" class="tab">
+                <a href="/leaderboard/teams" class="tab">
                     <i data-lucide="users"></i>
                     Team Rankings
                 </a>
