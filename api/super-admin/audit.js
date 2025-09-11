@@ -27,16 +27,47 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    // Route to appropriate handler
-    if (req.method === 'POST' && req.url.includes('/log')) {
+    // Route to appropriate handler based on method
+    if (req.method === 'POST') {
+      // Handle audit logging for any POST request
       return await handleAuditLogging(req, res, user);
     }
     
-    if (req.method === 'GET' && req.url.includes('/recent')) {
-      return await handleRecentAuditLogs(req, res, user);
-    }
-    
     if (req.method === 'GET') {
+      // Handle GET requests - check for query parameters
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      const hasLimit = url.searchParams.has('limit');
+      
+      // If limit parameter exists, return recent logs
+      if (hasLimit) {
+        const limit = Math.min(parseInt(url.searchParams.get('limit')) || 10, 100);
+        
+        const { data: logs, error } = await supabase
+          .from('admin_audit_log')
+          .select('*')
+          .order('timestamp', { ascending: false })
+          .limit(limit);
+
+        if (error) {
+          console.error('Error fetching audit logs:', error);
+          return res.status(500).json({ error: 'Failed to fetch audit logs' });
+        }
+
+        // Map timestamp to created_at for frontend compatibility
+        const entries = (logs || []).map(log => ({
+          ...log,
+          created_at: log.timestamp,
+          action: log.action || 'UNKNOWN',
+          details: log.details || 'No details provided'
+        }));
+
+        return res.status(200).json({ 
+          entries: entries,
+          count: entries.length 
+        });
+      }
+      
+      // Otherwise handle as comprehensive query
       return await handleAuditLogQuery(req, res, user);
     }
 

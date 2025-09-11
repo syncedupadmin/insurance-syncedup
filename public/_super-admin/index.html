@@ -11,7 +11,7 @@
       var t = localStorage.getItem('selectedTheme') || 'professional';
       var h = document.documentElement;
       if (t === 'classic') { h.classList.add('classic-mode'); h.style.backgroundColor = '#008080'; }
-      else if (t === 'modern') { h.classList.add('modern-mode'); h.style.background = 'linear-gradient(135deg,#667eea 0%,#764ba2 100%)'; }
+      else if (t === 'modern') { h.classList.add('modern-mode'); h.style.background = 'linear-gradient(135deg,#dc2626 0%,#991b1b 100%)'; }
       else { h.style.background = 'linear-gradient(-45deg,#c2410c,#ea580c,#fb923c,#fed7aa)'; }
       h.style.visibility = 'hidden';
       setTimeout(function(){ h.style.visibility='visible'; h.style.transition='opacity .2s'; h.style.opacity='1'; }, 50);
@@ -1296,7 +1296,7 @@
             `;
             
             // Load users by default
-            await loadUserList();
+            await showUserTab();
             updateActiveNav(event);
         }
         
@@ -1312,7 +1312,62 @@
             document.getElementById('userTabBtn').style.border = 'none';
             
             document.getElementById('tabContent').innerHTML = '<div id="users-container"><p style="color: var(--text-secondary);">Loading users...</p></div>';
-            await loadUserList();
+            
+            // Load user data
+            try {
+                const response = await fetch('/api/super-admin/users', {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const container = document.getElementById('users-container');
+                    
+                    if (container && data.users && data.users.length > 0) {
+                        container.innerHTML = `
+                            <table class="audit-table" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Email</th>
+                                        <th>Name</th>
+                                        <th>Role</th>
+                                        <th>Agency</th>
+                                        <th>Status</th>
+                                        <th>Last Login</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.users.map(user => `
+                                        <tr>
+                                            <td>${user.email}</td>
+                                            <td>${user.full_name || 'N/A'}</td>
+                                            <td>${user.role}</td>
+                                            <td>${user.agency_name || 'N/A'}</td>
+                                            <td style="color: ${user.is_active ? 'var(--success)' : 'var(--danger)'}">
+                                                ${user.is_active ? 'Active' : 'Inactive'}
+                                            </td>
+                                            <td>${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
+                                            <td>
+                                                <button onclick="editUser('${user.id}')" style="padding: 0.25rem 0.5rem; background: var(--accent-blue); border: none; border-radius: 0.25rem; color: white; cursor: pointer; margin-right: 0.5rem;">Edit</button>
+                                                <button onclick="toggleUserStatus('${user.id}', ${user.is_active})" style="padding: 0.25rem 0.5rem; background: ${user.is_active ? 'var(--warning)' : 'var(--success)'}; border: none; border-radius: 0.25rem; color: white; cursor: pointer;">${user.is_active ? 'Deactivate' : 'Activate'}</button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        `;
+                    } else if (container) {
+                        container.innerHTML = '<p style="color: var(--text-secondary);">No users found</p>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+                const container = document.getElementById('users-container');
+                if (container) {
+                    container.innerHTML = '<p style="color: var(--danger);">Error loading users</p>';
+                }
+            }
         }
         
         async function showAgencyTab() {
@@ -1804,13 +1859,40 @@
                 </div>
             `;
             
-            // Load real metrics
-            loadSystemMetrics();
+            // Load metrics for Executive Dashboard
+            loadExecutiveDashboardMetrics();
             loadRecentAuditEntries();
         }
         
+        async function loadExecutiveDashboardMetrics() {
+            try {
+                const response = await fetch('/api/super-admin/metrics', {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const metrics = await response.json();
+                    
+                    // Update Executive Dashboard specific elements
+                    const revenueEl = document.getElementById('total-revenue');
+                    if (revenueEl) revenueEl.textContent = `$${(metrics.monthlyRecurringRevenue || 0).toLocaleString()}`;
+                    
+                    const usersEl = document.getElementById('active-users');
+                    if (usersEl) usersEl.textContent = (metrics.totalUsers || 0).toLocaleString();
+                    
+                    const healthEl = document.getElementById('system-health');
+                    if (healthEl) healthEl.textContent = `${metrics.uptimePercentage || metrics.uptime || 99.97}%`;
+                    
+                    const policiesEl = document.getElementById('total-policies');
+                    if (policiesEl) policiesEl.textContent = (metrics.totalPolicies || 0).toLocaleString();
+                }
+            } catch (error) {
+                console.error('Error loading executive dashboard metrics:', error);
+            }
+        }
+        
         async function refreshAllMetrics() {
-            loadSystemMetrics();
+            loadExecutiveDashboardMetrics();
             loadRecentAuditEntries();
         }
         
