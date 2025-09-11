@@ -331,29 +331,11 @@
         </div>
     </div>
 
-    <!-- Navigation -->
-    <div class="nav">
-        <a href="/agent" class="nav-link">
-            <i data-lucide="layout-dashboard" class="icon"></i>
-            Dashboard
-        </a>
-        <a href="/agent/quotes" class="nav-link">
-            <i data-lucide="calculator" class="icon"></i>
-            Quote Products
-        </a>
-        <a href="/agent/commissions" class="nav-link active">
-            <i data-lucide="dollar-sign" class="icon"></i>
-            My Commissions
-        </a>
-        <a href="/agent/settings" class="nav-link">
-            <i data-lucide="settings" class="icon"></i>
-            Settings
-        </a>
-        <a href="/global-leaderboard" class="nav-link">
-            <i data-lucide="trophy" class="icon"></i>
-            Global Leaderboard
-        </a>
+    <!-- Navigation (Centralized) -->
+    <div class="nav" id="agentNavigation">
+        <!-- Navigation will be injected by navigation.js -->
     </div>
+    <script src="/agent/components/navigation.js"></script>
 
     <div class="container">
         <!-- Commission Summary Cards -->
