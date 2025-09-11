@@ -77,8 +77,8 @@ function applyAgencyCustomizations() {
     document.documentElement.style.setProperty('--agency-secondary', config.secondaryColor);
   }
   
-  // Apply custom background
-  if (config.branding.customBackground) {
+  // Apply custom background - ONLY in agent portal to prevent contamination
+  if (config.branding.customBackground && window.location.pathname.includes('/_agent/')) {
     document.body.style.background = config.branding.customBackground;
     document.body.style.backgroundSize = '400% 400%';
     document.body.style.animation = 'gradient 15s ease infinite';
