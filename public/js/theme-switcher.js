@@ -48,9 +48,22 @@
                 localStorage.setItem('detectedPortal', portalClass);
             }
         },
+        
+        getThemeKey: function() {
+            // Return portal-specific localStorage key
+            const path = (window.location.pathname || '/').replace(/^\/_/, '/');
+            if (path.includes('/manager/')) return 'managerTheme';
+            else if (path.includes('/agent/')) return 'agentTheme';
+            else if (path.includes('/customer-service/')) return 'serviceTheme';
+            else if (path.includes('/admin/')) return 'adminTheme';
+            else if (path.includes('/super-admin/')) return 'superAdminTheme';
+            else if (path.includes('/leaderboard')) return 'leaderboardTheme';
+            return 'selectedTheme'; // fallback for other pages
+        },
 
         loadSavedTheme: function() {
-            const savedTheme = localStorage.getItem('selectedTheme') || 'professional';
+            const themeKey = this.getThemeKey();
+            const savedTheme = localStorage.getItem(themeKey) || 'professional';
             
             // Always ensure theme CSS is loaded (critical script may have already loaded it)
             if (!document.querySelector(`link[data-theme-css="${savedTheme}"]`)) {
@@ -84,7 +97,8 @@
             this.loadThemeCSS(themeName);
 
             this.currentTheme = themeName;
-            localStorage.setItem('selectedTheme', themeName);
+            const themeKey = this.getThemeKey();
+            localStorage.setItem(themeKey, themeName);
 
             // Dispatch theme change event
             document.dispatchEvent(new CustomEvent('themeChanged', {

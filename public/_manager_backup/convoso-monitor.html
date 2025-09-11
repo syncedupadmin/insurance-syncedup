@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Critical Theme Flash Prevention -->
+    <script>
+    (function(){
+        var t=localStorage.getItem("selectedTheme")||"professional";
+        var h=document.documentElement;
+        h.classList.add(t+"-mode");
+        
+        // Load theme CSS immediately
+        var existingTheme = document.querySelector('link[data-theme-css]');
+        if(existingTheme) existingTheme.remove();
+        
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = '/css/themes/' + t + '.css';
+        link.setAttribute('data-theme-css', t);
+        document.head.appendChild(link);
+        
+        // Add body class when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            if(document.body) document.body.classList.add(t+"-mode");
+        });
+        
+        // Set background for immediate visual feedback
+        if(t==="classic"){h.style.backgroundColor="#008080";}
+        else if(t==="modern"){h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        else if(t==="professional"){h.style.background="linear-gradient(-45deg,#f8fafc,#e2e8f0,#cbd5e1,#94a3b8)";}
+        else{h.style.background="linear-gradient(-45deg,#059669,#10b981,#34d399,#a7f3d0)";}
+        
+        h.style.visibility="hidden";
+        setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
+    })();
+    </script>
+    <script src="/js/auth-helper.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Monitor - Convoso Dashboard</title>
+    
+    
+    <!-- Favicons - Blue for Manager Portal -->
+    <link rel="icon" type="image/png" sizes="50x50" href="/favicons/manager-50x50.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/manager-180x180.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicons/manager-512x512.png">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/manager/shared-nav.js"></script>
+    
+    <!-- Manager Global Styles -->
+    <link rel="stylesheet" href="/manager/manager-global.css">
+    <link rel="stylesheet" href="/css/themes/professional.css">
+    
+    <style>
+        /* Override font to match site fonts */
+        body, * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        }
+        
+        .monitor-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 50%, #1d4ed8 100%);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        .monitor-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .refresh-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .refresh-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #48bb78;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .refresh-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #718096;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .performance-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .performance-label {
+            font-size: 0.75rem;
+            color: #718096;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        
+        .performance-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+        
+        .performance-bar {
+            height: 8px;
+            background: #f7fafc;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .performance-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .agent-status-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .agent-status-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .agent-status-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: #a0aec0;
+        }
+        
+        .agent-status-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+        }
+        
+        .agent-status-label {
+            color: #718096;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .agents-table {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .table-header {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+        
+        .table-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .agents-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .agents-table th {
+            background: #f8f9fa;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.875rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .agents-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #f7fafc;
+            font-size: 0.875rem;
+        }
+        
+        .agents-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .agent-status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .status-logged-in { background: #f0fff4; color: #22543d; border: 1px solid #9ae6b4; }
+        .status-waiting { background: #fffaf0; color: #c05621; border: 1px solid #fbd38d; }
+        .status-in-call { background: #e6fffa; color: #234e52; border: 1px solid #81e6d9; }
+        .status-paused { background: #fed7d7; color: #742a2a; border: 1px solid #feb2b2; }
+        .status-dead-call { background: #f5f5f5; color: #4a5568; border: 1px solid #e2e8f0; }
+        
+        .current-call {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .call-duration {
+            background: #e6fffa;
+            color: #234e52;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown select {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .dropdown select option {
+            background: #4a5568;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Monitor Header -->
+    <div class="monitor-header">
+        <div class="monitor-title">
+            <i data-lucide="monitor-speaker"></i>
+            Agent Monitor
+        </div>
+        <div class="refresh-controls">
+            <div class="dropdown">
+                <select id="campaign-filter">
+                    <option value="">--- All Campaigns ---</option>
+                </select>
+            </div>
+            <div class="dropdown">
+                <select id="queue-filter">
+                    <option value="">--- All Queues ---</option>
+                </select>
+            </div>
+            <div class="dropdown">
+                <select id="agent-filter">
+                    <option value="">--- Include Remote Agents ---</option>
+                    <option value="local">Local Agents Only</option>
+                </select>
+            </div>
+            <div class="refresh-status">
+                <span>Refresh Rate: (Slow)</span>
+                <button class="refresh-btn" id="refresh-control">
+                    <span id="refresh-text">STOP</span>
+                </button>
+                <button class="refresh-btn" id="refresh-speed">
+                    <span>SLOW (6 sec)</span>
+                </button>
+                <button class="refresh-btn" id="refresh-fast">
+                    <span>FAST (1 sec)</span>
+                </button>
+            </div>
+            <div class="refresh-status">
+                <span>DIAL METHOD: -</span>
+                <div class="status-indicator"></div>
+                <span id="current-time">2025-09-07 13:28:42</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="/manager" class="nav-link">
+            <i data-lucide="layout-dashboard" class="icon"></i>Dashboard
+        </a>
+        <a href="/manager/convoso-leads" class="nav-link">
+            <i data-lucide="users" class="icon"></i>Leads
+        </a>
+        <a href="/manager/convoso-monitor" class="nav-link active">
+            <i data-lucide="monitor-speaker" class="icon"></i>Convoso
+        </a>
+        <a href="/manager/team-management" class="nav-link">
+            <i data-lucide="users" class="icon"></i>Team Management
+        </a>
+        <a href="/manager/performance" class="nav-link">
+            <i data-lucide="trending-up" class="icon"></i>Team Performance
+        </a>
+        <a href="/manager/settings" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>Settings
+        </a>
+    </div>
+    
+    <div class="container">
+        <!-- Call Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="total-calls">0</div>
+                <div class="stat-label">Total Calls Placed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="calls-ringing">0</div>
+                <div class="stat-label">Calls Ringing</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="outbound-waiting">0</div>
+                <div class="stat-label">Outbound Calls Waiting</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="inbound-waiting">1</div>
+                <div class="stat-label">Inbound Calls Waiting</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="messages-playing">0</div>
+                <div class="stat-label">Messages Playing</div>
+            </div>
+        </div>
+        
+        <!-- Performance Metrics -->
+        <div class="performance-grid">
+            <div class="performance-card">
+                <div class="performance-label">Dialable Leads: <span id="dialable-leads">409983</span></div>
+            </div>
+            <div class="performance-card">
+                <div class="performance-label">Leads in Hopper: <span id="leads-hopper">2512</span></div>
+            </div>
+            <div class="performance-card">
+                <div class="performance-label">Dial Level: -</div>
+            </div>
+            <div class="performance-card">
+                <div class="performance-label">Avg Agents: <span id="avg-agents">3.23</span></div>
+            </div>
+        </div>
+        
+        <div class="performance-grid">
+            <div class="performance-card">
+                <div class="performance-label">Outbound Calls Today: <span id="outbound-today">94626</span></div>
+            </div>
+            <div class="performance-card">
+                <div class="performance-label">Manual Calls Today: <span id="manual-today">135</span></div>
+            </div>
+            <div class="performance-card">
+                <div class="performance-label">Outbound Dropped: <span id="outbound-dropped">1.40%</span></div>
+                <div class="performance-bar">
+                    <div class="performance-fill" style="background: #f6ad55; width: 1.4%;"></div>
+                </div>
+            </div>
+            <div class="performance-card">
+                <div class="performance-label">Outbound (Dropped / Answered): <span id="outbound-ratio">188 / 13415</span></div>
+            </div>
+        </div>
+        
+        <div class="performance-grid">
+            <div class="performance-card">
+                <div class="performance-label">Inbound Calls Answered: <span id="inbound-answered">990</span></div>
+            </div>
+            <div class="performance-card">
+                <div class="performance-label">Inbound Answered: <span id="inbound-answered-percent">84.98%</span></div>
+                <div class="performance-bar">
+                    <div class="performance-fill" style="background: #48bb78; width: 84.98%;"></div>
+                </div>
+            </div>
+            <div class="performance-card">
+                <div class="performance-label">Inbound Abandoned: <span id="inbound-abandoned">12.79%</span></div>
+                <div class="performance-bar">
+                    <div class="performance-fill" style="background: #f56565; width: 12.79%;"></div>
+                </div>
+            </div>
+            <div class="performance-card">
+                <div class="performance-label">Inbound (Abandoned / Received): <span id="inbound-ratio">149 / 1165</span></div>
+            </div>
+        </div>
+        
+        <div class="performance-grid">
+            <div class="performance-card">
+                <div class="performance-label">Avg Agent Wait:</div>
+            </div>
+            <div class="performance-card">
+                <div class="performance-label">Avg Agent Talk:</div>
+            </div>
+            <div class="performance-card">
+                <div class="performance-label">Avg Agent Dispo:</div>
+            </div>
+            <div class="performance-card">
+                <div class="performance-label">Avg Agent Pause:</div>
+            </div>
+        </div>
+        
+        <!-- Agent Status Overview -->
+        <div class="agent-status-grid">
+            <div class="agent-status-card">
+                <div class="agent-status-icon"><i data-lucide="users"></i></div>
+                <div class="agent-status-number" id="agents-logged-in">0</div>
+                <div class="agent-status-label">Agents Logged In</div>
+            </div>
+            <div class="agent-status-card">
+                <div class="agent-status-icon"><i data-lucide="clock"></i></div>
+                <div class="agent-status-number" id="agents-waiting">0</div>
+                <div class="agent-status-label">Agents Waiting</div>
+            </div>
+            <div class="agent-status-card">
+                <div class="agent-status-icon"><i data-lucide="phone"></i></div>
+                <div class="agent-status-number" id="agents-in-call">0</div>
+                <div class="agent-status-label">Agents In Call</div>
+            </div>
+            <div class="agent-status-card">
+                <div class="agent-status-icon"><i data-lucide="edit"></i></div>
+                <div class="agent-status-number" id="agents-in-dispo">0</div>
+                <div class="agent-status-label">Agents In Dispo</div>
+            </div>
+            <div class="agent-status-card">
+                <div class="agent-status-icon"><i data-lucide="pause"></i></div>
+                <div class="agent-status-number" id="agents-paused">0</div>
+                <div class="agent-status-label">Agents Paused</div>
+            </div>
+            <div class="agent-status-card">
+                <div class="agent-status-icon"><i data-lucide="alert-triangle"></i></div>
+                <div class="agent-status-number" id="agents-dead-call">0</div>
+                <div class="agent-status-label">Agents In Dead Call</div>
+            </div>
+        </div>
+        
+        <!-- Live Agent Table -->
+        <div class="agents-table">
+            <div class="table-header">
+                <div class="table-title">Live Agent Status</div>
+                <div>
+                    <button class="btn btn-success" onclick="refreshAgentData()">🔄 Refresh</button>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Extension</th>
+                        <th>Virtual Agent</th>
+                        <th>Agent Name</th>
+                        <th>Lead</th>
+                        <th>Listen</th>
+                        <th>Call Type</th>
+                        <th>Status</th>
+                        <th>Status Time</th>
+                        <th>Current Call</th>
+                        <th>Ready Time</th>
+                        <th>Since Last</th>
+                        <th>Total Calls</th>
+                        <th>Session</th>
+                        <th>Campaign</th>
+                        <th>Queue</th>
+                        <th>List</th>
+                        <th>Logout</th>
+                    </tr>
+                </thead>
+                <tbody id="agents-table-body">
+                    <tr>
+                        <td colspan="17" style="text-align: center; padding: 2rem; color: #718096;">
+                            Loading agent data...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let refreshInterval;
+        let refreshRate = 6000; // 6 seconds
+        let isRefreshing = true;
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+            loadAgentData();
+            startAutoRefresh();
+            updateClock();
+            setInterval(updateClock, 1000);
+            
+            // Initialize Lucide icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+        
+        function initializePage() {
+            // Load campaigns and queues for filters
+            loadFilters();
+            
+            // Set up event listeners
+            document.getElementById('refresh-control').addEventListener('click', toggleRefresh);
+            document.getElementById('refresh-speed').addEventListener('click', setSlowRefresh);
+            document.getElementById('refresh-fast').addEventListener('click', setFastRefresh);
+        }
+        
+        async function loadFilters() {
+            try {
+                const response = await fetch('/api/admin/convoso-config', { credentials: 'include' });
+                if (response.ok) {
+                    const data = await response.json();
+                    populateFilters(data);
+                }
+            } catch (error) {
+                console.error('Failed to load filters:', error);
+            }
+        }
+        
+        function populateFilters(data) {
+            const campaignSelect = document.getElementById('campaign-filter');
+            const queueSelect = document.getElementById('queue-filter');
+            
+            // Populate campaigns
+            if (data.campaigns) {
+                data.campaigns.forEach(campaign => {
+                    const option = document.createElement('option');
+                    option.value = campaign.id;
+                    option.textContent = campaign.name;
+                    campaignSelect.appendChild(option);
+                });
+            }
+            
+            // Populate queues
+            if (data.queues) {
+                data.queues.forEach(queue => {
+                    const option = document.createElement('option');
+                    option.value = queue.id;
+                    option.textContent = queue.name;
+                    queueSelect.appendChild(option);
+                });
+            }
+        }
+        
+        async function loadAgentData() {
+            try {
+                const response = await fetch('/api/admin/convoso-agent-monitor', { credentials: 'include' });
+                if (response.ok) {
+                    const data = await response.json();
+                    updateDashboard(data);
+                } else {
+                    console.error('Failed to load agent data');
+                    showSampleData();
+                }
+            } catch (error) {
+                console.error('Failed to load agent data:', error);
+                showSampleData();
+            }
+        }
+        
+        function updateDashboard(data) {
+            // Update call statistics
+            document.getElementById('total-calls').textContent = data.stats?.totalCalls || 0;
+            document.getElementById('calls-ringing').textContent = data.stats?.callsRinging || 0;
+            document.getElementById('outbound-waiting').textContent = data.stats?.outboundWaiting || 0;
+            document.getElementById('inbound-waiting').textContent = data.stats?.inboundWaiting || 1;
+            document.getElementById('messages-playing').textContent = data.stats?.messagesPlaying || 0;
+            
+            // Update agent counts
+            document.getElementById('agents-logged-in').textContent = data.agents?.loggedIn || 0;
+            document.getElementById('agents-waiting').textContent = data.agents?.waiting || 0;
+            document.getElementById('agents-in-call').textContent = data.agents?.inCall || 0;
+            document.getElementById('agents-in-dispo').textContent = data.agents?.inDispo || 0;
+            document.getElementById('agents-paused').textContent = data.agents?.paused || 0;
+            document.getElementById('agents-dead-call').textContent = data.agents?.deadCall || 0;
+            
+            // Update agent table
+            renderAgentTable(data.agentList || []);
+        }
+        
+        function showSampleData() {
+            // Show sample/demo data when API is not available
+            const sampleData = {
+                stats: {
+                    totalCalls: 0,
+                    callsRinging: 0,
+                    outboundWaiting: 0,
+                    inboundWaiting: 1,
+                    messagesPlaying: 0
+                },
+                agents: {
+                    loggedIn: 0,
+                    waiting: 0,
+                    inCall: 0,
+                    inDispo: 0,
+                    paused: 0,
+                    deadCall: 0
+                },
+                agentList: []
+            };
+            updateDashboard(sampleData);
+        }
+        
+        function renderAgentTable(agents) {
+            const tbody = document.getElementById('agents-table-body');
+            
+            if (agents.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="17" style="text-align: center; padding: 2rem; color: #718096;">
+                            No agents currently logged in
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = agents.map(agent => `
+                <tr>
+                    <td>${agent.extension || '-'}</td>
+                    <td>${agent.virtualAgent || '-'}</td>
+                    <td style="font-weight: 500;">${agent.name || 'Unknown'}</td>
+                    <td>${agent.currentLead || '-'}</td>
+                    <td>
+                        ${agent.canListen ? '<button class="btn btn-sm">👂 Listen</button>' : '-'}
+                    </td>
+                    <td>${agent.callType || '-'}</td>
+                    <td>
+                        <span class="agent-status-badge ${getStatusClass(agent.status)}">
+                            ${agent.status || 'Unknown'}
+                        </span>
+                    </td>
+                    <td>${formatTime(agent.statusTime)}</td>
+                    <td>
+                        ${agent.currentCall ? `
+                            <div class="current-call">
+                                <span class="call-duration">${formatDuration(agent.currentCall.duration)}</span>
+                            </div>
+                        ` : '-'}
+                    </td>
+                    <td>${formatTime(agent.readyTime)}</td>
+                    <td>${formatTime(agent.sinceLast)}</td>
+                    <td>${agent.totalCalls || 0}</td>
+                    <td>${formatDuration(agent.sessionTime)}</td>
+                    <td>${agent.campaign || '-'}</td>
+                    <td>${agent.queue || '-'}</td>
+                    <td>${agent.list || '-'}</td>
+                    <td>
+                        ${agent.canLogout ? '<button class="btn btn-danger btn-sm">🚪 Logout</button>' : '-'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function getStatusClass(status) {
+            switch (status?.toLowerCase()) {
+                case 'logged in':
+                case 'ready':
+                    return 'status-logged-in';
+                case 'waiting':
+                    return 'status-waiting';
+                case 'in call':
+                case 'incall':
+                    return 'status-in-call';
+                case 'paused':
+                case 'pause':
+                    return 'status-paused';
+                case 'dead call':
+                    return 'status-dead-call';
+                default:
+                    return 'status-waiting';
+            }
+        }
+        
+        function formatTime(timestamp) {
+            if (!timestamp) return '-';
+            try {
+                return new Date(timestamp).toLocaleTimeString();
+            } catch {
+                return '-';
+            }
+        }
+        
+        function formatDuration(seconds) {
+            if (!seconds) return '-';
+            const hrs = Math.floor(seconds / 3600);
+            const mins = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            
+            if (hrs > 0) {
+                return `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        function toggleRefresh() {
+            const btn = document.getElementById('refresh-control');
+            const text = document.getElementById('refresh-text');
+            
+            if (isRefreshing) {
+                stopAutoRefresh();
+                text.textContent = 'START';
+                isRefreshing = false;
+            } else {
+                startAutoRefresh();
+                text.textContent = 'STOP';
+                isRefreshing = true;
+            }
+        }
+        
+        function setSlowRefresh() {
+            refreshRate = 6000;
+            document.getElementById('refresh-speed').innerHTML = '<span>SLOW (6 sec)</span>';
+            if (isRefreshing) {
+                stopAutoRefresh();
+                startAutoRefresh();
+            }
+        }
+        
+        function setFastRefresh() {
+            refreshRate = 1000;
+            document.getElementById('refresh-fast').innerHTML = '<span>FAST (1 sec)</span>';
+            if (isRefreshing) {
+                stopAutoRefresh();
+                startAutoRefresh();
+            }
+        }
+        
+        function startAutoRefresh() {
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = setInterval(loadAgentData, refreshRate);
+        }
+        
+        function stopAutoRefresh() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+                refreshInterval = null;
+            }
+        }
+        
+        function refreshAgentData() {
+            loadAgentData();
+        }
+        
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = 
+                now.getFullYear() + '-' + 
+                String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                String(now.getDate()).padStart(2, '0') + ' ' + 
+                String(now.getHours()).padStart(2, '0') + ':' + 
+                String(now.getMinutes()).padStart(2, '0') + ':' + 
+                String(now.getSeconds()).padStart(2, '0');
+        }
+    </script>
+    <script src="/js/theme-switcher.js"></script>
+</body>
+</html>

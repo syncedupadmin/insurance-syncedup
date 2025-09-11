@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Critical Theme Flash Prevention -->
+    <script>
+    (function(){
+        var t=localStorage.getItem("selectedTheme")||"professional";
+        var h=document.documentElement;
+        if(t==="classic"){h.classList.add("classic-mode");h.style.backgroundColor="#008080";}
+        else if(t==="modern"){h.classList.add("modern-mode");h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        else{h.style.background="linear-gradient(-45deg,#4c1d95,#5b21b6,#6d28d9,#7c3aed)";}
+        h.style.visibility="hidden";
+        setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
+    })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>License Management - SyncedUp Insurance</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .nav { display: flex; gap: 2rem; padding: 0 2rem; background: white; border-bottom: 1px solid #e2e8f0; overflow-x: auto; }
+        .nav a { padding: 1rem; text-decoration: none; color: #2d3748; font-weight: 500; white-space: nowrap; }
+        .nav a.active { color: #667eea; border-bottom: 2px solid #667eea; }
+        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+        .grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 2rem; }
+        .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: #667eea; }
+        .stat-label { color: #718096; margin-top: 0.5rem; font-size: 0.9rem; }
+        .btn { padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 0.25rem; }
+        .btn:hover { background: #5a67d8; }
+        .btn-success { background: #48bb78; }
+        .btn-warning { background: #ed8936; }
+        .btn-danger { background: #f56565; }
+        .state-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.5rem; margin: 1rem 0; }
+        .state-card { background: #f7fafc; border: 2px solid #e2e8f0; padding: 0.75rem; text-align: center; border-radius: 6px; cursor: pointer; }
+        .state-card.licensed { background: #c6f6d5; border-color: #48bb78; }
+        .state-card.expiring { background: #fed7d7; border-color: #f56565; }
+        .state-code { font-weight: bold; font-size: 0.9rem; }
+        .agent-count { font-size: 0.8rem; color: #718096; margin-top: 0.25rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .table-container { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        th { background: #f7fafc; padding: 0.75rem; text-align: left; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 0.75rem; border-bottom: 1px solid #e2e8f0; }
+        .status-active { color: #48bb78; font-weight: 500; }
+        .status-expiring { color: #ed8936; font-weight: 500; }
+        .status-expired { color: #f56565; font-weight: 500; }
+        .filter-bar { display: flex; gap: 1rem; margin-bottom: 1rem; align-items: center; flex-wrap: wrap; }
+        .filter-bar select, .filter-bar input { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; }
+        .alert { padding: 1rem; margin: 1rem 0; border-radius: 6px; }
+        .alert-warning { background: #fed7d7; border: 1px solid #f56565; color: #742a2a; }
+        .section-title { font-size: 1.25rem; font-weight: 600; color: #2d3748; margin: 2rem 0 1rem 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>License Management</h1>
+        <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">Logout</button>
+    </div>
+        <nav class="nav">
+        <a href="/admin/">
+            <i data-lucide="layout-dashboard" class="icon"></i>Dashboard
+        </a>
+        <a href="/admin/agent-performance">
+            <i data-lucide="trending-up" class="icon"></i>Agent Performance
+        </a>
+        <a href="/admin/users">
+            <i data-lucide="users" class="icon"></i>Users
+        </a>
+        <a href="/admin/licenses">
+            <i data-lucide="shield-check" class="icon"></i>Licenses
+        </a>
+        <a href="/admin/convoso-leads">
+            <i data-lucide="users" class="icon"></i>Leads
+        </a>
+        <a href="/admin/vendors">
+            <i data-lucide="building-2" class="icon"></i>Vendors
+        </a>
+        <a href="/admin/commissions">
+            <i data-lucide="dollar-sign" class="icon"></i>Commissions
+        </a>
+        <a href="/admin/settings">
+            <i data-lucide="settings" class="icon"></i>Settings
+        </a>
+        <a href="/admin/convoso-monitor">
+            <i data-lucide="monitor-speaker" class="icon"></i>Convoso
+        </a>
+        <a href="/global-leaderboard">
+            <i data-lucide="trophy" class="icon"></i>Global Leaderboard
+        </a>
+    </nav>
+    
+    <div class="container">
+        <!-- License Summary -->
+        <div class="grid">
+            <div class="card">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Total Licenses</div>
+            </div>
+            <div class="card">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Active Licenses</div>
+            </div>
+            <div class="card">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Expiring Soon</div>
+            </div>
+            <div class="card">
+                <div class="stat-value">0</div>
+                <div class="stat-label">States Covered</div>
+            </div>
+            <div class="card">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Compliance Issues</div>
+            </div>
+        </div>
+
+        <!-- Alerts -->
+        <div class="alert alert-warning" id="expiringAlert" style="display: none;">
+            <strong>License Expiration Alert:</strong> <span id="alertText">Some licenses are expiring soon!</span>
+        </div>
+
+        <!-- State Coverage Grid -->
+        <div class="card">
+            <h3 class="section-title">State Coverage Overview</h3>
+            <p style="color: #718096; margin-bottom: 1rem;">Green = Licensed, Red = Expiring Soon, Gray = Not Licensed</p>
+            <div class="state-grid" id="stateGrid">
+                <!-- States will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- License Table -->
+        <div class="section-title">License Details</div>
+        <div class="filter-bar">
+            <select id="stateFilter" onchange="filterLicenses()">
+                <option value="">All States</option>
+            </select>
+            <select id="statusFilter" onchange="filterLicenses()">
+                <option value="">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="expiring">Expiring Soon</option>
+                <option value="expired">Expired</option>
+            </select>
+            <input type="text" id="searchInput" placeholder="Search agent name..." onkeyup="filterLicenses()">
+            <button class="btn btn-success" onclick="addLicense()">+ Add License</button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Agent</th>
+                        <th>State</th>
+                        <th>License #</th>
+                        <th>Type</th>
+                        <th>Issue Date</th>
+                        <th>Expiration</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="licensesTableBody">
+                    <tr><td colspan="8" style="text-align: center;">Loading license data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // US States array
+        const US_STATES = [
+            'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
+            'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
+            'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+            'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
+            'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
+        ];
+
+        let licenses = [];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLicenses();
+            populateStateGrid();
+            populateStateFilter();
+        });
+
+        async function loadLicenses() {
+            // Simulate loading - replace with actual API call
+            setTimeout(() => {
+                // Mock data for demo
+                licenses = [
+                    {
+                        id: 1,
+                        agent_name: 'John Doe',
+                        state: 'CA',
+                        license_number: 'CA12345',
+                        type: 'Property & Casualty',
+                        issue_date: '2023-01-15',
+                        expiration_date: '2025-01-15',
+                        status: 'active'
+                    },
+                    {
+                        id: 2,
+                        agent_name: 'Jane Smith',
+                        state: 'TX',
+                        license_number: 'TX67890',
+                        type: 'Life & Health',
+                        issue_date: '2023-03-10',
+                        expiration_date: '2024-12-31',
+                        status: 'expiring'
+                    }
+                ];
+                
+                updateSummaryStats();
+                displayLicenses();
+                updateStateGrid();
+                checkExpiringLicenses();
+            }, 1000);
+        }
+
+        function updateSummaryStats() {
+            const stats = document.querySelectorAll('.stat-value');
+            const active = licenses.filter(l => l.status === 'active').length;
+            const expiring = licenses.filter(l => l.status === 'expiring').length;
+            const states = [...new Set(licenses.map(l => l.state))].length;
+            
+            stats[0].textContent = licenses.length;
+            stats[1].textContent = active;
+            stats[2].textContent = expiring;
+            stats[3].textContent = states;
+            stats[4].textContent = expiring; // compliance issues
+        }
+
+        function populateStateGrid() {
+            const grid = document.getElementById('stateGrid');
+            grid.innerHTML = US_STATES.map(state => {
+                return `
+                    <div class="state-card" id="state-${state}" onclick="filterByState('${state}')">
+                        <div class="state-code">${state}</div>
+                        <div class="agent-count" id="count-${state}">0 agents</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateStateGrid() {
+            // Reset all states
+            US_STATES.forEach(state => {
+                const card = document.getElementById(`state-${state}`);
+                const count = document.getElementById(`count-${state}`);
+                const stateLicenses = licenses.filter(l => l.state === state);
+                
+                card.className = 'state-card';
+                count.textContent = `${stateLicenses.length} agents`;
+                
+                if (stateLicenses.length > 0) {
+                    const hasExpiring = stateLicenses.some(l => l.status === 'expiring');
+                    card.classList.add(hasExpiring ? 'expiring' : 'licensed');
+                }
+            });
+        }
+
+        function populateStateFilter() {
+            const filter = document.getElementById('stateFilter');
+            const states = [...new Set(licenses.map(l => l.state))];
+            states.forEach(state => {
+                const option = document.createElement('option');
+                option.value = state;
+                option.textContent = state;
+                filter.appendChild(option);
+            });
+        }
+
+        function displayLicenses(filteredLicenses = null) {
+            const licensesToShow = filteredLicenses || licenses;
+            const tbody = document.getElementById('licensesTableBody');
+            
+            if (licensesToShow.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No licenses found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = licensesToShow.map(license => `
+                <tr>
+                    <td>${license.agent_name}</td>
+                    <td>${license.state}</td>
+                    <td>${license.license_number}</td>
+                    <td>${license.type}</td>
+                    <td>${new Date(license.issue_date).toLocaleDateString()}</td>
+                    <td>${new Date(license.expiration_date).toLocaleDateString()}</td>
+                    <td><span class="status-${license.status}">${license.status.toUpperCase()}</span></td>
+                    <td>
+                        <button class="btn" style="padding: 0.5rem; font-size: 0.8rem;" onclick="editLicense(${license.id})">Edit</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterLicenses() {
+            const stateFilter = document.getElementById('stateFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            const filtered = licenses.filter(license => {
+                const matchesState = !stateFilter || license.state === stateFilter;
+                const matchesStatus = !statusFilter || license.status === statusFilter;
+                const matchesSearch = !searchTerm || license.agent_name.toLowerCase().includes(searchTerm);
+                
+                return matchesState && matchesStatus && matchesSearch;
+            });
+            
+            displayLicenses(filtered);
+        }
+
+        function filterByState(state) {
+            document.getElementById('stateFilter').value = state;
+            filterLicenses();
+        }
+
+        function checkExpiringLicenses() {
+            const expiring = licenses.filter(l => l.status === 'expiring').length;
+            if (expiring > 0) {
+                document.getElementById('expiringAlert').style.display = 'block';
+                document.getElementById('alertText').textContent = `${expiring} license(s) are expiring within 60 days.`;
+            }
+        }
+
+        function addLicense() {
+            alert('Add License functionality will be connected to backend API');
+        }
+
+        function editLicense(id) {
+            alert('Edit License functionality will be connected to backend API');
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+        }
+    </script>
+    
+    <!-- Professional Theme System -->
+    <script src="/js/theme-switcher.js"></script>
+    <script src="/assets/session-prod.js"></script>
+</body>
+</html>

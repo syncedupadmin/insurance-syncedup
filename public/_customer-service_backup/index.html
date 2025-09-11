@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Critical Theme Flash Prevention -->
+    <script>
+    (function(){
+        var t=localStorage.getItem("selectedTheme")||"professional";
+        var h=document.documentElement;
+        if(t==="classic"){h.classList.add("classic-mode");h.style.backgroundColor="#008080";}
+        else if(t==="modern"){h.classList.add("modern-mode");h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        else{h.style.background="linear-gradient(-45deg,#1e3a8a,#3b82f6,#60a5fa,#dbeafe)";}
+        h.style.visibility="hidden";
+        setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
+    })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Service Dashboard - SyncedUp Insurance</title>
+    
+    <!-- Favicons - Orange for Customer Service Portal -->
+    <link rel="icon" type="image/png" sizes="50x50" href="/favicons/customer-service-50x50.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/customer-service-180x180.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicons/customer-service-512x512.png">
+    
+    <link rel="stylesheet" href="/customer-service/customer-service-global.css">
+    
+    <!-- Server-side portal-guard.js already verified customer-service access -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/js/role-switcher.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Customer Service Dashboard</h1>
+        <div class="user-info">
+            <div id="roleSwitcherMount"></div>
+            <span id="userDisplay">Loading...</span>
+            <button class="btn btn-secondary" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="index.html" class="nav-link active">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="/customer-service/member-search.html" class="nav-link">
+            <i data-lucide="search" class="icon"></i>
+            Member Search
+        </a>
+        <a href="/customer-service/member-profile.html" class="nav-link">
+            <i data-lucide="user-check" class="icon"></i>
+            Member History
+        </a>
+        <a href="/customer-service/settings.html" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Customer Service Welcome Notice -->
+        <div class="cs-notice">
+            <h3><i data-lucide="headphones"></i> Customer Service Portal</h3>
+            <p>Comprehensive member support dashboard. Search members, manage cases, and track interaction history.</p>
+        </div>
+        
+        <!-- Performance Stats -->
+        <div class="grid grid-4">
+            <div class="stat-card">
+                <div class="stat-value" id="dailyCases">0</div>
+                <div class="stat-label">Daily Cases</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="activeCases">0</div>
+                <div class="stat-label">Active Cases</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalMembers">0</div>
+                <div class="stat-label">Total Members</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgResponseTime">0m</div>
+                <div class="stat-label">Avg Response Time</div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button class="btn btn-primary" onclick="location.href='/customer-service/member-search.html'">
+                <i data-lucide="search"></i>
+                Search Member
+            </button>
+            <button class="btn btn-success" onclick="createNewCase()">
+                <i data-lucide="plus-circle"></i>
+                New Case
+            </button>
+            <button class="btn btn-warning" onclick="location.href='interactions.html'">
+                <i data-lucide="clock"></i>
+                View Active Cases
+            </button>
+            <button class="btn btn-secondary" onclick="generateReport()">
+                <i data-lucide="download"></i>
+                Generate Report
+            </button>
+        </div>
+        
+        <!-- Portal Hub Tools -->
+        <div class="grid grid-3">
+            <div class="card">
+                <h3><i data-lucide="user-plus" class="card-icon"></i>FirstEnroll Management</h3>
+                <div class="portal-actions">
+                    <button class="btn btn-primary" onclick="openFirstEnroll()">
+                        <i data-lucide="external-link"></i>
+                        Open FirstEnroll Portal
+                    </button>
+                    <button class="btn btn-secondary" onclick="searchFirstEnrollMember()">
+                        <i data-lucide="search"></i>
+                        Search Members
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3><i data-lucide="shield" class="card-icon"></i>Health Sherpa</h3>
+                <div class="portal-actions">
+                    <button class="btn btn-success" onclick="openHealthSherpa()">
+                        <i data-lucide="external-link"></i>
+                        Open Health Sherpa
+                    </button>
+                    <button class="btn btn-secondary" onclick="checkHealthSherpaEnrollments()">
+                        <i data-lucide="check-circle"></i>
+                        Check Enrollments
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3><i data-lucide="building" class="card-icon"></i>Blue Enrollments</h3>
+                <div class="portal-actions">
+                    <button class="btn btn-info" onclick="openBlueEnrollments()">
+                        <i data-lucide="external-link"></i>
+                        Open Blue Portal
+                    </button>
+                    <button class="btn btn-secondary" onclick="verifyBlueEnrollment()">
+                        <i data-lucide="user-check"></i>
+                        Verify Enrollment
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Provider Search Tools -->
+        <div class="card">
+            <h3><i data-lucide="map-pin" class="card-icon"></i>Provider Search Tools</h3>
+            <div class="grid grid-2">
+                <div class="search-tool">
+                    <h4><i data-lucide="stethoscope"></i>Find Providers</h4>
+                    <div class="search-form">
+                        <input type="text" id="providerZip" placeholder="ZIP Code" class="form-input">
+                        <select id="providerType" class="form-select">
+                            <option value="">Select Provider Type</option>
+                            <option value="primary">Primary Care</option>
+                            <option value="specialist">Specialist</option>
+                            <option value="hospital">Hospital</option>
+                            <option value="pharmacy">Pharmacy</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="searchProviders()">
+                            <i data-lucide="search"></i>
+                            Search
+                        </button>
+                    </div>
+                </div>
+                <div class="search-tool">
+                    <h4><i data-lucide="user-check"></i>Member Verification</h4>
+                    <div class="search-form">
+                        <input type="text" id="memberIdVerify" placeholder="Member ID" class="form-input">
+                        <input type="text" id="memberDobVerify" placeholder="Date of Birth (MM/DD/YYYY)" class="form-input">
+                        <button class="btn btn-success" onclick="verifyMember()">
+                            <i data-lucide="check-circle"></i>
+                            Verify Member
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="providerResults" class="provider-results" style="display: none;">
+                <h4>Search Results</h4>
+                <div id="providerList"></div>
+            </div>
+        </div>
+
+        <!-- Dashboard Content Grid -->
+        <div class="grid">
+            <div class="card">
+                <h3><i data-lucide="clock" class="card-icon"></i>Recent Activity</h3>
+                <div id="recentActivity">
+                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                        <div class="loading"></div>
+                        Loading recent activity...
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3><i data-lucide="trending-up" class="card-icon"></i>Case Statistics</h3>
+                <div id="caseStatistics">
+                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                        <div class="loading"></div>
+                        Loading case statistics...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Priority Cases -->
+        <div class="card">
+            <h3><i data-lucide="alert-triangle" class="card-icon"></i>Priority Cases</h3>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Case ID</th>
+                            <th>Member Name</th>
+                            <th>Issue Type</th>
+                            <th>Priority</th>
+                            <th>Created</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="priorityCasesBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                                <div class="loading"></div>
+                                Loading priority cases...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Today's Assigned Cases -->
+        <div class="card">
+            <h3><i data-lucide="user-check" class="card-icon"></i>Today's Assigned Cases</h3>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Case ID</th>
+                            <th>Member</th>
+                            <th>Contact Info</th>
+                            <th>Issue</th>
+                            <th>Last Update</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="assignedCasesBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                                <div class="loading"></div>
+                                Loading assigned cases...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        // Authentication check
+        async function checkAuth() {
+            // Server-side portal guard already verified customer-service access
+            try {
+                const userResponse = await fetch('/api/auth/verify', { credentials: 'include' });
+                if (userResponse.ok) {
+                    const { user } = await userResponse.json();
+                    document.getElementById('userDisplay').textContent = `${user.email} (${user.role})`;
+                    currentUser = user;
+                    return true;
+                } else {
+                    // Fallback if verify endpoint fails - use role cookie
+                    const roleCookie = document.cookie.split(';').find(c => c.trim().startsWith('user_role='));
+                    const userRole = roleCookie ? decodeURIComponent(roleCookie.split('=')[1]) : 'customer_service';
+                    currentUser = { role: userRole };
+                    document.getElementById('userDisplay').textContent = `Customer Service (${userRole})`;
+                    return true;
+                }
+            } catch (error) {
+                console.error('Auth verification failed:', error);
+                currentUser = { role: 'customer_service' };
+                document.getElementById('userDisplay').textContent = 'Customer Service Dashboard';
+                return true;
+            }
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            // Load dashboard data
+            await loadDashboardData();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                await loadStats();
+                await loadRecentActivity();
+                await loadCaseStatistics();
+                await loadPriorityCases();
+                await loadAssignedCases();
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                loadFallbackData();
+            }
+        }
+
+        // Load performance stats
+        async function loadStats() {
+            try {
+                // API endpoints not configured - show clean zero state
+                console.log('API endpoints not configured, showing empty state...');
+                
+                document.getElementById('dailyCases').textContent = '0';
+                document.getElementById('activeCases').textContent = '0';
+                document.getElementById('totalMembers').textContent = '0';
+                document.getElementById('avgResponseTime').textContent = '0m';
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                document.getElementById('dailyCases').textContent = '0';
+                document.getElementById('activeCases').textContent = '0';
+                document.getElementById('totalMembers').textContent = '0';
+                document.getElementById('avgResponseTime').textContent = '0m';
+            }
+        }
+
+        // Load recent activity
+        async function loadRecentActivity() {
+            const activityContainer = document.getElementById('recentActivity');
+            
+            try {
+                // No API configured - show empty state
+                console.log('API endpoints not configured, showing empty activity state...');
+                activityContainer.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.7);">No recent activity data available</p>';
+            } catch (error) {
+                console.error('Error loading recent activity:', error);
+                activityContainer.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.7);">No recent activity data available</p>';
+            }
+        }
+
+        // Load case statistics
+        async function loadCaseStatistics() {
+            const statsContainer = document.getElementById('caseStatistics');
+            
+            try {
+                // No API configured - show clean zero state
+                console.log('API endpoints not configured, showing empty stats state...');
+                
+                const stats = `
+                    <div style="display: grid; gap: 1rem;">
+                        <div class="profile-field">
+                            <span class="profile-label">Total Cases Today:</span>
+                            <span class="profile-value">0</span>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-label">Resolved Cases:</span>
+                            <span class="profile-value">0</span>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-label">Pending Cases:</span>
+                            <span class="profile-value">0</span>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-label">Escalated Cases:</span>
+                            <span class="profile-value">0</span>
+                        </div>
+                        <div class="profile-field">
+                            <span class="profile-label">Resolution Rate:</span>
+                            <span class="profile-value">0%</span>
+                        </div>
+                    </div>
+                `;
+
+                statsContainer.innerHTML = stats;
+            } catch (error) {
+                console.error('Error loading case statistics:', error);
+                statsContainer.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.7);">No case statistics data available</p>';
+            }
+        }
+
+        // Load priority cases
+        async function loadPriorityCases() {
+            const tableBody = document.getElementById('priorityCasesBody');
+            
+            try {
+                // No API configured - show empty cases
+                const cases = [];
+
+                const casesHTML = cases.map(caseItem => `
+                    <tr onclick="viewCase('${caseItem.id}')">
+                        <td>${caseItem.id}</td>
+                        <td>${caseItem.member}</td>
+                        <td>${caseItem.type}</td>
+                        <td><span class="status-badge status-${caseItem.priority?.toLowerCase() || 'medium'}">${caseItem.priority || 'Medium'}</span></td>
+                        <td>${caseItem.created}</td>
+                        <td><span class="status-badge status-${(caseItem.status || 'open').toLowerCase().replace(' ', '')}">${caseItem.status || 'Open'}</span></td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="event.stopPropagation(); viewCase('${caseItem.id}')">View</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                tableBody.innerHTML = casesHTML || '<tr><td colspan="7" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">No priority cases</td></tr>';
+            } catch (error) {
+                console.error('Error loading priority cases:', error);
+                tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">Unable to load priority cases</td></tr>';
+            }
+        }
+
+        // Load assigned cases
+        async function loadAssignedCases() {
+            const tableBody = document.getElementById('assignedCasesBody');
+            
+            try {
+                // No API configured - show empty assigned cases
+                const cases = [];
+
+                const casesHTML = cases.map(caseItem => `
+                    <tr onclick="viewCase('${caseItem.id}')">
+                        <td>${caseItem.id}</td>
+                        <td>${caseItem.member}</td>
+                        <td>${caseItem.contact || 'N/A'}</td>
+                        <td>${caseItem.issue}</td>
+                        <td>${caseItem.lastUpdate}</td>
+                        <td><span class="status-badge status-${(caseItem.status || 'pending').toLowerCase()}">${caseItem.status || 'Pending'}</span></td>
+                        <td>
+                            <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="event.stopPropagation(); viewCase('${caseItem.id}')">View</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                tableBody.innerHTML = casesHTML || '<tr><td colspan="7" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">No assigned cases today</td></tr>';
+            } catch (error) {
+                console.error('Error loading assigned cases:', error);
+                tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">Unable to load assigned cases</td></tr>';
+            }
+        }
+
+        // Fallback data for when API fails
+        function loadFallbackData() {
+            document.getElementById('dailyCases').textContent = '20';
+            document.getElementById('activeCases').textContent = '5';
+            document.getElementById('totalMembers').textContent = '1,000';
+            document.getElementById('avgResponseTime').textContent = '15m';
+        }
+
+        // Action functions
+        function createNewCase() {
+            alert('New Case creation - This will redirect to case creation form');
+        }
+
+        function generateReport() {
+            alert('Report generation - This will generate and download case reports');
+        }
+
+        function viewCase(caseId) {
+            alert(`View Case ${caseId} - This will redirect to detailed case view`);
+        }
+
+        // Logout function
+        function logout() {
+            // Clear authentication cookies
+            document.cookie = 'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            document.cookie = 'user_role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            window.location.href = '/login';
+        }
+
+        // Portal Hub Functions
+        function openFirstEnroll() {
+            window.open('https://firstenroll.com/agent-portal', '_blank');
+        }
+
+        function searchFirstEnrollMember() {
+            const memberId = prompt('Enter Member ID:');
+            if (memberId) {
+                alert(`Searching FirstEnroll for Member ID: ${memberId}\nThis would typically open a member search interface.`);
+            }
+        }
+
+        function openHealthSherpa() {
+            window.open('https://healthsherpa.com/agent', '_blank');
+        }
+
+        function checkHealthSherpaEnrollments() {
+            alert('Checking Health Sherpa enrollments...\nThis would typically show recent enrollment status and updates.');
+        }
+
+        function openBlueEnrollments() {
+            window.open('https://www.bcbsga.com/provider', '_blank');
+        }
+
+        function verifyBlueEnrollment() {
+            const memberId = prompt('Enter Member ID to verify:');
+            if (memberId) {
+                alert(`Verifying Blue enrollment for Member ID: ${memberId}\nThis would typically check enrollment status with Blue Cross Blue Shield.`);
+            }
+        }
+
+        function searchProviders() {
+            const zip = document.getElementById('providerZip').value;
+            const type = document.getElementById('providerType').value;
+            
+            if (!zip) {
+                alert('Please enter a ZIP code');
+                return;
+            }
+
+            // Mock provider search results
+            const results = [
+                { name: 'Atlanta Medical Center', address: '303 Parkway Dr NE, Atlanta, GA 30312', phone: '(404) 265-4000', type: 'Hospital' },
+                { name: 'Piedmont Atlanta Hospital', address: '1968 Peachtree Rd NW, Atlanta, GA 30309', phone: '(404) 605-5000', type: 'Hospital' },
+                { name: 'Emory University Hospital', address: '1364 Clifton Rd NE, Atlanta, GA 30322', phone: '(404) 712-2000', type: 'Hospital' }
+            ];
+
+            const providerList = document.getElementById('providerList');
+            const providerResults = document.getElementById('providerResults');
+
+            providerList.innerHTML = results.map(provider => `
+                <div class="provider-item">
+                    <h5>${provider.name}</h5>
+                    <p><i data-lucide="map-pin"></i> ${provider.address}</p>
+                    <p><i data-lucide="phone"></i> ${provider.phone}</p>
+                    <span class="provider-type">${provider.type}</span>
+                </div>
+            `).join('');
+
+            providerResults.style.display = 'block';
+            lucide.createIcons();
+        }
+
+        function verifyMember() {
+            const memberId = document.getElementById('memberIdVerify').value;
+            const dob = document.getElementById('memberDobVerify').value;
+            
+            if (!memberId || !dob) {
+                alert('Please enter both Member ID and Date of Birth');
+                return;
+            }
+
+            alert(`Member Verification:\nMember ID: ${memberId}\nDOB: ${dob}\n\nStatus: ACTIVE\nPlan: Blue Choice HMO\nEffective Date: 01/01/2025`);
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+
+        // Customer service can assume Agent
+        window.RoleSwitcher.renderSwitcher('roleSwitcherMount', [
+            { value:'agent', label:'Agent' }
+        ]);
+    </script>
+
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
+    <script src="/assets/session-prod.js"></script>
+    <script src="/js/theme-switcher.js"></script>
+    <script src="/js/role-switcher.js"></script>
+</body>
+</html>

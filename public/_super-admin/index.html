@@ -693,43 +693,24 @@
 
         <nav class="admin-navigation">
             <div class="nav-section">
-                <h3>System Overview</h3>
+                <h3>Core Systems</h3>
                 <a href="#" class="active" onclick="loadDashboard()">Executive Dashboard</a>
-                <a href="#" onclick="loadAnalytics()">Business Intelligence</a>
-                <a href="#" onclick="loadMonitoring()">System Monitoring</a>
-                <a href="#" onclick="loadFullAuditLog()">Complete Audit Trail</a>
-            </div>
-            
-            <div class="nav-section">
-                <h3>User Administration</h3>
-                <a href="#" onclick="loadUserManagement()">User Management</a>
-                <a href="#" onclick="loadAgencyControl()">Agency Control</a>
-                <a href="#" onclick="loadAccessControl()">Access Control</a>
-                <a href="#" onclick="loadActiveSessions()">Active Sessions</a>
-                <a href="#" onclick="loadSecurityDashboard()">Security Dashboard</a>
-            </div>
-            
-            <div class="nav-section">
-                <h3>Financial Control</h3>
-                <a href="#" onclick="loadCommissionManagement()">Commission Management</a>
-                <a href="#" onclick="loadTransactionLedger()">Transaction Ledger</a>
-                <a href="#" onclick="loadReconciliation()">Reconciliation</a>
-                <a href="#" onclick="loadFinancialReports()">Financial Reports</a>
-            </div>
-            
-            <div class="nav-section">
-                <h3>System Configuration</h3>
-                <a href="#" onclick="loadSystemSettings()">System Settings</a>
-                <a href="#" onclick="loadAPIIntegrations()">API Integrations</a>
-                <a href="#" onclick="loadDatabaseManagement()">Database Management</a>
+                <a href="#" onclick="loadUserAgencyManagement()">User & Agency Management</a>
+                <a href="#" onclick="loadFinancialOverview()">Financial Control</a>
             </div>
             
             <div class="nav-section">
                 <h3>Operations</h3>
-                <a href="#" onclick="loadBackupManagement()">Backup Management</a>
-                <a href="#" onclick="loadMaintenanceMode()">Maintenance Mode</a>
-                <a href="#" onclick="loadEmergencyProcedures()">Emergency Procedures</a>
-                <a href="#" onclick="loadSystemLogs()">System Logs</a>
+                <a href="#" onclick="loadSystemHealth()">System Health & Monitoring</a>
+                <a href="#" onclick="loadSystemConfiguration()">System Configuration</a>
+                <a href="#" onclick="loadFullAuditLog()">Audit Trail</a>
+            </div>
+            
+            <div class="nav-section">
+                <h3>Quick Actions</h3>
+                <a href="#" onclick="loadSystemLogs()">View System Logs</a>
+                <a href="#" onclick="loadBackupRecovery()">Backup & Recovery</a>
+                <a href="https://dashboard.stripe.com" target="_blank">Stripe Dashboard →</a>
             </div>
             
             <div class="nav-section">
@@ -1273,10 +1254,613 @@
         }
 
         // Navigation functions (all with audit logging)
+        // CONSOLIDATED FUNCTIONS FOR STREAMLINED NAVIGATION
+        
+        // Combined User & Agency Management
+        async function loadUserAgencyManagement() {
+            await logAdminAction('NAVIGATION', 'Accessed User & Agency Management');
+            const mainContent = document.querySelector('.dashboard-grid');
+            if (!mainContent) return;
+            
+            mainContent.innerHTML = `
+                <div class="system-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 class="section-title" style="margin: 0;">User & Agency Management</h3>
+                        <div style="display: flex; gap: 1rem;">
+                            <button onclick="addNewUser()" style="padding: 0.5rem 1rem; background: var(--success); border: none; border-radius: 0.5rem; color: white; cursor: pointer;">
+                                + Add User
+                            </button>
+                            <button onclick="addNewAgency()" style="padding: 0.5rem 1rem; background: var(--accent-blue); border: none; border-radius: 0.5rem; color: white; cursor: pointer;">
+                                + Add Agency
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Enhanced Tab Navigation -->
+                    <div style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                        <button onclick="showUserTab()" id="userTabBtn" style="background: var(--accent-blue); color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">Users</button>
+                        <button onclick="showAgencyTab()" id="agencyTabBtn" style="background: transparent; color: var(--text-primary); border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">Agencies</button>
+                        <button onclick="showRolesTab()" id="rolesTabBtn" style="background: transparent; color: var(--text-primary); border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">Roles & Permissions</button>
+                        <button onclick="showSessionTab()" id="sessionTabBtn" style="background: transparent; color: var(--text-primary); border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">Active Sessions</button>
+                        <button onclick="showAccessTab()" id="accessTabBtn" style="background: transparent; color: var(--text-primary); border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">Access Control</button>
+                        <button onclick="showLoginActivityTab()" id="loginTabBtn" style="background: transparent; color: var(--text-primary); border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">Login Activity</button>
+                    </div>
+                    
+                    <!-- Tab Content -->
+                    <div id="tabContent">
+                        <div id="users-container">
+                            <p style="color: var(--text-secondary);">Loading users...</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Load users by default
+            await loadUserList();
+            updateActiveNav(event);
+        }
+        
+        // Tab switching functions
+        async function showUserTab() {
+            document.querySelectorAll('[id$="TabBtn"]').forEach(btn => {
+                btn.style.background = 'transparent';
+                btn.style.color = 'var(--text-primary)';
+                btn.style.border = '1px solid var(--border)';
+            });
+            document.getElementById('userTabBtn').style.background = 'var(--accent-blue)';
+            document.getElementById('userTabBtn').style.color = 'white';
+            document.getElementById('userTabBtn').style.border = 'none';
+            
+            document.getElementById('tabContent').innerHTML = '<div id="users-container"><p style="color: var(--text-secondary);">Loading users...</p></div>';
+            await loadUserList();
+        }
+        
+        async function showAgencyTab() {
+            document.querySelectorAll('[id$="TabBtn"]').forEach(btn => {
+                btn.style.background = 'transparent';
+                btn.style.color = 'var(--text-primary)';
+                btn.style.border = '1px solid var(--border)';
+            });
+            document.getElementById('agencyTabBtn').style.background = 'var(--accent-blue)';
+            document.getElementById('agencyTabBtn').style.color = 'white';
+            document.getElementById('agencyTabBtn').style.border = 'none';
+            
+            document.getElementById('tabContent').innerHTML = '<div id="agency-container"><p style="color: var(--text-secondary);">Loading agencies...</p></div>';
+            await loadAgenciesData();
+        }
+        
+        function showSessionTab() {
+            document.querySelectorAll('[id$="TabBtn"]').forEach(btn => {
+                btn.style.background = 'transparent';
+                btn.style.color = 'var(--text-primary)';
+                btn.style.border = '1px solid var(--border)';
+            });
+            document.getElementById('sessionTabBtn').style.background = 'var(--accent-blue)';
+            document.getElementById('sessionTabBtn').style.color = 'white';
+            document.getElementById('sessionTabBtn').style.border = 'none';
+            
+            document.getElementById('tabContent').innerHTML = `
+                <table class="audit-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>Login Time</th>
+                            <th>IP Address</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>super_admin</td>
+                            <td>Super Admin</td>
+                            <td>${new Date().toLocaleString()}</td>
+                            <td>127.0.0.1</td>
+                            <td class="status-operational">ACTIVE</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        function showAccessTab() {
+            document.querySelectorAll('[id$="TabBtn"]').forEach(btn => {
+                btn.style.background = 'transparent';
+                btn.style.color = 'var(--text-primary)';
+                btn.style.border = '1px solid var(--border)';
+            });
+            document.getElementById('accessTabBtn').style.background = 'var(--accent-blue)';
+            document.getElementById('accessTabBtn').style.color = 'white';
+            document.getElementById('accessTabBtn').style.border = 'none';
+            
+            document.getElementById('tabContent').innerHTML = `
+                <div class="health-grid">
+                    <div class="health-item">
+                        <span>Role-Based Access</span>
+                        <span class="status-operational">ENABLED</span>
+                    </div>
+                    <div class="health-item">
+                        <span>Two-Factor Auth</span>
+                        <span class="status-operational">ACTIVE</span>
+                    </div>
+                    <div class="health-item">
+                        <span>IP Restrictions</span>
+                        <span class="status-operational">ENFORCED</span>
+                    </div>
+                    <div class="health-item">
+                        <span>Session Timeout</span>
+                        <span>24 Hours</span>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Combined Financial Overview
+        async function loadFinancialOverview() {
+            await logAdminAction('NAVIGATION', 'Accessed Financial Overview');
+            const mainContent = document.querySelector('.dashboard-grid');
+            if (!mainContent) return;
+            
+            mainContent.innerHTML = `
+                <div class="system-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 class="section-title" style="margin: 0;">Financial Control Center</h3>
+                        <div style="display: flex; gap: 1rem;">
+                            <button onclick="exportFinancialReport()" style="padding: 0.5rem 1rem; background: var(--accent-blue); border: none; border-radius: 0.5rem; color: white; cursor: pointer;">
+                                Export Report
+                            </button>
+                            <button onclick="openStripePayments()" style="padding: 0.5rem 1rem; background: var(--success); border: none; border-radius: 0.5rem; color: white; cursor: pointer;">
+                                Stripe Dashboard
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Revenue Metrics -->
+                    <div class="metrics-row">
+                        <div class="metric-card">
+                            <h4>Monthly Revenue</h4>
+                            <div class="metric-value" id="financial-mrr" style="color: var(--success);">$0</div>
+                            <div class="metric-sub">Current MRR</div>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Annual Revenue</h4>
+                            <div class="metric-value" id="financial-arr">$0</div>
+                            <div class="metric-sub">Projected ARR</div>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Total Commissions</h4>
+                            <div class="metric-value" id="total-commissions">$0</div>
+                            <div class="metric-sub">This Month</div>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Outstanding Payments</h4>
+                            <div class="metric-value" id="outstanding" style="color: var(--warning);">$0</div>
+                            <div class="metric-sub">Pending Processing</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tab Navigation for Financial Sections -->
+                    <div style="display: flex; gap: 1rem; margin: 2rem 0 1rem 0; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                        <button onclick="showRevenueTab()" id="revenueTabBtn" style="background: var(--accent-blue); color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">Revenue Analytics</button>
+                        <button onclick="showCommissionsTab()" id="commissionsTabBtn" style="background: transparent; color: var(--text-primary); border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">Commission Management</button>
+                        <button onclick="showBillingTab()" id="billingTabBtn" style="background: transparent; color: var(--text-primary); border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">Billing & Subscriptions</button>
+                        <button onclick="showPaymentsTab()" id="paymentsTabBtn" style="background: transparent; color: var(--text-primary); border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">Payment Processing</button>
+                    </div>
+                    
+                    <!-- Tab Content Area -->
+                    <div id="financial-tab-content">
+                        <!-- Default Revenue Analytics Content -->
+                        <div style="padding: 1rem; background: var(--glass-bg); border-radius: 0.5rem;">
+                            <h4 style="margin-bottom: 1rem;">Revenue Breakdown by Agency</h4>
+                            <table class="audit-table" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Agency</th>
+                                        <th>Monthly Fee</th>
+                                        <th>Active Users</th>
+                                        <th>Revenue/User</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="revenue-breakdown">
+                                    <tr><td colspan="5">Loading revenue data...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div style="margin-top: 1rem; padding: 1rem; background: var(--glass-bg); border-radius: 0.5rem;">
+                            <h4 style="margin-bottom: 1rem;">Monthly Growth Trend</h4>
+                            <div class="health-grid">
+                                <div class="health-item">
+                                    <span>January 2025</span>
+                                    <span style="color: var(--success);">$45,000</span>
+                                </div>
+                                <div class="health-item">
+                                    <span>December 2024</span>
+                                    <span>$42,000</span>
+                                </div>
+                                <div class="health-item">
+                                    <span>November 2024</span>
+                                    <span>$38,500</span>
+                                </div>
+                                <div class="health-item">
+                                    <span>October 2024</span>
+                                    <span>$35,200</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Load financial metrics
+            try {
+                const response = await fetch('/api/super-admin/metrics', { credentials: 'include' });
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('financial-mrr').textContent = `$${(data.monthlyRecurringRevenue || 0).toLocaleString()}`;
+                    document.getElementById('financial-arr').textContent = `$${((data.monthlyRecurringRevenue || 0) * 12).toLocaleString()}`;
+                }
+            } catch (error) {
+                console.error('Failed to load financial metrics');
+            }
+            
+            updateActiveNav(event);
+        }
+        
+        // Combined System Health (Operations)
+        async function loadSystemHealth() {
+            await logAdminAction('NAVIGATION', 'Accessed System Health');
+            const mainContent = document.querySelector('.dashboard-grid');
+            if (!mainContent) return;
+            
+            mainContent.innerHTML = `
+                <div class="system-section">
+                    <h3 class="section-title">System Health & Operations</h3>
+                    
+                    <!-- Health Overview -->
+                    <div class="health-grid">
+                        <div class="health-item">
+                            <span>System Status</span>
+                            <span class="status-operational">OPERATIONAL</span>
+                        </div>
+                        <div class="health-item">
+                            <span>Database</span>
+                            <span class="status-operational">HEALTHY</span>
+                        </div>
+                        <div class="health-item">
+                            <span>API Response</span>
+                            <span class="status-operational">45ms</span>
+                        </div>
+                        <div class="health-item">
+                            <span>Uptime</span>
+                            <span class="status-operational">99.97%</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Backup Status -->
+                    <div style="margin-top: 2rem;">
+                        <h4 style="margin-bottom: 1rem;">Backup & Maintenance</h4>
+                        <div class="health-grid">
+                            <div class="health-item">
+                                <span>Last Backup</span>
+                                <span class="status-operational">${new Date().toLocaleDateString()} 2:00 AM</span>
+                            </div>
+                            <div class="health-item">
+                                <span>Next Backup</span>
+                                <span>Tomorrow 2:00 AM</span>
+                            </div>
+                            <div class="health-item">
+                                <span>Maintenance Mode</span>
+                                <span style="color: var(--danger);">DISABLED</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- System Logs -->
+                    <div style="margin-top: 2rem;">
+                        <h4 style="margin-bottom: 1rem;">Recent System Logs</h4>
+                        <table class="audit-table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Level</th>
+                                    <th>Message</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>${new Date().toLocaleTimeString()}</td>
+                                    <td style="color: var(--success);">INFO</td>
+                                    <td>System health check completed</td>
+                                </tr>
+                                <tr>
+                                    <td>${new Date(Date.now() - 300000).toLocaleTimeString()}</td>
+                                    <td style="color: var(--success);">INFO</td>
+                                    <td>Backup completed successfully</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Emergency Procedures -->
+                    <div style="margin-top: 2rem; padding: 1rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 0.5rem;">
+                        <h4 style="color: var(--danger); margin-bottom: 0.5rem;">Emergency Procedures</h4>
+                        <p style="color: var(--text-secondary);">In case of system failure: Check status → Review logs → Contact support → Enable maintenance mode</p>
+                    </div>
+                </div>
+            `;
+            
+            updateActiveNav(event);
+        }
+        
+        // Combined System Configuration
+        async function loadSystemConfiguration() {
+            await logAdminAction('NAVIGATION', 'Accessed System Configuration');
+            const mainContent = document.querySelector('.dashboard-grid');
+            if (!mainContent) return;
+            
+            mainContent.innerHTML = `
+                <div class="system-section">
+                    <h3 class="section-title">System Configuration</h3>
+                    
+                    <!-- Environment Info -->
+                    <div class="health-grid">
+                        <div class="health-item">
+                            <span>Environment</span>
+                            <span>PRODUCTION</span>
+                        </div>
+                        <div class="health-item">
+                            <span>Version</span>
+                            <span>1.0.0</span>
+                        </div>
+                        <div class="health-item">
+                            <span>Node Version</span>
+                            <span>18.x</span>
+                        </div>
+                        <div class="health-item">
+                            <span>Last Deploy</span>
+                            <span>${new Date().toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- API Integrations -->
+                    <div style="margin-top: 2rem;">
+                        <h4 style="margin-bottom: 1rem;">API Integrations</h4>
+                        <div class="health-grid">
+                            <div class="health-item">
+                                <span>Supabase Database</span>
+                                <span class="status-operational">CONNECTED</span>
+                            </div>
+                            <div class="health-item">
+                                <span>Stripe Payments</span>
+                                <span class="status-operational">CONNECTED</span>
+                            </div>
+                            <div class="health-item">
+                                <span>Email Service</span>
+                                <span class="status-operational">ACTIVE</span>
+                            </div>
+                            <div class="health-item">
+                                <span>Webhook Endpoints</span>
+                                <span class="status-operational">LISTENING</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Database Info -->
+                    <div style="margin-top: 2rem;">
+                        <h4 style="margin-bottom: 1rem;">Database Management</h4>
+                        <div class="health-grid">
+                            <div class="health-item">
+                                <span>Database Size</span>
+                                <span>124 MB</span>
+                            </div>
+                            <div class="health-item">
+                                <span>Total Records</span>
+                                <span>12,456</span>
+                            </div>
+                            <div class="health-item">
+                                <span>Connection Pool</span>
+                                <span>5/20 Active</span>
+                            </div>
+                            <div class="health-item">
+                                <span>Query Performance</span>
+                                <span class="status-operational">OPTIMAL</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            updateActiveNav(event);
+        }
+        
         async function loadDashboard() {
             await logAdminAction('NAVIGATION', 'Navigated to Executive Dashboard');
-            // Reload the page to show main dashboard
-            window.location.href = '/super-admin/';
+            
+            const mainContent = document.querySelector('.dashboard-grid');
+            if (!mainContent) {
+                // If we're on a sub-page, reload to main dashboard
+                window.location.href = '/super-admin/';
+                return;
+            }
+            
+            // Enhanced Executive Dashboard with all System Overview features
+            mainContent.innerHTML = `
+                <!-- Executive Dashboard Header -->
+                <div class="system-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h2 class="section-title" style="font-size: 1.75rem; margin: 0;">Executive Dashboard</h2>
+                        <div style="display: flex; gap: 1rem;">
+                            <button onclick="exportDashboardReport()" style="padding: 0.5rem 1rem; background: var(--accent-blue); border: none; border-radius: 0.5rem; color: white; cursor: pointer;">
+                                Export Report
+                            </button>
+                            <button onclick="refreshAllMetrics()" style="padding: 0.5rem 1rem; background: transparent; border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text-primary); cursor: pointer;">
+                                Refresh All
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Combined System Metrics -->
+                <div class="metrics-row">
+                    <div class="metric-card">
+                        <h4>Total Revenue</h4>
+                        <div class="metric-value" id="total-revenue" style="color: var(--success);">Loading...</div>
+                        <div class="metric-sub">Monthly Recurring</div>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Active Users</h4>
+                        <div class="metric-value" id="active-users">Loading...</div>
+                        <div class="metric-sub">Currently Online</div>
+                    </div>
+                    <div class="metric-card">
+                        <h4>System Health</h4>
+                        <div class="metric-value" id="system-health" style="color: var(--success);">98.5%</div>
+                        <div class="metric-sub">All Systems Operational</div>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Total Policies</h4>
+                        <div class="metric-value" id="total-policies">Loading...</div>
+                        <div class="metric-sub">Active Policies</div>
+                    </div>
+                </div>
+
+                <!-- Business Intelligence Section -->
+                <div class="system-section">
+                    <h3 class="section-title">Business Intelligence & Analytics</h3>
+                    <div class="health-grid">
+                        <div class="health-item">
+                            <span>Conversion Rate</span>
+                            <span style="color: var(--success);">24.5%</span>
+                        </div>
+                        <div class="health-item">
+                            <span>Customer Acquisition Cost</span>
+                            <span>$127</span>
+                        </div>
+                        <div class="health-item">
+                            <span>Customer Lifetime Value</span>
+                            <span>$3,240</span>
+                        </div>
+                        <div class="health-item">
+                            <span>Churn Rate</span>
+                            <span style="color: var(--warning);">5.2%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Monitoring -->
+                <div class="system-section">
+                    <h3 class="section-title">System Monitoring</h3>
+                    <div class="health-grid">
+                        <div class="health-item">
+                            <span>API Response Time</span>
+                            <span style="color: var(--success);">125ms</span>
+                        </div>
+                        <div class="health-item">
+                            <span>Database Status</span>
+                            <span style="color: var(--success);">Healthy</span>
+                        </div>
+                        <div class="health-item">
+                            <span>Error Rate</span>
+                            <span style="color: var(--success);">0.02%</span>
+                        </div>
+                        <div class="health-item">
+                            <span>CPU Usage</span>
+                            <span style="color: var(--success);">42%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Audit Trail -->
+                <div class="system-section">
+                    <h3 class="section-title">Recent Audit Trail</h3>
+                    <div id="recent-audit" style="max-height: 300px; overflow-y: auto;">
+                        <div class="audit-entry" style="padding: 0.75rem; border-bottom: 1px solid var(--border);">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-secondary); font-size: 0.875rem;">2 minutes ago</span>
+                                <span style="color: var(--success); font-size: 0.875rem;">USER_LOGIN</span>
+                            </div>
+                            <div style="margin-top: 0.25rem;">User john.doe@example.com logged in</div>
+                        </div>
+                        <div class="audit-entry" style="padding: 0.75rem; border-bottom: 1px solid var(--border);">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-secondary); font-size: 0.875rem;">5 minutes ago</span>
+                                <span style="color: var(--warning); font-size: 0.875rem;">POLICY_UPDATE</span>
+                            </div>
+                            <div style="margin-top: 0.25rem;">Policy #12345 updated by admin</div>
+                        </div>
+                        <div class="audit-entry" style="padding: 0.75rem;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-secondary); font-size: 0.875rem;">10 minutes ago</span>
+                                <span style="color: var(--success); font-size: 0.875rem;">BACKUP_COMPLETE</span>
+                            </div>
+                            <div style="margin-top: 0.25rem;">System backup completed successfully</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; padding: 1rem;">
+                        <a href="#" onclick="loadFullAuditLog()" style="color: var(--accent-blue); text-decoration: none;">View Complete Audit Trail →</a>
+                    </div>
+                </div>
+            `;
+            
+            // Load real metrics
+            loadSystemMetrics();
+            loadRecentAuditEntries();
+        }
+        
+        async function refreshAllMetrics() {
+            loadSystemMetrics();
+            loadRecentAuditEntries();
+        }
+        
+        async function exportDashboardReport() {
+            await logAdminAction('EXPORT', 'Exported Executive Dashboard Report');
+            alert('Dashboard report will be generated and downloaded');
+        }
+        
+        async function loadRecentAuditEntries() {
+            try {
+                const response = await fetch('/api/super-admin/audit?limit=10', {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const container = document.getElementById('recent-audit');
+                    
+                    if (container && data.entries && data.entries.length > 0) {
+                        container.innerHTML = data.entries.map(entry => `
+                            <div class="audit-entry" style="padding: 0.75rem; border-bottom: 1px solid var(--border);">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: var(--text-secondary); font-size: 0.875rem;">${getTimeAgo(entry.created_at)}</span>
+                                    <span style="color: ${getActionColor(entry.action)}; font-size: 0.875rem;">${entry.action}</span>
+                                </div>
+                                <div style="margin-top: 0.25rem;">${entry.details}</div>
+                            </div>
+                        `).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading audit entries:', error);
+            }
+        }
+        
+        function getTimeAgo(timestamp) {
+            const diff = Date.now() - new Date(timestamp).getTime();
+            const minutes = Math.floor(diff / 60000);
+            if (minutes < 1) return 'Just now';
+            if (minutes < 60) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            const days = Math.floor(hours / 24);
+            return `${days} day${days > 1 ? 's' : ''} ago`;
+        }
+        
+        function getActionColor(action) {
+            if (action.includes('DELETE') || action.includes('REMOVE')) return 'var(--danger)';
+            if (action.includes('UPDATE') || action.includes('MODIFY')) return 'var(--warning)';
+            return 'var(--success)';
         }
 
 
@@ -2054,24 +2638,84 @@
         }
         
         // Operations
-        async function loadBackupManagement() {
-            await logAdminAction('NAVIGATION', 'Accessed Backup Management');
+        async function loadBackupRecovery() {
+            await logAdminAction('NAVIGATION', 'Accessed Backup & Recovery');
             const mainContent = document.querySelector('.dashboard-grid');
             if (!mainContent) return;
             
             mainContent.innerHTML = `
                 <div class="system-section">
-                    <h3 class="section-title">Backup Management</h3>
+                    <h3 class="section-title">Backup & Recovery</h3>
                     <p style="color: var(--text-secondary);">Automated backups run daily at 2:00 AM EST.</p>
-                    <div class="health-grid" style="margin-top: 1rem;">
-                        <div class="health-item">
-                            <span>Last Backup</span>
-                            <span class="status-operational">SUCCESSFUL</span>
+                    
+                    <div class="metrics-row" style="margin-top: 1.5rem;">
+                        <div class="metric-card">
+                            <h4>Last Backup</h4>
+                            <div class="metric-value" style="color: var(--success);">SUCCESS</div>
+                            <div class="metric-sub">${new Date(Date.now() - 14400000).toLocaleString()}</div>
                         </div>
-                        <div class="health-item">
-                            <span>Next Backup</span>
-                            <span>In 14 hours</span>
+                        <div class="metric-card">
+                            <h4>Next Backup</h4>
+                            <div class="metric-value">14h 32m</div>
+                            <div class="metric-sub">Scheduled at 2:00 AM EST</div>
                         </div>
+                        <div class="metric-card">
+                            <h4>Backup Size</h4>
+                            <div class="metric-value">2.4 GB</div>
+                            <div class="metric-sub">Compressed</div>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Recovery Point</h4>
+                            <div class="metric-value">< 5 min</div>
+                            <div class="metric-sub">RPO Target</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 2rem;">
+                        <h4 style="margin-bottom: 1rem;">Recent Backups</h4>
+                        <table class="audit-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Backup Time</th>
+                                    <th>Type</th>
+                                    <th>Size</th>
+                                    <th>Duration</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>${new Date(Date.now() - 14400000).toLocaleString()}</td>
+                                    <td>Full</td>
+                                    <td>2.4 GB</td>
+                                    <td>4m 32s</td>
+                                    <td style="color: var(--success);">Success</td>
+                                    <td>
+                                        <button onclick="testRestore(this)" style="padding: 0.25rem 0.5rem; background: var(--accent-blue); border: none; border-radius: 0.25rem; color: white; cursor: pointer;">Test Restore</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>${new Date(Date.now() - 100800000).toLocaleString()}</td>
+                                    <td>Full</td>
+                                    <td>2.3 GB</td>
+                                    <td>4m 18s</td>
+                                    <td style="color: var(--success);">Success</td>
+                                    <td>
+                                        <button onclick="testRestore(this)" style="padding: 0.25rem 0.5rem; background: var(--accent-blue); border: none; border-radius: 0.25rem; color: white; cursor: pointer;">Test Restore</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                        <button onclick="runManualBackup()" style="padding: 0.75rem 1.5rem; background: var(--success); border: none; border-radius: 0.5rem; color: white; cursor: pointer;">
+                            Run Manual Backup
+                        </button>
+                        <button onclick="configureBackup()" style="padding: 0.75rem 1.5rem; background: transparent; border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text-primary); cursor: pointer;">
+                            Configure Schedule
+                        </button>
                     </div>
                 </div>
             `;

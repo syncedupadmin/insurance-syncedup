@@ -4,7 +4,7 @@
     <!-- Critical Theme Flash Prevention -->
     <script>
     (function(){
-        var t=localStorage.getItem("selectedTheme")||"professional";
+        var t=localStorage.getItem("agentTheme")||"professional";
         var h=document.documentElement;
         h.classList.add(t+"-mode");
         
@@ -24,9 +24,9 @@
         });
         
         // Set background for immediate visual feedback
-        if(t==="classic"){h.style.backgroundColor="#008080";}
-        else if(t==="modern"){h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
-        else if(t==="professional"){h.style.background="linear-gradient(-45deg,#f8fafc,#e2e8f0,#cbd5e1,#94a3b8)";}
+        if(t==="classic"){h.style.background="linear-gradient(-45deg,#047857,#059669,#10b981,#34d399)";}
+        else if(t==="modern"){h.style.background="linear-gradient(135deg,#10b981 0%,#059669 100%)";}
+        else if(t==="professional"){h.style.background="linear-gradient(-45deg,#059669,#10b981,#34d399,#a7f3d0)";}
         else{h.style.background="linear-gradient(-45deg,#059669,#10b981,#34d399,#a7f3d0)";}
         
         h.style.visibility="hidden";

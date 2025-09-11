@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Critical Theme Flash Prevention -->
+    <script>
+    (function(){
+        var t=localStorage.getItem("selectedTheme")||"professional";
+        var h=document.documentElement;
+        h.classList.add(t+"-mode");
+        
+        // Load theme CSS immediately
+        var existingTheme = document.querySelector('link[data-theme-css]');
+        if(existingTheme) existingTheme.remove();
+        
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = '/css/themes/' + t + '.css';
+        link.setAttribute('data-theme-css', t);
+        document.head.appendChild(link);
+        
+        // Add body class when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            if(document.body) document.body.classList.add(t+"-mode");
+        });
+        
+        // Set background for immediate visual feedback
+        if(t==="classic"){h.style.backgroundColor="#008080";}
+        else if(t==="modern"){h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        else if(t==="professional"){h.style.background="linear-gradient(-45deg,#f8fafc,#e2e8f0,#cbd5e1,#94a3b8)";}
+        else{h.style.background="linear-gradient(-45deg,#059669,#10b981,#34d399,#a7f3d0)";}
+        
+        h.style.visibility="hidden";
+        setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
+    })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Dashboard - SyncedUp Insurance</title>
+    
+    <!-- Favicons - Blue for Manager Portal -->
+    <link rel="icon" type="image/png" sizes="50x50" href="/favicons/manager-50x50.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/manager-180x180.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicons/manager-512x512.png">
+    
+    <link rel="stylesheet" href="/manager/manager-global.css">
+    <link rel="stylesheet" href="/css/themes/professional.css">
+    
+    <!-- Server-side portal-guard.js already verified manager access -->
+    
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/js/role-switcher.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Manager Dashboard</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div id="roleSwitcherMount"></div>
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="/manager" class="nav-link active">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="/manager/convoso-leads" class="nav-link">
+            <i data-lucide="users" class="icon"></i>
+            Leads
+        </a>
+        <a href="/manager/team-management" class="nav-link">
+            <i data-lucide="users" class="icon"></i>
+            Team Management
+        </a>
+        <a href="/manager/performance" class="nav-link">
+            <i data-lucide="trending-up" class="icon"></i>
+            Team Performance
+        </a>
+        <a href="/manager/reports" class="nav-link">
+            <i data-lucide="file-text" class="icon"></i>
+            Reports
+        </a>
+        <a href="/manager/goals" class="nav-link">
+            <i data-lucide="target" class="icon"></i>
+            Goals
+        </a>
+        <a href="/manager/vendors" class="nav-link">
+            <i data-lucide="building-2" class="icon"></i>
+            Vendors
+        </a>
+        <a href="/manager/settings" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+        <a href="/manager/convoso-monitor" class="nav-link">
+            <i data-lucide="monitor-speaker" class="icon"></i>
+            Convoso
+        </a>
+        <a href="/global-leaderboard" class="nav-link">
+            <i data-lucide="trophy" class="icon"></i>
+            Global Leaderboard
+        </a>
+    </div>
+    
+    <div class="container">
+        <div class="manager-notice">
+            <h3><i data-lucide="shield-check"></i> Manager Portal</h3>
+            <p>You have access to agent data and performance metrics for your team.</p>
+        </div>
+        
+        <div class="grid">
+            <div class="card">
+                <div class="stat-value" id="activeAgents">0</div>
+                <div class="stat-label">Active Agents</div>
+            </div>
+            <div class="card">
+                <div class="stat-value" id="mtdRevenue">$0</div>
+                <div class="stat-label">MTD Premium Volume</div>
+            </div>
+            <div class="card">
+                <div class="stat-value" id="policiesSold">0</div>
+                <div class="stat-label">Policies Sold</div>
+            </div>
+            <div class="card">
+                <div class="stat-value" id="avgSaleSize">$0</div>
+                <div class="stat-label">Average Sale Size</div>
+            </div>
+        </div>
+        
+        <div class="quick-actions">
+            <button class="btn" onclick="location.href='/manager/team-management'">
+                <i data-lucide="users" class="icon"></i>
+                Manage Team
+            </button>
+            <button class="btn" onclick="location.href='/manager/performance'">
+                <i data-lucide="trending-up" class="icon"></i>
+                Team Performance
+            </button>
+            <button class="btn btn-success" onclick="location.href='/manager/reports'">
+                <i data-lucide="file-text" class="icon"></i>
+                Generate Reports
+            </button>
+            <button class="btn btn-warning" onclick="viewAgentDashboard()">
+                <i data-lucide="eye" class="icon"></i>
+                View as Agent
+            </button>
+        </div>
+        
+        <!-- Team Overview -->
+        <div class="card">
+            <h3><i data-lucide="users" class="icon"></i> Team Overview (This Month)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Agent</th>
+                        <th>Sales Count</th>
+                        <th>Premium Volume</th>
+                        <th>Status</th>
+                        <th>Last Activity</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="teamOverviewTable">
+                    <tr><td colspan="6" style="text-align: center;">Loading team data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="card">
+            <h3><i data-lucide="activity" class="icon"></i> Recent Team Activity</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Agent</th>
+                        <th>Action</th>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th>Premium</th>
+                    </tr>
+                </thead>
+                <tbody id="recentActivityTable">
+                    <tr><td colspan="6" style="text-align: center;">Loading recent activity...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        let currentUser = null;
+        
+        // Team data will be loaded from API
+        let teamData = [];
+        let recentActivity = [];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Server-side guard already verified manager access - just load data
+            initializeDashboard();
+        });
+        
+        async function initializeDashboard() {
+            showLoadingState();
+            await loadManagerDashboard();
+            hideLoadingState();
+            
+            // Set up auto-refresh every 5 minutes
+            setInterval(refreshDashboardData, 5 * 60 * 1000);
+        }
+        
+        async function loadManagerDashboard(){
+            const url = '/api/manager/dashboard?timeframe=month';
+            try {
+                const headers = { 'Accept':'application/json' };
+
+                const resp = await fetch(url, { method:'GET', credentials:'include', headers });
+                const text = await resp.text();
+                let data;
+                try { data = JSON.parse(text); }
+                catch { console.error('Dashboard API: non-JSON'); data = { ok:false, kpis: emptyKPIsForAPI() }; }
+
+                if (data && data.ok !== false) {
+                    // Convert new API structure to existing structure for compatibility
+                    const compatData = {
+                        quick_stats: { 
+                            active_agents: data.kpis?.activeAgents || 0,
+                            total_sales_mtd: data.kpis?.policies || 0
+                        },
+                        agency_overview: { 
+                            total_sales: data.kpis?.mtdPremium || 0
+                        },
+                        team_performance: data.team_performance || { top_performers: [] },
+                        recent_activity: data.recent_activity || []
+                    };
+                    displayDashboardData(compatData);
+                } else {
+                    console.log('Dashboard API:', data?.reason || 'not available');
+                    displayEmptyDashboard();
+                }
+            } catch (err){
+                console.error('Dashboard temporarily unavailable', err);
+                displayEmptyDashboard();
+            }
+        }
+        function emptyKPIsForAPI(){ return { activeAgents:0, mtdPremium:0, policies:0, avgSale:0 }; }
+
+        function emptyKPIsClient() {
+            return {
+                quick_stats: { active_agents: 0, total_sales_mtd: 0 },
+                agency_overview: { total_sales: 0 },
+                team_performance: { top_performers: [] },
+                recent_activity: []
+            };
+        }
+        
+        function displayDashboardData(data) {
+            // Display quick stats
+            document.getElementById('activeAgents').textContent = data.quick_stats?.active_agents || 0;
+            document.getElementById('mtdRevenue').textContent = `$${(data.agency_overview?.total_sales || 0).toLocaleString()}`;
+            document.getElementById('policiesSold').textContent = data.quick_stats?.total_sales_mtd || 0;
+            
+            // Calculate and display average sale size
+            const totalSales = data.agency_overview?.total_sales || 0;
+            const totalPolicies = data.quick_stats?.total_sales_mtd || 0;
+            const avgSale = totalPolicies > 0 ? Math.round(totalSales / totalPolicies) : 0;
+            document.getElementById('avgSaleSize').textContent = `$${avgSale.toLocaleString()}`;
+            
+            // Update team data with real data
+            if (data.team_performance?.top_performers) {
+                teamData = data.team_performance.top_performers.map(agent => ({
+                    id: agent.agent_id,
+                    name: agent.agent_name,
+                    sales: agent.sales_count,
+                    premium: agent.total_sales,
+                    status: 'Active',
+                    lastActivity: new Date().toISOString().split('T')[0]
+                }));
+            }
+            
+            // Update recent activity with real data
+            if (data.recent_activity) {
+                updateRecentActivityFromAPI(data.recent_activity);
+            }
+            
+            loadTeamOverviewTable();
+            loadRecentActivityTable();
+        }
+        
+        function displayEmptyDashboard() {
+            // Show empty state - no fake data
+            document.getElementById('activeAgents').textContent = '0';
+            document.getElementById('mtdRevenue').textContent = '$0';
+            document.getElementById('policiesSold').textContent = '0';
+            document.getElementById('avgSaleSize').textContent = '$0';
+            
+            // Show empty tables
+            loadEmptyTeamTable();
+            loadEmptyActivityTable();
+        }
+        
+        function loadTeamOverviewTable() {
+            const tableBody = document.getElementById('teamOverviewTable');
+            tableBody.innerHTML = '';
+            
+            if (teamData.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="6" style="text-align: center; color: #666; padding: 2rem;">No agents found</td>`;
+                tableBody.appendChild(row);
+                return;
+            }
+            
+            teamData.forEach(agent => {
+                const row = document.createElement('tr');
+                const statusClass = agent.status === 'Active' ? 'status-active' : 'status-inactive';
+                
+                row.innerHTML = `
+                    <td><strong>${agent.name}</strong><br><small>${agent.id}</small></td>
+                    <td><strong>${agent.sales}</strong></td>
+                    <td class="premium-amount">$${agent.premium.toLocaleString()}</td>
+                    <td><span class="${statusClass}">${agent.status}</span></td>
+                    <td>${new Date(agent.lastActivity).toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 
+                                onclick="viewAgentPerformance('${agent.id}')">
+                                <i data-lucide="trending-up" class="icon"></i> View
+                        </button>
+                        <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 
+                                onclick="contactAgent('${agent.id}')">
+                                <i data-lucide="message-circle" class="icon"></i> Contact
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function loadRecentActivityTable() {
+            const tableBody = document.getElementById('recentActivityTable');
+            tableBody.innerHTML = '';
+            
+            if (recentActivity.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="6" style="text-align: center; color: #666; padding: 2rem;">No recent activity found</td>`;
+                tableBody.appendChild(row);
+                return;
+            }
+            
+            recentActivity.forEach(activity => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${activity.time}</td>
+                    <td><strong>${activity.agent}</strong></td>
+                    <td>${activity.action}</td>
+                    <td>${activity.customer}</td>
+                    <td>${activity.product}</td>
+                    <td class="premium-amount">$${activity.premium.toLocaleString()}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function loadEmptyTeamTable() {
+            const tableBody = document.getElementById('teamOverviewTable');
+            tableBody.innerHTML = '';
+            const row = document.createElement('tr');
+            row.innerHTML = `<td colspan="6" style="text-align: center; color: #666; padding: 2rem;">No agents found</td>`;
+            tableBody.appendChild(row);
+        }
+        
+        function loadEmptyActivityTable() {
+            const tableBody = document.getElementById('recentActivityTable');
+            tableBody.innerHTML = '';
+            const row = document.createElement('tr');
+            row.innerHTML = `<td colspan="6" style="text-align: center; color: #666; padding: 2rem;">No recent activity found</td>`;
+            tableBody.appendChild(row);
+        }
+        
+        function viewAgentPerformance(agentId) {
+            window.location.href = `/manager/performance?agent=${agentId}`;
+        }
+        
+        function contactAgent(agentId) {
+            const agent = teamData.find(a => a.id === agentId);
+            alert(`Contact ${agent.name} - This would open communication tools in production.`);
+        }
+        
+        function viewAgentDashboard() {
+            // Allow manager to view the agent interface (useful for training/support)
+            window.open('/agent/', '_blank');
+        }
+        
+        function updateRecentActivityFromAPI(apiActivity) {
+            recentActivity.length = 0; // Clear existing data
+            apiActivity.forEach(activity => {
+                recentActivity.push({
+                    time: new Date(activity.date).toLocaleTimeString(),
+                    agent: activity.agent_name,
+                    action: activity.type === 'sale' ? 'Sale Recorded' : 'Activity',
+                    customer: activity.description.split(' to ')[1] || 'Customer',
+                    product: activity.description.split(' sold ')[1]?.split(' to ')[0] || 'Product',
+                    premium: activity.amount || 0
+                });
+            });
+        }
+        
+        function showLoadingState() {
+            const tables = document.querySelectorAll('tbody');
+            tables.forEach(tbody => {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;"><div class="loading"></div> Loading data...</td></tr>';
+            });
+            
+            // Show loading in stats
+            document.getElementById('activeAgents').innerHTML = '<div class="loading"></div>';
+            document.getElementById('mtdRevenue').innerHTML = '<div class="loading"></div>';
+            document.getElementById('policiesSold').innerHTML = '<div class="loading"></div>';
+        }
+        
+        function hideLoadingState() {
+            // Loading states will be replaced by actual data
+        }
+        
+        async function refreshDashboardData() {
+            console.log('Refreshing dashboard data...');
+            await loadManagerDashboard();
+        }
+        
+        function logout() {
+            document.cookie = 'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            document.cookie = 'user_role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            window.location.href = '/login';
+        }
+        
+        // Initialize Lucide icons
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Lucide icons after page load
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+
+        // Manager can assume Agent
+        window.RoleSwitcher.renderSwitcher('roleSwitcherMount', [
+            { value:'agent', label:'Agent' }
+        ]);
+
+    </script>
+    
+    <!-- Simple Theme Loading -->
+    <script>
+        // Theme initialization is now handled by theme-switcher.js
+        // No additional theme code needed here
+    </script>
+    
+    <!-- Professional Theme System -->
+    <script src="/js/theme-switcher.js"></script>
+    <script src="/js/role-switcher.js"></script>
+</body>
+</html>

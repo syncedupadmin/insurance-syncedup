@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Critical Theme Flash Prevention -->
+    <script>
+    (function(){
+        var t=localStorage.getItem("selectedTheme")||"professional";
+        var h=document.documentElement;
+        h.classList.add(t+"-mode");
+        
+        // Load theme CSS immediately
+        var existingTheme = document.querySelector('link[data-theme-css]');
+        if(existingTheme) existingTheme.remove();
+        
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = '/css/themes/' + t + '.css';
+        link.setAttribute('data-theme-css', t);
+        document.head.appendChild(link);
+        
+        // Add body class when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            if(document.body) document.body.classList.add(t+"-mode");
+        });
+        
+        // Set background for immediate visual feedback
+        if(t==="classic"){h.style.background="linear-gradient(-45deg,#047857,#059669,#10b981,#34d399)";}
+        else if(t==="modern"){h.style.background="linear-gradient(135deg,#10b981 0%,#059669 100%)";}
+        else if(t==="professional"){h.style.background="linear-gradient(-45deg,#059669,#10b981,#34d399,#a7f3d0)";}
+        else{h.style.background="linear-gradient(-45deg,#059669,#10b981,#34d399,#a7f3d0)";}
+        
+        h.style.visibility="hidden";
+        setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
+    })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Dashboard - SyncedUp Insurance</title>
+    
+    <!-- Favicons - Green for Agent Portal -->
+    <link rel="icon" type="image/png" sizes="50x50" href="/favicons/agent-50x50.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/agent-180x180.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicons/agent-512x512.png">
+    
+    <link rel="stylesheet" href="/agent/agent-global.css">
+    
+    <!-- Server-side portal-guard.js already verified agent access -->
+    
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Agent Dashboard</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div id="roleSwitcherMount"></div>
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="/agent" class="nav-link active">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="/agent/quotes" class="nav-link">
+            <i data-lucide="calculator" class="icon"></i>
+            Quote Products
+        </a>
+        <a href="/agent/commissions" class="nav-link">
+            <i data-lucide="dollar-sign" class="icon"></i>
+            My Commissions
+        </a>
+        <a href="/agent/settings" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+        <a href="/global-leaderboard" class="nav-link">
+            <i data-lucide="trophy" class="icon"></i>
+            Global Leaderboard
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Agent Welcome Notice -->
+        <div class="agent-notice">
+            <h3><i data-lucide="shield-check"></i> Agent Portal</h3>
+            <p>Welcome to your agent dashboard. Generate quotes, track sales, and manage your commission earnings.</p>
+        </div>
+        
+        <!-- Performance Stats -->
+        <div class="grid">
+            <div class="stat-card">
+                <div class="stat-value" id="monthlyCommissions">$0</div>
+                <div class="stat-label">Monthly Commissions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="monthlySales">0</div>
+                <div class="stat-label">Monthly Sales</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalCustomers">0</div>
+                <div class="stat-label">Total Customers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="conversionRate">0%</div>
+                <div class="stat-label">Conversion Rate</div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button class="btn btn-primary" onclick="location.href='/agent/quotes'">
+                <i data-lucide="calculator"></i>
+                Generate Quote
+            </button>
+            <button class="btn btn-warning" onclick="location.href='/agent/commissions'">
+                <i data-lucide="download"></i>
+                Download Commissions
+            </button>
+        </div>
+        
+        <!-- Recent Activity & Performance -->
+        <div class="grid">
+            <div class="card">
+                <h3><i data-lucide="clock" class="card-icon"></i>Recent Activity</h3>
+                <div id="recentActivity">
+                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                        <div class="loading"></div>
+                        Loading recent activity...
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3><i data-lucide="trending-up" class="card-icon"></i>This Month's Performance</h3>
+                <div id="performanceChart">
+                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                        <div class="loading"></div>
+                        Loading performance data...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Quotes -->
+        <div class="card">
+            <h3><i data-lucide="file-text" class="card-icon"></i>Recent Quotes</h3>
+            <div id="recentQuotes">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Product</th>
+                            <th>Premium</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quotesTableBody">
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                                <div class="loading"></div>
+                                Loading recent quotes...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Goals & Progress -->
+        <div class="card">
+            <h3><i data-lucide="target" class="card-icon"></i>Monthly Goals</h3>
+            <div class="grid">
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Sales Goal</span>
+                        <span id="salesGoalText">0 / 15</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" id="salesGoalProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Commission Goal</span>
+                        <span id="commissionGoalText">$0 / $5,000</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" id="commissionGoalProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        // Authentication check
+        async function checkAuth() {
+            // Server-side portal guard already verified agent access
+            try {
+                const userResponse = await fetch('/api/auth/verify', { credentials: 'include' });
+                if (userResponse.ok) {
+                    const { user } = await userResponse.json();
+                    document.getElementById('userDisplay').textContent = `${user.email} (${user.role})`;
+                    currentUser = user;
+                    return true;
+                } else {
+                    // Fallback if verify endpoint fails - use role cookie
+                    const roleCookie = document.cookie.split(';').find(c => c.trim().startsWith('user_role='));
+                    const userRole = roleCookie ? decodeURIComponent(roleCookie.split('=')[1]) : 'agent';
+                    currentUser = { role: userRole };
+                    document.getElementById('userDisplay').textContent = `Agent (${userRole})`;
+                    return true;
+                }
+            } catch (error) {
+                console.error('Auth verification failed:', error);
+                currentUser = { role: 'agent' };
+                document.getElementById('userDisplay').textContent = 'Agent Dashboard';
+                return true;
+            }
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            // Load dashboard data
+            await loadDashboardData();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                // Load stats
+                await loadStats();
+                await loadRecentActivity();
+                await loadRecentQuotes();
+                await loadGoalProgress();
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                loadFallbackData();
+            }
+        }
+
+        // Load performance stats
+        async function loadStats() {
+            try {
+                // API endpoints not configured - show clean zero state
+                console.log('API endpoints not configured, showing empty state...');
+                
+                document.getElementById('monthlyCommissions').textContent = '$0';
+                document.getElementById('monthlySales').textContent = '0';
+                document.getElementById('totalCustomers').textContent = '0';
+                document.getElementById('conversionRate').textContent = '0%';
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+                document.getElementById('monthlyCommissions').textContent = '$0';
+                document.getElementById('monthlySales').textContent = '0';
+                document.getElementById('totalCustomers').textContent = '0';
+                document.getElementById('conversionRate').textContent = '0%';
+            }
+        }
+
+        // Load recent activity
+        async function loadRecentActivity() {
+            const activityContainer = document.getElementById('recentActivity');
+            
+            // No hardcoded data - show empty state
+            activityContainer.innerHTML = `
+                <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                    No recent activity found
+                </div>
+            `;
+        }
+
+        // Load recent quotes
+        async function loadRecentQuotes() {
+            const tableBody = document.getElementById('quotesTableBody');
+            
+            try {
+                // No API configured - show empty quotes
+                const quotes = [];
+
+                let quotesHTML;
+                if (quotes.length === 0) {
+                    quotesHTML = `<tr><td colspan="6" style="text-align: center; color: rgba(255,255,255,0.6); padding: 2rem;">No quotes data available</td></tr>`;
+                } else {
+                    quotesHTML = quotes.map(quote => `
+                        <tr>
+                            <td>${new Date(quote.createdAt).toLocaleDateString()}</td>
+                            <td>${quote.firstName} ${quote.lastName}</td>
+                            <td>${quote.productType}</td>
+                            <td class="premium-amount">$${quote.premium || 'TBD'}</td>
+                            <td><span class="status-${quote.status || 'pending'}">${quote.status || 'Pending'}</span></td>
+                            <td>
+                                <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">View</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+
+                tableBody.innerHTML = quotesHTML;
+            } catch (error) {
+                console.error('Failed to load quotes:', error);
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #666; padding: 2rem;">Error loading quotes</td></tr>`;
+            }
+        }
+
+        // Load goal progress
+        async function loadGoalProgress() {
+            try {
+                const user = JSON.parse(sessionStorage.getItem('syncedup:user') || '{}');
+                // No API configured - show empty goals
+                const goals = [];
+                const sales = [];
+                const commissions = [];
+
+                const salesGoal = goals.find(g => g.type === 'monthly-sales')?.target || 30;
+                const currentSales = sales.length;
+                const salesProgress = Math.min((currentSales / salesGoal) * 100, 100);
+
+                const commissionGoal = 5000; // Default goal
+                const currentCommissions = commissions.reduce((sum, c) => sum + (c.amount || 0), 0);
+                const commissionProgress = Math.min((currentCommissions / commissionGoal) * 100, 100);
+
+                document.getElementById('salesGoalText').textContent = `${currentSales} / ${salesGoal}`;
+                document.getElementById('salesGoalProgress').style.width = `${salesProgress}%`;
+                
+                document.getElementById('commissionGoalText').textContent = `$${currentCommissions.toLocaleString()} / $${commissionGoal.toLocaleString()}`;
+                document.getElementById('commissionGoalProgress').style.width = `${commissionProgress}%`;
+            } catch (error) {
+                console.error('Failed to load goals:', error);
+                document.getElementById('salesGoalText').textContent = '0 / 30';
+                document.getElementById('salesGoalProgress').style.width = '0%';
+                document.getElementById('commissionGoalText').textContent = '$0 / $5,000';
+                document.getElementById('commissionGoalProgress').style.width = '0%';
+            }
+        }
+
+        // Fallback data for when API fails
+        function loadFallbackData() {
+            document.getElementById('monthlyCommissions').textContent = '$0';
+            document.getElementById('monthlySales').textContent = '0';
+            document.getElementById('totalCustomers').textContent = '0';
+            document.getElementById('conversionRate').textContent = '0%';
+        }
+
+        // Logout function
+        function logout() {
+            // Clear authentication cookies
+            document.cookie = 'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            document.cookie = 'user_role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            window.location.href = '/login';
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+
+    <!-- Simple Theme Loading -->
+    <script>
+        // Theme initialization is now handled by theme-switcher.js
+        // No additional theme code needed here
+    </script>
+
+    <!-- Professional Theme System -->
+    <script src="/js/theme-switcher.js"></script>
+    <script src="/js/role-switcher.js"></script>
+    <script src="/assets/session-prod.js"></script>
+</body>
+</html>

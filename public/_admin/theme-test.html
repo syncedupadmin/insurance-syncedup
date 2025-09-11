@@ -4,7 +4,7 @@
     <!-- Critical Theme Flash Prevention -->
     <script>
     (function(){
-        var t=localStorage.getItem("selectedTheme")||"professional";
+        var t=localStorage.getItem("adminTheme")||"professional";
         var h=document.documentElement;
         if(t==="classic"){h.classList.add("classic-mode");h.style.backgroundColor="#008080";}
         else if(t==="modern"){h.classList.add("modern-mode");h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
@@ -46,7 +46,7 @@
     <script>
         function updateInfo() {
             document.getElementById('current-theme').textContent = 
-                localStorage.getItem('selectedTheme') || 'professional (default)';
+                localStorage.getItem('adminTheme') || 'professional (default)';
             document.getElementById('body-classes').textContent = 
                 document.body.className || 'none';
             document.getElementById('loaded-css').textContent = 

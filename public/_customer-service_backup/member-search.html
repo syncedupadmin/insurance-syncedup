@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Critical Theme Flash Prevention -->
+    <script>
+    (function(){
+        var t=localStorage.getItem("selectedTheme")||"professional";
+        var h=document.documentElement;
+        if(t==="classic"){h.classList.add("classic-mode");h.style.backgroundColor="#008080";}
+        else if(t==="modern"){h.classList.add("modern-mode");h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        else{h.style.background="linear-gradient(-45deg,#1e3a8a,#3b82f6,#60a5fa,#dbeafe)";}
+        h.style.visibility="hidden";
+        setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
+    })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Search - SyncedUp Insurance</title>
+    <link rel="stylesheet" href="/customer-service/customer-service-global.css">
+    <script src="/js/auth-helper.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Member Search</h1>
+        <div class="user-info">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn btn-secondary" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="/customer-service/index.html" class="nav-link">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="/customer-service/member-search.html" class="nav-link active">
+            <i data-lucide="search" class="icon"></i>
+            Member Search
+        </a>
+        <a href="/customer-service/member-profile.html" class="nav-link">
+            <i data-lucide="user-check" class="icon"></i>
+            Member History
+        </a>
+        <a href="/customer-service/settings.html" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Search Form -->
+        <div class="card">
+            <h3><i data-lucide="search" class="card-icon"></i>Member Search</h3>
+            <form id="memberSearchForm" onsubmit="performSearch(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="memberId">Member ID</label>
+                        <input type="text" id="memberId" class="form-control" placeholder="e.g., MEM001234">
+                    </div>
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" class="form-control" placeholder="Enter first name">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" class="form-control" placeholder="Enter last name">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" class="form-control" placeholder="(555) 123-4567">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" class="form-control" placeholder="member@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="productType">Product Type</label>
+                        <select id="productType" class="form-control">
+                            <option value="">All Products</option>
+                            <option value="auto">Auto Insurance</option>
+                            <option value="home">Home Insurance</option>
+                            <option value="life">Life Insurance</option>
+                            <option value="business">Business Insurance</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="quick-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="search"></i>
+                        Search Members
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="clearSearch()">
+                        <i data-lucide="x-circle"></i>
+                        Clear Search
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="advancedSearch()">
+                        <i data-lucide="filter"></i>
+                        Advanced Search
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Search Results -->
+        <div class="card" id="searchResultsCard" style="display: none;">
+            <h3><i data-lucide="users" class="card-icon"></i>Search Results <span id="resultCount">(0 members found)</span></h3>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Member ID</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Product</th>
+                            <th>Status</th>
+                            <th>Agent</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="searchResultsBody">
+                        <!-- Results will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Searches -->
+        <div class="card">
+            <h3><i data-lucide="clock" class="card-icon"></i>Recent Searches</h3>
+            <div id="recentSearches">
+                <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                    <i data-lucide="history"></i>
+                    <p>Your recent member searches will appear here</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Access Members -->
+        <div class="card">
+            <h3><i data-lucide="star" class="card-icon"></i>Frequently Accessed Members</h3>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Member ID</th>
+                            <th>Name</th>
+                            <th>Last Contact</th>
+                            <th>Cases</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="frequentMembersBody">
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                                <div class="loading"></div>
+                                Loading frequently accessed members...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let searchHistory = JSON.parse(localStorage.getItem('memberSearchHistory') || '[]');
+
+        // Authentication check
+        function checkAuth() {
+            // Authentication handled by portal-guard
+            // Authentication handled by portal-guard
+            
+            if (!token || !user.email) {
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            // Check if user has customer service permissions
+            // Handle both role formats: customer-service and customer_service
+            const normalizeRole = (r) => String(r || '').toLowerCase().replace(/[\s-]+/g, '_');
+            const userRole = user.role;
+            const normalizedRole = normalizeRole(userRole);
+            const allowedRoles = ['customer-service', 'customer_service', 'manager', 'admin', 'super-admin', 'super_admin'];
+            
+            if (!allowedRoles.includes(userRole) && !allowedRoles.includes(normalizedRole)) {
+                alert('Access denied. Customer service permissions required.');
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
+            currentUser = user;
+            return true;
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            // Load page data
+            await loadFrequentMembers();
+            loadRecentSearches();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Perform member search
+        async function performSearch(event) {
+            event.preventDefault();
+            
+            const searchParams = {
+                memberId: document.getElementById('memberId').value,
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                productType: document.getElementById('productType').value
+            };
+
+            // Validate that at least one search parameter is provided
+            const hasSearchParams = Object.values(searchParams).some(value => value.trim() !== '');
+            if (!hasSearchParams) {
+                alert('Please enter at least one search parameter.');
+                return;
+            }
+
+            try {
+                // Show loading state
+                const submitBtn = document.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<div class="loading"></div>Searching...';
+                submitBtn.disabled = true;
+
+                // Perform the search
+                const results = await searchMembers(searchParams);
+                
+                // Display results
+                displaySearchResults(results);
+                
+                // Add to search history
+                addToSearchHistory(searchParams, results.length);
+
+            } catch (error) {
+                console.error('Search error:', error);
+                alert('Error performing search. Please try again.');
+            } finally {
+                // Restore button state
+                const submitBtn = document.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '<i data-lucide="search"></i>Search Members';
+                submitBtn.disabled = false;
+                lucide.createIcons();
+            }
+        }
+
+        // Search members API call
+        async function searchMembers(searchParams) {
+            try {
+                const response = await fetch('/api/customer-service/member-search', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        ...searchParams,
+                        agencyId: currentUser?.agency_id
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const results = await response.json();
+                return results;
+            } catch (error) {
+                console.error('API search error:', error);
+                
+                // Fallback to mock data if API fails
+                const mockResults = [
+                    {
+                        memberId: 'MEM001234',
+                        firstName: 'John',
+                        lastName: 'Smith',
+                        phone: '(555) 123-4567',
+                        email: 'john.smith@email.com',
+                        product: 'Auto Insurance Premium',
+                        status: 'Active',
+                        agent: 'Sarah Johnson'
+                    },
+                    {
+                        memberId: 'MEM001235',
+                        firstName: 'Mary',
+                        lastName: 'Johnson',
+                        phone: '(555) 987-6543',
+                        email: 'mary.johnson@email.com',
+                        product: 'Home Insurance Standard',
+                        status: 'Active',
+                        agent: 'Mike Davis'
+                    },
+                    {
+                        memberId: 'MEM001236',
+                        firstName: 'Bob',
+                        lastName: 'Wilson',
+                        phone: '(555) 456-7890',
+                        email: 'bob.wilson@email.com',
+                        product: 'Life Insurance Basic',
+                        status: 'Pending',
+                        agent: 'Lisa Brown'
+                    }
+                ];
+
+                // Apply basic filtering to mock data
+                return mockResults.filter(member => {
+                    if (searchParams.memberId && !member.memberId.toLowerCase().includes(searchParams.memberId.toLowerCase())) return false;
+                    if (searchParams.firstName && !member.firstName.toLowerCase().includes(searchParams.firstName.toLowerCase())) return false;
+                    if (searchParams.lastName && !member.lastName.toLowerCase().includes(searchParams.lastName.toLowerCase())) return false;
+                    if (searchParams.phone && !member.phone.includes(searchParams.phone)) return false;
+                    if (searchParams.email && !member.email.toLowerCase().includes(searchParams.email.toLowerCase())) return false;
+                    return true;
+                });
+            }
+        }
+
+        // Display search results
+        function displaySearchResults(results) {
+            const resultsCard = document.getElementById('searchResultsCard');
+            const resultCount = document.getElementById('resultCount');
+            const resultsBody = document.getElementById('searchResultsBody');
+
+            resultCount.textContent = `(${results.length} member${results.length !== 1 ? 's' : ''} found)`;
+
+            if (results.length === 0) {
+                resultsBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                            <i data-lucide="search-x"></i>
+                            <p>No members found matching your search criteria.</p>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                const resultsHTML = results.map(member => `
+                    <tr onclick="viewMemberProfile('${member.memberId}')">
+                        <td>${member.memberId}</td>
+                        <td>${member.firstName} ${member.lastName}</td>
+                        <td>${member.phone}</td>
+                        <td>${member.email}</td>
+                        <td>${member.product}</td>
+                        <td><span class="status-badge status-${member.status.toLowerCase()}">${member.status}</span></td>
+                        <td>${member.agent}</td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="event.stopPropagation(); viewMemberProfile('${member.memberId}')">View</button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                resultsBody.innerHTML = resultsHTML;
+            }
+
+            resultsCard.style.display = 'block';
+            lucide.createIcons();
+        }
+
+        // Load frequent members
+        async function loadFrequentMembers() {
+            const tableBody = document.getElementById('frequentMembersBody');
+            
+            try {
+                const response = await fetch(`/api/customer-service/frequent-members?agencyId=${currentUser?.agency_id || 'DEMO001'}`, {
+                    credentials: 'include',
+                    headers: {
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const frequentMembers = await response.json();
+
+                if (frequentMembers.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                                <i data-lucide="users"></i>
+                                <p>No frequent members found.</p>
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    const membersHTML = frequentMembers.map(member => `
+                        <tr onclick="viewMemberProfile('${member.memberId}')">
+                            <td>${member.memberId}</td>
+                            <td>${member.firstName} ${member.lastName}</td>
+                            <td>${member.phone}</td>
+                            <td>${member.interactions || 1}</td>
+                            <td><span class="status-badge status-${member.status.toLowerCase()}">${member.status}</span></td>
+                            <td>
+                                <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="event.stopPropagation(); viewMemberProfile('${member.memberId}')">View</button>
+                            </td>
+                        </tr>
+                    `).join('');
+
+                    tableBody.innerHTML = membersHTML;
+                }
+            } catch (error) {
+                console.error('Error loading frequent members:', error);
+                
+                // Fallback to mock data
+                const mockMembers = [
+                    { memberId: 'MEM001234', firstName: 'John', lastName: 'Smith', phone: '(555) 123-4567', interactions: 3, status: 'Active' },
+                    { memberId: 'MEM001235', firstName: 'Mary', lastName: 'Johnson', phone: '(555) 987-6543', interactions: 1, status: 'Active' },
+                    { memberId: 'MEM001236', firstName: 'Bob', lastName: 'Wilson', phone: '(555) 456-7890', interactions: 2, status: 'Pending' }
+                ];
+
+                const membersHTML = mockMembers.map(member => `
+                    <tr onclick="viewMemberProfile('${member.memberId}')">
+                        <td>${member.memberId}</td>
+                        <td>${member.firstName} ${member.lastName}</td>
+                        <td>${member.phone}</td>
+                        <td>${member.interactions}</td>
+                        <td><span class="status-badge status-${member.status.toLowerCase()}">${member.status}</span></td>
+                        <td>
+                            <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="event.stopPropagation(); viewMemberProfile('${member.memberId}')">View</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                tableBody.innerHTML = membersHTML;
+            }
+
+            lucide.createIcons();
+        }
+
+        // Load recent searches
+        function loadRecentSearches() {
+            const recentSearchesContainer = document.getElementById('recentSearches');
+            
+            if (searchHistory.length === 0) {
+                recentSearchesContainer.innerHTML = `
+                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                        <i data-lucide="history"></i>
+                        <p>Your recent member searches will appear here</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const historyHTML = searchHistory.slice(-5).reverse().map(search => `
+                <div class="interaction-item">
+                    <div class="interaction-header">
+                        <span class="interaction-type">Search: ${search.description}</span>
+                        <span class="interaction-date">${search.timestamp}</span>
+                    </div>
+                    <div class="interaction-note">${search.results} member${search.results !== 1 ? 's' : ''} found</div>
+                </div>
+            `).join('');
+
+            recentSearchesContainer.innerHTML = historyHTML;
+            lucide.createIcons();
+        }
+
+        // Add to search history
+        function addToSearchHistory(searchParams, resultCount) {
+            const searchDescription = Object.entries(searchParams)
+                .filter(([key, value]) => value.trim() !== '')
+                .map(([key, value]) => `${key}: ${value}`)
+                .join(', ');
+
+            const historyEntry = {
+                description: searchDescription,
+                results: resultCount,
+                timestamp: new Date().toLocaleString(),
+                params: searchParams
+            };
+
+            searchHistory.push(historyEntry);
+            
+            // Keep only last 10 searches
+            if (searchHistory.length > 10) {
+                searchHistory = searchHistory.slice(-10);
+            }
+
+            localStorage.setItem('memberSearchHistory', JSON.stringify(searchHistory));
+            loadRecentSearches();
+        }
+
+        // Clear search form
+        function clearSearch() {
+            document.getElementById('memberSearchForm').reset();
+            document.getElementById('searchResultsCard').style.display = 'none';
+        }
+
+        // Advanced search
+        function advancedSearch() {
+            alert('Advanced Search - This will open advanced search filters');
+        }
+
+        // View member profile
+        function viewMemberProfile(memberId) {
+            // Store member ID for profile page
+            localStorage.setItem('selectedMemberId', memberId);
+            window.location.href = 'member-profile.html';
+        }
+
+        // Logout function
+        function logout() {
+            clearAuthCookies();
+            window.location.href = '/login';
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
+    <script src="/assets/session-prod.js"></script>
+    <script src="/js/theme-switcher.js"></script>
+</body>
+</html>

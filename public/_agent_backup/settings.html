@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Critical Theme Flash Prevention -->
+    <script>
+    (function(){
+        var t=localStorage.getItem("selectedTheme")||"professional";
+        var h=document.documentElement;
+        
+        h.classList.add(t+"-mode");
+        
+        // Load theme CSS immediately
+        var existingTheme = document.querySelector('link[data-theme-css]');
+        if(existingTheme) existingTheme.remove();
+        
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = '/css/themes/' + t + '.css';
+        link.setAttribute('data-theme-css', t);
+        document.head.appendChild(link);
+        // Add body class when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            if(document.body) document.body.classList.add(t+"-mode");
+        });
+        
+        if(t==="classic"){h.style.background="linear-gradient(-45deg,#047857,#059669,#10b981,#34d399)";}
+        else if(t==="modern"){h.style.background="linear-gradient(135deg,#10b981 0%,#059669 100%)";}
+        else if(t==="professional"){h.style.background="linear-gradient(-45deg,#059669,#10b981,#34d399,#a7f3d0)";}
+        else{h.style.background="linear-gradient(-45deg,#059669,#10b981,#34d399,#a7f3d0)";}
+        h.style.visibility="hidden";
+        setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
+    })();
+    </script>
+    <script src="/js/auth-helper.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - SyncedUp Insurance Agent</title>
+    <link rel="stylesheet" href="/agent/agent-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Agent Settings</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="/agent" class="nav-link">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="/agent/quotes" class="nav-link">
+            <i data-lucide="calculator" class="icon"></i>
+            Quote Products
+        </a>
+        <a href="/agent/commissions" class="nav-link">
+            <i data-lucide="dollar-sign" class="icon"></i>
+            My Commissions
+        </a>
+        <a href="/agent/settings" class="nav-link active">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+        <a href="/global-leaderboard" class="nav-link">
+            <i data-lucide="trophy" class="icon"></i>
+            Global Leaderboard
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Agent Profile Settings -->
+        <div class="card">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="user" class="card-icon"></i>
+                Agent Profile
+            </h3>
+
+            <form id="profileForm">
+                <div class="grid" style="margin-bottom: 1.5rem;">
+                    <div>
+                        <label class="form-label">First Name</label>
+                        <input type="text" id="firstName" class="form-input" placeholder="Enter first name">
+                    </div>
+                    <div>
+                        <label class="form-label">Last Name</label>
+                        <input type="text" id="lastName" class="form-input" placeholder="Enter last name">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="email" class="form-input" placeholder="agent@agency.com" readonly>
+                    <small style="color: rgba(255,255,255,0.7);">Email cannot be changed. Contact your manager if needed.</small>
+                </div>
+
+                <div class="grid" style="margin-bottom: 1.5rem;">
+                    <div>
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" id="phone" class="form-input" placeholder="(555) 123-4567">
+                    </div>
+                    <div>
+                        <label class="form-label">Agent License #</label>
+                        <input type="text" id="licenseNumber" class="form-input" placeholder="AG-123456">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Time Zone</label>
+                    <select id="timeZone" class="form-select">
+                        <option value="America/New_York">Eastern Time</option>
+                        <option value="America/Chicago">Central Time</option>
+                        <option value="America/Denver">Mountain Time</option>
+                        <option value="America/Los_Angeles" selected>Pacific Time</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-2" style="margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="save" class="icon"></i>
+                        Save Profile
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sales Preferences -->
+        <div class="card">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="target" class="card-icon"></i>
+                Sales Preferences
+            </h3>
+
+            <form id="salesPreferencesForm">
+                <div class="form-group">
+                    <label class="form-label">Monthly Sales Goal</label>
+                    <input type="number" id="salesGoal" class="form-input" placeholder="15" min="1">
+                    <small style="color: rgba(255,255,255,0.7);">Number of policies you aim to sell per month</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Monthly Commission Goal</label>
+                    <input type="number" id="commissionGoal" class="form-input" placeholder="5000" min="100">
+                    <small style="color: rgba(255,255,255,0.7);">Target commission earnings per month ($)</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Default Quote Follow-up Period</label>
+                    <select id="followupPeriod" class="form-select">
+                        <option value="24">24 Hours</option>
+                        <option value="48" selected>48 Hours</option>
+                        <option value="72">72 Hours</option>
+                        <option value="168">1 Week</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="emailNotifications" checked>
+                        <span>Email Notifications for New Leads</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="smsNotifications" checked>
+                        <span>SMS Notifications for Urgent Updates</span>
+                    </label>
+                </div>
+
+                <div class="flex gap-2" style="margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="save" class="icon"></i>
+                        Save Preferences
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Interface Theme Settings -->
+        <div class="card">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="monitor" class="card-icon"></i>
+                Interface Theme
+            </h3>
+
+            <div class="form-group">
+                <label class="form-label">Display Mode</label>
+                <p style="color: rgba(255,255,255,0.7); margin-bottom: 1rem;">Switch between green glassmorphism, corporate Fortune 500 style, and classic Windows 95 theme</p>
+                
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button class="btn btn-secondary" id="professionalModeToggle" onclick="toggleProfessionalMode()">
+                        <i data-lucide="briefcase" class="icon"></i>
+                        <span id="professionalModeText">Professional Mode</span>
+                    </button>
+                    
+                    <button class="btn btn-primary" id="classicModeToggle" onclick="toggleClassicMode()">
+                        <i data-lucide="palette" class="icon"></i>
+                        <span id="classicModeText">Classic Mode</span>
+                    </button>
+                    
+                    <button class="btn btn-warning" id="modernModeToggle" onclick="toggleModernMode()">
+                        <i data-lucide="zap" class="icon"></i>
+                        <span id="modernModeText">Modern Mode</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Commission Settings -->
+        <div class="card">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="dollar-sign" class="card-icon"></i>
+                Commission Tracking
+            </h3>
+
+            <form id="commissionForm">
+                <div class="form-group">
+                    <label class="form-label">Payment Method</label>
+                    <select id="paymentMethod" class="form-select">
+                        <option value="direct_deposit" selected>Direct Deposit</option>
+                        <option value="check">Check</option>
+                        <option value="paypal">PayPal</option>
+                    </select>
+                </div>
+
+                <div id="directDepositInfo">
+                    <div class="grid" style="margin-bottom: 1.5rem;">
+                        <div>
+                            <label class="form-label">Bank Name</label>
+                            <input type="text" id="bankName" class="form-input" placeholder="Your Bank">
+                        </div>
+                        <div>
+                            <label class="form-label">Account Type</label>
+                            <select id="accountType" class="form-select">
+                                <option value="checking" selected>Checking</option>
+                                <option value="savings">Savings</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="grid" style="margin-bottom: 1.5rem;">
+                        <div>
+                            <label class="form-label">Routing Number</label>
+                            <input type="text" id="routingNumber" class="form-input" placeholder="123456789" maxlength="9">
+                        </div>
+                        <div>
+                            <label class="form-label">Account Number</label>
+                            <input type="text" id="accountNumber" class="form-input" placeholder="Account number">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Commission Report Frequency</label>
+                    <select id="reportFrequency" class="form-select">
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly" selected>Monthly</option>
+                        <option value="quarterly">Quarterly</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-2" style="margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="save" class="icon"></i>
+                        Save Commission Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Data Export -->
+        <div class="card">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="download" class="card-icon"></i>
+                Data Export
+            </h3>
+
+            <div class="form-group">
+                <label class="form-label">Export Your Data</label>
+                <p style="color: rgba(255,255,255,0.7); margin-bottom: 1rem;">Download your sales data, commissions, and customer information</p>
+                
+                <div class="flex gap-2">
+                    <button class="btn btn-success" onclick="exportData('sales')">
+                        <i data-lucide="handshake" class="icon"></i>
+                        Export Sales History
+                    </button>
+                    <button class="btn btn-warning" onclick="exportData('commissions')">
+                        <i data-lucide="dollar-sign" class="icon"></i>
+                        Export Commissions
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportData('customers')">
+                        <i data-lucide="users" class="icon"></i>
+                        Export Customer List
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        // Authentication check
+        function checkAuth() {
+            // Authentication is now handled server-side via portal-guard
+            // Just proceed with page initialization
+            return true;
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            // Load user profile data
+            loadProfileData();
+            loadPreferences();
+            
+            // Set up form handlers
+            setupFormHandlers();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Load user profile data
+        function loadProfileData() {
+            if (currentUser) {
+                document.getElementById('firstName').value = currentUser.firstName || '';
+                document.getElementById('lastName').value = currentUser.lastName || '';
+                document.getElementById('email').value = currentUser.email || '';
+                document.getElementById('phone').value = currentUser.phone || '';
+                document.getElementById('licenseNumber').value = currentUser.licenseNumber || '';
+            }
+        }
+
+        // Load user preferences
+        function loadPreferences() {
+            const salesGoal = localStorage.getItem('agentSalesGoal') || '15';
+            const commissionGoal = localStorage.getItem('agentCommissionGoal') || '5000';
+            const followupPeriod = localStorage.getItem('agentFollowupPeriod') || '48';
+            const emailNotifications = localStorage.getItem('agentEmailNotifications') !== 'false';
+            const smsNotifications = localStorage.getItem('agentSmsNotifications') !== 'false';
+            const timeZone = localStorage.getItem('agentTimeZone') || 'America/Los_Angeles';
+            const paymentMethod = localStorage.getItem('agentPaymentMethod') || 'direct_deposit';
+            const reportFrequency = localStorage.getItem('agentReportFrequency') || 'monthly';
+
+            document.getElementById('salesGoal').value = salesGoal;
+            document.getElementById('commissionGoal').value = commissionGoal;
+            document.getElementById('followupPeriod').value = followupPeriod;
+            document.getElementById('emailNotifications').checked = emailNotifications;
+            document.getElementById('smsNotifications').checked = smsNotifications;
+            document.getElementById('timeZone').value = timeZone;
+            document.getElementById('paymentMethod').value = paymentMethod;
+            document.getElementById('reportFrequency').value = reportFrequency;
+        }
+
+        // Setup form handlers
+        function setupFormHandlers() {
+            // Profile form
+            document.getElementById('profileForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveProfile();
+            });
+
+            // Sales preferences form
+            document.getElementById('salesPreferencesForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveSalesPreferences();
+            });
+
+            // Commission form
+            document.getElementById('commissionForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveCommissionSettings();
+            });
+        }
+
+        // Save profile
+        async function saveProfile() {
+            const profileData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                phone: document.getElementById('phone').value,
+                licenseNumber: document.getElementById('licenseNumber').value,
+                timeZone: document.getElementById('timeZone').value
+            };
+
+            try {
+                // In a real implementation, this would make an API call
+                // For now, update localStorage
+                const updatedUser = { ...currentUser, ...profileData };
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+                currentUser = updatedUser;
+                
+                document.getElementById('userDisplay').textContent = `${updatedUser.firstName} ${updatedUser.lastName} (${updatedUser.role})`;
+                
+                showSuccess('Profile updated successfully!');
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                showError('Failed to save profile');
+            }
+        }
+
+        // Save sales preferences
+        async function saveSalesPreferences() {
+            const preferences = {
+                salesGoal: document.getElementById('salesGoal').value,
+                commissionGoal: document.getElementById('commissionGoal').value,
+                followupPeriod: document.getElementById('followupPeriod').value,
+                emailNotifications: document.getElementById('emailNotifications').checked,
+                smsNotifications: document.getElementById('smsNotifications').checked
+            };
+
+            try {
+                // Save to localStorage
+                localStorage.setItem('agentSalesGoal', preferences.salesGoal);
+                localStorage.setItem('agentCommissionGoal', preferences.commissionGoal);
+                localStorage.setItem('agentFollowupPeriod', preferences.followupPeriod);
+                localStorage.setItem('agentEmailNotifications', preferences.emailNotifications);
+                localStorage.setItem('agentSmsNotifications', preferences.smsNotifications);
+                
+                showSuccess('Sales preferences saved successfully!');
+            } catch (error) {
+                console.error('Error saving preferences:', error);
+                showError('Failed to save preferences');
+            }
+        }
+
+        // Save commission settings
+        async function saveCommissionSettings() {
+            const commissionData = {
+                paymentMethod: document.getElementById('paymentMethod').value,
+                bankName: document.getElementById('bankName').value,
+                accountType: document.getElementById('accountType').value,
+                routingNumber: document.getElementById('routingNumber').value,
+                accountNumber: document.getElementById('accountNumber').value,
+                reportFrequency: document.getElementById('reportFrequency').value
+            };
+
+            try {
+                // Save to localStorage (in real app, this would be encrypted and stored securely)
+                localStorage.setItem('agentPaymentMethod', commissionData.paymentMethod);
+                localStorage.setItem('agentReportFrequency', commissionData.reportFrequency);
+                
+                showSuccess('Commission settings saved successfully!');
+            } catch (error) {
+                console.error('Error saving commission settings:', error);
+                showError('Failed to save commission settings');
+            }
+        }
+
+        // Export data
+        function exportData(type) {
+            const timestamp = new Date().toISOString().split('T')[0];
+            
+            if (type === 'sales') {
+                // Create sample CSV content
+                const csvContent = `Date,Customer,Product,Premium,Commission,Status
+${timestamp},John Smith,Health Plan Premium,$149.99,$15.00,Completed
+${timestamp},Mary Johnson,Life Insurance Gold,$87.50,$8.75,Completed
+${timestamp},Bob Wilson,Auto Coverage Plus,$234.00,$23.40,Pending`;
+                
+                downloadCSV(csvContent, `sales-history-${timestamp}.csv`);
+                showSuccess('Sales history exported successfully!');
+            } else if (type === 'commissions') {
+                const csvContent = `Date,Sale ID,Customer,Product,Premium,Commission Rate,Commission Amount,Status
+${timestamp},S001,John Smith,Health Plan Premium,$149.99,10%,$15.00,Paid
+${timestamp},S002,Mary Johnson,Life Insurance Gold,$87.50,10%,$8.75,Paid
+${timestamp},S003,Bob Wilson,Auto Coverage Plus,$234.00,10%,$23.40,Pending`;
+                
+                downloadCSV(csvContent, `commissions-${timestamp}.csv`);
+                showSuccess('Commission data exported successfully!');
+            } else if (type === 'customers') {
+                const csvContent = `Customer Name,Email,Phone,Last Contact,Total Premium,Status
+John Smith,john@email.com,(555) 123-4567,${timestamp},$149.99,Active
+Mary Johnson,mary@email.com,(555) 234-5678,${timestamp},$87.50,Active
+Bob Wilson,bob@email.com,(555) 345-6789,${timestamp},$234.00,Prospect`;
+                
+                downloadCSV(csvContent, `customers-${timestamp}.csv`);
+                showSuccess('Customer list exported successfully!');
+            }
+        }
+
+        // Download CSV helper
+        function downloadCSV(content, filename) {
+            const blob = new Blob([content], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Logout function
+        function logout() {
+            clearAuthCookies();
+            localStorage.removeItem('user');
+            localStorage.removeItem('currentUser');
+            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+        }
+
+        // Message functions
+        function showSuccess(message) {
+            const div = document.createElement('div');
+            div.className = 'alert alert-success';
+            div.textContent = message;
+            div.style.position = 'fixed';
+            div.style.top = '20px';
+            div.style.right = '20px';
+            div.style.zIndex = '10000';
+            div.style.padding = '1rem';
+            div.style.borderRadius = '8px';
+            div.style.background = 'rgba(34, 197, 94, 0.9)';
+            div.style.color = 'white';
+            div.style.backdropFilter = 'blur(10px)';
+            
+            document.body.appendChild(div);
+            
+            setTimeout(() => {
+                if (document.body.contains(div)) {
+                    document.body.removeChild(div);
+                }
+            }, 3000);
+        }
+
+        function showError(message) {
+            const div = document.createElement('div');
+            div.className = 'alert alert-danger';
+            div.textContent = message;
+            div.style.position = 'fixed';
+            div.style.top = '20px';
+            div.style.right = '20px';
+            div.style.zIndex = '10000';
+            div.style.padding = '1rem';
+            div.style.borderRadius = '8px';
+            div.style.background = 'rgba(239, 68, 68, 0.9)';
+            div.style.color = 'white';
+            div.style.backdropFilter = 'blur(10px)';
+            
+            document.body.appendChild(div);
+            
+            setTimeout(() => {
+                if (document.body.contains(div)) {
+                    document.body.removeChild(div);
+                }
+            }, 3000);
+        }
+
+        // Theme Mode functionality - integrated with theme-switcher.js
+        function showThemeSuccess(themeName) {
+            showSuccess(`${themeName} Mode enabled! Theme applied instantly.`);
+        }
+
+        function updateThemeButtons() {
+            const currentTheme = localStorage.getItem('selectedTheme') || 'professional';
+            
+            // Update professional mode button
+            const professionalButton = document.getElementById('professionalModeToggle');
+            const professionalText = document.getElementById('professionalModeText');
+            if (professionalButton && professionalText) {
+                if (currentTheme === 'professional') {
+                    professionalButton.classList.remove('btn-secondary');
+                    professionalButton.classList.add('btn-primary');
+                    professionalText.textContent = 'Professional Mode (Active)';
+                } else {
+                    professionalButton.classList.remove('btn-primary');
+                    professionalButton.classList.add('btn-secondary');
+                    professionalText.textContent = 'Professional Mode';
+                }
+            }
+            
+            // Update classic mode button
+            const classicButton = document.getElementById('classicModeToggle');
+            const classicText = document.getElementById('classicModeText');
+            if (classicButton && classicText) {
+                if (currentTheme === 'classic') {
+                    classicButton.classList.remove('btn-secondary');
+                    classicButton.classList.add('btn-primary');
+                    classicText.textContent = 'Classic Mode (Active)';
+                } else {
+                    classicButton.classList.remove('btn-primary');
+                    classicButton.classList.add('btn-secondary');
+                    classicText.textContent = 'Classic Mode';
+                }
+            }
+        }
+
+        // Override theme toggle functions to integrate with new theme system
+        function toggleProfessionalMode() {
+            if (window.themeSystem && window.themeSystem.applyTheme) {
+                window.themeSystem.applyTheme('professional');
+                showThemeSuccess('Professional');
+                setTimeout(updateThemeButtons, 100); // Update button states after theme change
+            } else {
+                console.error('Theme system not loaded');
+                showError('Theme system not available. Please refresh the page.');
+            }
+        }
+
+        function toggleClassicMode() {
+            if (window.themeSystem && window.themeSystem.applyTheme) {
+                window.themeSystem.applyTheme('classic');
+                showThemeSuccess('Classic');
+                setTimeout(updateThemeButtons, 100); // Update button states after theme change
+            } else {
+                console.error('Theme system not loaded');
+                showError('Theme system not available. Please refresh the page.');
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            initializePage();
+            
+            // Initialize theme button states after theme system loads
+            setTimeout(() => {
+                updateThemeButtons();
+            }, 500);
+            
+            // Listen for theme change events to update button states
+            document.addEventListener('themeChanged', () => {
+                updateThemeButtons();
+            });
+        });
+    </script>
+
+    <!-- Professional Theme System -->
+    <script src="/js/theme-switcher.js"></script>
+    <script src="/assets/session-prod.js"></script>
+</body>
+</html>

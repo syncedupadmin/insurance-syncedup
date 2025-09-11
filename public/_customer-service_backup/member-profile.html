@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Critical Theme Flash Prevention -->
+    <script>
+    (function(){
+        var t=localStorage.getItem("selectedTheme")||"professional";
+        var h=document.documentElement;
+        if(t==="classic"){h.classList.add("classic-mode");h.style.backgroundColor="#008080";}
+        else if(t==="modern"){h.classList.add("modern-mode");h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        else{h.style.background="linear-gradient(-45deg,#1e3a8a,#3b82f6,#60a5fa,#dbeafe)";}
+        h.style.visibility="hidden";
+        setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
+    })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Profile - SyncedUp Insurance</title>
+    <link rel="stylesheet" href="/customer-service/customer-service-global.css">
+    <script src="/js/auth-helper.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Member Profile</h1>
+        <div class="user-info">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn btn-secondary" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="/customer-service/index.html" class="nav-link">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="/customer-service/member-search.html" class="nav-link">
+            <i data-lucide="search" class="icon"></i>
+            Member Search
+        </a>
+        <a href="/customer-service/member-profile.html" class="nav-link active">
+            <i data-lucide="user-check" class="icon"></i>
+            Member History
+        </a>
+        <a href="/customer-service/settings.html" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Member Info Header -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div>
+                    <h2 id="memberName">Loading Member...</h2>
+                    <p style="color: var(--cs-text-secondary); margin: 0;">Member ID: <span id="memberId">-</span></p>
+                </div>
+                <div class="quick-actions">
+                    <button class="btn btn-primary" onclick="createCase()">
+                        <i data-lucide="plus-circle"></i>
+                        New Case
+                    </button>
+                    <button class="btn btn-warning" onclick="editMember()">
+                        <i data-lucide="edit"></i>
+                        Edit Contact
+                    </button>
+                    <button class="btn btn-secondary" onclick="goBackToSearch()">
+                        <i data-lucide="arrow-left"></i>
+                        Back to Search
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Member Profile Sections -->
+        <div class="member-profile">
+            <!-- Demographics -->
+            <div class="profile-section">
+                <h3><i data-lucide="user" class="card-icon"></i>Demographics</h3>
+                <div id="demographics">
+                    <div class="profile-field">
+                        <span class="profile-label">Full Name:</span>
+                        <span class="profile-value" id="fullName">-</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-label">Date of Birth:</span>
+                        <span class="profile-value" id="dateOfBirth">-</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-label">Phone:</span>
+                        <span class="profile-value" id="phoneNumber">-</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-label">Email:</span>
+                        <span class="profile-value" id="emailAddress">-</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-label">Address:</span>
+                        <span class="profile-value" id="address">-</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-label">Member Since:</span>
+                        <span class="profile-value" id="memberSince">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Status -->
+            <div class="profile-section">
+                <h3><i data-lucide="shield-check" class="card-icon"></i>Account Status</h3>
+                <div id="accountStatus">
+                    <div class="profile-field">
+                        <span class="profile-label">Status:</span>
+                        <span class="profile-value" id="accountStatusValue">-</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-label">Assigned Agent:</span>
+                        <span class="profile-value" id="assignedAgent">-</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-label">Last Contact:</span>
+                        <span class="profile-value" id="lastContact">-</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-label">Total Cases:</span>
+                        <span class="profile-value" id="totalCases">-</span>
+                    </div>
+                    <div class="profile-field">
+                        <span class="profile-label">Active Cases:</span>
+                        <span class="profile-value" id="activeCases">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Products -->
+        <div class="card">
+            <h3><i data-lucide="shield" class="card-icon"></i>Current Products</h3>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Policy Number</th>
+                            <th>Product Type</th>
+                            <th>Coverage Amount</th>
+                            <th>Premium</th>
+                            <th>Status</th>
+                            <th>Effective Date</th>
+                            <th>Next Payment</th>
+                        </tr>
+                    </thead>
+                    <tbody id="currentProductsBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                                <div class="loading"></div>
+                                Loading current products...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Payment History -->
+        <div class="card">
+            <h3><i data-lucide="credit-card" class="card-icon"></i>Payment History</h3>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Policy</th>
+                            <th>Status</th>
+                            <th>Reference</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentHistoryBody">
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                                <div class="loading"></div>
+                                Loading payment history...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Interaction History -->
+        <div class="card">
+            <h3><i data-lucide="message-circle" class="card-icon"></i>Interaction History</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div></div>
+                <button class="btn btn-primary" onclick="addInteraction()">
+                    <i data-lucide="plus"></i>
+                    Add Note
+                </button>
+            </div>
+            <div id="interactionHistory">
+                <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                    <div class="loading"></div>
+                    Loading interaction history...
+                </div>
+            </div>
+        </div>
+
+        <!-- Historical Policies -->
+        <div class="card">
+            <h3><i data-lucide="archive" class="card-icon"></i>Policy History</h3>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Policy Number</th>
+                            <th>Product Type</th>
+                            <th>Effective Date</th>
+                            <th>End Date</th>
+                            <th>Reason</th>
+                            <th>Premium</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="policyHistoryBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                                <div class="loading"></div>
+                                Loading policy history...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Interaction Modal -->
+    <div id="interactionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--cs-glass-bg); backdrop-filter: blur(15px); border: 1px solid var(--cs-glass-border); border-radius: 16px; padding: 2rem; width: 90%; max-width: 500px;">
+            <h3 style="margin-bottom: 1rem;">Add Interaction Note</h3>
+            <form id="interactionForm">
+                <div class="form-group">
+                    <label for="interactionType">Interaction Type</label>
+                    <select id="interactionType" class="form-control" required>
+                        <option value="">Select Type</option>
+                        <option value="phone">Phone Call</option>
+                        <option value="email">Email</option>
+                        <option value="chat">Live Chat</option>
+                        <option value="in-person">In Person</option>
+                        <option value="note">Internal Note</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="interactionNote">Notes</label>
+                    <textarea id="interactionNote" class="form-control" rows="4" required placeholder="Enter interaction details..."></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeInteractionModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Note</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let currentMemberId = null;
+
+        // Authentication check
+        function checkAuth() {
+            // Authentication handled by portal-guard
+            // Authentication handled by portal-guard
+            
+            if (!token || !user.email) {
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            // Check if user has customer service permissions
+            // Handle both role formats: customer-service and customer_service
+            const normalizeRole = (r) => String(r || '').toLowerCase().replace(/[\s-]+/g, '_');
+            const userRole = user.role;
+            const normalizedRole = normalizeRole(userRole);
+            const allowedRoles = ['customer-service', 'customer_service', 'manager', 'admin', 'super-admin', 'super_admin'];
+            
+            if (!allowedRoles.includes(userRole) && !allowedRoles.includes(normalizedRole)) {
+                alert('Access denied. Customer service permissions required.');
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
+            currentUser = user;
+            return true;
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            // Get member ID from localStorage or URL
+            currentMemberId = localStorage.getItem('selectedMemberId') || 'MEM001234';
+            
+            // Load member data
+            await loadMemberProfile();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Load member profile data
+        async function loadMemberProfile() {
+            try {
+                await loadMemberBasicInfo();
+                await loadCurrentProducts();
+                await loadPaymentHistory();
+                await loadInteractionHistory();
+                await loadPolicyHistory();
+            } catch (error) {
+                console.error('Error loading member profile:', error);
+                loadFallbackData();
+            }
+        }
+
+        // Load basic member information
+        async function loadMemberBasicInfo() {
+            try {
+                const response = await fetch(`/api/customer-service/member-profile?memberId=${currentMemberId}`, {
+                    credentials: 'include',
+                    headers: {
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const profile = await response.json();
+                
+                // Update UI with real data
+                const fullName = `${profile.firstName} ${profile.lastName}`;
+                const address = profile.address ? 
+                    `${profile.address.street}, ${profile.address.city}, ${profile.address.state} ${profile.address.zip}` : 
+                    'No address on file';
+                
+                document.getElementById('memberName').textContent = fullName;
+                document.getElementById('memberId').textContent = profile.memberId;
+                document.getElementById('fullName').textContent = fullName;
+                document.getElementById('dateOfBirth').textContent = profile.dateOfBirth || 'Not provided';
+                document.getElementById('phoneNumber').textContent = profile.phone || 'Not provided';
+                document.getElementById('emailAddress').textContent = profile.email || 'Not provided';
+                document.getElementById('address').textContent = address;
+                document.getElementById('memberSince').textContent = profile.createdAt ? new Date(profile.createdAt).toLocaleDateString() : 'Unknown';
+                document.getElementById('accountStatusValue').innerHTML = `<span class="status-badge status-${profile.status?.toLowerCase() || 'unknown'}">${profile.status || 'Unknown'}</span>`;
+                document.getElementById('assignedAgent').textContent = profile.assignedAgent?.name || 'Unassigned';
+                document.getElementById('lastContact').textContent = 'Today'; // Will implement later
+                document.getElementById('totalCases').textContent = profile.interactions?.length || '0';
+                document.getElementById('activeCases').textContent = profile.interactions?.filter(i => i.status === 'open')?.length || '0';
+
+                // Store profile for other functions
+                window.currentMemberProfile = profile;
+
+            } catch (error) {
+                console.error('Error loading member profile:', error);
+                
+                // Fallback to mock data
+                const memberData = {
+                    memberId: currentMemberId,
+                    firstName: 'John',
+                    lastName: 'Smith',
+                    fullName: 'John Michael Smith',
+                    dateOfBirth: '1985-03-15',
+                    phone: '(555) 123-4567',
+                    email: 'john.smith@email.com',
+                    address: '123 Main Street, Anytown, ST 12345',
+                    memberSince: '2020-06-15',
+                    status: 'Active',
+                    assignedAgent: 'Sarah Johnson',
+                    lastContact: '2025-09-02',
+                    totalCases: '5',
+                    activeCases: '1'
+                };
+
+                // Update UI with mock data
+                document.getElementById('memberName').textContent = memberData.fullName;
+                document.getElementById('memberId').textContent = memberData.memberId;
+                document.getElementById('fullName').textContent = memberData.fullName;
+                document.getElementById('dateOfBirth').textContent = memberData.dateOfBirth;
+                document.getElementById('phoneNumber').textContent = memberData.phone;
+                document.getElementById('emailAddress').textContent = memberData.email;
+                document.getElementById('address').textContent = memberData.address;
+                document.getElementById('memberSince').textContent = memberData.memberSince;
+                document.getElementById('accountStatusValue').innerHTML = `<span class="status-badge status-${memberData.status.toLowerCase()}">${memberData.status}</span>`;
+                document.getElementById('assignedAgent').textContent = memberData.assignedAgent;
+                document.getElementById('lastContact').textContent = memberData.lastContact;
+                document.getElementById('totalCases').textContent = memberData.totalCases;
+                document.getElementById('activeCases').textContent = memberData.activeCases;
+            }
+        }
+
+        // Load current products
+        async function loadCurrentProducts() {
+            const tableBody = document.getElementById('currentProductsBody');
+            
+            // Use data from profile if available
+            const products = window.currentMemberProfile?.policies || [];
+            
+            if (products.length === 0) {
+                // Show mock data or empty state
+                const mockProducts = [
+                    {
+                        policy_number: 'POL-AUTO-001234',
+                        product_type: 'Auto Insurance Premium',
+                        coverage_amount: 100000,
+                        premium_amount: 1200,
+                        status: 'Active',
+                        effective_date: '2024-01-01',
+                        next_payment_date: '2025-10-01'
+                    },
+                    {
+                        policy_number: 'POL-HOME-001234',
+                        product_type: 'Home Insurance Standard',
+                        coverage_amount: 250000,
+                        premium_amount: 800,
+                        status: 'Active',
+                        effective_date: '2023-06-15',
+                        next_payment_date: '2025-09-15'
+                    }
+                ];
+
+                const productsHTML = mockProducts.map(product => `
+                    <tr>
+                        <td>${product.policy_number}</td>
+                        <td>${product.product_type}</td>
+                        <td>$${product.coverage_amount?.toLocaleString() || 'N/A'}</td>
+                        <td>$${product.premium_amount?.toLocaleString() || 'N/A'}/year</td>
+                        <td><span class="status-badge status-${product.status.toLowerCase()}">${product.status}</span></td>
+                        <td>${product.effective_date}</td>
+                        <td>${product.next_payment_date}</td>
+                    </tr>
+                `).join('');
+
+                tableBody.innerHTML = productsHTML;
+            } else {
+                const productsHTML = products.map(product => `
+                    <tr>
+                        <td>${product.policy_number || 'N/A'}</td>
+                        <td>${product.product_type || 'N/A'}</td>
+                        <td>$${product.coverage_amount?.toLocaleString() || 'N/A'}</td>
+                        <td>$${product.premium_amount?.toLocaleString() || 'N/A'}/year</td>
+                        <td><span class="status-badge status-${(product.status || 'unknown').toLowerCase()}">${product.status || 'Unknown'}</span></td>
+                        <td>${product.effective_date || 'N/A'}</td>
+                        <td>${product.next_payment_date || 'N/A'}</td>
+                    </tr>
+                `).join('');
+
+                tableBody.innerHTML = productsHTML;
+            }
+        }
+
+        // Load payment history
+        async function loadPaymentHistory() {
+            const tableBody = document.getElementById('paymentHistoryBody');
+            
+            // Mock data - replace with actual API call
+            const payments = [
+                { date: '2025-08-15', amount: '$166.67', method: 'Auto Pay', policy: 'POL-AUTO-001234', status: 'Paid', reference: 'PAY-20250815-001' },
+                { date: '2025-07-15', amount: '$166.67', method: 'Credit Card', policy: 'POL-AUTO-001234', status: 'Paid', reference: 'PAY-20250715-001' },
+                { date: '2025-06-15', amount: '$66.67', method: 'Bank Transfer', policy: 'POL-HOME-001234', status: 'Paid', reference: 'PAY-20250615-001' },
+                { date: '2025-05-15', amount: '$166.67', method: 'Auto Pay', policy: 'POL-AUTO-001234', status: 'Paid', reference: 'PAY-20250515-001' }
+            ];
+
+            const paymentsHTML = payments.map(payment => `
+                <tr>
+                    <td>${payment.date}</td>
+                    <td>${payment.amount}</td>
+                    <td>${payment.method}</td>
+                    <td>${payment.policy}</td>
+                    <td><span class="status-badge status-${payment.status.toLowerCase()}">${payment.status}</span></td>
+                    <td>${payment.reference}</td>
+                </tr>
+            `).join('');
+
+            tableBody.innerHTML = paymentsHTML;
+        }
+
+        // Load interaction history
+        async function loadInteractionHistory() {
+            const historyContainer = document.getElementById('interactionHistory');
+            
+            // Use data from profile if available
+            const interactions = window.currentMemberProfile?.interactions || [];
+            
+            if (interactions.length === 0) {
+                // Show mock data
+                const mockInteractions = [
+                    {
+                        created_at: '2025-09-02T10:30:00Z',
+                        case_type: 'Phone Call',
+                        assigned_agent: { name: 'Sarah Johnson' },
+                        subject: 'Billing question',
+                        description: 'Member called regarding billing question. Explained auto-pay setup and confirmed next payment date. Member satisfied with resolution.'
+                    },
+                    {
+                        created_at: '2025-08-15T14:15:00Z',
+                        case_type: 'Email',
+                        assigned_agent: { name: 'Mike Davis' },
+                        subject: 'Policy coverage inquiry',
+                        description: 'Responded to policy coverage inquiry. Sent detailed explanation of coverage limits and deductibles.'
+                    },
+                    {
+                        created_at: '2025-07-30T11:45:00Z',
+                        case_type: 'Live Chat',
+                        assigned_agent: { name: 'Lisa Brown' },
+                        subject: 'Mobile app login help',
+                        description: 'Quick question about mobile app login. Helped reset password and verified account access.'
+                    }
+                ];
+
+                const historyHTML = mockInteractions.map(interaction => `
+                    <div class="interaction-item">
+                        <div class="interaction-header">
+                            <span class="interaction-type">${interaction.case_type}</span>
+                            <span class="interaction-date">${new Date(interaction.created_at).toLocaleString()}</span>
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--cs-text-secondary); margin-bottom: 0.5rem;">
+                            Agent: ${interaction.assigned_agent?.name || 'Unknown'}
+                        </div>
+                        <div style="font-weight: 600; margin-bottom: 0.25rem;">${interaction.subject}</div>
+                        <div class="interaction-note">${interaction.description}</div>
+                    </div>
+                `).join('');
+
+                historyContainer.innerHTML = historyHTML;
+            } else {
+                const historyHTML = interactions.map(interaction => `
+                    <div class="interaction-item">
+                        <div class="interaction-header">
+                            <span class="interaction-type">${interaction.case_type || 'General'}</span>
+                            <span class="interaction-date">${new Date(interaction.created_at).toLocaleString()}</span>
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--cs-text-secondary); margin-bottom: 0.5rem;">
+                            Agent: ${interaction.assigned_agent?.name || 'Unknown'}
+                        </div>
+                        <div style="font-weight: 600; margin-bottom: 0.25rem;">${interaction.subject || 'No subject'}</div>
+                        <div class="interaction-note">${interaction.description || 'No description available'}</div>
+                    </div>
+                `).join('');
+
+                historyContainer.innerHTML = historyHTML;
+            }
+        }
+
+        // Load policy history
+        async function loadPolicyHistory() {
+            const tableBody = document.getElementById('policyHistoryBody');
+            
+            // Mock data - replace with actual API call
+            const policies = [
+                {
+                    policyNumber: 'POL-LIFE-001234',
+                    productType: 'Life Insurance Basic',
+                    effectiveDate: '2020-06-15',
+                    endDate: '2023-12-31',
+                    reason: 'Upgraded Coverage',
+                    premium: '$2,400/year',
+                    status: 'Cancelled'
+                },
+                {
+                    policyNumber: 'POL-AUTO-001233',
+                    productType: 'Auto Insurance Standard',
+                    effectiveDate: '2020-06-15',
+                    endDate: '2023-12-31',
+                    reason: 'Policy Upgrade',
+                    premium: '$1,000/year',
+                    status: 'Replaced'
+                }
+            ];
+
+            const policiesHTML = policies.map(policy => `
+                <tr>
+                    <td>${policy.policyNumber}</td>
+                    <td>${policy.productType}</td>
+                    <td>${policy.effectiveDate}</td>
+                    <td>${policy.endDate}</td>
+                    <td>${policy.reason}</td>
+                    <td>${policy.premium}</td>
+                    <td><span class="status-badge status-${policy.status.toLowerCase()}">${policy.status}</span></td>
+                </tr>
+            `).join('');
+
+            tableBody.innerHTML = policiesHTML;
+        }
+
+        // Fallback data for when API fails
+        function loadFallbackData() {
+            document.getElementById('memberName').textContent = 'Member Data Unavailable';
+            document.getElementById('memberId').textContent = currentMemberId;
+        }
+
+        // Action functions
+        function createCase() {
+            alert(`Create new case for ${currentMemberId} - This will redirect to case creation form`);
+        }
+
+        function editMember() {
+            alert(`Edit member ${currentMemberId} contact information - This will open edit form`);
+        }
+
+        function goBackToSearch() {
+            window.location.href = '/customer-service/member-search.html';
+        }
+
+        function addInteraction() {
+            document.getElementById('interactionModal').style.display = 'block';
+        }
+
+        function closeInteractionModal() {
+            document.getElementById('interactionModal').style.display = 'none';
+            document.getElementById('interactionForm').reset();
+        }
+
+        // Handle interaction form submission
+        document.getElementById('interactionForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const type = document.getElementById('interactionType').value;
+            const note = document.getElementById('interactionNote').value;
+            
+            try {
+                // Add interaction (mock API call)
+                console.log('Adding interaction:', { type, note, memberId: currentMemberId });
+                
+                // Reload interaction history
+                await loadInteractionHistory();
+                
+                // Close modal
+                closeInteractionModal();
+                
+                alert('Interaction note added successfully!');
+            } catch (error) {
+                console.error('Error adding interaction:', error);
+                alert('Error adding interaction note. Please try again.');
+            }
+        });
+
+        // Logout function
+        function logout() {
+            clearAuthCookies();
+            localStorage.removeItem('selectedMemberId');
+            window.location.href = '/login';
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
+    <script src="/assets/session-prod.js"></script>
+    <script src="/js/theme-switcher.js"></script>
+</body>
+</html>

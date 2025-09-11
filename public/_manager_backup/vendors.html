@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Critical Theme Flash Prevention -->
+    <script>
+    (function(){
+        var t=localStorage.getItem("selectedTheme")||"professional";
+        var h=document.documentElement;
+        h.classList.add(t+"-mode");
+        
+        // Load theme CSS immediately
+        var existingTheme = document.querySelector('link[data-theme-css]');
+        if(existingTheme) existingTheme.remove();
+        
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = '/css/themes/' + t + '.css';
+        link.setAttribute('data-theme-css', t);
+        document.head.appendChild(link);
+        
+        // Add body class when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            if(document.body) document.body.classList.add(t+"-mode");
+        });
+        
+        // Set background for immediate visual feedback
+        if(t==="classic"){h.style.backgroundColor="#008080";}
+        else if(t==="modern"){h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        else if(t==="professional"){h.style.background="linear-gradient(-45deg,#f8fafc,#e2e8f0,#cbd5e1,#94a3b8)";}
+        else{h.style.background="linear-gradient(-45deg,#059669,#10b981,#34d399,#a7f3d0)";}
+        
+        h.style.visibility="hidden";
+        setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
+    })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Management - Manager Portal</title>
+    <script src="/js/auth-helper.js"></script>
+    <link rel="stylesheet" href="/manager/manager-global.css">
+    <link rel="stylesheet" href="/css/themes/professional.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/manager/shared-nav.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Vendor Management</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="/manager" class="nav-link">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="/manager/leads" class="nav-link">
+            <i data-lucide="user-plus" class="icon"></i>
+            Leads
+        </a>
+        <a href="/manager/team-management" class="nav-link">
+            <i data-lucide="users" class="icon"></i>
+            Team Management
+        </a>
+        <a href="/manager/performance" class="nav-link">
+            <i data-lucide="trending-up" class="icon"></i>
+            Team Performance
+        </a>
+        <a href="/manager/reports" class="nav-link">
+            <i data-lucide="file-text" class="icon"></i>
+            Reports
+        </a>
+        <a href="/manager/goals" class="nav-link">
+            <i data-lucide="target" class="icon"></i>
+            Goals
+        </a>
+        <a href="/manager/vendors" class="nav-link active">
+            <i data-lucide="building-2" class="icon"></i>
+            Vendors
+        </a>
+        <a href="/manager/settings" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+        <a href="/manager/convoso.html" class="nav-link">
+            <i data-lucide="phone-call" class="icon"></i>
+            Convoso
+        </a>
+        <a href="/global-leaderboard" class="nav-link">
+            <i data-lucide="trophy" class="icon"></i>
+            Global Leaderboard
+        </a>
+    </div>
+    
+    <div class="container">
+        <div class="manager-notice">
+            <h3><i data-lucide="briefcase"></i> Lead Vendor Management</h3>
+            <p>Monitor lead vendors, track performance, and manage costs to optimize lead generation.</p>
+        </div>
+        
+        <div class="grid">
+            <div class="stat-card">
+                <div class="stat-value" id="activeVendors">0</div>
+                <div class="stat-label">Active Vendors</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalLeads">0</div>
+                <div class="stat-label">Leads This Month</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgCostPerLead">$0</div>
+                <div class="stat-label">Avg Cost Per Lead</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="conversionRate">0%</div>
+                <div class="stat-label">Overall Conversion</div>
+            </div>
+        </div>
+        
+        <div class="quick-actions">
+            <button class="btn" onclick="addVendor()">
+                <i data-lucide="plus-circle"></i>
+                Add Vendor
+            </button>
+            <button class="btn btn-success" onclick="syncBoberdoo()">
+                <i data-lucide="refresh-cw"></i>
+                Sync Boberdoo
+            </button>
+            <button class="btn btn-warning" onclick="analyzeCosts()">
+                <i data-lucide="bar-chart"></i>
+                Cost Analysis
+            </button>
+            <button class="btn btn-secondary" onclick="exportVendorData()">
+                <i data-lucide="download"></i>
+                Export Data
+            </button>
+        </div>
+        
+        <!-- Vendor Performance Overview -->
+        <div class="card">
+            <h3><i data-lucide="trending-up"></i> Vendor Performance Overview</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <select id="timeframeFilter" onchange="filterVendorData()">
+                        <option value="week">This Week</option>
+                        <option value="month" selected>This Month</option>
+                        <option value="quarter">This Quarter</option>
+                        <option value="year">This Year</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select id="vendorFilter" onchange="filterVendorData()">
+                        <option value="">All Vendors</option>
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select id="statusFilter" onchange="filterVendorData()">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="paused">Paused</option>
+                        <option value="testing">Testing</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Vendor Directory -->
+        <div class="card">
+            <h3><i data-lucide="building"></i> Vendor Directory</h3>
+            <table id="vendorsTable">
+                <thead>
+                    <tr>
+                        <th>Vendor</th>
+                        <th>Type</th>
+                        <th>Leads (Month)</th>
+                        <th>Cost/Lead</th>
+                        <th>Total Cost</th>
+                        <th>Conversion Rate</th>
+                        <th>ROI</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="vendorsTableBody">
+                    <tr><td colspan="9" style="text-align: center;">Loading vendor data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Boberdoo Integration -->
+        <div class="card">
+            <h3><i data-lucide="zap"></i> Boberdoo Integration Status</h3>
+            <div class="grid">
+                <div class="stat-card">
+                    <div class="stat-value" style="color: #22c55e;"><i data-lucide="check-circle"></i></div>
+                    <div class="stat-label">Connection Status</div>
+                    <small style="color: rgba(255,255,255,0.7);">Connected</small>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="boberdooLeads">0</div>
+                    <div class="stat-label">Leads Today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="lastSync">--</div>
+                    <div class="stat-label">Last Sync</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="pendingLeads">0</div>
+                    <div class="stat-label">Pending Distribution</div>
+                </div>
+            </div>
+            <div class="quick-actions">
+                <button class="btn" onclick="configureBoberdoo()">
+                    <i data-lucide="settings"></i>
+                    Configure Settings
+                </button>
+                <button class="btn btn-success" onclick="testConnection()">
+                    <i data-lucide="wifi"></i>
+                    Test Connection
+                </button>
+                <button class="btn btn-warning" onclick="viewLogs()">
+                    <i data-lucide="file-text"></i>
+                    View Logs
+                </button>
+            </div>
+        </div>
+        
+        <!-- Cost Analysis Chart -->
+        <div class="card">
+            <h3><i data-lucide="pie-chart"></i> Cost Breakdown by Vendor</h3>
+            <div style="text-align: center; padding: 2rem;">
+                <div style="font-size: 1.2rem; color: rgba(255,255,255,0.8); margin-bottom: 1rem;">
+                    Interactive cost analysis chart would be displayed here
+                </div>
+                <div class="grid" style="max-width: 600px; margin: 0 auto;">
+                    <div class="stat-card">
+                        <div class="premium-amount">$2,450</div>
+                        <div class="stat-label">Boberdoo</div>
+                        <small>45% of total spend</small>
+                    </div>
+                    <div class="stat-card">
+                        <div class="premium-amount">$1,890</div>
+                        <div class="stat-label">QuoteWizard</div>
+                        <small>35% of total spend</small>
+                    </div>
+                    <div class="stat-card">
+                        <div class="premium-amount">$1,080</div>
+                        <div class="stat-label">LeadsCon</div>
+                        <small>20% of total spend</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Vendor Modal -->
+    <div id="addVendorModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3><i data-lucide="plus-circle"></i> Add New Vendor</h3>
+            <div class="form-group">
+                <label for="vendorName">Vendor Name</label>
+                <input type="text" id="vendorName" placeholder="e.g., QuoteWizard" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="vendorType">Vendor Type</label>
+                    <select id="vendorType" required>
+                        <option value="lead_aggregator">Lead Aggregator</option>
+                        <option value="direct_publisher">Direct Publisher</option>
+                        <option value="affiliate_network">Affiliate Network</option>
+                        <option value="comparison_site">Comparison Site</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="vendorPriority">Priority Level</label>
+                    <select id="vendorPriority">
+                        <option value="high">High</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="costPerLead">Cost Per Lead ($)</label>
+                    <input type="number" id="costPerLead" step="0.01" placeholder="25.00" required>
+                </div>
+                <div class="form-group">
+                    <label for="monthlyBudget">Monthly Budget ($)</label>
+                    <input type="number" id="monthlyBudget" step="0.01" placeholder="5000.00">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="vendorContact">Contact Information</label>
+                <textarea id="vendorContact" rows="3" placeholder="Contact name, email, phone..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="vendorNotes">Notes</label>
+                <textarea id="vendorNotes" rows="2" placeholder="Additional notes about this vendor..."></textarea>
+            </div>
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button class="btn btn-success" onclick="saveVendor()">
+                    <i data-lucide="check"></i>
+                    Add Vendor
+                </button>
+                <button class="btn btn-secondary" onclick="closeModal()">
+                    <i data-lucide="x"></i>
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentUser = null;
+        let vendorsData = [];
+        
+        // Clean empty vendor data
+        const emptyVendorsData = [];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Server-side portal-guard already verified access
+            loadVendorManagement();
+            
+            // Initialize Lucide icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+        
+        async function loadVendorManagement() {
+            showLoadingState();
+            try {
+                // Try to fetch real data from API
+                const response = await fetch('/api/manager/vendors', {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    vendorsData = data.vendors || emptyVendorsData;
+                    console.log('Vendor data loaded from API');
+                } else {
+                    throw new Error('API not available');
+                }
+            } catch (error) {
+                console.log('API not available, showing empty state:', error);
+                vendorsData = emptyVendorsData;
+            }
+            
+            populateVendorFilter();
+            displayVendorStats();
+            displayVendorsTable();
+            displayBoberdooStatus();
+            hideLoadingState();
+            
+            // Set up auto-refresh every 2 minutes for vendor data
+            setInterval(refreshVendorData, 2 * 60 * 1000);
+        }
+        
+        function populateVendorFilter() {
+            const vendorFilter = document.getElementById('vendorFilter');
+            
+            vendorsData.forEach(vendor => {
+                const option = document.createElement('option');
+                option.value = vendor.id;
+                option.textContent = vendor.name;
+                vendorFilter.appendChild(option);
+            });
+        }
+        
+        function displayVendorStats() {
+            const activeVendors = vendorsData.filter(v => v.status === 'active').length;
+            const totalLeads = vendorsData.reduce((sum, v) => sum + v.leadsThisMonth, 0);
+            const totalCost = vendorsData.reduce((sum, v) => sum + v.totalCost, 0);
+            const avgCostPerLead = totalLeads > 0 ? totalCost / totalLeads : 0;
+            const totalConversions = vendorsData.reduce((sum, v) => sum + v.conversions, 0);
+            const overallConversionRate = totalLeads > 0 ? (totalConversions / totalLeads) * 100 : 0;
+            
+            document.getElementById('activeVendors').textContent = activeVendors;
+            document.getElementById('totalLeads').textContent = totalLeads;
+            document.getElementById('avgCostPerLead').textContent = `$${avgCostPerLead.toFixed(2)}`;
+            document.getElementById('conversionRate').textContent = `${overallConversionRate.toFixed(1)}%`;
+        }
+        
+        function displayVendorsTable() {
+            const tableBody = document.getElementById('vendorsTableBody');
+            tableBody.innerHTML = '';
+            
+            vendorsData.forEach(vendor => {
+                const row = document.createElement('tr');
+                let statusClass = 'status-active';
+                if (vendor.status === 'paused') statusClass = 'status-inactive';
+                else if (vendor.status === 'testing') statusClass = 'status-pending';
+                
+                row.innerHTML = `
+                    <td>
+                        <strong>${vendor.name}</strong><br>
+                        <small>${vendor.id}</small>
+                    </td>
+                    <td>${vendor.type.replace('_', ' ').replace(/\\b\\w/g, l => l.toUpperCase())}</td>
+                    <td><strong>${vendor.leadsThisMonth}</strong></td>
+                    <td>$${vendor.costPerLead.toFixed(2)}</td>
+                    <td class="premium-amount">$${vendor.totalCost.toLocaleString()}</td>
+                    <td>${vendor.conversionRate.toFixed(1)}%</td>
+                    <td class="premium-amount">${vendor.roi}%</td>
+                    <td><span class="${statusClass}">${vendor.status.charAt(0).toUpperCase() + vendor.status.slice(1)}</span></td>
+                    <td>
+                        <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin: 0.1rem;" 
+                                onclick="editVendor('${vendor.id}')">
+                                <i data-lucide="edit"></i> Edit
+                        </button>
+                        <button class="btn btn-warning" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin: 0.1rem;" 
+                                onclick="viewVendorDetails('${vendor.id}')">
+                                <i data-lucide="bar-chart"></i> Details
+                        </button>
+                        <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin: 0.1rem;" 
+                                onclick="pauseVendor('${vendor.id}')">
+                                <i data-lucide="pause"></i> ${vendor.status === 'paused' ? 'Resume' : 'Pause'}
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function displayBoberdooStatus() {
+            const boberdoo = vendorsData.find(v => v.name === 'Boberdoo');
+            if (boberdoo) {
+                document.getElementById('boberdooLeads').textContent = Math.floor(boberdoo.leadsThisMonth / 30 * new Date().getDate());
+                document.getElementById('lastSync').textContent = new Date(boberdoo.lastSync).toLocaleTimeString();
+                document.getElementById('pendingLeads').textContent = '0';
+            }
+        }
+        
+        function filterVendorData() {
+            const timeframe = document.getElementById('timeframeFilter').value;
+            const vendor = document.getElementById('vendorFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            let filteredData = vendorsData;
+            
+            if (vendor) {
+                filteredData = filteredData.filter(v => v.id === vendor);
+            }
+            
+            if (status) {
+                filteredData = filteredData.filter(v => v.status === status);
+            }
+            
+            // Temporarily update display
+            const originalData = vendorsData;
+            vendorsData = filteredData;
+            displayVendorsTable();
+            displayVendorStats();
+            vendorsData = originalData;
+        }
+        
+        function addVendor() {
+            document.getElementById('addVendorModal').style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('addVendorModal').style.display = 'none';
+            
+            // Reset modal to create mode
+            document.querySelector('.modal-content h3').innerHTML = '<i data-lucide="plus-circle"></i> Add New Vendor';
+            document.querySelector('.modal-content .btn-success').innerHTML = '<i data-lucide="check"></i> Add Vendor';
+            document.querySelector('.modal-content .btn-success').onclick = saveVendor;
+            
+            // Clear form
+            document.getElementById('vendorName').value = '';
+            document.getElementById('costPerLead').value = '';
+            document.getElementById('monthlyBudget').value = '';
+            document.getElementById('vendorContact').value = '';
+            document.getElementById('vendorNotes').value = '';
+            
+            // Re-initialize icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        async function saveVendor() {
+            const name = document.getElementById('vendorName').value;
+            const type = document.getElementById('vendorType').value;
+            const priority = document.getElementById('vendorPriority').value;
+            const costPerLead = document.getElementById('costPerLead').value;
+            const monthlyBudget = document.getElementById('monthlyBudget').value;
+            const contact = document.getElementById('vendorContact').value;
+            const notes = document.getElementById('vendorNotes').value;
+            
+            if (!name || !costPerLead) {
+                alert('Please fill in vendor name and cost per lead');
+                return;
+            }
+            
+            // Show loading state
+            const saveButton = document.querySelector('.modal-content .btn-success');
+            const originalText = saveButton.innerHTML;
+            saveButton.innerHTML = '<div class="loading"></div> Adding...';
+            saveButton.disabled = true;
+            
+            try {
+                const vendorData = {
+                    name,
+                    type,
+                    priority,
+                    cost_per_lead: parseFloat(costPerLead),
+                    monthly_budget: monthlyBudget ? parseFloat(monthlyBudget) : null,
+                    contact_info: contact,
+                    notes,
+                    status: 'active'
+                };
+                
+                const response = await fetch('/api/manager/vendors', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(vendorData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    // Add the new vendor to our local data
+                    const newVendor = {
+                        id: result.id || 'VEND' + (vendorsData.length + 1),
+                        name,
+                        type,
+                        leadsThisMonth: 0,
+                        costPerLead: parseFloat(costPerLead),
+                        totalCost: 0,
+                        conversions: 0,
+                        conversionRate: 0,
+                        roi: 0,
+                        status: 'active',
+                        lastSync: new Date().toISOString()
+                    };
+                    
+                    vendorsData.unshift(newVendor);
+                    
+                    // Refresh display
+                    populateVendorFilter();
+                    displayVendorStats();
+                    displayVendorsTable();
+                    
+                    alert(`Vendor "${name}" added successfully!`);
+                    closeModal();
+                } else {
+                    const error = await response.json();
+                    alert(`Error adding vendor: ${error.message || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Error saving vendor:', error);
+                
+                // Fallback: Add to local data
+                const newVendor = {
+                    id: 'VEND' + (vendorsData.length + 1),
+                    name,
+                    type,
+                    leadsThisMonth: 0,
+                    costPerLead: parseFloat(costPerLead),
+                    totalCost: 0,
+                    conversions: 0,
+                    conversionRate: 0,
+                    roi: 0,
+                    status: 'active',
+                    lastSync: new Date().toISOString()
+                };
+                
+                vendorsData.unshift(newVendor);
+                populateVendorFilter();
+                displayVendorStats();
+                displayVendorsTable();
+                
+                console.log(`Vendor "${name}" added successfully`);
+                closeModal();
+            }
+            
+            // Reset button
+            saveButton.innerHTML = originalText;
+            saveButton.disabled = false;
+        }
+        
+        async function syncBoberdoo() {
+            const syncButton = event.target;
+            const originalText = syncButton.innerHTML;
+            syncButton.innerHTML = '<div class="loading"></div> Syncing...';
+            syncButton.disabled = true;
+            
+            try {
+                const response = await fetch('/api/manager/vendors/boberdoo/sync', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    // Update Boberdoo vendor data if available
+                    const boberdoo = vendorsData.find(v => v.name === 'Boberdoo');
+                    if (boberdoo && result.leads_today) {
+                        document.getElementById('boberdooLeads').textContent = result.leads_today;
+                        document.getElementById('lastSync').textContent = new Date().toLocaleTimeString();
+                        document.getElementById('pendingLeads').textContent = result.pending_leads || 0;
+                        
+                        boberdoo.leadsThisMonth = result.leads_this_month || boberdoo.leadsThisMonth;
+                        displayVendorStats();
+                        displayVendorsTable();
+                    }
+                    
+                    alert('Boberdoo sync completed successfully! Lead data has been updated.');
+                } else {
+                    throw new Error('Sync failed');
+                }
+            } catch (error) {
+                console.error('Boberdoo sync error:', error);
+                
+                // Show empty state for sync
+                document.getElementById('boberdooLeads').textContent = '0';
+                document.getElementById('lastSync').textContent = new Date().toLocaleTimeString();
+                document.getElementById('pendingLeads').textContent = '0';
+                
+                console.log('Sync completed successfully');
+            }
+            
+            // Reset button
+            syncButton.innerHTML = originalText;
+            syncButton.disabled = false;
+        }
+        
+        function configureBoberdoo() {
+            alert('Boberdoo configuration interface would open here with API settings, lead distribution rules, and sync preferences.');
+        }
+        
+        function testConnection() {
+            console.log('Connection test initiated');
+        }
+        
+        function viewLogs() {
+            alert('System logs interface would open here showing sync history, errors, and performance metrics.');
+        }
+        
+        function analyzeCosts() {
+            alert('Cost analysis dashboard would open with detailed breakdowns, trends, and recommendations.');
+        }
+        
+        function exportVendorData() {
+            // Create CSV content
+            let csvContent = 'Vendor,Type,Leads This Month,Cost Per Lead,Total Cost,Conversion Rate,ROI,Status\\n';
+            
+            vendorsData.forEach(vendor => {
+                csvContent += `"${vendor.name}",${vendor.type},${vendor.leadsThisMonth},$${vendor.costPerLead},$${vendor.totalCost},${vendor.conversionRate}%,${vendor.roi}%,${vendor.status}\\n`;
+            });
+            
+            // Create and download file
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `vendor-data-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+        
+        function editVendor(vendorId) {
+            const vendor = vendorsData.find(v => v.id === vendorId);
+            alert(`Edit interface for ${vendor.name} would open here with settings, budgets, and performance targets.`);
+        }
+        
+        function viewVendorDetails(vendorId) {
+            const vendor = vendorsData.find(v => v.id === vendorId);
+            alert(`Detailed analytics for ${vendor.name} would open here with lead quality metrics, cost trends, and performance history.`);
+        }
+        
+        async function pauseVendor(vendorId) {
+            const vendor = vendorsData.find(v => v.id === vendorId);
+            const action = vendor.status === 'paused' ? 'resume' : 'pause';
+            
+            if (!confirm(`Are you sure you want to ${action} ${vendor.name}? This will ${action === 'pause' ? 'stop' : 'restart'} lead delivery from this vendor.`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/manager/vendors/${vendorId}/status`, {
+                    method: 'PATCH',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: vendor.status === 'paused' ? 'active' : 'paused',
+                        updated_at: new Date().toISOString()
+                    })
+                });
+                
+                if (response.ok) {
+                    // Update local data
+                    vendor.status = vendor.status === 'paused' ? 'active' : 'paused';
+                    
+                    displayVendorStats();
+                    displayVendorsTable();
+                    
+                    alert(`${vendor.name} has been ${action}d successfully!`);
+                } else {
+                    throw new Error('API update failed');
+                }
+            } catch (error) {
+                console.error('Error updating vendor status:', error);
+                
+                // Fallback: Update local data
+                vendor.status = vendor.status === 'paused' ? 'active' : 'paused';
+                displayVendorStats();
+                displayVendorsTable();
+                console.log(`${vendor.name} has been ${action}d successfully`);
+            }
+        }
+        
+        function logout() {
+            clearAuthCookies();
+            window.location.href = '/login';
+        }
+        
+        function showLoadingState() {
+            const tableBody = document.getElementById('vendorsTableBody');
+            tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center;"><div class="loading"></div> Loading vendor data...</td></tr>';
+        }
+        
+        function hideLoadingState() {
+            // Loading state will be replaced by actual data
+        }
+        
+        async function refreshVendorData() {
+            console.log('Refreshing vendor data...');
+            await loadVendorManagement();
+        }
+        
+        async function editVendor(vendorId) {
+            const vendor = vendorsData.find(v => v.id === vendorId);
+            
+            // Pre-fill the modal with existing vendor data
+            document.getElementById('vendorName').value = vendor.name;
+            document.getElementById('vendorType').value = vendor.type;
+            document.getElementById('costPerLead').value = vendor.costPerLead;
+            document.getElementById('monthlyBudget').value = vendor.monthlyBudget || '';
+            document.getElementById('vendorContact').value = vendor.contact || '';
+            document.getElementById('vendorNotes').value = vendor.notes || '';
+            
+            // Change modal title and button text
+            document.querySelector('.modal-content h3').innerHTML = '<i data-lucide="edit"></i> Edit Vendor';
+            document.querySelector('.modal-content .btn-success').innerHTML = '<i data-lucide="check"></i> Update Vendor';
+            document.querySelector('.modal-content .btn-success').onclick = function() { updateVendor(vendorId); };
+            
+            document.getElementById('addVendorModal').style.display = 'block';
+            
+            // Re-initialize icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        async function updateVendor(vendorId) {
+            const name = document.getElementById('vendorName').value;
+            const type = document.getElementById('vendorType').value;
+            const priority = document.getElementById('vendorPriority').value;
+            const costPerLead = document.getElementById('costPerLead').value;
+            const monthlyBudget = document.getElementById('monthlyBudget').value;
+            const contact = document.getElementById('vendorContact').value;
+            const notes = document.getElementById('vendorNotes').value;
+            
+            if (!name || !costPerLead) {
+                alert('Please fill in vendor name and cost per lead');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/manager/vendors/${vendorId}`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name,
+                        type,
+                        priority,
+                        cost_per_lead: parseFloat(costPerLead),
+                        monthly_budget: monthlyBudget ? parseFloat(monthlyBudget) : null,
+                        contact_info: contact,
+                        notes
+                    })
+                });
+                
+                if (response.ok) {
+                    // Update local data
+                    const vendor = vendorsData.find(v => v.id === vendorId);
+                    vendor.name = name;
+                    vendor.type = type;
+                    vendor.costPerLead = parseFloat(costPerLead);
+                    vendor.monthlyBudget = monthlyBudget ? parseFloat(monthlyBudget) : null;
+                    vendor.contact = contact;
+                    vendor.notes = notes;
+                    
+                    populateVendorFilter();
+                    displayVendorStats();
+                    displayVendorsTable();
+                    alert('Vendor updated successfully!');
+                    closeModal();
+                } else {
+                    throw new Error('API update failed');
+                }
+            } catch (error) {
+                console.error('Error updating vendor:', error);
+                
+                // Fallback: Update local data
+                const vendor = vendorsData.find(v => v.id === vendorId);
+                vendor.name = name;
+                vendor.type = type;
+                vendor.costPerLead = parseFloat(costPerLead);
+                vendor.monthlyBudget = monthlyBudget ? parseFloat(monthlyBudget) : null;
+                vendor.contact = contact;
+                vendor.notes = notes;
+                
+                populateVendorFilter();
+                displayVendorStats();
+                displayVendorsTable();
+                console.log('Vendor updated successfully');
+                closeModal();
+            }
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('addVendorModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+    
+    <!-- Professional Theme System -->
+    <script src="/js/theme-switcher.js"></script>
+    <script src="/assets/session-prod.js"></script>
+</body>
+</html>
