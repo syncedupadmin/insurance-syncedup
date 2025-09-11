@@ -1,0 +1,32 @@
+/* AGENT PORTAL - Modern Theme (Green Variation) */
+
+/* Force green modern theme for agent portal */
+.portal-agent body.modern-mode,
+body.portal-agent.modern-mode {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    background-attachment: fixed !important;
+    color: #ffffff !important;
+}
+
+/* Override any purple from global modern.css */
+.portal-agent .modern-mode .header,
+body.portal-agent.modern-mode .header {
+    background: linear-gradient(135deg, #059669, #10b981, #34d399) !important;
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.5) !important;
+}
+
+/* Green glow effects for agent modern theme */
+body.portal-agent.modern-mode::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(16, 185, 129, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(5, 150, 105, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(52, 211, 153, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+}

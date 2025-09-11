@@ -7,7 +7,7 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #8B5CF6 100%);
+    /* Background should be set by portal-specific CSS, not globally */
     min-height: 100vh;
     color: #ffffff;
     overflow-x: hidden;
