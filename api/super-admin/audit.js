@@ -2,14 +2,19 @@
 // This API handles ALL administrator actions with complete audit trail
 
 const { createClient } = require('@supabase/supabase-js');
-const { verifySuperAdmin } = require('./auth-middleware');
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL, 
-  process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const jwt = require('jsonwebtoken');
 
 module.exports = async function handler(req, res) {
+  // Create Supabase client inside handler to ensure env vars are loaded
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  
+  if (!supabaseUrl || !supabaseKey) {
+    console.error('Missing Supabase credentials:', { url: !!supabaseUrl, key: !!supabaseKey });
+    return res.status(500).json({ error: 'Database configuration error' });
+  }
+  
+  const supabase = createClient(supabaseUrl, supabaseKey);
   // CORS headers for security
   res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGINS || '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -19,11 +24,34 @@ module.exports = async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // Verify super admin authentication
-  const user = await verifySuperAdmin(req, res);
-  if (!user) {
-    // verifySuperAdmin already sent the response
-    return;
+  // Verify super admin authentication using JWT from cookie
+  const getCookie = (name) => {
+    const match = (req.headers.cookie || '').match(new RegExp(`(?:^|; )${name}=([^;]+)`));
+    return match ? decodeURIComponent(match[1]) : null;
+  };
+  
+  const token = getCookie('auth_token');
+  if (!token) {
+    return res.status(401).json({ error: 'Authorization required' });
+  }
+  
+  let user;
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const role = getCookie('user_role') || payload.role;
+    
+    if (role !== 'super_admin') {
+      return res.status(403).json({ error: 'Super admin privileges required' });
+    }
+    
+    user = {
+      id: payload.id || payload.sub,
+      email: payload.email,
+      role: role
+    };
+  } catch (jwtError) {
+    console.error('JWT verification error:', jwtError);
+    return res.status(403).json({ error: 'Invalid or expired token' });
   }
 
   try {
@@ -43,9 +71,9 @@ module.exports = async function handler(req, res) {
         const limit = Math.min(parseInt(url.searchParams.get('limit')) || 10, 100);
         
         const { data: logs, error } = await supabase
-          .from('admin_audit_log')
+          .from('audit_logs')
           .select('*')
-          .order('timestamp', { ascending: false })
+          .order('created_at', { ascending: false })
           .limit(limit);
 
         if (error) {
@@ -53,10 +81,10 @@ module.exports = async function handler(req, res) {
           return res.status(500).json({ error: 'Failed to fetch audit logs' });
         }
 
-        // Map timestamp to created_at for frontend compatibility
+        // Map created_at to created_at for frontend compatibility
         const entries = (logs || []).map(log => ({
           ...log,
-          created_at: log.timestamp,
+          created_at: log.created_at,
           action: log.action || 'UNKNOWN',
           details: log.details || 'No details provided'
         }));
@@ -86,6 +114,17 @@ module.exports = async function handler(req, res) {
 
 // Handle administrator action logging
 async function handleAuditLogging(req, res, user) {
+  // Create Supabase client
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  
+  if (!supabaseUrl || !supabaseKey) {
+    console.error('Missing Supabase credentials in handleAuditLogging');
+    return res.status(500).json({ error: 'Database configuration error' });
+  }
+  
+  const supabase = createClient(supabaseUrl, supabaseKey);
+  
   try {
     const {
       action,
@@ -107,25 +146,30 @@ async function handleAuditLogging(req, res, user) {
       admin_id: user.id,
       admin_email: user.email,
       action: action.toUpperCase(),
-      details,
+      details: { message: details, timestamp: new Date().toISOString() }, // Plain object for JSONB
       target_resource,
-      ip_address: getClientIP(req),
+      ip_address: getClientIP(req) || '0.0.0.0', // Ensure valid IP
       user_agent: req.headers['user-agent'] || 'Unknown',
       session_id,
       screen_resolution,
       browser_language,
       referrer,
-      timestamp: new Date().toISOString(),
+      created_at: new Date().toISOString(),
       metadata: {
         request_headers: sanitizeHeaders(req.headers),
-        user_role: user.user_metadata?.role || user.app_metadata?.role,
-        user_agency: user.user_metadata?.agency_id
-      }
+        user_role: user.role,
+        user_agency: null
+      },
+      // Add existing columns
+      agency_id: null, // Don't set agency_id for super admin
+      user_id: user.id,
+      user_email: user.email,
+      portal: 'super-admin' // varchar accepts any text
     };
 
     // Insert audit log with error handling
     const { data, error } = await supabase
-      .from('admin_audit_log')
+      .from('audit_logs')
       .insert([auditEntry])
       .select();
 
@@ -142,7 +186,7 @@ async function handleAuditLogging(req, res, user) {
     return res.status(200).json({ 
       success: true, 
       audit_id: data[0]?.id,
-      timestamp: auditEntry.timestamp
+      created_at: auditEntry.created_at
     });
 
   } catch (error) {
@@ -153,11 +197,22 @@ async function handleAuditLogging(req, res, user) {
 
 // Handle recent audit logs retrieval
 async function handleRecentAuditLogs(req, res, user) {
+  // Create Supabase client
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  
+  if (!supabaseUrl || !supabaseKey) {
+    console.error('Missing Supabase credentials in handleRecentAuditLogs');
+    return res.status(500).json({ error: 'Database configuration error' });
+  }
+  
+  const supabase = createClient(supabaseUrl, supabaseKey);
+  
   try {
     const limit = Math.min(parseInt(req.query.limit) || 10, 100); // Max 100 records
     
     const { data: logs, error } = await supabase
-      .from('admin_audit_log')
+      .from('audit_logs')
       .select(`
         id,
         admin_email,
@@ -165,10 +220,10 @@ async function handleRecentAuditLogs(req, res, user) {
         details,
         target_resource,
         ip_address,
-        timestamp,
+        created_at,
         metadata
       `)
-      .order('timestamp', { ascending: false })
+      .order('created_at', { ascending: false })
       .limit(limit);
 
     if (error) {
@@ -177,14 +232,18 @@ async function handleRecentAuditLogs(req, res, user) {
     }
 
     // Log the audit log access
-    await supabase.from('admin_audit_log').insert([{
+    await supabase.from('audit_logs').insert([{
       admin_id: user.id,
       admin_email: user.email,
       action: 'AUDIT_LOGS_VIEWED',
-      details: `Viewed ${logs?.length || 0} recent audit log entries`,
-      ip_address: getClientIP(req),
+      details: { message: `Viewed ${logs?.length || 0} recent audit log entries` },
+      ip_address: getClientIP(req) || '0.0.0.0',
       user_agent: req.headers['user-agent'],
-      timestamp: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      user_id: user.id,
+      user_email: user.email,
+      agency_id: null,
+      portal: 'super-admin'
     }]);
 
     return res.status(200).json(logs || []);
@@ -197,6 +256,17 @@ async function handleRecentAuditLogs(req, res, user) {
 
 // Handle comprehensive audit log queries with filters
 async function handleAuditLogQuery(req, res, user) {
+  // Create Supabase client
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  
+  if (!supabaseUrl || !supabaseKey) {
+    console.error('Missing Supabase credentials in handleAuditLogQuery');
+    return res.status(500).json({ error: 'Database configuration error' });
+  }
+  
+  const supabase = createClient(supabaseUrl, supabaseKey);
+  
   try {
     const {
       start_date,
@@ -209,7 +279,7 @@ async function handleAuditLogQuery(req, res, user) {
     } = req.query;
 
     let query = supabase
-      .from('admin_audit_log')
+      .from('audit_logs')
       .select(`
         id,
         admin_email,
@@ -217,16 +287,16 @@ async function handleAuditLogQuery(req, res, user) {
         details,
         target_resource,
         ip_address,
-        timestamp,
+        created_at,
         metadata
       `);
 
     // Apply filters
     if (start_date) {
-      query = query.gte('timestamp', start_date);
+      query = query.gte('created_at', start_date);
     }
     if (end_date) {
-      query = query.lte('timestamp', end_date);
+      query = query.lte('created_at', end_date);
     }
     if (action_type) {
       query = query.eq('action', action_type.toUpperCase());
@@ -240,7 +310,7 @@ async function handleAuditLogQuery(req, res, user) {
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
     const { data: logs, error, count } = await query
-      .order('timestamp', { ascending: false })
+      .order('created_at', { ascending: false })
       .range(offset, offset + parseInt(limit) - 1);
 
     if (error) {
@@ -249,14 +319,17 @@ async function handleAuditLogQuery(req, res, user) {
     }
 
     // Log the comprehensive audit query
-    await supabase.from('admin_audit_log').insert([{
+    await supabase.from('audit_logs').insert([{
       admin_id: user.id,
       admin_email: user.email,
       action: 'COMPREHENSIVE_AUDIT_QUERY',
-      details: `Queried audit logs with filters: ${JSON.stringify(req.query)}`,
+      details: { message: 'Queried audit logs', filters: req.query },
       ip_address: getClientIP(req),
       user_agent: req.headers['user-agent'],
-      timestamp: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      user_id: user.id,
+      user_email: user.email,
+      portal: 'super-admin'
     }]);
 
     return res.status(200).json({
@@ -283,6 +356,17 @@ async function handleAuditLogQuery(req, res, user) {
 
 // Log security events (separate from admin actions)
 async function logSecurityEvent(eventType, details, req) {
+  // Create Supabase client
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  
+  if (!supabaseUrl || !supabaseKey) {
+    console.error('Missing Supabase credentials in logSecurityEvent');
+    return;
+  }
+  
+  const supabase = createClient(supabaseUrl, supabaseKey);
+  
   try {
     const securityEvent = {
       event_type: eventType,
@@ -291,7 +375,7 @@ async function logSecurityEvent(eventType, details, req) {
       user_agent: req.headers['user-agent'] || 'Unknown',
       attempted_endpoint: req.url,
       details,
-      timestamp: new Date().toISOString(),
+      created_at: new Date().toISOString(),
       metadata: {
         method: req.method,
         headers: sanitizeHeaders(req.headers)

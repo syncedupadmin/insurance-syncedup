@@ -20,7 +20,7 @@
         
         // Add body class when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
-            if(document.body) document.body.classList.add(t+"-mode");
+            if(document.body) {document.body.classList.add("portal-agent");document.body.classList.add(t+"-mode");}
         });
         
         // Set background for immediate visual feedback
@@ -42,7 +42,7 @@
     <!-- Agent Portal Theme Override -->
     <link rel="stylesheet" href="/css/themes/agent-modern.css">
 </head>
-<body>
+<body class="portal-agent">
     <!-- Header -->
     <div class="header">
         <h1>Quote Products</h1>

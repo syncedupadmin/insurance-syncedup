@@ -2,14 +2,19 @@
 // Provides comprehensive user administration with complete audit trail
 
 const { createClient } = require('@supabase/supabase-js');
-const { verifySuperAdmin } = require('./auth-middleware');
-
-const supabase = createClient(
-  process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL, 
-  process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const jwt = require('jsonwebtoken');
 
 module.exports = async function handler(req, res) {
+  // Create Supabase client inside handler to ensure env vars are loaded
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  
+  if (!supabaseUrl || !supabaseKey) {
+    console.error('Missing Supabase credentials:', { url: !!supabaseUrl, key: !!supabaseKey });
+    return res.status(500).json({ error: 'Database configuration error' });
+  }
+  
+  const supabase = createClient(supabaseUrl, supabaseKey);
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGINS || '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -19,11 +24,34 @@ module.exports = async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // Verify super admin authentication
-  const user = await verifySuperAdmin(req, res);
-  if (!user) {
-    // verifySuperAdmin already sent the response
-    return;
+  // Verify super admin authentication using JWT from cookie
+  const getCookie = (name) => {
+    const match = (req.headers.cookie || '').match(new RegExp(`(?:^|; )${name}=([^;]+)`));
+    return match ? decodeURIComponent(match[1]) : null;
+  };
+  
+  const token = getCookie('auth_token');
+  if (!token) {
+    return res.status(401).json({ error: 'Authorization required' });
+  }
+  
+  let user;
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const role = getCookie('user_role') || payload.role;
+    
+    if (role !== 'super_admin') {
+      return res.status(403).json({ error: 'Super admin privileges required' });
+    }
+    
+    user = {
+      id: payload.id || payload.sub,
+      email: payload.email,
+      role: role
+    };
+  } catch (jwtError) {
+    console.error('JWT verification error:', jwtError);
+    return res.status(403).json({ error: 'Invalid or expired token' });
   }
 
   try {

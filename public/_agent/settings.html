@@ -20,7 +20,7 @@
         document.head.appendChild(link);
         // Add body class when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
-            if(document.body) document.body.classList.add(t+"-mode");
+            if(document.body) {document.body.classList.add("portal-agent");document.body.classList.add(t+"-mode");}
         });
         
         if(t==="classic"){h.style.background="linear-gradient(-45deg,#047857,#059669,#10b981,#34d399)";}
@@ -40,7 +40,7 @@
     <!-- Agent Portal Theme Override -->
     <link rel="stylesheet" href="/css/themes/agent-modern.css">
 </head>
-<body>
+<body class="portal-agent">
     <!-- Header -->
     <div class="header">
         <h1>Agent Settings</h1>
