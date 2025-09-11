@@ -1,0 +1,21 @@
+/* Modern Purple Theme - For Admin Portal */
+/* This file defines purple color variables */
+/* Must be loaded AFTER modern-base.css */
+
+:root {
+    /* Purple Theme Colors */
+    --primary-gradient-start: #667eea;
+    --primary-gradient-mid: #764ba2;
+    --primary-gradient-end: #8B5CF6;
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.18);
+    --card-bg: rgba(255, 255, 255, 0.15);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.8);
+    --shadow-color: rgba(31, 38, 135, 0.37);
+}
+
+/* Apply purple gradient to body */
+body {
+    background: linear-gradient(135deg, var(--primary-gradient-start) 0%, var(--primary-gradient-mid) 50%, var(--primary-gradient-end) 100%) !important;
+}

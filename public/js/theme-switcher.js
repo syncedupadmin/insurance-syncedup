@@ -107,11 +107,33 @@
         },
 
         loadThemeCSS: function(themeName) {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = `/css/themes/${themeName}.css`;
-            link.setAttribute('data-theme-css', themeName);
-            document.head.appendChild(link);
+            // For modern theme, load both base and portal-specific color CSS
+            if (themeName === 'modern') {
+                // Load modern-base.css first
+                const baseLink = document.createElement('link');
+                baseLink.rel = 'stylesheet';
+                baseLink.href = '/css/themes/modern-base.css';
+                baseLink.setAttribute('data-theme-css', 'modern-base');
+                document.head.appendChild(baseLink);
+                
+                // Load portal-specific color CSS
+                const path = (window.location.pathname || '/').replace(/^\/_/, '/');
+                if (path.includes('/admin/')) {
+                    const purpleLink = document.createElement('link');
+                    purpleLink.rel = 'stylesheet';
+                    purpleLink.href = '/css/themes/modern-purple.css';
+                    purpleLink.setAttribute('data-theme-css', 'modern-purple');
+                    document.head.appendChild(purpleLink);
+                }
+                // Agent, manager, and customer-service use their own portal CSS colors
+            } else {
+                // Load traditional single theme CSS
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = `/css/themes/${themeName}.css`;
+                link.setAttribute('data-theme-css', themeName);
+                document.head.appendChild(link);
+            }
         },
 
         setupEventListeners: function() {

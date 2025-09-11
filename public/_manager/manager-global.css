@@ -1,5 +1,19 @@
 /* Manager Global Styles - Orange Glassmorphism Theme */
 
+/* CSS Variables for Orange Theme */
+:root {
+    /* Orange Theme Colors */
+    --primary-gradient-start: #c2410c;
+    --primary-gradient-mid: #ea580c;
+    --primary-gradient-end: #fb923c;
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.18);
+    --card-bg: rgba(255, 255, 255, 0.15);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.8);
+    --shadow-color: rgba(234, 88, 12, 0.37);
+}
+
 /* Fonts */
 /* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'); */
 

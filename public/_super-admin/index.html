@@ -4,80 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Admin Portal - Insurance.SyncedUp</title>
-    <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
     <link rel="stylesheet" href="./css/super-admin.css">
 </head>
 <body>
     <div class="admin-console">
-        <!-- Header -->
         <header class="console-header">
             <h1>🛡️ Super Admin Console</h1>
             <div class="header-meta">
                 <span>Environment: Production</span>
                 <span id="current-time"></span>
-                <span id="session-user"></span>
+                <span id="session-user">Admin: Loading...</span>
             </div>
         </header>
         
-        <!-- Navigation Sidebar -->
         <nav class="admin-navigation">
             <div class="nav-section">
-                <h3>Main</h3>
-                <a href="#dashboard" class="active">Dashboard</a>
-                <a href="#users">User Management</a>
-                <a href="#analytics">Analytics</a>
+                <h3>MAIN</h3>
+                <a href="#dashboard" class="nav-item active" onclick="navigateTo('dashboard')">Dashboard</a>
+                <a href="#agencies" class="nav-item" onclick="navigateTo('agencies')">Agency Management</a>
+                <a href="#analytics" class="nav-item" onclick="navigateTo('analytics')">Analytics</a>
             </div>
             
             <div class="nav-section">
-                <h3>System</h3>
-                <a href="#config">System Config</a>
-                <a href="#audit">Audit Trail</a>
-                <a href="#security">Security</a>
+                <h3>SYSTEM</h3>
+                <a href="#config" class="nav-item" onclick="navigateTo('config')">System Config</a>
+                <a href="#audit" class="nav-item" onclick="navigateTo('audit')">Audit Trail</a>
+                <a href="#security" class="nav-item" onclick="navigateTo('security')">Security</a>
             </div>
             
             <div class="nav-section">
-                <h3>Account</h3>
-                <a href="#settings">Settings</a>
-                <a href="#logout">Logout</a>
+                <h3>ACCOUNT</h3>
+                <a href="#settings" class="nav-item" onclick="navigateTo('settings')">Settings</a>
+                <a href="#logout" class="nav-item" onclick="logout()">Logout</a>
             </div>
         </nav>
         
-        <!-- Main Content Area -->
-        <main class="dashboard-grid">
-            <!-- Dynamic content loaded here -->
+        <main class="dashboard-grid" id="main-content">
+            <div class="loading">Loading dashboard...</div>
         </main>
     </div>
     
-    <!-- JavaScript Modules -->
-    <script type="module" src="./js/dashboard.js"></script>
-    
-    <!-- Time Display -->
-    <script>
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('current-time').textContent = 
-                now.toLocaleString('en-US', { 
-                    weekday: 'short', 
-                    month: 'short', 
-                    day: 'numeric', 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                });
-        }
-        
-        // Update time immediately and then every minute
-        updateTime();
-        setInterval(updateTime, 60000);
-        
-        // Set session user
-        fetch('/api/super-admin/current-user', { credentials: 'include' })
-            .then(res => res.json())
-            .then(data => {
-                if (data.email) {
-                    document.getElementById('session-user').textContent = `Admin: ${data.email}`;
-                }
-            })
-            .catch(err => console.error('Error loading user info:', err));
-    </script>
+    <script src="./js/main.js"></script>
 </body>
 </html>

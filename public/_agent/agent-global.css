@@ -1,5 +1,19 @@
 /* Agent Global Styles - Green Glassmorphism Theme */
 
+/* CSS Variables for Green Theme */
+:root {
+    /* Green Theme Colors */
+    --primary-gradient-start: #059669;
+    --primary-gradient-mid: #10b981;
+    --primary-gradient-end: #34d399;
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.18);
+    --card-bg: rgba(255, 255, 255, 0.15);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.8);
+    --shadow-color: rgba(5, 150, 105, 0.37);
+}
+
 /* Fonts */
 
 /* Lucide Icons - Removed problematic import */

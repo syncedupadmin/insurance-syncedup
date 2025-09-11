@@ -1,5 +1,19 @@
 /* Admin Global Styles - Purple Glassmorphism Theme */
 
+/* CSS Variables for Purple Theme */
+:root {
+    /* Purple Theme Colors - Admin Portal */
+    --primary-gradient-start: #4c1d95;
+    --primary-gradient-mid: #6d28d9;
+    --primary-gradient-end: #8b5cf6;
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.18);
+    --card-bg: rgba(255, 255, 255, 0.15);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.8);
+    --shadow-color: rgba(31, 38, 135, 0.37);
+}
+
 /* Fonts */
 
 /* Global Reset */

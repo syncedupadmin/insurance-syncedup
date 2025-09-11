@@ -13,11 +13,22 @@
         var existingTheme = document.querySelector('link[data-theme-css]');
         if(existingTheme) existingTheme.remove();
         
-        var link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = '/css/themes/' + t + '.css';
-        link.setAttribute('data-theme-css', t);
-        document.head.appendChild(link);
+        if(t==="modern"){
+            // Load modern base styles (structure only)
+            var baseLink = document.createElement('link');
+            baseLink.rel = 'stylesheet';
+            baseLink.href = '/css/themes/modern-base.css';
+            baseLink.setAttribute('data-theme-css', 'modern-base');
+            document.head.appendChild(baseLink);
+            // Agent portal green colors are in agent-global.css
+        } else {
+            // Load traditional theme CSS
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = '/css/themes/' + t + '.css';
+            link.setAttribute('data-theme-css', t);
+            document.head.appendChild(link);
+        }
         // Add body class when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
             if(document.body) {document.body.classList.add("portal-agent");document.body.classList.add(t+"-mode");}
