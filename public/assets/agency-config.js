@@ -20,8 +20,8 @@ const agencyConfigs = {
     }
   },
   'SyncedUp Solutions': {
-    primaryColor: '#7c3aed',
-    secondaryColor: '#a855f7',
+    primaryColor: '#059669',
+    secondaryColor: '#10b981',
     logo: '/images/syncedup-logo.png',
     companyName: 'SyncedUp Solutions',
     welcomeMessage: 'System Administration Portal',
@@ -35,13 +35,13 @@ const agencyConfigs = {
     },
     branding: {
       showAgencyName: true,
-      customHeaderColor: '#7c3aed',
-      customBackground: 'linear-gradient(-45deg, #4c1d95, #5b21b6, #6d28d9, #7c3aed, #8b5cf6, #a855f7, #c084fc, #ddd6fe)'
+      customHeaderColor: '#059669',
+      customBackground: 'linear-gradient(-45deg, #047857, #059669, #10b981, #34d399)'
     }
   },
   'Demo Agency': {
-    primaryColor: '#7c3aed',
-    secondaryColor: '#a855f7', 
+    primaryColor: '#059669',
+    secondaryColor: '#10b981', 
     logo: '/images/demo-logo.png',
     companyName: 'Demo Agency',
     welcomeMessage: 'Demo Environment - Test Features Here',
@@ -54,8 +54,8 @@ const agencyConfigs = {
     },
     branding: {
       showAgencyName: true,
-      customHeaderColor: '#7c3aed',
-      customBackground: 'linear-gradient(-45deg, #4c1d95, #5b21b6, #6d28d9, #7c3aed, #8b5cf6, #a855f7, #c084fc, #ddd6fe)'
+      customHeaderColor: '#059669',
+      customBackground: 'linear-gradient(-45deg, #047857, #059669, #10b981, #34d399)'
     }
   }
 };
