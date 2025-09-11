@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import jwt from 'jsonwebtoken';
+const { verifySuperAdmin } = require('./_auth-helper');
 
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -25,14 +25,13 @@ export default async function handler(req, res) {
             return res.status(401).json({ error: 'No token provided' });
         }
 
-        const token = authHeader.substring(7);
-        let decoded;
+        const authHeader = req.headers.authorization;
+        const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
         
-        try {
-            decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
-        } catch (jwtError) {
-            console.log('JWT verification failed:', jwtError.message);
-            return res.status(403).json({ error: 'Invalid token' });
+        const user = await verifySuperAdmin(token);
+        if (!user) {
+            return res.status(403).json({ error: 'Super admin privileges required' });
+        });
         }
 
         // Allow admin and super-admin roles

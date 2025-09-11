@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { verifySuperAdmin } from './auth-middleware.js';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -17,29 +18,10 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Authentication check
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Missing or invalid authorization header' });
-    }
-
-    const token = authHeader.substring(7);
-    
-    // Verify JWT token and get user
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    if (authError || !user) {
-      return res.status(401).json({ error: 'Invalid token' });
-    }
-
-    // Get user profile to check role
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('role, agency_id')
-      .eq('id', user.id)
-      .single();
-
-    if (profileError || profile.role !== 'super_admin') {
-      return res.status(403).json({ error: 'Super admin access required' });
+    // Verify super admin authentication
+    const user = await verifySuperAdmin(req, res);
+    if (!user) {
+      return; // verifySuperAdmin already sent the response
     }
 
     if (req.method === 'GET') {

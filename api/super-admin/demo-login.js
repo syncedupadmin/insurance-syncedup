@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import jwt from 'jsonwebtoken';
+const { verifySuperAdmin } = require('./_auth-helper');
 import bcrypt from 'bcryptjs';
 
 const supabase = createClient(
@@ -24,37 +24,11 @@ export default async function handler(req, res) {
     try {
         // Verify super-admin authentication
         const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ error: 'No token provided' });
-        }
-
-        const token = authHeader.substring(7);
-        let decoded;
+        const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
         
-        try {
-            decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
-        } catch (jwtError) {
-            return res.status(403).json({ error: 'Invalid token' });
-        }
-
-        // Check if user is super-admin
-        if (decoded.role !== 'super-admin' && decoded.role !== 'super_admin') {
-            return res.status(403).json({ error: 'Insufficient permissions' });
-        }
-
-        const { email, role } = req.body;
-
-        if (!email || !role) {
-            return res.status(400).json({ error: 'Email and role are required' });
-        }
-
-        // Valid demo accounts with DEMO001 agency
-        const demoAccounts = {
-            'agent@demo.com': { role: 'agent', name: 'Demo Agent' },
-            'manager@demo.com': { role: 'manager', name: 'Demo Manager' },
-            'admin@demo.com': { role: 'admin', name: 'Demo Admin' },
-            'customerservice@demo.com': { role: 'customer_service', name: 'Demo Support' },
-            'superadmin@demo.com': { role: 'super_admin', name: 'Demo Super Admin' }
+        const user = await verifySuperAdmin(token);
+        if (!user) {
+            return res.status(403).json({ error: 'Super admin privileges required' });
         };
 
         if (!demoAccounts[email]) {

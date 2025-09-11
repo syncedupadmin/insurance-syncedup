@@ -1,0 +1,585 @@
+<!-- User Management Content - For inline loading in Super Admin dashboard -->
+<div class="console-section">
+    <div class="section-header">
+        <h2>User Management</h2>
+        <div class="section-actions">
+            <button class="btn btn-primary" onclick="showAddUserModal()">
+                ➕ Add New User
+            </button>
+            <button class="btn" onclick="refreshUserList()">
+                🔄 Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- User Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total Users</h3>
+            <div class="stat-value" id="totalUsersCount">0</div>
+        </div>
+        <div class="stat-card">
+            <h3>Active Users</h3>
+            <div class="stat-value" id="activeUsersCount">0</div>
+        </div>
+        <div class="stat-card">
+            <h3>Admins</h3>
+            <div class="stat-value" id="adminCount">0</div>
+        </div>
+        <div class="stat-card">
+            <h3>Agents</h3>
+            <div class="stat-value" id="agentCount">0</div>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="search-filters">
+        <div class="search-box">
+            <input type="text" class="search-input" id="userSearch" placeholder="Search users..." onkeyup="filterUsers()">
+        </div>
+        <select class="filter-select" id="roleFilter" onchange="filterUsers()">
+            <option value="">All Roles</option>
+            <option value="super_admin">Super Admin</option>
+            <option value="admin">Admin</option>
+            <option value="manager">Manager</option>
+            <option value="agent">Agent</option>
+            <option value="customer_service">Customer Service</option>
+        </select>
+        <select class="filter-select" id="statusFilter" onchange="filterUsers()">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+        </select>
+    </div>
+
+    <!-- Users Table -->
+    <div class="table-container">
+        <table class="data-table" id="usersTable">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Agency</th>
+                    <th>Status</th>
+                    <th>Last Login</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="usersTableBody">
+                <!-- Users will be loaded here -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div id="addUserModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add New User</h3>
+            <span class="close" onclick="closeAddUserModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="addUserForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="newUserEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="newUserName" required>
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select id="newUserRole" required>
+                        <option value="">Select Role</option>
+                        <option value="admin">Admin</option>
+                        <option value="manager">Manager</option>
+                        <option value="agent">Agent</option>
+                        <option value="customer_service">Customer Service</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Agency</label>
+                    <select id="newUserAgency">
+                        <option value="">Select Agency</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddUserModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* User Management Specific Styles */
+.console-section {
+    background: rgba(20, 27, 45, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 1rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.section-header h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #e0e6ed;
+}
+
+.section-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.stat-card h3 {
+    font-size: 0.9rem;
+    color: #a4a9b3;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #e0e6ed;
+}
+
+.search-filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.search-box {
+    flex: 1;
+    position: relative;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #e0e6ed;
+    font-size: 0.9rem;
+}
+
+.filter-select {
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #e0e6ed;
+    min-width: 150px;
+}
+
+.table-container {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    text-align: left;
+    font-weight: 500;
+    color: #a4a9b3;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.data-table td {
+    padding: 1rem;
+    color: #e0e6ed;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.data-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: #1e3a5f;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #2d5a87;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e0e6ed;
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-warning {
+    background: #f59e0b;
+    color: white;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-active {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.status-inactive {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #141b2d;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 2rem;
+    min-width: 500px;
+    max-width: 90%;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.modal-header h3 {
+    font-size: 1.5rem;
+    color: #e0e6ed;
+}
+
+.close {
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #a4a9b3;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #a4a9b3;
+    font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #e0e6ed;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+</style>
+
+<script>
+// User Management Functions
+let allUsers = [];
+let agencies = [];
+
+// Load users on page load
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('usersTable')) {
+        loadUsers();
+        loadAgencies();
+    }
+});
+
+async function loadUsers() {
+    try {
+        const response = await fetch('/api/super-admin/users', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+            }
+        });
+        
+        if (!response.ok) throw new Error('Failed to load users');
+        
+        const data = await response.json();
+        allUsers = data.users || [];
+        
+        updateUserStats();
+        displayUsers(allUsers);
+    } catch (error) {
+        console.error('Error loading users:', error);
+        showNotification('Failed to load users', 'error');
+    }
+}
+
+async function loadAgencies() {
+    try {
+        const response = await fetch('/api/super-admin/agencies', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+            }
+        });
+        
+        if (!response.ok) throw new Error('Failed to load agencies');
+        
+        const data = await response.json();
+        agencies = data.agencies || [];
+        
+        // Populate agency dropdown
+        const agencySelect = document.getElementById('newUserAgency');
+        if (agencySelect) {
+            agencySelect.innerHTML = '<option value="">Select Agency</option>';
+            agencies.forEach(agency => {
+                agencySelect.innerHTML += `<option value="${agency.id}">${agency.name}</option>`;
+            });
+        }
+    } catch (error) {
+        console.error('Error loading agencies:', error);
+    }
+}
+
+function updateUserStats() {
+    const totalUsers = allUsers.length;
+    const activeUsers = allUsers.filter(u => u.is_active).length;
+    const admins = allUsers.filter(u => u.role === 'admin' || u.role === 'super_admin').length;
+    const agents = allUsers.filter(u => u.role === 'agent').length;
+    
+    document.getElementById('totalUsersCount').textContent = totalUsers;
+    document.getElementById('activeUsersCount').textContent = activeUsers;
+    document.getElementById('adminCount').textContent = admins;
+    document.getElementById('agentCount').textContent = agents;
+}
+
+function displayUsers(users) {
+    const tbody = document.getElementById('usersTableBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    
+    users.forEach(user => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${user.email}</td>
+            <td>${user.full_name || user.name || 'N/A'}</td>
+            <td><span class="role-badge">${user.role}</span></td>
+            <td>${getAgencyName(user.agency_id)}</td>
+            <td>
+                <span class="status-badge ${user.is_active ? 'status-active' : 'status-inactive'}">
+                    ${user.is_active ? 'Active' : 'Inactive'}
+                </span>
+            </td>
+            <td>${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
+            <td>
+                <button class="btn btn-sm btn-warning" onclick="editUser('${user.id}')">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="toggleUserStatus('${user.id}', ${user.is_active})">
+                    ${user.is_active ? 'Deactivate' : 'Activate'}
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function getAgencyName(agencyId) {
+    const agency = agencies.find(a => a.id === agencyId);
+    return agency ? agency.name : 'N/A';
+}
+
+function filterUsers() {
+    const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+    const roleFilter = document.getElementById('roleFilter').value;
+    const statusFilter = document.getElementById('statusFilter').value;
+    
+    let filtered = allUsers;
+    
+    if (searchTerm) {
+        filtered = filtered.filter(user => 
+            user.email.toLowerCase().includes(searchTerm) ||
+            (user.full_name && user.full_name.toLowerCase().includes(searchTerm)) ||
+            (user.name && user.name.toLowerCase().includes(searchTerm))
+        );
+    }
+    
+    if (roleFilter) {
+        filtered = filtered.filter(user => user.role === roleFilter);
+    }
+    
+    if (statusFilter) {
+        filtered = filtered.filter(user => 
+            statusFilter === 'active' ? user.is_active : !user.is_active
+        );
+    }
+    
+    displayUsers(filtered);
+}
+
+function showAddUserModal() {
+    document.getElementById('addUserModal').style.display = 'flex';
+}
+
+function closeAddUserModal() {
+    document.getElementById('addUserModal').style.display = 'none';
+    document.getElementById('addUserForm').reset();
+}
+
+function refreshUserList() {
+    loadUsers();
+    showNotification('User list refreshed', 'success');
+}
+
+async function editUser(userId) {
+    // Implementation for editing user
+    showNotification('Edit user functionality coming soon', 'info');
+}
+
+async function toggleUserStatus(userId, currentStatus) {
+    try {
+        const response = await fetch(`/api/super-admin/users/${userId}/toggle-status`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ is_active: !currentStatus })
+        });
+        
+        if (!response.ok) throw new Error('Failed to update user status');
+        
+        loadUsers();
+        showNotification('User status updated successfully', 'success');
+    } catch (error) {
+        console.error('Error updating user status:', error);
+        showNotification('Failed to update user status', 'error');
+    }
+}
+
+// Form submission
+document.getElementById('addUserForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const userData = {
+        email: document.getElementById('newUserEmail').value,
+        full_name: document.getElementById('newUserName').value,
+        role: document.getElementById('newUserRole').value,
+        agency_id: document.getElementById('newUserAgency').value
+    };
+    
+    try {
+        const response = await fetch('/api/super-admin/users', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData)
+        });
+        
+        if (!response.ok) throw new Error('Failed to add user');
+        
+        closeAddUserModal();
+        loadUsers();
+        showNotification('User added successfully', 'success');
+    } catch (error) {
+        console.error('Error adding user:', error);
+        showNotification('Failed to add user', 'error');
+    }
+});
+
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#1e3a5f'};
+        color: white;
+        border-radius: 8px;
+        z-index: 2000;
+        animation: slideIn 0.3s ease;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+</script>

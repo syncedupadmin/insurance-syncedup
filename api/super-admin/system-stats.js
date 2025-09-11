@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import jwt from 'jsonwebtoken';
+import { verifySuperAdmin } from './auth-middleware.js';
 
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -21,33 +21,10 @@ export default async function handler(req, res) {
     }
 
     try {
-        // Authentication check
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ error: 'No token provided' });
-        }
-
-        const token = authHeader.substring(7);
-        let decoded;
-        
-        try {
-            decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
-            console.log(`JWT decoded successfully. User: ${decoded.email || decoded.id}, Role: ${decoded.role}`);
-        } catch (jwtError) {
-            console.log('JWT verification failed:', jwtError.message);
-            return res.status(403).json({ 
-                error: 'Invalid token',
-                debug: jwtError.message
-            });
-        }
-        
-        // Check if user is super-admin (handle multiple role formats)
-        const allowedRoles = ['super-admin', 'super_admin', 'admin'];
-        if (!allowedRoles.includes(decoded.role)) {
-            console.log(`Role check failed. User role: ${decoded.role}, User: ${decoded.email || decoded.id}`);
-            return res.status(403).json({ 
-                error: 'Insufficient permissions',
-                debug: `User role: ${decoded.role}, Required: ${allowedRoles.join(', ')}`
+        // Verify super admin authentication
+        const user = await verifySuperAdmin(req, res);
+        if (!user) {
+            return; // verifySuperAdmin already sent the response
             });
         }
 

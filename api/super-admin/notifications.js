@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import jwt from 'jsonwebtoken';
+const { verifySuperAdmin } = require('./_auth-helper');
 
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -19,38 +19,12 @@ export default async function handler(req, res) {
     try {
         // Authentication check
         const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ error: 'No token provided' });
-        }
-
-        const token = authHeader.substring(7);
-        let decoded;
+        const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
         
-        try {
-            decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
-        } catch (jwtError) {
-            return res.status(403).json({ error: 'Invalid token' });
-        }
-
-        // Check if user is super-admin
-        if (decoded.role !== 'super-admin' && decoded.role !== 'super_admin') {
-            return res.status(403).json({ error: 'Insufficient permissions' });
-        }
-
-        switch (req.method) {
-            case 'GET':
-                return await getNotifications(req, res, decoded);
-            case 'POST':
-                return await createNotification(req, res, decoded);
-            case 'PUT':
-                return await updateNotification(req, res, decoded);
-            case 'DELETE':
-                return await deleteNotification(req, res, decoded);
-            default:
-                return res.status(405).json({ error: 'Method not allowed' });
-        }
-
-    } catch (error) {
+        const user = await verifySuperAdmin(token);
+        if (!user) {
+            return res.status(403).json({ error: 'Super admin privileges required' });
+        } catch (error) {
         console.error('Notifications API error:', error);
         return res.status(500).json({ error: 'Internal server error' });
     }

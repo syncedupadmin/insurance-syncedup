@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import jwt from 'jsonwebtoken';
+const { verifySuperAdmin } = require('./_auth-helper');
 
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -22,36 +22,12 @@ export default async function handler(req, res) {
     try {
         // Authentication check
         const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ error: 'No token provided' });
-        }
-
-        const token = authHeader.substring(7);
-        let decoded;
+        const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
         
-        try {
-            decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
-        } catch (jwtError) {
-            return res.status(403).json({ error: 'Invalid token' });
+        const user = await verifySuperAdmin(token);
+        if (!user) {
+            return res.status(403).json({ error: 'Super admin privileges required' });
         }
-
-        // Check if user is super-admin
-        if (decoded.role !== 'super-admin' && decoded.role !== 'super_admin') {
-            return res.status(403).json({ error: 'Insufficient permissions' });
-        }
-
-        const revenueData = await getRevenueChartData();
-        
-        return res.status(200).json({
-            success: true,
-            data: revenueData
-        });
-
-    } catch (error) {
-        console.error('Revenue chart API error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
-    }
-}
 
 async function getRevenueChartData() {
     try {
