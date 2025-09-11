@@ -51,7 +51,7 @@ body::before {
     background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    box-shadow: 0 8px 32px 0 rgba(5, 150, 105, 0.37);
 }
 
 /* Header Styling */
@@ -64,7 +64,7 @@ body::before {
     display: flex; 
     justify-content: space-between; 
     align-items: center;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    box-shadow: 0 8px 32px 0 rgba(5, 150, 105, 0.37);
     position: relative;
     z-index: 10;
 }
@@ -86,7 +86,7 @@ body::before {
     border: 1px solid rgba(255, 255, 255, 0.18);
     border-top: none;
     overflow-x: auto;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    box-shadow: 0 8px 32px 0 rgba(5, 150, 105, 0.37);
     position: relative;
     z-index: 9;
 }
@@ -139,7 +139,7 @@ body::before {
     border: 1px solid rgba(255, 255, 255, 0.18);
     padding: 2rem; 
     border-radius: 12px; 
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    box-shadow: 0 8px 32px 0 rgba(5, 150, 105, 0.37);
     margin-bottom: 1.5rem;
     transition: all 0.3s ease;
     position: relative;
@@ -148,7 +148,7 @@ body::before {
 
 .card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 48px 0 rgba(31, 38, 135, 0.5);
+    box-shadow: 0 12px 48px 0 rgba(5, 150, 105, 0.5);
 }
 
 .card::before {
@@ -168,14 +168,14 @@ body::before {
     border: 1px solid rgba(255, 255, 255, 0.18);
     padding: 1.5rem;
     border-radius: 12px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    box-shadow: 0 8px 32px 0 rgba(5, 150, 105, 0.37);
     text-align: center;
     transition: all 0.3s ease;
 }
 
 .stat-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 48px 0 rgba(31, 38, 135, 0.5);
+    box-shadow: 0 12px 48px 0 rgba(5, 150, 105, 0.5);
 }
 
 .stat-value { 
@@ -503,7 +503,7 @@ h3 { font-size: 1.5rem; }
     width: 90%;
     max-width: 600px;
     border-radius: 12px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    box-shadow: 0 8px 32px 0 rgba(5, 150, 105, 0.37);
     position: relative;
 }
 

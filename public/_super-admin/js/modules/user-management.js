@@ -54,8 +54,9 @@ export async function loadUsers(role = null) {
         });
         
         if (response.ok) {
-            const users = await response.json();
-            displayUsers(users);
+            const data = await response.json();
+            // API returns {users: [], pagination: {}, filters_applied: {}}
+            displayUsers(data.users || data);
         } else {
             throw new Error('Failed to load users');
         }

@@ -11,8 +11,21 @@ window.superAdmin = {
     loadUserManagement,
     loadAuditTrail: loadFullAuditLog,
     loadSettings,
-    logout
+    logout,
+    loadAnalytics,
+    loadSystemConfig,
+    loadSecurity,
+    currentView: 'dashboard'
 };
+
+// Helper to clear and reset the main content
+function resetMainContent() {
+    const mainContent = document.querySelector('.dashboard-grid');
+    if (mainContent) {
+        mainContent.innerHTML = '';
+    }
+    return mainContent;
+}
 
 // Initialize dashboard on page load
 document.addEventListener('DOMContentLoaded', async () => {
@@ -45,8 +58,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadDashboard() {
     await logAdminAction('NAVIGATION', 'Dashboard Overview');
     
-    const mainContent = document.querySelector('.dashboard-grid');
+    const mainContent = resetMainContent();
     if (!mainContent) return;
+    
+    window.superAdmin.currentView = 'dashboard';
     
     mainContent.innerHTML = `
         <!-- Metrics Row -->
@@ -163,8 +178,10 @@ function setupNavigation() {
 async function loadSettings() {
     await logAdminAction('NAVIGATION', 'Accessed Settings');
     
-    const mainContent = document.querySelector('.dashboard-grid');
+    const mainContent = resetMainContent();
     if (!mainContent) return;
+    
+    window.superAdmin.currentView = 'settings';
     
     mainContent.innerHTML = `
         <div class="dashboard-header">
@@ -186,8 +203,10 @@ async function loadSettings() {
 async function loadAnalytics() {
     await logAdminAction('NAVIGATION', 'Accessed Analytics');
     
-    const mainContent = document.querySelector('.dashboard-grid');
+    const mainContent = resetMainContent();
     if (!mainContent) return;
+    
+    window.superAdmin.currentView = 'analytics';
     
     mainContent.innerHTML = `
         <div class="dashboard-header">
@@ -242,8 +261,10 @@ async function loadAnalytics() {
 async function loadSystemConfig() {
     await logAdminAction('NAVIGATION', 'Accessed System Configuration');
     
-    const mainContent = document.querySelector('.dashboard-grid');
+    const mainContent = resetMainContent();
     if (!mainContent) return;
+    
+    window.superAdmin.currentView = 'system-config';
     
     mainContent.innerHTML = `
         <div class="dashboard-header">
@@ -323,8 +344,10 @@ function saveSystemConfig() {
 async function loadSecurity() {
     await logAdminAction('NAVIGATION', 'Accessed Security Settings');
     
-    const mainContent = document.querySelector('.dashboard-grid');
+    const mainContent = resetMainContent();
     if (!mainContent) return;
+    
+    window.superAdmin.currentView = 'security';
     
     mainContent.innerHTML = `
         <div class="dashboard-header">
