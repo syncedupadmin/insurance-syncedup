@@ -599,33 +599,73 @@
             </div>
             
             <form id="upload-form">
+                <!-- Agency Selection (for PHS) -->
                 <div class="form-group">
-                    <label class="form-label">Select List</label>
-                    <select class="form-input" id="upload-list" required>
-                        <option value="">Choose a list...</option>
+                    <label class="form-label">Agency</label>
+                    <select class="form-input" id="upload-agency" required onchange="updateCampaignOptions()">
+                        <option value="">Select agency...</option>
+                        <option value="PHS-001">PHS Agency</option>
+                    </select>
+                </div>
+
+                <!-- Campaign Selection -->
+                <div class="form-group" id="campaign-group" style="display: none;">
+                    <label class="form-label">Campaign</label>
+                    <select class="form-input" id="upload-campaign" required>
+                        <option value="">Select campaign...</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">CSV File</label>
-                    <input type="file" class="form-input" id="upload-file" accept=".csv" required>
+                    <label class="form-label">Select List</label>
+                    <select class="form-input" id="upload-list">
+                        <option value="">Choose a list (optional)...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">File Upload</label>
+                    <input type="file" class="form-input" id="upload-file" accept=".csv,.json" required>
                     <small style="color: #718096; font-size: 0.75rem;">
-                        CSV format: First Name, Last Name, Phone, Email, City, State, ZIP
+                        Supported formats: CSV or JSON<br>
+                        CSV columns: First Name, Last Name, Phone, Email, City, State, ZIP<br>
+                        JSON: Array of lead objects with matching fields
                     </small>
                 </div>
                 
                 <div class="form-group">
                     <label style="display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="checkbox" id="skip-duplicates">
+                        <input type="checkbox" id="skip-duplicates" checked>
                         Skip duplicate phone numbers
                     </label>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="dry-run">
+                        Dry run (validate without importing)
+                    </label>
+                </div>
+
+                <!-- Progress indicator -->
+                <div id="upload-progress" style="display: none; margin-top: 1rem;">
+                    <div style="background: rgba(255, 255, 255, 0.1); border-radius: 4px; height: 20px; overflow: hidden;">
+                        <div id="progress-bar" style="background: #4299e1; height: 100%; width: 0%; transition: width 0.3s;"></div>
+                    </div>
+                    <p id="progress-text" style="margin-top: 0.5rem; font-size: 0.875rem; color: #718096;">Preparing upload...</p>
+                </div>
+
+                <!-- Results summary (shown after import) -->
+                <div id="upload-results" style="display: none; margin-top: 1rem; padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 4px;">
+                    <h4 style="margin-top: 0;">Import Results</h4>
+                    <div id="results-content"></div>
                 </div>
                 
                 <div class="form-actions">
                     <button type="button" onclick="hideUploadModal()" class="btn" style="background: rgba(255, 255, 255, 0.1); color: white;">
                         Cancel
                     </button>
-                    <button type="submit" class="btn upload-btn">
+                    <button type="submit" class="btn upload-btn" id="upload-submit-btn">
                         Upload Leads
                     </button>
                 </div>
@@ -711,6 +751,15 @@
         let selectedLeads = new Set();
         let allLeads = [];
         let availableLists = [];
+        
+        // PHS Campaign Configuration
+        const PHS_CAMPAIGNS = [
+            { id: 'PHS-AUTO-2025', name: 'PHS Auto Insurance Q1 2025' },
+            { id: 'PHS-HOME-2025', name: 'PHS Home Insurance Q1 2025' },
+            { id: 'PHS-LIFE-2025', name: 'PHS Life Insurance Q1 2025' },
+            { id: 'PHS-HEALTH-2025', name: 'PHS Health Insurance Q1 2025' },
+            { id: 'PHS-BUNDLE-2025', name: 'PHS Bundle Campaign 2025' }
+        ];
         
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
@@ -1158,18 +1207,166 @@
             alert(`Mass editing ${selectedLeads.size} leads...`);
         }
         
+        // Update campaign options based on agency selection
+        function updateCampaignOptions() {
+            const agencyId = document.getElementById('upload-agency').value;
+            const campaignGroup = document.getElementById('campaign-group');
+            const campaignSelect = document.getElementById('upload-campaign');
+            
+            if (agencyId === 'PHS-001') {
+                campaignGroup.style.display = 'block';
+                campaignSelect.innerHTML = '<option value="">Select campaign...</option>';
+                
+                PHS_CAMPAIGNS.forEach(campaign => {
+                    const option = document.createElement('option');
+                    option.value = campaign.id;
+                    option.textContent = campaign.name;
+                    campaignSelect.appendChild(option);
+                });
+            } else {
+                campaignGroup.style.display = 'none';
+                campaignSelect.innerHTML = '<option value="">Select campaign...</option>';
+            }
+        }
+
         // Form Handlers
-        document.getElementById('upload-form').addEventListener('submit', function(e) {
+        document.getElementById('upload-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const listId = document.getElementById('upload-list').value;
+            
+            const agencyId = document.getElementById('upload-agency').value;
+            const campaignId = document.getElementById('upload-campaign').value;
             const file = document.getElementById('upload-file').files[0];
+            const skipDuplicates = document.getElementById('skip-duplicates').checked;
+            const dryRun = document.getElementById('dry-run').checked;
             
-            if (!listId || !file) return;
+            if (!agencyId || !file) {
+                alert('Please select an agency and upload a file');
+                return;
+            }
             
-            // Implementation would handle file upload
-            alert('Upload functionality would be implemented here');
-            hideUploadModal();
+            if (agencyId === 'PHS-001' && !campaignId) {
+                alert('Please select a campaign for PHS agency');
+                return;
+            }
+            
+            // Show progress
+            document.getElementById('upload-progress').style.display = 'block';
+            document.getElementById('upload-results').style.display = 'none';
+            document.getElementById('upload-submit-btn').disabled = true;
+            
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('agency_id', agencyId);
+            formData.append('campaign_id', campaignId);
+            formData.append('skip_duplicates', skipDuplicates);
+            formData.append('dry_run', dryRun);
+            
+            try {
+                // Update progress
+                updateProgress(20, 'Uploading file...');
+                
+                const response = await fetch('/api/admin/import-campaign-leads', {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData
+                });
+                
+                updateProgress(60, 'Processing leads...');
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    updateProgress(100, 'Import complete!');
+                    showImportResults(result);
+                    
+                    // Refresh the leads table if not a dry run
+                    if (!dryRun) {
+                        setTimeout(() => {
+                            searchLeads();
+                            hideUploadModal();
+                        }, 3000);
+                    }
+                } else {
+                    throw new Error(result.error || 'Import failed');
+                }
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert(`Import failed: ${error.message}`);
+                document.getElementById('upload-progress').style.display = 'none';
+            } finally {
+                document.getElementById('upload-submit-btn').disabled = false;
+            }
         });
+        
+        function updateProgress(percent, text) {
+            document.getElementById('progress-bar').style.width = percent + '%';
+            document.getElementById('progress-text').textContent = text;
+        }
+        
+        function showImportResults(result) {
+            const resultsDiv = document.getElementById('upload-results');
+            const contentDiv = document.getElementById('results-content');
+            
+            let html = '';
+            
+            if (result.dry_run) {
+                html += '<p style="color: #fbbf24; margin-top: 0;">⚠️ Dry Run Mode - No data was imported</p>';
+            }
+            
+            html += `
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem;">
+                    <div>
+                        <strong>Total Rows:</strong> ${result.summary.total_rows}
+                    </div>
+                    <div>
+                        <strong style="color: #48bb78;">Imported:</strong> ${result.summary.imported || result.summary.valid_leads || 0}
+                    </div>
+                    <div>
+                        <strong style="color: #f6ad55;">Duplicates:</strong> ${result.summary.duplicates}
+                    </div>
+                    <div>
+                        <strong style="color: #fc8181;">Errors:</strong> ${result.summary.errors}
+                    </div>
+                </div>
+            `;
+            
+            if (result.campaign) {
+                html += `<p style="margin-top: 1rem;"><strong>Campaign:</strong> ${result.campaign}</p>`;
+            }
+            
+            if (result.errors && result.errors.length > 0) {
+                html += `
+                    <details style="margin-top: 1rem;">
+                        <summary style="cursor: pointer; color: #fc8181;">View Errors (${result.errors.length})</summary>
+                        <ul style="margin-top: 0.5rem; font-size: 0.875rem;">
+                            ${result.errors.slice(0, 5).map(err => 
+                                `<li>Row ${err.row}: ${err.error}</li>`
+                            ).join('')}
+                            ${result.errors.length > 5 ? `<li>... and ${result.errors.length - 5} more</li>` : ''}
+                        </ul>
+                    </details>
+                `;
+            }
+            
+            if (result.duplicates && result.duplicates.length > 0) {
+                html += `
+                    <details style="margin-top: 1rem;">
+                        <summary style="cursor: pointer; color: #f6ad55;">View Duplicates (${result.duplicates.length})</summary>
+                        <ul style="margin-top: 0.5rem; font-size: 0.875rem;">
+                            ${result.duplicates.slice(0, 5).map(dup => 
+                                `<li>Row ${dup.row}: ${dup.phone}</li>`
+                            ).join('')}
+                            ${result.duplicates.length > 5 ? `<li>... and ${result.duplicates.length - 5} more</li>` : ''}
+                        </ul>
+                    </details>
+                `;
+            }
+            
+            contentDiv.innerHTML = html;
+            resultsDiv.style.display = 'block';
+        }
         
         document.getElementById('edit-form').addEventListener('submit', function(e) {
             e.preventDefault();

@@ -210,24 +210,50 @@
         async function checkAuth() {
             // Server-side portal guard already verified agent access
             try {
+                // First check localStorage for user data
+                const localUser = localStorage.getItem('user');
+                if (localUser) {
+                    const userData = JSON.parse(localUser);
+                    currentUser = userData;
+                    
+                    // Update global header if available
+                    if (window.AgentHeader && window.AgentHeader.refreshUserData) {
+                        await window.AgentHeader.refreshUserData();
+                    }
+                    return true;
+                }
+                
+                // Try to get from server
                 const userResponse = await fetch('/api/auth/verify', { credentials: 'include' });
                 if (userResponse.ok) {
                     const { user } = await userResponse.json();
-                    document.getElementById('userDisplay').textContent = `${user.email} (${user.role})`;
                     currentUser = user;
+                    
+                    // Save to localStorage for persistence
+                    if (user) {
+                        localStorage.setItem('user', JSON.stringify(user));
+                    }
+                    
+                    // Update global header
+                    if (window.AgentHeader && window.AgentHeader.refreshUserData) {
+                        await window.AgentHeader.refreshUserData();
+                    }
                     return true;
                 } else {
                     // Fallback if verify endpoint fails - use role cookie
                     const roleCookie = document.cookie.split(';').find(c => c.trim().startsWith('user_role='));
                     const userRole = roleCookie ? decodeURIComponent(roleCookie.split('=')[1]) : 'agent';
                     currentUser = { role: userRole };
-                    document.getElementById('userDisplay').textContent = `Agent (${userRole})`;
+                    
+                    // Update global header
+                    if (window.AgentHeader && window.AgentHeader.refreshUserData) {
+                        await window.AgentHeader.refreshUserData();
+                    }
                     return true;
                 }
             } catch (error) {
                 console.error('Auth verification failed:', error);
                 currentUser = { role: 'agent' };
-                document.getElementById('userDisplay').textContent = 'Agent Dashboard';
                 return true;
             }
         }
