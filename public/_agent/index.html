@@ -63,26 +63,30 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <!-- Agent Portal Theme Override -->
     <link rel="stylesheet" href="/css/themes/agent-modern.css">
+    
+    <!-- Load auth helper for user context -->
+    <script src="/js/auth-helper.js"></script>
+    <!-- Load role switcher if available -->
+    <script src="/js/role-switcher.js"></script>
+    <!-- Load navigation component -->
+    <script src="/agent/components/navigation.js"></script>
+    <!-- Load global header component -->
+    <script src="/agent/components/global-header.js"></script>
 </head>
 <body class="portal-agent">
-    <!-- Header -->
-    <div class="header">
-        <h1>Agent Dashboard</h1>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <div id="roleSwitcherMount"></div>
-            <span id="userDisplay">Loading...</span>
-            <button class="btn" onclick="logout()">
-                <i data-lucide="log-out" class="icon"></i>
-                Logout
-            </button>
-        </div>
-    </div>
-
-    <!-- Navigation (Centralized) -->
-    <div class="nav" id="agentNavigation">
-        <!-- Navigation will be injected by navigation.js -->
-    </div>
-    <script src="/agent/components/navigation.js"></script>
+    <!-- Global Header Mount Point -->
+    <div id="global-header-mount"></div>
+    
+    <!-- Initialize Global Header -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            AgentHeader.init({
+                pageTitle: 'Agent Dashboard',
+                showRoleSwitcher: true,
+                showUserDisplay: true
+            });
+        });
+    </script>
 
     <div class="container">
         <!-- Agent Welcome Notice -->
@@ -357,12 +361,7 @@
         }
 
         // Logout function
-        function logout() {
-            // Clear authentication cookies
-            document.cookie = 'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-            document.cookie = 'user_role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-            window.location.href = '/login';
-        }
+        // Logout is now handled by global header component
 
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', initializePage);
