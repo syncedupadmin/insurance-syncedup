@@ -56,10 +56,27 @@
         // Get current user data
         getUserData: async function() {
             try {
+                // First, try to get from localStorage (most up-to-date)
+                const localUser = localStorage.getItem('user');
+                if (localUser) {
+                    const userData = JSON.parse(localUser);
+                    if (userData.firstName && userData.lastName) {
+                        return {
+                            role: userData.role || 'agent',
+                            name: `${userData.firstName} ${userData.lastName}`,
+                            email: userData.email || '',
+                            firstName: userData.firstName,
+                            lastName: userData.lastName
+                        };
+                    }
+                }
+                
                 // Check if SyncedUpAuth is available
                 if (typeof SyncedUpAuth !== 'undefined' && SyncedUpAuth.getCurrentUser) {
                     const user = await SyncedUpAuth.getCurrentUser();
-                    return user;
+                    if (user) {
+                        return user;
+                    }
                 }
                 
                 // Fallback to checking cookies
@@ -72,11 +89,12 @@
                 
                 const userRole = getCookie('user_role');
                 const userName = getCookie('user_name');
+                const userEmail = getCookie('user_email');
                 
                 return {
                     role: userRole || 'agent',
                     name: userName || 'Agent User',
-                    email: getCookie('user_email') || ''
+                    email: userEmail || ''
                 };
             } catch (error) {
                 console.warn('Failed to get user data:', error);
@@ -215,6 +233,14 @@
             if (userDisplay) {
                 userDisplay.textContent = displayText;
             }
+        },
+
+        // Refresh user data from storage
+        refreshUserData: async function() {
+            const userData = await this.getUserData();
+            const displayText = userData ? `${userData.name || 'Agent User'} (${userData.role || 'Agent'})` : 'Loading...';
+            this.updateUserDisplay(displayText);
+            return userData;
         }
     };
 

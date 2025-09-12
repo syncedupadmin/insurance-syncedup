@@ -398,7 +398,20 @@
                 localStorage.setItem('user', JSON.stringify(updatedUser));
                 currentUser = updatedUser;
                 
-                document.getElementById('userDisplay').textContent = `${updatedUser.firstName} ${updatedUser.lastName} (${updatedUser.role})`;
+                // Update the global header display
+                const displayName = `${updatedUser.firstName} ${updatedUser.lastName} (${updatedUser.role || 'Agent'})`;
+                if (window.AgentHeader && window.AgentHeader.updateUserDisplay) {
+                    window.AgentHeader.updateUserDisplay(displayName);
+                } else {
+                    // Fallback: Update the display directly
+                    const userDisplay = document.getElementById('userDisplay');
+                    if (userDisplay) {
+                        userDisplay.textContent = displayName;
+                    }
+                }
+                
+                // Also update cookie for persistence across pages
+                document.cookie = `user_name=${updatedUser.firstName} ${updatedUser.lastName}; Path=/; SameSite=Lax`;
                 
                 showSuccess('Profile updated successfully!');
             } catch (error) {
