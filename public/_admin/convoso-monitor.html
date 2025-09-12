@@ -718,10 +718,24 @@
         
         async function loadFilters() {
             try {
-                const response = await fetch('/api/admin/convoso-config');
+                // Use authenticatedFetch if available, otherwise use regular fetch with credentials
+                const fetchMethod = typeof SyncedUpAuth !== 'undefined' && SyncedUpAuth.authenticatedFetch 
+                    ? SyncedUpAuth.authenticatedFetch 
+                    : fetch;
+                
+                const response = await fetchMethod('/api/admin/convoso-config', {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
                 if (response.ok) {
                     const data = await response.json();
                     populateFilters(data);
+                } else {
+                    console.error('Failed to load filters:', response.status);
                 }
             } catch (error) {
                 console.error('Failed to load filters:', error);
@@ -755,7 +769,13 @@
         
         async function loadAgentData() {
             try {
-                const response = await fetch('/api/admin/convoso-agent-monitor', {
+                // Use authenticatedFetch if available, otherwise use regular fetch with credentials
+                const fetchMethod = typeof SyncedUpAuth !== 'undefined' && SyncedUpAuth.authenticatedFetch 
+                    ? SyncedUpAuth.authenticatedFetch 
+                    : fetch;
+                
+                const response = await fetchMethod('/api/admin/convoso-agent-monitor', {
+                    method: 'GET',
                     credentials: 'include',
                     headers: {
                         'Content-Type': 'application/json'
@@ -768,6 +788,8 @@
                     updateDashboard(data);
                 } else {
                     console.error('Failed to load agent data:', response.status, response.statusText);
+                    const errorData = await response.text();
+                    console.error('Error details:', errorData);
                     showSampleData();
                 }
             } catch (error) {

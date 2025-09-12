@@ -88,9 +88,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Shared logout function
 function logout() {
-    localStorage.clear();
-    sessionStorage.clear();
-    window.location.href = '/login';
+    // If SyncedUpAuth is available, use its logout method for proper server-side logout
+    if (typeof SyncedUpAuth !== 'undefined' && SyncedUpAuth.logout) {
+        SyncedUpAuth.logout();
+    } else {
+        // Fallback: Clear cookies for server-side session
+        document.cookie = 'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        document.cookie = 'user_role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        document.cookie = 'user_roles=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        document.cookie = 'assumed_role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        // Also clear localStorage/sessionStorage for any legacy data
+        try {
+            localStorage.clear();
+            sessionStorage.clear();
+        } catch (e) {
+            // Ignore errors
+        }
+        // Redirect to login
+        window.location.href = '/login';
+    }
 }
 
 // Export for manual initialization if needed

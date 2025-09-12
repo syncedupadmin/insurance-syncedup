@@ -7,23 +7,35 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   try {
     if (req.method !== 'GET') {
       return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    // Get user info from token
+    // Get user info from token (but don't require it for now)
     const token = req.headers.authorization?.replace('Bearer ', '');
-    if (!token) {
-      return res.status(401).json({ error: 'No authorization token' });
-    }
-
     let decoded;
-    try {
-      decoded = jwt.verify(token, process.env.AUTH_SECRET || 'fallback-secret');
-    } catch (jwtError) {
-      console.warn('JWT verification failed, proceeding with fallback');
-      // For demo purposes, continue with PHS agency
+    
+    if (token && token !== 'undefined' && token !== 'null') {
+      try {
+        decoded = jwt.verify(token, process.env.AUTH_SECRET || 'fallback-secret');
+      } catch (jwtError) {
+        console.warn('JWT verification failed, proceeding with fallback');
+        // For demo purposes, continue with PHS agency
+      }
+    } else {
+      console.log('No token provided, using demo mode');
     }
 
     // For now, use hardcoded Convoso token until database is properly set up

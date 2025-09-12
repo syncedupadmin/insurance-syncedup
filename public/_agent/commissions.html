@@ -331,68 +331,51 @@
     <link rel="stylesheet" href="/css/themes/agent-modern.css">
 </head>
 <body class="portal-agent">
-    <!-- Sidebar Navigation -->
-    <div class="app-sidenav" id="agent-sidenav" aria-label="Global navigation">
-      <div class="brand">
-        <div class="logo"></div>
-        <div>Agent Portal</div>
-      </div>
-      <nav>
-        <div class="nav-group">
-          <div class="nav-label">Main</div>
-          <a class="nav-link" href="/agent/" data-route="dashboard"><i data-lucide="layout-dashboard" class="icon"></i> Dashboard</a>
-          <a class="nav-link" href="/agent/quotes" data-route="quotes"><i data-lucide="badge-dollar-sign" class="icon"></i> Quote Products</a>
-          <a class="nav-link" href="/agent/commissions" data-route="commissions"><i data-lucide="line-chart" class="icon"></i> My Commissions</a>
-          <a class="nav-link" href="/agent/settings" data-route="settings"><i data-lucide="settings" class="icon"></i> Settings</a>
-          <a class="nav-link" href="/leaderboard" data-route="leaderboard"><i data-lucide="trophy" class="icon"></i> Global Leaderboard</a>
+    <!-- Header -->
+    <div class="header">
+        <h1>My Commissions</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
         </div>
-      </nav>
     </div>
-    <div class="sidenav-scrim" id="sidenav-scrim"></div>
-    
-    <main class="app-main">
-        <!-- Utility Top Bar -->
-        <div class="mod-topbar">
-            <div style="display:flex;gap:10px;align-items:center;">
-                <button id="sidenav-toggle" class="mod-btn"><i data-lucide="menu"></i> Menu</button>
-                <h1 style="font-size:1.25rem;font-weight:700;margin:0;">My Commissions</h1>
-            </div>
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <span id="userDisplay" style="font-size:0.9rem;">Loading...</span>
-                <button class="mod-btn" onclick="logout && logout()">
-                    <i data-lucide="log-out" class="icon"></i>
-                    Logout
-                </button>
-            </div>
-        </div>
 
-        <div class="container" style="position:relative;z-index:1;">
+    <!-- Navigation (Centralized) -->
+    <div class="nav" id="agentNavigation">
+        <!-- Navigation will be injected by navigation.js -->
+    </div>
+    <script src="/agent/components/navigation.js"></script>
+
+    <div class="container">
         <!-- Commission Summary Cards -->
         <div class="grid" style="margin-bottom: 2rem;">
-            <div class="stat-card mod-card">
-                <div class="kpi-number" id="totalEarned">$0</div>
-                <div class="kpi-label">Total Earned</div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalEarned">$0</div>
+                <div class="stat-label">Total Earned</div>
                 <div class="stat-change" id="totalEarnedChange">+0% from last month</div>
             </div>
-            <div class="stat-card mod-card">
-                <div class="kpi-number" id="monthlyCommissions">$0</div>
-                <div class="kpi-label">This Month</div>
+            <div class="stat-card">
+                <div class="stat-value" id="monthlyCommissions">$0</div>
+                <div class="stat-label">This Month</div>
                 <div class="stat-change" id="monthlyChange">+0% from last month</div>
             </div>
-            <div class="stat-card mod-card">
-                <div class="kpi-number" id="pendingCommissions">$0</div>
-                <div class="kpi-label">Pending</div>
+            <div class="stat-card">
+                <div class="stat-value" id="pendingCommissions">$0</div>
+                <div class="stat-label">Pending</div>
                 <div class="stat-change" id="pendingCount">0 transactions</div>
             </div>
-            <div class="stat-card mod-card">
-                <div class="kpi-number" id="avgCommissionRate">0%</div>
-                <div class="kpi-label">Avg Commission Rate</div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgCommissionRate">0%</div>
+                <div class="stat-label">Avg Commission Rate</div>
                 <div class="stat-change" id="rateChange">Based on recent sales</div>
             </div>
         </div>
 
         <!-- Monthly Commission Chart -->
-        <div class="card mod-card" style="margin-bottom: 2rem;">
+        <div class="card" style="margin-bottom: 2rem;">
             <h3><i data-lucide="trending-up" class="card-icon"></i>Commission Trends</h3>
             <div class="chart-container">
                 <canvas id="commissionChart"></canvas>
@@ -446,8 +429,8 @@
         </div>
 
         <!-- Commission Statements Table -->
-        <div class="table-wrap">
-            <div class="table-head">
+        <div class="commission-table-container">
+            <div class="table-header">
                 <div class="table-title">
                     <i data-lucide="file-text"></i>
                     Commission Statements
@@ -494,7 +477,7 @@
         </div>
 
         <!-- Payment History -->
-        <div class="payment-history mod-card">
+        <div class="payment-history">
             <h3 style="margin-bottom: 1.5rem;"><i data-lucide="credit-card" class="card-icon"></i>Payment History</h3>
             <div id="paymentHistoryContainer">
                 <div class="empty-state">
@@ -506,8 +489,7 @@
                 </div>
             </div>
         </div>
-        </div>
-    </main>
+    </div>
 
     <script>
         let currentUser = null;
@@ -641,7 +623,7 @@
                     <td class="commission-amount">$${commission.premium.toLocaleString()}</td>
                     <td>${commission.rate}%</td>
                     <td class="commission-amount">$${commission.amount.toLocaleString()}</td>
-                    <td><span class="badge ${commission.status === 'paid' ? 'ok' : commission.status === 'pending' ? 'warn' : 'bad'}">${commission.status}</span></td>
+                    <td><span class="status-badge status-${commission.status}">${commission.status}</span></td>
                     <td>
                         <button class="btn-export" onclick="viewDetails('${commission.id}')">
                             <i data-lucide="eye"></i>
@@ -930,36 +912,7 @@
         }
 
         // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', function(){
-            initializePage();
-            // Only activate sidebar for modern mode
-            if (document.body.classList.contains('modern-mode')) {
-                document.body.classList.add('has-sidenav');
-                // Sidebar nav activation
-                var p = location.pathname;
-                document.querySelectorAll('.app-sidenav a.nav-link').forEach(function(a){
-                    var r = a.getAttribute('href');
-                    if (r && (p === r || p === r + '.html' || p.endsWith('commissions.html') || p.endsWith('commissions'))) {
-                        a.setAttribute('aria-current','page');
-                    }
-                });
-                // Mobile toggle
-                var nav = document.getElementById('agent-sidenav'), scrim = document.getElementById('sidenav-scrim');
-                var btn = document.getElementById('sidenav-toggle');
-                if (btn && nav) btn.addEventListener('click', function(){ nav.classList.toggle('open'); scrim.classList.toggle('show'); });
-                if (scrim) scrim.addEventListener('click', function(){ nav.classList.remove('open'); scrim.classList.remove('show'); });
-            } else {
-                // Hide sidebar elements for non-modern themes
-                var sidebar = document.getElementById('agent-sidenav');
-                var scrim = document.getElementById('sidenav-scrim');
-                var topbar = document.querySelector('.mod-topbar');
-                var main = document.querySelector('.app-main');
-                if (sidebar) sidebar.style.display = 'none';
-                if (scrim) scrim.style.display = 'none';
-                if (topbar) topbar.style.display = 'none';
-                if (main) main.className = '';
-            }
-        });
+        document.addEventListener('DOMContentLoaded', initializePage);
     </script>
 
     <!-- Professional Theme System -->

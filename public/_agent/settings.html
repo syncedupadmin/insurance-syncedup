@@ -52,44 +52,27 @@
     <link rel="stylesheet" href="/css/themes/agent-modern.css">
 </head>
 <body class="portal-agent">
-    <!-- Sidebar Navigation -->
-    <div class="app-sidenav" id="agent-sidenav" aria-label="Global navigation">
-      <div class="brand">
-        <div class="logo"></div>
-        <div>Agent Portal</div>
-      </div>
-      <nav>
-        <div class="nav-group">
-          <div class="nav-label">Main</div>
-          <a class="nav-link" href="/agent/" data-route="dashboard"><i data-lucide="layout-dashboard" class="icon"></i> Dashboard</a>
-          <a class="nav-link" href="/agent/quotes" data-route="quotes"><i data-lucide="badge-dollar-sign" class="icon"></i> Quote Products</a>
-          <a class="nav-link" href="/agent/commissions" data-route="commissions"><i data-lucide="line-chart" class="icon"></i> My Commissions</a>
-          <a class="nav-link" href="/agent/settings" data-route="settings"><i data-lucide="settings" class="icon"></i> Settings</a>
-          <a class="nav-link" href="/leaderboard" data-route="leaderboard"><i data-lucide="trophy" class="icon"></i> Global Leaderboard</a>
+    <!-- Header -->
+    <div class="header">
+        <h1>Agent Settings</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
         </div>
-      </nav>
     </div>
-    <div class="sidenav-scrim" id="sidenav-scrim"></div>
-    
-    <main class="app-main">
-        <!-- Utility Top Bar -->
-        <div class="mod-topbar">
-            <div style="display:flex;gap:10px;align-items:center;">
-                <button id="sidenav-toggle" class="mod-btn"><i data-lucide="menu"></i> Menu</button>
-                <h1 style="font-size:1.25rem;font-weight:700;margin:0;">Agent Settings</h1>
-            </div>
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <span id="userDisplay" style="font-size:0.9rem;">Loading...</span>
-                <button class="mod-btn" onclick="logout && logout()">
-                    <i data-lucide="log-out" class="icon"></i>
-                    Logout
-                </button>
-            </div>
-        </div>
 
-        <div class="container" style="position:relative;z-index:1;">
+    <!-- Navigation (Centralized) -->
+    <div class="nav" id="agentNavigation">
+        <!-- Navigation will be injected by navigation.js -->
+    </div>
+    <script src="/agent/components/navigation.js"></script>
+
+    <div class="container">
         <!-- Agent Profile Settings -->
-        <div class="card mod-card">
+        <div class="card">
             <h3 style="display: flex; align-items: center;">
                 <i data-lucide="user" class="card-icon"></i>
                 Agent Profile
@@ -144,7 +127,7 @@
         </div>
 
         <!-- Sales Preferences -->
-        <div class="card mod-card">
+        <div class="card">
             <h3 style="display: flex; align-items: center;">
                 <i data-lucide="target" class="card-icon"></i>
                 Sales Preferences
@@ -197,7 +180,7 @@
         </div>
 
         <!-- Interface Theme Settings -->
-        <div class="card mod-card">
+        <div class="card">
             <h3 style="display: flex; align-items: center;">
                 <i data-lucide="monitor" class="card-icon"></i>
                 Interface Theme
@@ -227,7 +210,7 @@
         </div>
 
         <!-- Commission Settings -->
-        <div class="card mod-card">
+        <div class="card">
             <h3 style="display: flex; align-items: center;">
                 <i data-lucide="dollar-sign" class="card-icon"></i>
                 Commission Tracking
@@ -289,7 +272,7 @@
         </div>
 
         <!-- Data Export -->
-        <div class="card mod-card">
+        <div class="card">
             <h3 style="display: flex; align-items: center;">
                 <i data-lucide="download" class="card-icon"></i>
                 Data Export
@@ -315,8 +298,7 @@
                 </div>
             </div>
         </div>
-        </div>
-    </main>
+    </div>
 
     <script>
         let currentUser = null;
@@ -645,33 +627,6 @@ Bob Wilson,bob@email.com,(555) 345-6789,${timestamp},$234.00,Prospect`;
             document.addEventListener('themeChanged', () => {
                 updateThemeButtons();
             });
-            // Only activate sidebar for modern mode
-            if (document.body.classList.contains('modern-mode')) {
-                document.body.classList.add('has-sidenav');
-                // Sidebar nav activation
-                var p = location.pathname;
-                document.querySelectorAll('.app-sidenav a.nav-link').forEach(function(a){
-                    var r = a.getAttribute('href');
-                    if (r && (p === r || p === r + '.html' || p.endsWith('settings.html') || p.endsWith('settings'))) {
-                        a.setAttribute('aria-current','page');
-                    }
-                });
-                // Mobile toggle
-                var nav = document.getElementById('agent-sidenav'), scrim = document.getElementById('sidenav-scrim');
-                var btn = document.getElementById('sidenav-toggle');
-                if (btn && nav) btn.addEventListener('click', function(){ nav.classList.toggle('open'); scrim.classList.toggle('show'); });
-                if (scrim) scrim.addEventListener('click', function(){ nav.classList.remove('open'); scrim.classList.remove('show'); });
-            } else {
-                // Hide sidebar elements for non-modern themes
-                var sidebar = document.getElementById('agent-sidenav');
-                var scrim = document.getElementById('sidenav-scrim');
-                var topbar = document.querySelector('.mod-topbar');
-                var main = document.querySelector('.app-main');
-                if (sidebar) sidebar.style.display = 'none';
-                if (scrim) scrim.style.display = 'none';
-                if (topbar) topbar.style.display = 'none';
-                if (main) main.className = '';
-            }
         });
     </script>
 

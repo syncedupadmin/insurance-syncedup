@@ -735,12 +735,26 @@
         
         async function loadInitialData() {
             try {
+                // Use authenticatedFetch if available, otherwise use regular fetch with credentials
+                const fetchMethod = typeof SyncedUpAuth !== 'undefined' && SyncedUpAuth.authenticatedFetch 
+                    ? SyncedUpAuth.authenticatedFetch 
+                    : fetch;
+                
                 // Load available lists
-                const response = await fetch('/api/admin/convoso-lists');
+                const response = await fetchMethod('/api/admin/convoso-lists', {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
                 if (response.ok) {
                     const data = await response.json();
                     availableLists = data.lists || [];
                     populateListDropdowns();
+                } else {
+                    console.error('Failed to load lists:', response.status);
                 }
             } catch (error) {
                 console.error('Failed to load initial data:', error);
@@ -784,7 +798,18 @@
                     sort_order: document.getElementById('sort-order').value
                 });
                 
-                const response = await fetch(`/api/admin/convoso-leads-search?${params}`);
+                // Use authenticatedFetch if available, otherwise use regular fetch with credentials
+                const fetchMethod = typeof SyncedUpAuth !== 'undefined' && SyncedUpAuth.authenticatedFetch 
+                    ? SyncedUpAuth.authenticatedFetch 
+                    : fetch;
+                
+                const response = await fetchMethod(`/api/admin/convoso-leads-search?${params}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
                 
                 if (response.ok) {
                     const data = await response.json();

@@ -346,17 +346,6 @@
             }
         }
         
-        function logout() {
-            try {
-                document.cookie = 'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-                document.cookie = 'user_role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-                window.location.href = '/login';
-            } catch (error) {
-                console.error('Logout failed:', error);
-                window.location.href = '/login';
-            }
-        }
-        
         // Initialize Lucide icons after DOM updates
         function initializeIcons() {
             try {
@@ -1067,12 +1056,6 @@
             if (diffInHours < 1) return 'Just now';
             if (diffInHours < 24) return `${diffInHours}h ago`;
             return `${Math.floor(diffInHours / 24)}d ago`;
-        }
-        
-        function logout() {
-            document.cookie = 'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-            document.cookie = 'user_role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-            window.location.href = '/login';
         }
         
         // Enhanced glassmorphism styling for admin dashboard
