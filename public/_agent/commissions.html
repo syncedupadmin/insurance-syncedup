@@ -329,25 +329,28 @@
     </style>
     <!-- Agent Portal Theme Override -->
     <link rel="stylesheet" href="/css/themes/agent-modern.css">
+    
+    <!-- Load auth helper for user context -->
+    <script src="/js/auth-helper.js"></script>
+    <!-- Load navigation component -->
+    <script src="/agent/components/navigation.js"></script>
+    <!-- Load global header component -->
+    <script src="/agent/components/global-header.js"></script>
 </head>
 <body class="portal-agent">
-    <!-- Header -->
-    <div class="header">
-        <h1>My Commissions</h1>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <span id="userDisplay">Loading...</span>
-            <button class="btn" onclick="logout()">
-                <i data-lucide="log-out" class="icon"></i>
-                Logout
-            </button>
-        </div>
-    </div>
-
-    <!-- Navigation (Centralized) -->
-    <div class="nav" id="agentNavigation">
-        <!-- Navigation will be injected by navigation.js -->
-    </div>
-    <script src="/agent/components/navigation.js"></script>
+    <!-- Global Header Mount Point -->
+    <div id="global-header-mount"></div>
+    
+    <!-- Initialize Global Header -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            AgentHeader.init({
+                pageTitle: 'My Commissions',
+                showRoleSwitcher: false,
+                showUserDisplay: true
+            });
+        });
+    </script>
 
     <div class="container">
         <!-- Commission Summary Cards -->
@@ -906,10 +909,7 @@
             localStorage.removeItem('user');
         }
 
-        function logout() {
-            clearAuthCookies();
-            window.location.href = '/login';
-        }
+        // Logout is now handled by global header component
 
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', initializePage);
