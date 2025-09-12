@@ -52,8 +52,9 @@
     <link rel="stylesheet" href="/css/themes/agent-modern.css">
 </head>
 <body class="portal-agent">
+    <div class="mod-shell">
     <!-- Header -->
-    <div class="header">
+    <div class="header mod-bar">
         <h1>Agent Settings</h1>
         <div style="display: flex; align-items: center; gap: 1rem;">
             <span id="userDisplay">Loading...</span>
@@ -70,9 +71,9 @@
     </div>
     <script src="/agent/components/navigation.js"></script>
 
-    <div class="container">
+    <div class="container" style="position:relative;z-index:1;">
         <!-- Agent Profile Settings -->
-        <div class="card">
+        <div class="card mod-card">
             <h3 style="display: flex; align-items: center;">
                 <i data-lucide="user" class="card-icon"></i>
                 Agent Profile
@@ -127,7 +128,7 @@
         </div>
 
         <!-- Sales Preferences -->
-        <div class="card">
+        <div class="card mod-card">
             <h3 style="display: flex; align-items: center;">
                 <i data-lucide="target" class="card-icon"></i>
                 Sales Preferences
@@ -180,7 +181,7 @@
         </div>
 
         <!-- Interface Theme Settings -->
-        <div class="card">
+        <div class="card mod-card">
             <h3 style="display: flex; align-items: center;">
                 <i data-lucide="monitor" class="card-icon"></i>
                 Interface Theme
@@ -210,7 +211,7 @@
         </div>
 
         <!-- Commission Settings -->
-        <div class="card">
+        <div class="card mod-card">
             <h3 style="display: flex; align-items: center;">
                 <i data-lucide="dollar-sign" class="card-icon"></i>
                 Commission Tracking
@@ -272,7 +273,7 @@
         </div>
 
         <!-- Data Export -->
-        <div class="card">
+        <div class="card mod-card">
             <h3 style="display: flex; align-items: center;">
                 <i data-lucide="download" class="card-icon"></i>
                 Data Export
@@ -298,6 +299,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <script>

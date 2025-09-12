@@ -65,8 +65,9 @@
     <link rel="stylesheet" href="/css/themes/agent-modern.css">
 </head>
 <body class="portal-agent">
+    <div class="mod-shell">
     <!-- Header -->
-    <div class="header">
+    <div class="header mod-bar">
         <h1>Agent Dashboard</h1>
         <div style="display: flex; align-items: center; gap: 1rem;">
             <div id="roleSwitcherMount"></div>
@@ -84,7 +85,7 @@
     </div>
     <script src="/agent/components/navigation.js"></script>
 
-    <div class="container">
+    <div class="container" style="position:relative;z-index:1;">
         <!-- Agent Welcome Notice -->
         <div class="agent-notice">
             <h3><i data-lucide="shield-check"></i> Agent Portal</h3>
@@ -93,21 +94,21 @@
         
         <!-- Performance Stats -->
         <div class="grid">
-            <div class="stat-card">
-                <div class="stat-value" id="monthlyCommissions">$0</div>
-                <div class="stat-label">Monthly Commissions</div>
+            <div class="stat-card mod-card">
+                <div class="kpi-number" id="monthlyCommissions">$0</div>
+                <div class="kpi-label">Monthly Commissions</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="monthlySales">0</div>
-                <div class="stat-label">Monthly Sales</div>
+            <div class="stat-card mod-card">
+                <div class="kpi-number" id="monthlySales">0</div>
+                <div class="kpi-label">Monthly Sales</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="totalCustomers">0</div>
-                <div class="stat-label">Total Customers</div>
+            <div class="stat-card mod-card">
+                <div class="kpi-number" id="totalCustomers">0</div>
+                <div class="kpi-label">Total Customers</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="conversionRate">0%</div>
-                <div class="stat-label">Conversion Rate</div>
+            <div class="stat-card mod-card">
+                <div class="kpi-number" id="conversionRate">0%</div>
+                <div class="kpi-label">Conversion Rate</div>
             </div>
         </div>
         
@@ -125,7 +126,7 @@
         
         <!-- Recent Activity & Performance -->
         <div class="grid">
-            <div class="card">
+            <div class="card mod-card">
                 <h3><i data-lucide="clock" class="card-icon"></i>Recent Activity</h3>
                 <div id="recentActivity">
                     <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
@@ -135,7 +136,7 @@
                 </div>
             </div>
             
-            <div class="card">
+            <div class="card mod-card">
                 <h3><i data-lucide="trending-up" class="card-icon"></i>This Month's Performance</h3>
                 <div id="performanceChart">
                     <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
@@ -147,8 +148,10 @@
         </div>
 
         <!-- Recent Quotes -->
-        <div class="card">
-            <h3><i data-lucide="file-text" class="card-icon"></i>Recent Quotes</h3>
+        <div class="table-wrap">
+            <div class="table-head">
+                <div class="table-title"><i data-lucide="file-text" class="card-icon"></i>Recent Quotes</div>
+            </div>
             <div id="recentQuotes">
                 <table>
                     <thead>
@@ -174,7 +177,7 @@
         </div>
 
         <!-- Goals & Progress -->
-        <div class="card">
+        <div class="card mod-card">
             <h3><i data-lucide="target" class="card-icon"></i>Monthly Goals</h3>
             <div class="grid">
                 <div>
@@ -197,6 +200,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <script>
@@ -302,7 +306,7 @@
                             <td>${quote.firstName} ${quote.lastName}</td>
                             <td>${quote.productType}</td>
                             <td class="premium-amount">$${quote.premium || 'TBD'}</td>
-                            <td><span class="status-${quote.status || 'pending'}">${quote.status || 'Pending'}</span></td>
+                            <td><span class="badge ${quote.status === 'active' ? 'ok' : quote.status === 'pending' ? 'warn' : 'bad'}">${quote.status || 'Pending'}</span></td>
                             <td>
                                 <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">View</button>
                             </td>

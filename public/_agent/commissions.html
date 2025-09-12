@@ -331,8 +331,9 @@
     <link rel="stylesheet" href="/css/themes/agent-modern.css">
 </head>
 <body class="portal-agent">
+    <div class="mod-shell">
     <!-- Header -->
-    <div class="header">
+    <div class="header mod-bar">
         <h1>My Commissions</h1>
         <div style="display: flex; align-items: center; gap: 1rem;">
             <span id="userDisplay">Loading...</span>
@@ -349,33 +350,33 @@
     </div>
     <script src="/agent/components/navigation.js"></script>
 
-    <div class="container">
+    <div class="container" style="position:relative;z-index:1;">
         <!-- Commission Summary Cards -->
         <div class="grid" style="margin-bottom: 2rem;">
-            <div class="stat-card">
-                <div class="stat-value" id="totalEarned">$0</div>
-                <div class="stat-label">Total Earned</div>
+            <div class="stat-card mod-card">
+                <div class="kpi-number" id="totalEarned">$0</div>
+                <div class="kpi-label">Total Earned</div>
                 <div class="stat-change" id="totalEarnedChange">+0% from last month</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="monthlyCommissions">$0</div>
-                <div class="stat-label">This Month</div>
+            <div class="stat-card mod-card">
+                <div class="kpi-number" id="monthlyCommissions">$0</div>
+                <div class="kpi-label">This Month</div>
                 <div class="stat-change" id="monthlyChange">+0% from last month</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="pendingCommissions">$0</div>
-                <div class="stat-label">Pending</div>
+            <div class="stat-card mod-card">
+                <div class="kpi-number" id="pendingCommissions">$0</div>
+                <div class="kpi-label">Pending</div>
                 <div class="stat-change" id="pendingCount">0 transactions</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="avgCommissionRate">0%</div>
-                <div class="stat-label">Avg Commission Rate</div>
+            <div class="stat-card mod-card">
+                <div class="kpi-number" id="avgCommissionRate">0%</div>
+                <div class="kpi-label">Avg Commission Rate</div>
                 <div class="stat-change" id="rateChange">Based on recent sales</div>
             </div>
         </div>
 
         <!-- Monthly Commission Chart -->
-        <div class="card" style="margin-bottom: 2rem;">
+        <div class="card mod-card" style="margin-bottom: 2rem;">
             <h3><i data-lucide="trending-up" class="card-icon"></i>Commission Trends</h3>
             <div class="chart-container">
                 <canvas id="commissionChart"></canvas>
@@ -429,8 +430,8 @@
         </div>
 
         <!-- Commission Statements Table -->
-        <div class="commission-table-container">
-            <div class="table-header">
+        <div class="table-wrap">
+            <div class="table-head">
                 <div class="table-title">
                     <i data-lucide="file-text"></i>
                     Commission Statements
@@ -477,7 +478,7 @@
         </div>
 
         <!-- Payment History -->
-        <div class="payment-history">
+        <div class="payment-history mod-card">
             <h3 style="margin-bottom: 1.5rem;"><i data-lucide="credit-card" class="card-icon"></i>Payment History</h3>
             <div id="paymentHistoryContainer">
                 <div class="empty-state">
@@ -489,6 +490,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <script>
@@ -623,7 +625,7 @@
                     <td class="commission-amount">$${commission.premium.toLocaleString()}</td>
                     <td>${commission.rate}%</td>
                     <td class="commission-amount">$${commission.amount.toLocaleString()}</td>
-                    <td><span class="status-badge status-${commission.status}">${commission.status}</span></td>
+                    <td><span class="badge ${commission.status === 'paid' ? 'ok' : commission.status === 'pending' ? 'warn' : 'bad'}">${commission.status}</span></td>
                     <td>
                         <button class="btn-export" onclick="viewDetails('${commission.id}')">
                             <i data-lucide="eye"></i>

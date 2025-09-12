@@ -54,8 +54,9 @@
     <link rel="stylesheet" href="/css/themes/agent-modern.css">
 </head>
 <body class="portal-agent">
+    <div class="mod-shell">
     <!-- Header -->
-    <div class="header">
+    <div class="header mod-bar">
         <h1>Quote Products</h1>
         <div style="display: flex; align-items: center; gap: 1rem;">
             <span id="userDisplay">Loading...</span>
@@ -72,9 +73,9 @@
     </div>
     <script src="/agent/components/navigation.js"></script>
 
-    <div class="container">
+    <div class="container" style="position:relative;z-index:1;">
         <!-- Quote Generator -->
-        <div class="card">
+        <div class="card mod-card">
             <h3 style="display: flex; align-items: center;">
                 <i data-lucide="calculator" class="card-icon"></i>
                 Generate Insurance Quote
@@ -188,7 +189,7 @@
         </div>
 
         <!-- Quote Results -->
-        <div id="quoteResults" class="card" style="display: none;">
+        <div id="quoteResults" class="card mod-card" style="display: none;">
             <h3 style="display: flex; align-items: center;">
                 <i data-lucide="file-text" class="card-icon"></i>
                 Quote Results
@@ -200,13 +201,12 @@
         </div>
 
         <!-- Recent Quotes -->
-        <div class="card">
-            <h3 style="display: flex; align-items: center;">
-                <i data-lucide="history" class="card-icon"></i>
-                Recent Quotes
-            </h3>
+        <div class="table-wrap">
+            <div class="table-head">
+                <div class="table-title"><i data-lucide="history" class="card-icon"></i>Recent Quotes</div>
+            </div>
 
-            <div style="margin-bottom: 1rem;">
+            <div style="padding: 1rem;">
                 <button class="btn btn-secondary" onclick="loadRecentQuotes()">
                     <i data-lucide="refresh-cw" class="icon"></i>
                     Refresh
@@ -238,6 +238,7 @@
                 </tbody>
             </table>
         </div>
+    </div>
     </div>
 
     <script>
@@ -519,7 +520,7 @@
                             <td>${quote.firstName} ${quote.lastName}</td>
                             <td>${quote.productType}</td>
                             <td class="premium-amount">$${quote.monthlyPremium}</td>
-                            <td><span class="status-${quote.status.toLowerCase()}">${quote.status}</span></td>
+                            <td><span class="badge ${quote.status === 'active' ? 'ok' : quote.status === 'pending' ? 'warn' : 'bad'}">${quote.status}</span></td>
                             <td>
                                 <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="viewQuote('${quote.id}')">
                                     <i data-lucide="eye" style="width: 12px; height: 12px;"></i>
@@ -575,7 +576,7 @@
                 if (response.ok) {
                     alert('Quote converted to sale successfully!');
                     setTimeout(() => {
-                        window.location.href = 'sales.html';
+                        window.location.href = '/agent/';
                     }, 1500);
                 } else {
                     alert('Failed to convert quote to sale');
