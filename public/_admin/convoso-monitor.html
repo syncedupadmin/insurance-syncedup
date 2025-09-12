@@ -717,12 +717,14 @@
         }
         
         async function loadFilters() {
+            console.log('loadFilters called');
             try {
                 // Use authenticatedFetch if available, otherwise use regular fetch with credentials
                 const fetchMethod = typeof SyncedUpAuth !== 'undefined' && SyncedUpAuth.authenticatedFetch 
                     ? SyncedUpAuth.authenticatedFetch 
                     : fetch;
                 
+                console.log('Fetching convoso-config...');
                 const response = await fetchMethod('/api/admin/convoso-config', {
                     method: 'GET',
                     credentials: 'include',
@@ -731,11 +733,16 @@
                     }
                 });
                 
+                console.log('Config response status:', response.status);
+                
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('Config data received:', data);
                     populateFilters(data);
                 } else {
                     console.error('Failed to load filters:', response.status);
+                    const errorText = await response.text();
+                    console.error('Error details:', errorText);
                 }
             } catch (error) {
                 console.error('Failed to load filters:', error);
@@ -743,27 +750,43 @@
         }
         
         function populateFilters(data) {
+            console.log('populateFilters called with data:', data);
             const campaignSelect = document.getElementById('campaign-filter');
             const queueSelect = document.getElementById('queue-filter');
             
+            if (!campaignSelect || !queueSelect) {
+                console.error('Filter select elements not found');
+                return;
+            }
+            
+            // Clear existing options except the first one (All Campaigns/All Queues)
+            campaignSelect.innerHTML = '<option value="">All Campaigns</option>';
+            queueSelect.innerHTML = '<option value="">All Queues</option>';
+            
             // Populate campaigns
-            if (data.campaigns) {
+            if (data.campaigns && Array.isArray(data.campaigns)) {
+                console.log(`Adding ${data.campaigns.length} campaigns to dropdown`);
                 data.campaigns.forEach(campaign => {
                     const option = document.createElement('option');
                     option.value = campaign.id;
                     option.textContent = campaign.name;
                     campaignSelect.appendChild(option);
                 });
+            } else {
+                console.warn('No campaigns data found');
             }
             
             // Populate queues
-            if (data.queues) {
+            if (data.queues && Array.isArray(data.queues)) {
+                console.log(`Adding ${data.queues.length} queues to dropdown`);
                 data.queues.forEach(queue => {
                     const option = document.createElement('option');
                     option.value = queue.id;
                     option.textContent = queue.name;
                     queueSelect.appendChild(option);
                 });
+            } else {
+                console.warn('No queues data found');
             }
         }
         
@@ -823,17 +846,8 @@
                 }
             };
             
-            updateStat('[data-stat="total-calls"]', data.stats?.totalCalls);
-            updateStat('[data-stat="calls-ringing"]', data.stats?.callsRinging);
-            updateStat('[data-stat="outbound-waiting"]', data.stats?.outboundWaiting);
-            updateStat('[data-stat="inbound-waiting"]', data.stats?.inboundWaiting);
-            updateStat('[data-stat="messages-playing"]', data.stats?.messagesPlaying);
-            updateStat('[data-stat="dialable-leads"]', data.stats?.dialableLeads);
-            updateStat('[data-stat="leads-hopper"]', data.stats?.leadsInHopper);
-            updateStat('[data-stat="dial-level"]', data.stats?.dialLevel);
-            updateStat('[data-stat="avg-agents"]', data.stats?.avgAgents);
-            
-            // Update all stats with ID-based selectors
+            // Remove the data-stat selectors as they don't exist in the HTML
+            // Only use ID-based selectors
             updateStat('#total-calls', data.stats?.totalCalls);
             updateStat('#calls-ringing', data.stats?.callsRinging);
             updateStat('#outbound-waiting', data.stats?.outboundWaiting);
@@ -957,28 +971,53 @@
             }
         }
         
-        // Populate and handle campaign dropdown
+        // Setup filter event listeners (but don't overwrite the dropdown options)
         function setupFilters(data) {
             const campaignSelect = document.querySelector('#campaign-filter');
             const queueSelect = document.querySelector('#queue-filter');
             
-            if (!campaignSelect || !queueSelect || !data.agentList) return;
+            if (!campaignSelect || !queueSelect) return;
             
-            // Get unique campaigns and queues
-            const campaigns = [...new Set(data.agentList.map(a => a.campaign).filter(Boolean))];
-            const queues = [...new Set(data.agentList.map(a => a.queue).filter(Boolean))];
-            
-            campaignSelect.innerHTML = '<option value="">-- All Campaigns --</option>' + 
-                campaigns.map(c => `<option value="${c}">${c}</option>`).join('');
-                
-            queueSelect.innerHTML = '<option value="">-- All Queues --</option>' + 
-                queues.map(q => `<option value="${q}">${q === 'Multiple Queues' ? 'Multi-Queue Agents' : q}</option>`).join('');
+            // Only setup event listeners, don't overwrite the options
+            // The options are already populated by populateFilters() from the API
             
             // Remove existing listeners and add new ones
             campaignSelect.removeEventListener('change', filterAgents);
             queueSelect.removeEventListener('change', filterAgents);
             campaignSelect.addEventListener('change', filterAgents);
             queueSelect.addEventListener('change', filterAgents);
+            
+            // If we want to show dynamic campaigns/queues from current agents,
+            // we should add them to existing options, not replace them
+            if (data.agentList && data.agentList.length > 0) {
+                // Get unique campaigns and queues from current agents
+                const agentCampaigns = [...new Set(data.agentList.map(a => a.campaign).filter(Boolean))];
+                const agentQueues = [...new Set(data.agentList.map(a => a.queue).filter(Boolean))];
+                
+                // Check if we need to add any new options that aren't already there
+                const existingCampaignValues = Array.from(campaignSelect.options).map(opt => opt.value);
+                const existingQueueValues = Array.from(queueSelect.options).map(opt => opt.value);
+                
+                // Add any new campaigns not in the list
+                agentCampaigns.forEach(campaign => {
+                    if (!existingCampaignValues.includes(campaign)) {
+                        const option = document.createElement('option');
+                        option.value = campaign;
+                        option.textContent = campaign + ' (Active)';
+                        campaignSelect.appendChild(option);
+                    }
+                });
+                
+                // Add any new queues not in the list
+                agentQueues.forEach(queue => {
+                    if (!existingQueueValues.includes(queue)) {
+                        const option = document.createElement('option');
+                        option.value = queue;
+                        option.textContent = queue === 'Multiple Queues' ? 'Multi-Queue Agents' : queue + ' (Active)';
+                        queueSelect.appendChild(option);
+                    }
+                });
+            }
         }
 
         function filterAgents() {
