@@ -827,20 +827,42 @@
             // Store current data for filtering
             window.currentAgentData = data.agentList || [];
             
+            // Ensure DOM is ready before updating
+            requestAnimationFrame(() => {
+                updateDashboardElements(data);
+            });
+        }
+        
+        function updateDashboardElements(data) {
+            
             // Update top call stats
             const updateStat = (selector, value) => {
                 const el = document.querySelector(selector);
-                console.log(`Updating ${selector} with value:`, value, 'Element found:', !!el);
                 if (el) {
                     // Handle different types of values
+                    let displayValue;
                     if (value === null || value === undefined) {
-                        el.textContent = '-';
+                        displayValue = '-';
                     } else if (value === 0) {
-                        el.textContent = '0';
+                        displayValue = '0';
                     } else {
-                        el.textContent = value.toString();
+                        displayValue = value.toString();
                     }
-                    console.log(`Updated ${selector} to:`, el.textContent);
+                    
+                    // Update the element
+                    el.textContent = displayValue;
+                    
+                    // Debug: Check computed styles
+                    const computed = window.getComputedStyle(el);
+                    console.log(`${selector}: value="${displayValue}", display="${computed.display}", visibility="${computed.visibility}", opacity="${computed.opacity}"`);
+                    
+                    // If element is hidden, make it visible
+                    if (computed.display === 'none' || computed.visibility === 'hidden' || computed.opacity === '0') {
+                        el.style.display = 'inline-block';
+                        el.style.visibility = 'visible';
+                        el.style.opacity = '1';
+                        console.warn(`Fixed hidden element ${selector}`);
+                    }
                 } else {
                     console.error(`Element not found: ${selector}`);
                 }
