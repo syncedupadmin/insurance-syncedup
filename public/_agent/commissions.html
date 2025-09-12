@@ -330,7 +330,7 @@
     <!-- Agent Portal Theme Override -->
     <link rel="stylesheet" href="/css/themes/agent-modern.css">
 </head>
-<body class="portal-agent modern-mode has-sidenav">
+<body class="portal-agent">
     <!-- Sidebar Navigation -->
     <div class="app-sidenav" id="agent-sidenav" aria-label="Global navigation">
       <div class="brand">
@@ -932,19 +932,33 @@
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function(){
             initializePage();
-            // Sidebar nav activation
-            var p = location.pathname;
-            document.querySelectorAll('.app-sidenav a.nav-link').forEach(function(a){
-                var r = a.getAttribute('href');
-                if (r && (p === r || p === r + '.html' || p.endsWith('commissions.html') || p.endsWith('commissions'))) {
-                    a.setAttribute('aria-current','page');
-                }
-            });
-            // Mobile toggle
-            var nav = document.getElementById('agent-sidenav'), scrim = document.getElementById('sidenav-scrim');
-            var btn = document.getElementById('sidenav-toggle');
-            if (btn && nav) btn.addEventListener('click', function(){ nav.classList.toggle('open'); scrim.classList.toggle('show'); });
-            if (scrim) scrim.addEventListener('click', function(){ nav.classList.remove('open'); scrim.classList.remove('show'); });
+            // Only activate sidebar for modern mode
+            if (document.body.classList.contains('modern-mode')) {
+                document.body.classList.add('has-sidenav');
+                // Sidebar nav activation
+                var p = location.pathname;
+                document.querySelectorAll('.app-sidenav a.nav-link').forEach(function(a){
+                    var r = a.getAttribute('href');
+                    if (r && (p === r || p === r + '.html' || p.endsWith('commissions.html') || p.endsWith('commissions'))) {
+                        a.setAttribute('aria-current','page');
+                    }
+                });
+                // Mobile toggle
+                var nav = document.getElementById('agent-sidenav'), scrim = document.getElementById('sidenav-scrim');
+                var btn = document.getElementById('sidenav-toggle');
+                if (btn && nav) btn.addEventListener('click', function(){ nav.classList.toggle('open'); scrim.classList.toggle('show'); });
+                if (scrim) scrim.addEventListener('click', function(){ nav.classList.remove('open'); scrim.classList.remove('show'); });
+            } else {
+                // Hide sidebar elements for non-modern themes
+                var sidebar = document.getElementById('agent-sidenav');
+                var scrim = document.getElementById('sidenav-scrim');
+                var topbar = document.querySelector('.mod-topbar');
+                var main = document.querySelector('.app-main');
+                if (sidebar) sidebar.style.display = 'none';
+                if (scrim) scrim.style.display = 'none';
+                if (topbar) topbar.style.display = 'none';
+                if (main) main.className = '';
+            }
         });
     </script>
 
