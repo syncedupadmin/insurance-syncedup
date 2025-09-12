@@ -9,7 +9,6 @@ function createManagerNavigation() {
         { href: '/manager/team-management', icon: 'users', text: 'Team Management' },
         { href: '/manager/performance', icon: 'trending-up', text: 'Team Performance' },
         { href: '/manager/reports', icon: 'file-text', text: 'Reports' },
-        { href: '/manager/goals', icon: 'target', text: 'Goals' },
         { href: '/manager/vendors', icon: 'building-2', text: 'Vendors' },
         { href: '/manager/settings', icon: 'settings', text: 'Settings' },
         { href: '/manager/convoso', icon: 'phone-call', text: 'Convoso' },

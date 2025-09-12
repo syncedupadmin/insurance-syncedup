@@ -64,28 +64,44 @@
     <!-- Agent Portal Theme Override -->
     <link rel="stylesheet" href="/css/themes/agent-modern.css">
 </head>
-<body class="portal-agent">
-    <div class="mod-shell">
-    <!-- Header -->
-    <div class="header mod-bar">
-        <h1>Agent Dashboard</h1>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <div id="roleSwitcherMount"></div>
-            <span id="userDisplay">Loading...</span>
-            <button class="btn" onclick="logout()">
-                <i data-lucide="log-out" class="icon"></i>
-                Logout
-            </button>
+<body class="portal-agent modern-mode has-sidenav">
+    <!-- Sidebar Navigation -->
+    <div class="app-sidenav" id="agent-sidenav" aria-label="Global navigation">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>Agent Portal</div>
+      </div>
+      <nav>
+        <div class="nav-group">
+          <div class="nav-label">Main</div>
+          <a class="nav-link" href="/agent/" data-route="dashboard"><i data-lucide="layout-dashboard" class="icon"></i> Dashboard</a>
+          <a class="nav-link" href="/agent/quotes" data-route="quotes"><i data-lucide="badge-dollar-sign" class="icon"></i> Quote Products</a>
+          <a class="nav-link" href="/agent/commissions" data-route="commissions"><i data-lucide="line-chart" class="icon"></i> My Commissions</a>
+          <a class="nav-link" href="/agent/settings" data-route="settings"><i data-lucide="settings" class="icon"></i> Settings</a>
+          <a class="nav-link" href="/leaderboard" data-route="leaderboard"><i data-lucide="trophy" class="icon"></i> Global Leaderboard</a>
         </div>
+      </nav>
     </div>
+    <div class="sidenav-scrim" id="sidenav-scrim"></div>
+    
+    <main class="app-main">
+        <!-- Utility Top Bar -->
+        <div class="mod-topbar">
+            <div style="display:flex;gap:10px;align-items:center;">
+                <button id="sidenav-toggle" class="mod-btn"><i data-lucide="menu"></i> Menu</button>
+                <h1 style="font-size:1.25rem;font-weight:700;margin:0;">Agent Dashboard</h1>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div id="roleSwitcherMount"></div>
+                <span id="userDisplay" style="font-size:0.9rem;">Loading...</span>
+                <button class="mod-btn" onclick="logout && logout()">
+                    <i data-lucide="log-out" class="icon"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
 
-    <!-- Navigation (Centralized) -->
-    <div class="nav" id="agentNavigation">
-        <!-- Navigation will be injected by navigation.js -->
-    </div>
-    <script src="/agent/components/navigation.js"></script>
-
-    <div class="container" style="position:relative;z-index:1;">
+        <div class="container" style="position:relative;z-index:1;">
         <!-- Agent Welcome Notice -->
         <div class="agent-notice">
             <h3><i data-lucide="shield-check"></i> Agent Portal</h3>
@@ -200,8 +216,8 @@
                 </div>
             </div>
         </div>
-    </div>
-    </div>
+        </div>
+    </main>
 
     <script>
         let currentUser = null;
@@ -369,7 +385,22 @@
         }
 
         // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', initializePage);
+        document.addEventListener('DOMContentLoaded', function(){
+            initializePage();
+            // Sidebar nav activation
+            var p = location.pathname;
+            document.querySelectorAll('.app-sidenav a.nav-link').forEach(function(a){
+                var r = a.getAttribute('href');
+                if (r && (p === r || p === r + 'index.html' || p.endsWith('index.html'))) {
+                    a.setAttribute('aria-current','page');
+                }
+            });
+            // Mobile toggle
+            var nav = document.getElementById('agent-sidenav'), scrim = document.getElementById('sidenav-scrim');
+            var btn = document.getElementById('sidenav-toggle');
+            if (btn && nav) btn.addEventListener('click', function(){ nav.classList.toggle('open'); scrim.classList.toggle('show'); });
+            if (scrim) scrim.addEventListener('click', function(){ nav.classList.remove('open'); scrim.classList.remove('show'); });
+        });
     </script>
 
     <!-- Simple Theme Loading -->

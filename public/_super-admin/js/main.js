@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     updateTime();
     setInterval(updateTime, 60000);
-    loadDashboard();
+    loadRevenueDashboard();
 });
 
 // Check authentication
@@ -49,18 +49,18 @@ function navigateTo(view) {
     // Load view
     currentView = view;
     switch(view) {
-        case 'dashboard': loadDashboard(); break;
-        case 'users': loadUserManagement(); break;
+        case 'dashboard': loadRevenueDashboard(); break;
         case 'agencies': loadAgencyManagement(); break;
-        case 'analytics': loadAnalytics(); break;
-        case 'config': loadSystemConfig(); break;
-        case 'audit': loadAuditTrail(); break;
-        case 'security': loadSecurity(); break;
+        case 'infrastructure': loadInfrastructure(); break;
+        case 'financial': loadFinancialReports(); break;
+        case 'usage': loadUsageReports(); break;
+        case 'analytics': loadPlatformAnalytics(); break;
+        case 'compliance': loadComplianceMonitoring(); break;
         case 'settings': loadSettings(); break;
     }
 }
 
-async function loadDashboard() {
+async function loadRevenueDashboard() {
     const content = document.getElementById('main-content');
     content.innerHTML = '<div class="loading">Loading real revenue data...</div>';
     
@@ -447,6 +447,28 @@ async function loadAgencyManagement() {
         
         if (!data.success) throw new Error(data.error);
         
+        // Build table rows separately to avoid nested template literal issues
+        const tableRows = data.agencies.map(agency => {
+            const statusClass = agency.is_active ? 'status-active' : 'status-inactive';
+            const statusText = agency.is_active ? 'Active' : 'Suspended';
+            const actionButton = agency.is_active ? 
+                `<button class="btn btn-sm btn-danger" onclick="suspendAgency('${agency.id}')">SUSPEND</button>` :
+                `<button class="btn btn-sm btn-success" onclick="reactivateAgency('${agency.id}')">REACTIVATE</button>`;
+            
+            return `
+                <tr>
+                    <td>${agency.name}</td>
+                    <td class="${statusClass}">${statusText}</td>
+                    <td>${agency.subscription_plan || 'free'}</td>
+                    <td>$${agency.monthly_fee || 0}</td>
+                    <td>
+                        ${actionButton}
+                        <button class="btn btn-sm" onclick="editAgency('${agency.id}')">EDIT</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        
         content.innerHTML = `
             <div class="card">
                 <h2>Agency Management - FULL CONTROL</h2>
@@ -464,23 +486,7 @@ async function loadAgencyManagement() {
                         </tr>
                     </thead>
                     <tbody>
-                        ${data.agencies.map(agency => `
-                            <tr>
-                                <td>${agency.name}</td>
-                                <td class="${agency.is_active ? 'status-active' : 'status-inactive'}">
-                                    ${agency.is_active ? 'Active' : 'Suspended'}
-                                </td>
-                                <td>${agency.subscription_plan || 'free'}</td>
-                                <td>$${agency.monthly_fee || 0}</td>
-                                <td>
-                                    ${agency.is_active ? 
-                                        `<button class="btn btn-sm btn-danger" onclick="suspendAgency('${agency.id}')">SUSPEND</button>` :
-                                        `<button class="btn btn-sm btn-success" onclick="reactivateAgency('${agency.id}')">REACTIVATE</button>`
-                                    }
-                                    <button class="btn btn-sm" onclick="editAgency('${agency.id}')">EDIT</button>
-                                </td>
-                            </tr>
-                        `).join('')}
+                        ${tableRows}
                     </tbody>
                 </table>
             </div>
@@ -532,14 +538,105 @@ async function reactivateAgency(agencyId) {
     }
 }
 
+// Store current agency data
+let currentAgencyData = null;
+
+// Open the slide-out panel with agency data
 async function editAgency(agencyId) {
-    const newPlan = prompt('Enter new plan (free/pro/enterprise):');
-    const newFee = prompt('Enter new monthly fee:');
+    try {
+        // Fetch the specific agency data
+        const response = await fetch('/api/super-admin/agencies-management');
+        const data = await response.json();
+        
+        if (!data.success) throw new Error('Failed to fetch agency data');
+        
+        // Find the specific agency
+        const agency = data.agencies.find(a => a.id === agencyId);
+        if (!agency) throw new Error('Agency not found');
+        
+        // Store for later use
+        currentAgencyData = agency;
+        
+        // Populate the form
+        document.getElementById('agency-id').value = agency.id;
+        document.getElementById('agency-name').value = agency.name || '';
+        document.getElementById('agency-code').value = agency.code || '';
+        document.getElementById('agency-email').value = agency.admin_email || '';
+        document.getElementById('agency-plan').value = agency.subscription_plan || 'free';
+        document.getElementById('agency-fee').value = agency.monthly_fee || 0;
+        document.getElementById('agency-billing').value = agency.next_billing_date ? agency.next_billing_date.split('T')[0] : '';
+        document.getElementById('agency-status').value = agency.subscription_status || 'active';
+        document.getElementById('agency-user-limit').value = agency.user_limit || 5;
+        document.getElementById('agency-storage-limit').value = agency.storage_limit_gb || 10;
+        document.getElementById('agency-api-limit').value = agency.api_calls_limit || 10000;
+        
+        // Show/hide activate/suspend buttons based on status
+        const activateBtn = document.getElementById('activate-btn');
+        const suspendBtn = document.getElementById('suspend-btn');
+        
+        if (agency.is_active) {
+            activateBtn.style.display = 'none';
+            suspendBtn.style.display = 'block';
+        } else {
+            activateBtn.style.display = 'block';
+            suspendBtn.style.display = 'none';
+        }
+        
+        // Open the panel
+        openAgencyPanel();
+        
+    } catch (error) {
+        alert('Error loading agency data: ' + error.message);
+    }
+}
+
+// Open the panel
+function openAgencyPanel() {
+    document.getElementById('agency-panel').classList.add('active');
+    document.getElementById('panel-overlay').classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+}
+
+// Close the panel
+function closeAgencyPanel() {
+    document.getElementById('agency-panel').classList.remove('active');
+    document.getElementById('panel-overlay').classList.remove('active');
+    document.body.style.overflow = 'auto';
+    currentAgencyData = null;
+}
+
+// Save agency changes
+async function saveAgencyChanges() {
+    const agencyId = document.getElementById('agency-id').value;
     
-    if (newPlan || newFee) {
-        const updates = {};
-        if (newPlan) updates.subscription_plan = newPlan;
-        if (newFee) updates.monthly_fee = parseFloat(newFee);
+    // Gather all the form data
+    const updates = {
+        name: document.getElementById('agency-name').value,
+        code: document.getElementById('agency-code').value,
+        admin_email: document.getElementById('agency-email').value,
+        subscription_plan: document.getElementById('agency-plan').value,
+        monthly_fee: parseFloat(document.getElementById('agency-fee').value) || 0,
+        next_billing_date: document.getElementById('agency-billing').value || null,
+        subscription_status: document.getElementById('agency-status').value,
+        user_limit: parseInt(document.getElementById('agency-user-limit').value) || 5,
+        storage_limit_gb: parseFloat(document.getElementById('agency-storage-limit').value) || 10,
+        api_calls_limit: parseInt(document.getElementById('agency-api-limit').value) || 10000,
+        is_active: document.getElementById('agency-status').value !== 'suspended' && 
+                   document.getElementById('agency-status').value !== 'cancelled'
+    };
+    
+    // Validate required fields
+    if (!updates.name) {
+        alert('Agency name is required');
+        return;
+    }
+    
+    try {
+        // Show loading state
+        const saveBtn = event.target;
+        const originalText = saveBtn.textContent;
+        saveBtn.textContent = 'Saving...';
+        saveBtn.disabled = true;
         
         const response = await fetch('/api/super-admin/agencies-management', {
             method: 'PUT',
@@ -547,9 +644,505 @@ async function editAgency(agencyId) {
             body: JSON.stringify({ agency_id: agencyId, updates })
         });
         
+        if (!response.ok) throw new Error('Failed to save changes');
+        
+        // Success notification
+        saveBtn.textContent = 'Saved!';
+        saveBtn.style.background = 'var(--success)';
+        
+        // Reload the table
+        loadAgencyManagement();
+        
+        // Close panel after short delay
+        setTimeout(() => {
+            closeAgencyPanel();
+            saveBtn.textContent = originalText;
+            saveBtn.disabled = false;
+            saveBtn.style.background = '';
+        }, 1500);
+        
+    } catch (error) {
+        alert('Error saving changes: ' + error.message);
+        // Reset button
+        event.target.textContent = 'Save Changes';
+        event.target.disabled = false;
+    }
+}
+
+// Suspend agency from panel
+async function suspendAgencyFromPanel() {
+    const agencyId = document.getElementById('agency-id').value;
+    const agencyName = document.getElementById('agency-name').value;
+    
+    if (!confirm(`Are you sure you want to SUSPEND ${agencyName}? They will lose access immediately!`)) return;
+    
+    document.getElementById('agency-status').value = 'suspended';
+    await saveAgencyChanges();
+}
+
+// Activate agency from panel
+async function activateAgency() {
+    const agencyId = document.getElementById('agency-id').value;
+    const agencyName = document.getElementById('agency-name').value;
+    
+    if (!confirm(`Activate ${agencyName}?`)) return;
+    
+    document.getElementById('agency-status').value = 'active';
+    await saveAgencyChanges();
+}
+
+async function loadInfrastructure() {
+    const content = document.getElementById('main-content');
+    content.innerHTML = '<div class="loading">Loading infrastructure data...</div>';
+    
+    try {
+        const response = await fetch('/api/super-admin/infrastructure');
+        const data = await response.json();
+        
+        if (!data.success) throw new Error(data.error);
+        
+        content.innerHTML = `
+            <div class="card">
+                <h2>Infrastructure & Resources</h2>
+            </div>
+            
+            <div class="metrics-row">
+                <div class="metric-card ${data.database.status === 'warning' ? 'alert' : ''}">
+                    <h4>DATABASE USAGE</h4>
+                    <div class="metric-value">${data.database.sizeGB} GB</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill ${data.database.usagePercent > 80 ? 'warning' : ''}" 
+                             style="width: ${data.database.usagePercent}%"></div>
+                    </div>
+                    <div class="metric-change">${data.database.usagePercent}% of ${data.database.limitGB} GB</div>
+                </div>
+                
+                <div class="metric-card ${data.storage.status === 'warning' ? 'alert' : ''}">
+                    <h4>STORAGE USAGE</h4>
+                    <div class="metric-value">${data.storage.sizeGB} GB</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill ${data.storage.usagePercent > 80 ? 'warning' : ''}" 
+                             style="width: ${data.storage.usagePercent}%"></div>
+                    </div>
+                    <div class="metric-change">${data.storage.usagePercent}% of ${data.storage.limitGB} GB</div>
+                </div>
+                
+                <div class="metric-card ${data.api.status === 'warning' ? 'alert' : ''}">
+                    <h4>API USAGE</h4>
+                    <div class="metric-value">${(data.api.estimatedCalls / 1000).toFixed(1)}k</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill ${data.api.usagePercent > 80 ? 'warning' : ''}" 
+                             style="width: ${data.api.usagePercent}%"></div>
+                    </div>
+                    <div class="metric-change">${data.api.usagePercent}% of monthly limit</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 class="section-title">Database Records</h3>
+                <table class="data-table">
+                    <tr>
+                        <td>Total Users</td>
+                        <td>${data.records.users.toLocaleString()}</td>
+                    </tr>
+                    <tr>
+                        <td>Total Agencies</td>
+                        <td>${data.records.agencies.toLocaleString()}</td>
+                    </tr>
+                    <tr>
+                        <td>Total Records</td>
+                        <td>${data.records.total.toLocaleString()}</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="card">
+                <h3 class="section-title">Estimated Costs</h3>
+                <table class="data-table">
+                    <tr>
+                        <td>Current Plan</td>
+                        <td>Free Tier</td>
+                    </tr>
+                    <tr>
+                        <td>Monthly Cost</td>
+                        <td>$${data.costs.estimated}</td>
+                    </tr>
+                    <tr>
+                        <td>Status</td>
+                        <td class="status-active">Within Free Limits</td>
+                    </tr>
+                </table>
+                ${data.database.usagePercent > 50 || data.storage.usagePercent > 50 ? `
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(245, 158, 11, 0.1); border-radius: 8px;">
+                        <strong>⚠️ Usage Warning:</strong> You're approaching free tier limits. Consider upgrading to Pro plan soon.
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    } catch (error) {
+        content.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+    }
+}// New dashboard functions for super admin
+
+async function loadFinancialReports() {
+    const content = document.getElementById('main-content');
+    content.innerHTML = '<div class="loading">Loading financial reports...</div>';
+    
+    try {
+        const response = await fetch('/api/super-admin/financial-reports');
+        const data = await response.json();
+        
+        if (!data.success) throw new Error(data.error);
+        
+        content.innerHTML = `
+            <div class="card">
+                <h2>Financial Reports</h2>
+            </div>
+            
+            <div class="metrics-row">
+                <div class="metric-card">
+                    <h4>CURRENT MRR</h4>
+                    <div class="metric-value">$${data.revenue.current_mrr.toLocaleString()}</div>
+                    <div class="metric-change ${parseFloat(data.revenue.growth_rate) >= 0 ? 'positive' : 'negative'}">
+                        ${data.revenue.growth_rate}% growth
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <h4>ANNUAL REVENUE</h4>
+                    <div class="metric-value">$${data.revenue.annual.toLocaleString()}</div>
+                    <div class="metric-change">Projected: $${data.revenue.projected_annual.toLocaleString()}</div>
+                </div>
+                
+                <div class="metric-card">
+                    <h4>AVG REVENUE/AGENCY</h4>
+                    <div class="metric-value">$${data.metrics.arpu}</div>
+                    <div class="metric-change">LTV: $${data.metrics.avg_ltv}</div>
+                </div>
+                
+                <div class="metric-card">
+                    <h4>CHURN RATE</h4>
+                    <div class="metric-value">${data.churn.churn_rate}%</div>
+                    <div class="metric-change">${data.churn.total_churned} agencies lost</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 class="section-title">Top Paying Agencies</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Agency</th>
+                            <th>Plan</th>
+                            <th>Monthly Fee</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${(data.top_agencies || []).map(agency => `
+                            <tr>
+                                <td>${agency.name}</td>
+                                <td>${agency.subscription_plan}</td>
+                                <td>$${agency.monthly_fee}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="card">
+                <button class="btn btn-primary" onclick="exportFinancialReport()">Export Report</button>
+            </div>
+        `;
+    } catch (error) {
+        content.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+    }
+}
+
+async function loadUsageReports() {
+    const content = document.getElementById('main-content');
+    content.innerHTML = '<div class="loading">Loading usage metrics...</div>';
+    
+    try {
+        const response = await fetch('/api/super-admin/usage-metrics');
+        const data = await response.json();
+        
+        if (!data.success) throw new Error(data.error);
+        
+        content.innerHTML = `
+            <div class="card">
+                <h2>Usage Reports</h2>
+            </div>
+            
+            <div class="metrics-row">
+                <div class="metric-card">
+                    <h4>TOTAL USERS</h4>
+                    <div class="metric-value">${data.totals.total_users.toLocaleString()}</div>
+                    <div class="metric-change">Avg per agency: ${data.totals.avg_users_per_agency}</div>
+                </div>
+                
+                <div class="metric-card">
+                    <h4>TOTAL STORAGE</h4>
+                    <div class="metric-value">${data.totals.total_storage_gb.toFixed(2)} GB</div>
+                    <div class="metric-change">Avg per agency: ${data.totals.avg_storage_per_agency} GB</div>
+                </div>
+                
+                <div class="metric-card">
+                    <h4>API CALLS</h4>
+                    <div class="metric-value">${(data.totals.total_api_calls / 1000).toFixed(1)}k</div>
+                    <div class="metric-change">Peak hour: ${data.activity.peak_hour}</div>
+                </div>
+            </div>
+            
+            ${data.nearLimits.length > 0 ? `
+                <div class="card">
+                    <h3 class="section-title">⚠️ Agencies Near Limits</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Agency</th>
+                                <th>Users</th>
+                                <th>Storage</th>
+                                <th>API Calls</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.nearLimits.map(agency => `
+                                <tr class="${parseFloat(agency.user_usage_percent) > 90 || parseFloat(agency.storage_usage_percent) > 90 ? 'overdue-row' : ''}">
+                                    <td>${agency.name}</td>
+                                    <td>${agency.user_usage_percent}%</td>
+                                    <td>${agency.storage_usage_percent}%</td>
+                                    <td>${agency.api_usage_percent}%</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            ` : ''}
+        `;
+    } catch (error) {
+        content.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+    }
+}
+
+async function loadPlatformAnalytics() {
+    const content = document.getElementById('main-content');
+    content.innerHTML = '<div class="loading">Loading platform analytics...</div>';
+    
+    try {
+        const response = await fetch('/api/super-admin/platform-analytics');
+        const data = await response.json();
+        
+        if (!data.success) throw new Error(data.error);
+        
+        content.innerHTML = `
+            <div class="card">
+                <h2>Platform Analytics</h2>
+            </div>
+            
+            <div class="metrics-row">
+                <div class="metric-card">
+                    <h4>TOTAL AGENCIES</h4>
+                    <div class="metric-value">${data.business_metrics.total_agencies}</div>
+                    <div class="metric-change">Active: ${data.business_metrics.active_agencies}</div>
+                </div>
+                
+                <div class="metric-card">
+                    <h4>GROWTH RATE</h4>
+                    <div class="metric-value">${data.business_metrics.growth_rate}</div>
+                    <div class="metric-change">New this month: ${data.business_metrics.new_this_month}</div>
+                </div>
+                
+                <div class="metric-card">
+                    <h4>CONVERSION RATE</h4>
+                    <div class="metric-value">${data.conversion.trial_to_paid_rate}</div>
+                    <div class="metric-change">${data.conversion.conversions_this_month} conversions</div>
+                </div>
+                
+                <div class="metric-card">
+                    <h4>HEALTH SCORE</h4>
+                    <div class="metric-value">${data.health_score.overall}%</div>
+                    <div class="metric-change status-${data.health_score.growth === 'positive' ? 'active' : 'inactive'}">
+                        ${data.health_score.growth} growth
+                    </div>
+                </div>
+            </div>
+            
+            ${data.engagement.at_risk_count > 0 ? `
+                <div class="card">
+                    <h3 class="section-title">🚨 At-Risk Agencies</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Agency</th>
+                                <th>Risk Reason</th>
+                                <th>API Calls</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.engagement.at_risk_agencies.map(agency => `
+                                <tr>
+                                    <td>${agency.name}</td>
+                                    <td>${agency.risk_reason}</td>
+                                    <td>${agency.api_calls}</td>
+                                    <td><button class="btn btn-sm btn-warning" onclick="contactAgency(${agency.id})">Contact</button></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            ` : ''}
+            
+            ${data.engagement.power_users_count > 0 ? `
+                <div class="card">
+                    <h3 class="section-title">⭐ Power Users</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Agency</th>
+                                <th>Active Users</th>
+                                <th>API Calls</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.engagement.power_users.map(agency => `
+                                <tr>
+                                    <td>${agency.name}</td>
+                                    <td>${agency.active_users}</td>
+                                    <td>${agency.api_calls.toLocaleString()}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            ` : ''}
+        `;
+    } catch (error) {
+        content.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+    }
+}
+
+async function loadComplianceMonitoring() {
+    const content = document.getElementById('main-content');
+    content.innerHTML = '<div class="loading">Loading compliance data...</div>';
+    
+    try {
+        const response = await fetch('/api/super-admin/compliance-monitoring');
+        const data = await response.json();
+        
+        if (!data.success) throw new Error(data.error);
+        
+        content.innerHTML = `
+            <div class="card">
+                <h2>Compliance & Limits</h2>
+                <span class="status-${data.compliance_status.overall === 'compliant' ? 'active' : 'error'}">
+                    Status: ${data.compliance_status.overall}
+                </span>
+            </div>
+            
+            <div class="metrics-row">
+                <div class="metric-card ${data.violations.count > 0 ? 'alert' : ''}">
+                    <h4>VIOLATIONS</h4>
+                    <div class="metric-value">${data.violations.count}</div>
+                    <div class="metric-change">Immediate action required</div>
+                </div>
+                
+                <div class="metric-card ${data.warnings.count > 5 ? 'alert' : ''}">
+                    <h4>WARNINGS</h4>
+                    <div class="metric-value">${data.warnings.count}</div>
+                    <div class="metric-change">Agencies approaching limits</div>
+                </div>
+                
+                <div class="metric-card">
+                    <h4>RATE LIMITS</h4>
+                    <div class="metric-value">${data.rate_limits.violations_24h}</div>
+                    <div class="metric-change">Violations in 24h</div>
+                </div>
+                
+                <div class="metric-card">
+                    <h4>DATA RETENTION</h4>
+                    <div class="metric-value">${data.data_retention.records_for_cleanup}</div>
+                    <div class="metric-change">Records > ${data.data_retention.retention_days} days</div>
+                </div>
+            </div>
+            
+            ${data.violations.count > 0 ? `
+                <div class="card">
+                    <h3 class="section-title">🚫 Limit Violations</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Agency</th>
+                                <th>Violation Type</th>
+                                <th>Current/Limit</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.violations.items.map(violation => `
+                                <tr class="overdue-row">
+                                    <td>${violation.agency_name}</td>
+                                    <td>${violation.type.replace(/_/g, ' ')}</td>
+                                    <td>${violation.current}/${violation.limit} (${violation.percent}%)</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-danger" 
+                                                onclick="enforceLimit(${violation.agency_id}, '${violation.type}')">
+                                            Enforce
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            ` : ''}
+        `;
+    } catch (error) {
+        content.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+    }
+}
+
+async function exportFinancialReport() {
+    const response = await fetch('/api/super-admin/financial-reports');
+    const data = await response.json();
+    
+    const csv = [
+        ['Metric', 'Value'],
+        ['Current MRR', data.revenue.current_mrr],
+        ['Annual Revenue', data.revenue.annual],
+        ['Growth Rate', data.revenue.growth_rate],
+        ['Churn Rate', data.churn.churn_rate],
+        ['Average Revenue Per Agency', data.metrics.arpu],
+        ['Average LTV', data.metrics.avg_ltv]
+    ].map(row => row.join(',')).join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `financial-report-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+}
+
+async function contactAgency(agencyId) {
+    alert(`Contact functionality for agency ${agencyId} would be implemented here`);
+}
+
+async function enforceLimit(agencyId, violationType) {
+    if (confirm(`Enforce limit for agency ${agencyId} due to ${violationType}?`)) {
+        const response = await fetch('/api/super-admin/compliance-monitoring', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'enforce_limit',
+                agency_id: agencyId,
+                reason: violationType
+            })
+        });
+        
         if (response.ok) {
-            alert('Agency UPDATED!');
-            loadAgencyManagement();
+            alert('Limit enforced - agency suspended');
+            loadComplianceMonitoring();
         }
     }
 }

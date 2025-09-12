@@ -43,10 +43,13 @@ export default async function handler(req, res) {
         if (req.method === 'PUT') {
             const { agency_id, updates } = req.body;
             
+            // Remove quotes if agency_id is wrapped in them
+            const cleanAgencyId = agency_id.replace(/['"]/g, '');
+            
             const { data, error } = await supabase
                 .from('agencies')
                 .update(updates)
-                .eq('id', agency_id)
+                .eq('id', cleanAgencyId)
                 .select()
                 .single();
                 

@@ -1,0 +1,36 @@
+<div class="app-sidenav" id="agent-sidenav" aria-label="Global navigation">
+  <div class="brand">
+    <div class="logo"></div>
+    <div>Agent Portal</div>
+  </div>
+  <nav>
+    <div class="nav-group">
+      <div class="nav-label">Main</div>
+      <a class="nav-link" href="/agent/" data-route="dashboard"><i data-lucide="layout-dashboard" class="icon"></i> Dashboard</a>
+      <a class="nav-link" href="/agent/quotes" data-route="quotes"><i data-lucide="badge-dollar-sign" class="icon"></i> Quote Products</a>
+      <a class="nav-link" href="/agent/commissions" data-route="commissions"><i data-lucide="line-chart" class="icon"></i> My Commissions</a>
+      <a class="nav-link" href="/agent/settings" data-route="settings"><i data-lucide="settings" class="icon"></i> Settings</a>
+      <a class="nav-link" href="/leaderboard" data-route="leaderboard"><i data-lucide="trophy" class="icon"></i> Global Leaderboard</a>
+    </div>
+  </nav>
+</div>
+<div class="sidenav-scrim" id="sidenav-scrim"></div>
+
+<script>
+  // Side nav activation + current route highlight (safe, isolated)
+  (function(){
+    var p = location.pathname;
+    document.querySelectorAll('.app-sidenav a.nav-link').forEach(function(a){
+      var r = a.getAttribute('href');
+      if (r && (p === r || p === r + '.html' || p.endsWith(r.replace('/agent/', '')))) {
+        a.setAttribute('aria-current','page');
+      }
+    });
+    if (window.lucide) try{ lucide.createIcons(); }catch(e){}
+    // Mobile toggle support if a button with id="sidenav-toggle" is present
+    var nav = document.getElementById('agent-sidenav'), scrim = document.getElementById('sidenav-scrim');
+    var btn = document.getElementById('sidenav-toggle');
+    if (btn && nav) btn.addEventListener('click', function(){ nav.classList.toggle('open'); scrim.classList.toggle('show'); });
+    if (scrim) scrim.addEventListener('click', function(){ nav.classList.remove('open'); scrim.classList.remove('show'); });
+  })();
+</script>

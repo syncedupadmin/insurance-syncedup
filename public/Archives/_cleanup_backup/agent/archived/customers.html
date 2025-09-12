@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Critical Theme Flash Prevention -->
+    <script>
+    (function(){
+        var t=localStorage.getItem("agentTheme")||"professional";
+        var h=document.documentElement;
+        
+        h.classList.add(t+"-mode");
+        
+        // Load theme CSS immediately
+        var existingTheme = document.querySelector('link[data-theme-css]');
+        if(existingTheme) existingTheme.remove();
+        
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = '/css/themes/' + t + '.css';
+        link.setAttribute('data-theme-css', t);
+        document.head.appendChild(link);
+        // Add body class when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            if(document.body) {document.body.classList.add("portal-agent");document.body.classList.add(t+"-mode");}
+        });
+        
+        if(t==="classic"){h.style.background="linear-gradient(-45deg,#047857,#059669,#10b981,#34d399)";}
+        else if(t==="modern"){h.style.background="linear-gradient(135deg,#10b981 0%,#059669 100%)";}
+        else if(t==="professional"){h.style.background="linear-gradient(-45deg,#059669,#10b981,#34d399,#a7f3d0)";}
+        else{h.style.background="linear-gradient(-45deg,#059669,#10b981,#34d399,#a7f3d0)";}
+        h.style.visibility="hidden";
+        setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
+    })();
+    </script>
+    <script src="/js/auth-helper.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Customers - SyncedUp Insurance Agent</title>
+    <link rel="stylesheet" href="/agent/agent-global.css">
+    
+    
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <!-- Agent Portal Theme Override -->
+    <link rel="stylesheet" href="/css/themes/agent-modern.css">
+</head>
+<body class="portal-agent">
+    <!-- Header -->
+    <div class="header">
+        <h1>My Customers</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="/agent" class="nav-link">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="/agent/quotes" class="nav-link">
+            <i data-lucide="calculator" class="icon"></i>
+            Quote Products
+        </a>
+        <a href="/agent/commissions" class="nav-link">
+            <i data-lucide="dollar-sign" class="icon"></i>
+            My Commissions
+        </a>
+        <a href="/agent/settings" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+        <a href="/global-leaderboard" class="nav-link">
+            <i data-lucide="trophy" class="icon"></i>
+            Global Leaderboard
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Agent Notice -->
+        <div class="agent-notice">
+            <h3><i data-lucide="users"></i> Customer Management</h3>
+            <p>View and manage all your customers, track their policies, and stay connected with their insurance needs.</p>
+        </div>
+        
+        <!-- Customer Summary Stats -->
+        <div class="grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalCustomers">0</div>
+                <div class="stat-label">Total Customers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="activeCustomers">0</div>
+                <div class="stat-label">Active Policies</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="prospectCustomers">0</div>
+                <div class="stat-label">Prospects</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="customerValue">$0</div>
+                <div class="stat-label">Total Customer Value</div>
+            </div>
+        </div>
+
+        <!-- Customer Search & Filters -->
+        <div class="card">
+            <h3><i data-lucide="search" class="card-icon"></i>Find Customers</h3>
+            
+            <div class="grid" style="margin-bottom: 1rem;">
+                <div class="form-group">
+                    <label class="form-label">Search</label>
+                    <input type="text" id="customerSearch" class="form-input" placeholder="Search by name, email, or phone...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select id="statusFilter" class="form-select">
+                        <option value="all">All Customers</option>
+                        <option value="active">Active Policies</option>
+                        <option value="prospect">Prospects</option>
+                        <option value="expired">Expired Policies</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex gap-2">
+                <button class="btn btn-primary" onclick="searchCustomers()">
+                    <i data-lucide="search"></i>
+                    Search
+                </button>
+                <button class="btn btn-success" onclick="addNewCustomer()">
+                    <i data-lucide="user-plus"></i>
+                    Add New Customer
+                </button>
+                <button class="btn btn-secondary" onclick="exportCustomers()">
+                    <i data-lucide="download"></i>
+                    Export List
+                </button>
+            </div>
+        </div>
+
+        <!-- Customer List -->
+        <div class="card">
+            <h3><i data-lucide="list" class="card-icon"></i>Customer List</h3>
+            
+            <div id="customersList">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Customer Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Policies</th>
+                            <th>Total Premium</th>
+                            <th>Last Contact</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customersTableBody">
+                        <tr>
+                            <td colspan="8" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                                <div class="loading"></div>
+                                Loading customers...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card">
+            <h3><i data-lucide="activity" class="card-icon"></i>Recent Customer Activity</h3>
+            <div id="recentActivity">
+                <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                    <div class="loading"></div>
+                    Loading recent activity...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        // Authentication check
+        function checkAuth() {
+            // Authentication is now handled server-side via portal-guard
+            // Just proceed with page initialization
+            return true;
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            // Load customer data
+            await loadCustomerData();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Load customer data
+        async function loadCustomerData() {
+            try {
+                const user = JSON.parse(sessionStorage.getItem('syncedup:user') || '{}');
+                
+                // Load customer stats
+                await loadCustomerStats();
+                await loadCustomersList();
+                await loadRecentActivity();
+            } catch (error) {
+                console.error('Error loading customer data:', error);
+                loadFallbackData();
+            }
+        }
+
+        // Load customer statistics
+        async function loadCustomerStats() {
+            try {
+                // In a real implementation, these would come from API calls
+                document.getElementById('totalCustomers').textContent = '0';
+                document.getElementById('activeCustomers').textContent = '0';
+                document.getElementById('prospectCustomers').textContent = '0';
+                document.getElementById('customerValue').textContent = '$0';
+            } catch (error) {
+                console.error('Failed to load customer stats:', error);
+            }
+        }
+
+        // Load customers list
+        async function loadCustomersList() {
+            const tableBody = document.getElementById('customersTableBody');
+            
+            try {
+                // Show empty state for now - would connect to API in real implementation
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                            No customers found. Start by generating quotes to build your customer base.
+                        </td>
+                    </tr>
+                `;
+            } catch (error) {
+                console.error('Failed to load customers:', error);
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: #ff6b6b; padding: 2rem;">
+                            Error loading customers. Please refresh the page.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Load recent activity
+        async function loadRecentActivity() {
+            const activityContainer = document.getElementById('recentActivity');
+            
+            // Show empty state - would connect to API in real implementation
+            activityContainer.innerHTML = `
+                <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 2rem;">
+                    No recent customer activity found
+                </div>
+            `;
+        }
+
+        // Search customers
+        function searchCustomers() {
+            const searchTerm = document.getElementById('customerSearch').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            // In real implementation, this would filter the customer list
+            console.log('Searching for:', searchTerm, 'with status:', statusFilter);
+            alert('Customer search functionality will be implemented with backend integration');
+        }
+
+        // Add new customer
+        function addNewCustomer() {
+            alert('Add new customer functionality will be implemented. For now, customers are created when generating quotes.');
+        }
+
+        // Export customers
+        function exportCustomers() {
+            // Create sample CSV content for demonstration
+            const csvContent = `Customer Name,Email,Phone,Policies,Total Premium,Status
+No customers available,,,0,$0.00,N/A`;
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `customers-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Fallback data for when API fails
+        function loadFallbackData() {
+            document.getElementById('totalCustomers').textContent = '0';
+            document.getElementById('activeCustomers').textContent = '0';
+            document.getElementById('prospectCustomers').textContent = '0';
+            document.getElementById('customerValue').textContent = '$0';
+        }
+
+        // Logout function
+        function logout() {
+            clearAuthCookies();
+            localStorage.removeItem('user');
+            localStorage.removeItem('currentUser');
+            window.location.href = '/login.html';
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+
+    <!-- Professional Theme System -->
+    <script src="/js/theme-switcher.js"></script>
+    <script src="/assets/session-prod.js"></script>
+</body>
+</html>

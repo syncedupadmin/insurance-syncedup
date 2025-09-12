@@ -166,6 +166,112 @@ body.portal-agent.modern-mode :focus-visible {
   outline-offset:2px 
 }
 
+/* ===== MODERN MODE SIDEBAR NAVIGATION ===== */
+/* Page chrome */
+body.portal-agent.modern-mode.has-sidenav { 
+  display:grid; grid-template-columns: var(--nav-w) 1fr; min-height:100dvh; 
+  --nav-w: 248px;
+}
+
+body.portal-agent.modern-mode .app-sidenav { 
+  position:sticky; top:0; height:100dvh; z-index:10;
+  background:var(--glass-strong); border-right:1px solid var(--line); 
+  backdrop-filter: blur(16px); box-shadow: var(--elev-1); 
+}
+
+body.portal-agent.modern-mode .app-main { 
+  position:relative; z-index:1; padding:24px 28px; 
+}
+
+/* Sidebar structure */
+body.portal-agent.modern-mode .app-sidenav .brand { 
+  display:flex; align-items:center; gap:10px; padding:18px; 
+  font-weight:900; letter-spacing:.3px; color: var(--ink);
+}
+
+body.portal-agent.modern-mode .app-sidenav .brand .logo { 
+  width:28px; height:28px; border-radius:8px; 
+  background: linear-gradient(180deg, var(--cta-1), var(--cta-2)); 
+  box-shadow: inset 0 1px 0 #ffffff33; 
+}
+
+body.portal-agent.modern-mode .app-sidenav nav { 
+  display:flex; flex-direction:column; gap:4px; padding:8px 8px 18px; 
+}
+
+body.portal-agent.modern-mode .app-sidenav .nav-group { 
+  margin-top:8px; 
+}
+
+body.portal-agent.modern-mode .app-sidenav .nav-label { 
+  color:var(--muted); font-size:11px; letter-spacing:.4px; 
+  padding:10px 12px 6px; text-transform:uppercase; 
+}
+
+body.portal-agent.modern-mode .app-sidenav a.nav-link { 
+  display:flex; align-items:center; gap:10px; padding:10px 12px; 
+  color:#ffffffde; text-decoration:none; border-radius:12px; 
+  border:1px solid transparent; transition: all 0.2s ease;
+}
+
+body.portal-agent.modern-mode .app-sidenav a.nav-link:hover { 
+  background:var(--glass); border-color:var(--hair); 
+}
+
+body.portal-agent.modern-mode .app-sidenav a.nav-link[aria-current="page"] { 
+  background: linear-gradient(180deg, #ffffff14, #ffffff0c); 
+  border-color:var(--line); box-shadow: var(--elev-1); 
+}
+
+body.portal-agent.modern-mode .app-sidenav .icon { 
+  width:18px; height:18px; 
+}
+
+/* Collapse (mobile) */
+@media (max-width: 1024px){
+  body.portal-agent.modern-mode.has-sidenav { 
+    grid-template-columns: 1fr; 
+  }
+  
+  body.portal-agent.modern-mode .app-sidenav { 
+    position: fixed; left:0; top:0; width: var(--nav-w); 
+    transform: translateX(-100%); transition: transform .2s ease; 
+  }
+  
+  body.portal-agent.modern-mode .app-sidenav.open { 
+    transform: translateX(0); 
+  }
+  
+  body.portal-agent.modern-mode .sidenav-scrim { 
+    position:fixed; inset:0; background:#0009; opacity:0; 
+    pointer-events:none; transition:opacity .2s; z-index:9;
+  }
+  
+  body.portal-agent.modern-mode .sidenav-scrim.show { 
+    opacity:1; pointer-events:auto; 
+  }
+}
+
+/* Utility top bar inside main content */
+body.portal-agent.modern-mode .mod-topbar { 
+  display:flex; align-items:center; justify-content:space-between; gap:10px; 
+  padding:10px 14px; border:1px solid var(--line);
+  background: linear-gradient(180deg, #ffffff14, #ffffff0f); 
+  border-radius:14px; backdrop-filter: blur(16px); 
+  box-shadow: var(--elev-1); margin-bottom:16px; 
+}
+
+body.portal-agent.modern-mode .mod-btn { 
+  display:inline-flex; align-items:center; gap:8px; padding:8px 12px; 
+  border:1px solid var(--hair); color:#fff; background:var(--glass); 
+  border-radius:12px; cursor:pointer; transition: all 0.2s ease;
+  text-decoration:none; font-weight:500;
+}
+
+body.portal-agent.modern-mode .mod-btn:hover{ 
+  transform: translateY(-1px); box-shadow: var(--elev-1); 
+}
+
 /* Fonts */
 
 /* Lucide Icons - Removed problematic import */

@@ -6,9 +6,43 @@
     (function(){
         var t=localStorage.getItem("adminTheme")||"professional";
         var h=document.documentElement;
-        if(t==="classic"){h.classList.add("classic-mode");h.style.backgroundColor="#008080";}
-        else if(t==="modern"){h.classList.add("modern-mode");h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        h.classList.add(t+"-mode");
+        
+        // Load theme CSS immediately
+        var existingTheme = document.querySelector('link[data-theme-css]');
+        if(existingTheme) existingTheme.remove();
+        
+        if(t==="modern"){
+            // Load modern base styles (structure only)
+            var baseLink = document.createElement('link');
+            baseLink.rel = 'stylesheet';
+            baseLink.href = '/css/themes/modern-base.css';
+            baseLink.setAttribute('data-theme-css', 'modern-base');
+            document.head.appendChild(baseLink);
+            // Admin portal purple colors are in admin-global.css
+        } else {
+            // Load traditional theme CSS
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = '/css/themes/' + t + '.css';
+            link.setAttribute('data-theme-css', t);
+            document.head.appendChild(link);
+        }
+        
+        // Add body class when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            if(document.body) {
+                document.body.classList.add('portal-admin');
+                document.body.classList.add(t+"-mode");
+            }
+        });
+        
+        // Set background for immediate visual feedback (purple colors for admin)
+        if(t==="classic"){h.style.background="linear-gradient(-45deg,#6b46c1,#7c3aed,#8b5cf6,#a78bfa)";}
+        else if(t==="modern"){h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        else if(t==="professional"){h.style.background="linear-gradient(-45deg,#4c1d95,#5b21b6,#6d28d9,#7c3aed)";}
         else{h.style.background="linear-gradient(-45deg,#4c1d95,#5b21b6,#6d28d9,#7c3aed)";}
+        
         h.style.visibility="hidden";
         setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
     })();
@@ -29,7 +63,6 @@
     
     <!-- Admin Global Styles -->
     <link rel="stylesheet" href="/admin/admin-global.css">
-    <link rel="stylesheet" href="/css/themes/professional.css">
     
     <!-- Shared Navigation -->
     <script src="/admin/shared-nav.js"></script>
@@ -41,7 +74,7 @@
         }
         
         .monitor-header {
-            background: linear-gradient(135deg, #4c1d95 0%, #5b21b6 50%, #6d28d9 100%);
+            background: rgba(255, 255, 255, 0.1);
             color: white;
             padding: 1rem;
             display: flex;
@@ -196,33 +229,35 @@
         .agent-status-icon {
             font-size: 2.5rem;
             margin-bottom: 0.5rem;
-            color: #a0aec0;
+            color: rgba(255, 255, 255, 0.6);
         }
         
         .agent-status-number {
             font-size: 2rem;
             font-weight: bold;
-            color: #2d3748;
+            color: white;
             margin-bottom: 0.25rem;
         }
         
         .agent-status-label {
-            color: #718096;
+            color: rgba(255, 255, 255, 0.7);
             font-size: 0.75rem;
             font-weight: 500;
         }
         
         .agents-table {
-            background: white;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
             border-radius: 8px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.18);
             overflow: hidden;
         }
         
         .table-header {
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.05);
             padding: 1rem;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             justify-content: between;
             align-items: center;
@@ -240,23 +275,24 @@
         }
         
         .agents-table th {
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.05);
             padding: 0.75rem;
             text-align: left;
             font-weight: 600;
-            color: #4a5568;
+            color: rgba(255, 255, 255, 0.9);
             font-size: 0.875rem;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .agents-table td {
             padding: 0.75rem;
-            border-bottom: 1px solid #f7fafc;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.8);
         }
         
         .agents-table tr:hover {
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.1);
         }
         
         .agent-status-badge {
@@ -376,15 +412,16 @@
         
         .agent-name {
             font-weight: 600;
-            color: #2d3748 !important;
+            color: white !important;
         }
         
         .agent-extension {
             font-family: monospace;
-            background: #f7fafc;
+            background: rgba(255, 255, 255, 0.1);
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 12px;
+            color: rgba(255, 255, 255, 0.9);
         }
         
         .call-count {
@@ -392,19 +429,7 @@
             color: #2b6cb0 !important;
         }
         
-        /* CRITICAL: Override any theme backgrounds for Convoso pages */
-        html, body {
-            background: #f5f7fa !important;
-            background-image: none !important;
-            background-attachment: fixed !important;
-        }
-        
-        html.classic-mode,
-        html.modern-mode,
-        html[style*="background"] {
-            background: #f5f7fa !important;
-            background-image: none !important;
-        }
+        /* Theme backgrounds are now handled by the admin portal theme system */
         
         /* Force container background */
         .container {
@@ -412,13 +437,14 @@
             min-height: 100vh;
         }
         
-        /* Ensure cards remain white */
+        /* Ensure cards use glassmorphic design */
         .stat-card, 
         .performance-card, 
         .agent-status-card, 
         .agents-table {
-            background: white !important;
-            border: 1px solid #e2e8f0 !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.18) !important;
         }
     </style>
 </head>

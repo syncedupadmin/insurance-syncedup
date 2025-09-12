@@ -11,12 +11,7 @@
             // Skip if already initialized (prevent double execution)
             if (this.initialized) return;
             
-            // Skip theme system on Convoso pages
-            if (window.CONVOSO_PAGE || document.title.includes('Convoso') || 
-                window.location.pathname.includes('convoso')) {
-                console.log('Theme system disabled for Convoso page');
-                return;
-            }
+            // Theme system now works on all pages including Convoso
             
             this.initialized = true;
             
