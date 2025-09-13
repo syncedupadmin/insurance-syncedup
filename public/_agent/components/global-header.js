@@ -125,11 +125,32 @@
                 headerContent += `<span id="userDisplay">${userDisplay}</span>`;
             }
             
-            // Add leaderboard button
+            // Add leaderboard button with game-themed styling
             headerContent += `
-                        <button class="btn btn-warning" onclick="window.location.href='/global-leaderboard'" style="display: flex; align-items: center; gap: 0.5rem;">
-                            <i data-lucide="trophy" class="icon"></i>
-                            Leaderboard
+                        <button class="leaderboard-btn" onclick="window.location.href='/global-leaderboard'" style="
+                            display: flex;
+                            align-items: center;
+                            gap: 0.5rem;
+                            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+                            color: #1a1a1a;
+                            border: 2px solid #FFD700;
+                            padding: 0.5rem 1rem;
+                            border-radius: 8px;
+                            font-weight: bold;
+                            font-size: 0.95rem;
+                            cursor: pointer;
+                            position: relative;
+                            overflow: hidden;
+                            transition: all 0.3s ease;
+                            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+                            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+                        "
+                        onmouseover="this.style.transform='translateY(-2px) scale(1.05)'; this.style.boxShadow='0 4px 12px rgba(255, 215, 0, 0.5)';"
+                        onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 2px 8px rgba(255, 215, 0, 0.3)';">
+                            <i data-lucide="trophy" class="icon" style="color: #1a1a1a;"></i>
+                            <span style="position: relative;">
+                                🏆 Leaderboard
+                            </span>
                         </button>
             `;
             
@@ -143,9 +164,15 @@
                 </div>
             `;
             
-            // Add navigation placeholder
+            // Add navigation placeholder with centered styling
             headerContent += `
-                <div class="nav" id="agentNavigation">
+                <div class="nav" id="agentNavigation" style="
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 1rem;
+                    padding: 1rem 0;
+                ">
                     <!-- Navigation will be injected by navigation.js -->
                 </div>
             `;
