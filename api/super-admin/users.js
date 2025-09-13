@@ -19,16 +19,50 @@ export default async function handler(req, res) {
     
     if (req.method === 'GET') {
         try {
-            // Get REAL users from database
-            const { data: users, error, count } = await supabase
-                .from('portal_users')
-                .select('*', { count: 'exact' })
-                .order('created_at', { ascending: false });
-                
-            if (error) {
-                console.error('Error fetching users:', error);
-                return res.status(500).json({ error: 'Failed to fetch users' });
+            // Get ONLY users that exist in BOTH portal_users AND auth.users
+            // This ensures we only show real, authenticated users
+            const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers({
+                page: 1,
+                perPage: 1000
+            });
+
+            if (authError) {
+                console.error('Error fetching auth users:', authError);
+                return res.status(500).json({ error: 'Failed to fetch auth users' });
             }
+
+            // Get portal users
+            const { data: portalUsers, error: portalError } = await supabase
+                .from('portal_users')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (portalError) {
+                console.error('Error fetching portal users:', portalError);
+                return res.status(500).json({ error: 'Failed to fetch portal users' });
+            }
+
+            // Create a map of auth users by email for quick lookup
+            const authUserMap = new Map();
+            authUsers.users.forEach(user => {
+                authUserMap.set(user.email.toLowerCase(), user);
+            });
+
+            // Filter portal users to only include those that exist in auth.users
+            // and merge auth metadata
+            const users = (portalUsers || []).filter(portalUser => {
+                const authUser = authUserMap.get(portalUser.email.toLowerCase());
+                if (authUser) {
+                    // Merge auth user ID and metadata
+                    portalUser.auth_user_id = authUser.id;
+                    portalUser.auth_role = authUser.app_metadata?.role || authUser.user_metadata?.role;
+                    portalUser.email_confirmed = !!authUser.email_confirmed_at;
+                    return true;
+                }
+                return false; // Exclude users not in auth.users
+            });
+
+            const count = users.length;
             
             return res.status(200).json({
                 users: users || [],
