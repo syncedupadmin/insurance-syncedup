@@ -1,5 +1,4 @@
-import jwt from 'jsonwebtoken';
-
+const { verifyToken } = require('../lib/auth-bridge.js');
 const CSRF_SECRET = process.env.JWT_SECRET + '_csrf' || 'csrf-fallback-secret';
 
 export default async function handler(req, res) {

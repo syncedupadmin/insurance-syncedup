@@ -1,4 +1,4 @@
-const jwt = require("jsonwebtoken");
+const { verifyToken } = require('../../lib/auth-bridge.js');
 const SECRET = process.env.JWT_SECRET;
 
 function getCookie(req, name) {
@@ -10,7 +10,7 @@ module.exports = (req, res) => {
   try {
     const token = getCookie(req, "auth_token");
     if (!token) throw new Error("no token");
-    const { email, role, sub } = jwt.verify(token, SECRET);
+    const { email, role, sub } = await verifyToken(, ["auth_token","auth-token","user_role","user_roles","assumed_role"]);
     res.setHeader("Content-Type","application/json");
     res.end(JSON.stringify({ ok:true, user:{ email, role, id: sub }}));
   } catch {

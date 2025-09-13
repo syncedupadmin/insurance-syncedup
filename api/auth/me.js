@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+const { verifyToken } = require('../../lib/auth-bridge.js');
 import { createClient } from '@supabase/supabase-js';
 import cookie from 'cookie';
 
@@ -26,10 +26,7 @@ export default async function handler(req, res) {
     }
 
     // Verify JWT token
-    const payload = jwt.verify(token, JWT_SECRET, {
-      audience: 'syncedup-app',
-      issuer: 'syncedup-auth'
-    });
+    const payload = await verifyToken(, ["auth_token","auth-token","user_role","user_roles","assumed_role"]);
 
     // Optional DB cross-check to ensure user still exists/active
     const supabase = createClient(

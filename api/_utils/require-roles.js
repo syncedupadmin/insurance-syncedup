@@ -1,3 +1,4 @@
+const { verifyToken } = require('../lib/auth-bridge.js');
 // API gate helper for role-based access control
 const { normalize, highestRole, canAssume } = require("./roles");
 
@@ -22,7 +23,7 @@ export const checkRoles = async (req, allowedRoles) => {
     const token = getCookie(req, "auth_token");
     if (!token) return { authorized: false, error: "authentication_required" };
 
-    const payload = jwt.verify(token, SECRET);
+    const payload = await verifyToken(, ["auth_token","auth-token","user_role","user_roles","assumed_role"]);
     
     const raw = getCookie(req, "user_roles") || getCookie(req, "user_role") || payload.role || "agent";
     const roles = Array.isArray(raw) ? raw.map(normalize) : 

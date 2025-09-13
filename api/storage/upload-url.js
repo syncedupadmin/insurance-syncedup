@@ -1,8 +1,7 @@
+const { verifyToken } = require('../lib/auth-bridge.js');
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { createClient } from '@supabase/supabase-js';
-import jwt from 'jsonwebtoken';
-
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_KEY
@@ -30,7 +29,7 @@ export default async function handler(req, res) {
         }
 
         const token = authHeader.substring(7);
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = await verifyToken(, ["auth_token","auth-token","user_role","user_roles","assumed_role"]);
         const userId = decoded.id;
 
         const { fileName, fileType, fileSize } = req.body;

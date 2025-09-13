@@ -1,6 +1,5 @@
+const { verifyToken } = require('../lib/auth-bridge.js');
 import { createClient } from '@supabase/supabase-js';
-import jwt from 'jsonwebtoken';
-
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
@@ -29,7 +28,7 @@ export default async function handler(req, res) {
     
     if (token && token !== 'undefined' && token !== 'null') {
       try {
-        decoded = jwt.verify(token, process.env.AUTH_SECRET || 'fallback-secret');
+        decoded = await verifyToken(, ["auth_token","auth-token","user_role","user_roles","assumed_role"]);
       } catch (jwtError) {
         console.warn('JWT verification failed, proceeding with fallback');
         // For demo purposes, continue with PHS agency

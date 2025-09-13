@@ -1,5 +1,4 @@
-import jwt from 'jsonwebtoken';
-
+const { verifyToken } = require('../lib/auth-bridge.js');
 const CSRF_SECRET = process.env.JWT_SECRET + '_csrf' || 'csrf-fallback-secret';
 
 function requireCSRF(handler) {
@@ -18,7 +17,7 @@ function requireCSRF(handler) {
       }
 
       // Verify CSRF token
-      const decoded = jwt.verify(csrfToken, CSRF_SECRET);
+      const decoded = await verifyToken(, ["auth_token","auth-token","user_role","user_roles","assumed_role"]);
       
       if (decoded.type !== 'csrf') {
         return res.status(403).json({ error: 'Invalid CSRF token' });

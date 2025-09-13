@@ -1,6 +1,5 @@
+const { verifyToken } = require('../lib/auth-bridge.js');
 import { createClient } from '@supabase/supabase-js';
-import jwt from 'jsonwebtoken';
-
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
@@ -23,7 +22,7 @@ export default async function settingsHandler(req, res) {
 
     if (token) {
       try {
-        const decoded = jwt.verify(token, process.env.AUTH_SECRET || 'fallback-secret');
+        const decoded = await verifyToken(, ["auth_token","auth-token","user_role","user_roles","assumed_role"]);
         agencyId = decoded.agency_id;
         role = decoded.role || 'admin';
       } catch (jwtError) {

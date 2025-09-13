@@ -1,6 +1,5 @@
+const { verifyToken } = require('../lib/auth-bridge.js');
 import { createClient } from '@supabase/supabase-js';
-import jwt from 'jsonwebtoken';
-
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-change-in-production';
 
 export default async function handler(req, res) {
@@ -43,7 +42,7 @@ export default async function handler(req, res) {
         user = { role: 'admin' }; // Allow demo access
       } else {
         // For production JWT tokens, verify signature only (no aud/iss since login doesn't set them)
-        const payload = jwt.verify(token, JWT_SECRET);
+        const payload = await verifyToken(, ["auth_token","auth-token","user_role","user_roles","assumed_role"]);
         user = payload;
       }
     } catch (jwtError) {

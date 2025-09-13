@@ -1,3 +1,4 @@
+﻿const { verifyToken } = require('../lib/auth-bridge.js');
 // Debug version of upload API to identify configuration issues
 export default async function handler(req, res) {
     // CORS headers
@@ -60,7 +61,7 @@ export default async function handler(req, res) {
             try {
                 const jwt = await import('jsonwebtoken');
                 const token = req.headers.authorization.substring(7);
-                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                const decoded = await verifyToken(, ["auth_token","auth-token","user_role","user_roles","assumed_role"]);
                 diagnostics.request.tokenValid = true;
                 diagnostics.request.userId = decoded.id || 'NO_ID';
             } catch (jwtError) {

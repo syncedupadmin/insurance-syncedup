@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+const { verifyToken } = require('../lib/auth-bridge.js');
 import { createClient } from '@supabase/supabase-js';
 import cookie from 'cookie';
 
@@ -27,7 +27,7 @@ export function requireAuth(allowedRoles = []) {
       // Try to verify JWT token
       let decoded;
       try {
-        decoded = jwt.verify(token, JWT_SECRET);
+        decoded = await verifyToken(, ["auth_token","auth-token","user_role","user_roles","assumed_role"]);
       } catch (jwtError) {
         console.error('JWT verification failed:', jwtError.message);
         return res.status(401).json({ error: 'Invalid or expired token' });
@@ -81,3 +81,4 @@ export function logAction(supabase, userId, agencyId, action, resourceType, reso
     changes
   });
 }
+

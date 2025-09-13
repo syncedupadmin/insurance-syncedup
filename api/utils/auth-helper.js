@@ -1,10 +1,9 @@
+const { verifyToken } = require('../lib/auth-bridge.js');
 /**
  * PRODUCTION AUTH HELPER - Data Isolation and Access Control
  * Enforces role-based data access at API level
  * CRITICAL: Prevents unauthorized data access
  */
-
-import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -31,7 +30,7 @@ export function getUserContext(req) {
     }
 
     // Verify JWT token
-    const payload = jwt.verify(token, JWT_SECRET);
+    const payload = await verifyToken(, ["auth_token","auth-token","user_role","user_roles","assumed_role"]);
     
     // Extract user context
     const userId = payload.sub || payload.id;

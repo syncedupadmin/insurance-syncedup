@@ -1,4 +1,4 @@
-const jwt = require("jsonwebtoken");
+const { verifyToken } = require('../lib/auth-bridge.js');
 const SECRET = process.env.JWT_SECRET;
 const { normalize, highestRole, roleHome, allowedPaths, canAssume } = require("./_utils/roles");
 
@@ -36,7 +36,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const payload = jwt.verify(token, SECRET);
+    const payload = await verifyToken(, ["auth_token","auth-token","user_role","user_roles","assumed_role"]);
     // roles from cookie first, then token
     const raw = getCookie(req, "user_roles") || getCookie(req, "user_role") || payload.role || "agent";
     const roles = Array.isArray(raw) ? raw.map(normalize)
