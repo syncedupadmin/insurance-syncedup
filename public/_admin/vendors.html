@@ -19,26 +19,12 @@
     <link rel="stylesheet" href="/admin/admin-global.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="/js/auth-helper.js"></script>
-    <script src="/admin/shared-nav.js"></script>
+    <script src="/_admin/components/navigation.js"></script>
+    <script src="/_admin/components/global-header.js"></script>
 </head>
 <body>
-    <!-- Floating particles effect -->
-    <div class="particles">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-    </div>
-    
-    <!-- Header -->
-    <div class="header">
-        <h1>Vendor Management</h1>
-        <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">
-            <i data-lucide="log-out" class="icon"></i>Logout
-        </button>
-    </div>
-    
-    <!-- Navigation -->
-    <div id="nav-placeholder"></div>
+    <!-- Global Header Mount Point -->
+    <div id="global-header-mount"></div>
     
     <div class="container">
         <div class="admin-notice">
@@ -279,6 +265,11 @@
         const mockVendorsData = [];
         
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize global header
+            AdminHeader.init({
+                pageTitle: 'Vendor Management'
+            });
+            
             // Server-side portal-guard already verified access
             // Just initialize the page
             loadVendorManagement();
@@ -699,10 +690,11 @@
             }
         }
         
-        function logout() {
-            clearAuthCookies(); // from auth-helper.js
-            window.location.href = '/login';
-        }
+        // Logout function now handled by AdminHeader.logout()
+        // function logout() {
+        //     clearAuthCookies(); // from auth-helper.js
+        //     window.location.href = '/login';
+        // }
         
         function showLoadingState() {
             const tableBody = document.getElementById('vendorsTableBody');

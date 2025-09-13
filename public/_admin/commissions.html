@@ -53,31 +53,13 @@
     <link rel="stylesheet" href="/admin/admin-global.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="/js/auth-helper.js"></script>
-    <!-- Shared Navigation -->
-    <script src="/admin/shared-nav.js"></script>
+    <!-- Global Header Components -->
+    <script src="/_admin/components/navigation.js"></script>
+    <script src="/_admin/components/global-header.js"></script>
 </head>
 <body>
-    <!-- Floating Particles -->
-    <div class="particles">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-    </div>
-
-    <!-- Header -->
-    <div class="header">
-        <h1>Commission Management</h1>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <span id="userDisplay">Loading...</span>
-            <button class="btn" onclick="logout()">
-                <i data-lucide="log-out" class="icon"></i>
-                Logout
-            </button>
-        </div>
-    </div>
-
-    <!-- Navigation placeholder -->
-    <div id="nav-placeholder"></div>
+    <!-- Global Header Mount Point -->
+    <div id="global-header-mount"></div>
 
     <div class="container">
         <!-- Commission Overview Stats -->
@@ -476,15 +458,17 @@
             // Portal-guard already verified - just return true
             }
 
-            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
+            // User display now handled by AdminHeader.refreshUserData()
+            AdminHeader.refreshUserData();
             return true;
         }
 
         // Logout function
-        function logout() {
-            clearAuthCookies(); // from auth-helper.js
-            window.location.href = '/login';
-        }
+        // Logout function now handled by AdminHeader.logout()
+        // function logout() {
+        //     clearAuthCookies(); // from auth-helper.js
+        //     window.location.href = '/login';
+        // }
 
         // Initialize page
         async function initializePage() {
@@ -1006,7 +990,14 @@
         }
 
         // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', initializePage);
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize global header
+            AdminHeader.init({
+                pageTitle: 'Commission Management'
+            });
+            
+            initializePage();
+        });
 
         // Handle clicks outside modals to close them
         document.addEventListener('click', (e) => {

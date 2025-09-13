@@ -54,30 +54,12 @@
     <link rel="stylesheet" href="/css/themes/professional.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="/js/auth-helper.js"></script>
-    <script src="/admin/shared-nav.js"></script>
+    <script src="/_admin/components/navigation.js"></script>
+    <script src="/_admin/components/global-header.js"></script>
 </head>
 <body>
-    <!-- Floating Particles -->
-    <div class="particles">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-    </div>
-
-    <!-- Header -->
-    <div class="header">
-        <h1>System Settings</h1>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <span id="userDisplay">Loading...</span>
-            <button class="btn" onclick="logout()">
-                <i data-lucide="log-out" class="icon"></i>
-                Logout
-            </button>
-        </div>
-    </div>
-
-    <!-- Navigation -->
-    <div id="nav-placeholder"></div>
+    <!-- Global Header Mount Point -->
+    <div id="global-header-mount"></div>
 
     <div class="container">
         <!-- API Key Management -->
@@ -510,14 +492,15 @@ Business City, ST 12345</textarea>
                 return false;
             }
 
-            SyncedUpAuth.safeUpdateElement('userDisplay', `${user.name || user.email} (${user.role})`);
+            // User display now handled by AdminHeader.refreshUserData()
+            AdminHeader.refreshUserData();
             return true;
         }
 
-        // Logout function using auth-helper
-        function logout() {
-            SyncedUpAuth.logout();
-        }
+        // Logout function now handled by AdminHeader.logout()
+        // function logout() {
+        //     SyncedUpAuth.logout();
+        // }
 
         // Initialize page
         async function initializePage() {
@@ -1181,6 +1164,11 @@ Business City, ST 12345</textarea>
 
         // Apply saved theme on page load
         window.addEventListener('DOMContentLoaded', () => {
+            // Initialize global header
+            AdminHeader.init({
+                pageTitle: 'System Settings'
+            });
+            
             initializePage();
             
             // Initialize all theme button states

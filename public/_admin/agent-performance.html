@@ -53,26 +53,12 @@
     <script src="/js/auth-helper.js"></script>
     <link rel="stylesheet" href="/admin/admin-global.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    <script src="/admin/shared-nav.js"></script>
+    <script src="/_admin/components/navigation.js"></script>
+    <script src="/_admin/components/global-header.js"></script>
 </head>
 <body>
-    <!-- Floating particles effect -->
-    <div class="particles">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-    </div>
-    
-    <!-- Header -->
-    <div class="header">
-        <h1>Agent Performance Dashboard</h1>
-        <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">
-            <i data-lucide="log-out" class="icon"></i>Logout
-        </button>
-    </div>
-    
-    <!-- Navigation -->
-    <div id="nav-placeholder"></div>
+    <!-- Global Header Mount Point -->
+    <div id="global-header-mount"></div>
 
     <div class="container">
         <!-- Performance Overview Cards -->
@@ -233,6 +219,11 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize global header
+            AdminHeader.init({
+                pageTitle: 'Agent Performance Dashboard'
+            });
+            
             // Server-side portal-guard already verified access
             initializePage();
         });
@@ -702,10 +693,11 @@
             }, 3000);
         }
 
-        function logout() {
-            clearAuthCookies();
-            window.location.href = '/login';
-        }
+        // Logout function now handled by AdminHeader.logout()
+        // function logout() {
+        //     clearAuthCookies();
+        //     window.location.href = '/login';
+        // }
 
         // Modal styling
         const modalStyles = `

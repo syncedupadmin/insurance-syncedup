@@ -363,54 +363,12 @@
     
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="/js/role-switcher.js"></script>
+    <script src="/_admin/components/navigation.js"></script>
+    <script src="/_admin/components/global-header.js"></script>
 </head>
 <body>
-    <!-- Floating particles effect -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute -top-10 -left-10 w-40 h-40 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce"></div>
-        <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce" style="animation-delay: 2s;"></div>
-        <div class="absolute top-1/2 left-1/2 w-40 h-40 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce" style="animation-delay: 4s;"></div>
-    </div>
-    
-    <div class="header">
-        <h1 class="neon-text">Agency Admin Dashboard</h1>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <div id="roleSwitcherMount"></div>
-            <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">Logout</button>
-        </div>
-    </div>
-    <nav class="nav">
-        <a href="/admin/" class="active">
-            <i data-lucide="layout-dashboard" class="icon"></i>Dashboard
-        </a>
-        <a href="/admin/agent-performance">
-            <i data-lucide="trending-up" class="icon"></i>Agent Performance
-        </a>
-        <a href="/admin/users">
-            <i data-lucide="users" class="icon"></i>Users
-        </a>
-        <a href="/admin/licenses">
-            <i data-lucide="shield-check" class="icon"></i>Licenses
-        </a>
-        <a href="/admin/convoso-leads">
-            <i data-lucide="users" class="icon"></i>Leads
-        </a>
-        <a href="/admin/vendors">
-            <i data-lucide="building-2" class="icon"></i>Vendors
-        </a>
-        <a href="/admin/commissions">
-            <i data-lucide="dollar-sign" class="icon"></i>Commissions
-        </a>
-        <a href="/admin/settings">
-            <i data-lucide="settings" class="icon"></i>Settings
-        </a>
-        <a href="/admin/convoso-monitor">
-            <i data-lucide="monitor-speaker" class="icon"></i>Convoso
-        </a>
-        <a href="/global-leaderboard">
-            <i data-lucide="trophy" class="icon"></i>Global Leaderboard
-        </a>
-    </nav>
+    <!-- Global Header Mount Point -->
+    <div id="global-header-mount"></div>
     <div class="container">
         <div class="grid">
             <div class="card">
@@ -1191,12 +1149,10 @@
             }, 500);
         });
 
-        // Admin can assume Manager, Customer Service, Agent
-        window.RoleSwitcher.renderSwitcher('roleSwitcherMount', [
-            { value:'manager', label:'Manager' },
-            { value:'customer_service', label:'Customer Service' },
-            { value:'agent', label:'Agent' }
-        ]);
+        // Initialize global header
+        AdminHeader.init({
+            pageTitle: 'Agency Admin Dashboard'
+        });
     </script>
     
     <!-- Simple Theme Loading -->
