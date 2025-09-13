@@ -149,7 +149,7 @@
                         onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 2px 8px rgba(255, 215, 0, 0.3)';">
                             <i data-lucide="trophy" class="icon" style="color: #1a1a1a;"></i>
                             <span style="position: relative;">
-                                🏆 Leaderboard
+                                Leaderboard
                             </span>
                         </button>
             `;

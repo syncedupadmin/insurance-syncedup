@@ -17,8 +17,7 @@
             { href: '/admin/onboarding.html', icon: 'user-plus', text: 'Onboarding' },
             { href: '/admin/reports.html', icon: 'file-text', text: 'Reports' },
             { href: '/admin/settings.html', icon: 'settings', text: 'Settings' },
-            { href: '/admin/convoso-monitor.html', icon: 'monitor-speaker', text: 'Convoso' },
-            { href: '/global-leaderboard', icon: 'trophy', text: 'Global Leaderboard' }
+            { href: '/admin/convoso-monitor.html', icon: 'monitor-speaker', text: 'Convoso' }
         ],
 
         // Initialize navigation
