@@ -21,39 +21,26 @@
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <!-- Customer Service Portal Theme Override -->
     <link rel="stylesheet" href="/css/themes/service-modern.css">
+    
+    <!-- Load navigation component -->
+    <script src="/customer-service/components/navigation.js"></script>
+    <!-- Load global header component -->
+    <script src="/customer-service/components/global-header.js"></script>
 </head>
 <body>
-    <!-- Header -->
-    <div class="header">
-        <h1>Customer Service Settings</h1>
-        <div class="user-info">
-            <span id="userDisplay">Loading...</span>
-            <button class="btn btn-secondary" onclick="logout()">
-                <i data-lucide="log-out" class="icon"></i>
-                Logout
-            </button>
-        </div>
-    </div>
-
-    <!-- Navigation -->
-    <div class="nav">
-        <a href="/customer-service/index.html" class="nav-link">
-            <i data-lucide="layout-dashboard" class="icon"></i>
-            Dashboard
-        </a>
-        <a href="/customer-service/member-search.html" class="nav-link">
-            <i data-lucide="search" class="icon"></i>
-            Member Search
-        </a>
-        <a href="/customer-service/member-profile.html" class="nav-link">
-            <i data-lucide="user-check" class="icon"></i>
-            Member History
-        </a>
-        <a href="/customer-service/settings.html" class="nav-link active">
-            <i data-lucide="settings" class="icon"></i>
-            Settings
-        </a>
-    </div>
+    <!-- Global Header Mount Point -->
+    <div id="global-header-mount"></div>
+    
+    <!-- Initialize Global Header -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            CSHeader.init({
+                pageTitle: 'Customer Service Settings',
+                showRoleSwitcher: false,
+                showUserDisplay: true
+            });
+        });
+    </script>
 
     <div class="container">
         <!-- Interface Settings -->
@@ -534,10 +521,7 @@ MEM003,Bob Wilson,bob.wilson@email.com,(555) 456-7890,Pending,2025-08-30`;
         }
 
         // Logout function
-        function logout() {
-            clearAuthCookies();
-            window.location.href = '/login';
-        }
+        // Logout is now handled by global header component
 
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', () => {
