@@ -1966,13 +1966,22 @@ async function inviteUser() {
             })
         });
 
-        const result = await response.json();
+        // Handle response with better error checking
+        let result;
+        const responseText = await response.text();
+
+        try {
+            result = JSON.parse(responseText);
+        } catch (parseError) {
+            console.error('Invite response:', responseText);
+            throw new Error('Invalid response from server - check if users endpoint exists');
+        }
 
         if (response.ok && result.ok) {
             alert(`Invitation sent to ${email}`);
             loadUserManagement();
         } else {
-            throw new Error(result.error || 'Failed to invite user');
+            throw new Error(result.error || result.message || 'Failed to invite user');
         }
     } catch (error) {
         alert('Error inviting user: ' + error.message);
@@ -1980,29 +1989,49 @@ async function inviteUser() {
 }
 
 async function resetUserPassword(userId, email) {
-    if (!confirm(`Reset password for ${email}?`)) return;
+    if (!confirm(`Reset password for ${email}?\n\nThis will generate a new password and invalidate all existing sessions.`)) return;
 
     try {
-        // For now, use the invite function to send a password reset
         const token = localStorage.getItem('auth_token');
-        const response = await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/users', {
+
+        // Use the actual reset-password endpoint
+        const response = await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/reset-password', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                action: 'invite',
-                email: email
+                user_id: userId
             })
         });
 
-        const result = await response.json();
+        // Handle response with better error checking
+        let result;
+        const responseText = await response.text();
 
-        if (response.ok && result.ok) {
-            alert(`Password reset email sent to ${email}`);
+        try {
+            result = JSON.parse(responseText);
+        } catch (parseError) {
+            console.error('Password reset response:', responseText);
+            throw new Error('Invalid response from server');
+        }
+
+        if (response.ok && result.new_password) {
+            // Show the new password to the admin
+            const message = `Password reset successful!\n\nNew password for ${email}:\n${result.new_password}\n\nPlease share this securely with the user.\nAll existing sessions have been invalidated.`;
+
+            // Create a temporary textarea to allow copying
+            const textarea = document.createElement('textarea');
+            textarea.value = result.new_password;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            alert(message + '\n\n(Password has been copied to clipboard)');
         } else {
-            throw new Error(result.error || 'Failed to reset password');
+            throw new Error(result.error || result.message || 'Failed to reset password');
         }
     } catch (error) {
         alert('Error resetting password: ' + error.message);
