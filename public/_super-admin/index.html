@@ -21,6 +21,7 @@
                 <h3>MAIN</h3>
                 <a href="#dashboard" class="nav-item active" onclick="navigateTo('dashboard')">Revenue Dashboard</a>
                 <a href="#agencies" class="nav-item" onclick="navigateTo('agencies')">Agency Management</a>
+                <a href="#users" class="nav-item" onclick="navigateTo('users')">User Management</a>
                 <a href="#infrastructure" class="nav-item" onclick="navigateTo('infrastructure')">Infrastructure</a>
             </div>
             
@@ -129,7 +130,76 @@
     
     <!-- Overlay -->
     <div id="panel-overlay" class="panel-overlay" onclick="closeAgencyPanel()"></div>
-    
+
+    <!-- Create Agency Modal -->
+    <div id="create-agency-modal" class="slide-panel">
+        <div class="panel-header">
+            <h2>Create New Agency</h2>
+            <button class="close-btn" onclick="closeCreateAgencyForm()">×</button>
+        </div>
+
+        <div class="panel-content">
+            <form id="create-agency-form">
+                <div class="form-section">
+                    <h3>Agency Information</h3>
+                    <div class="form-group">
+                        <label>Agency Name *</label>
+                        <input type="text" id="new-agency-name" class="form-input" required />
+                        <small>This will be used to generate the agency code</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Email *</label>
+                        <input type="email" id="new-agency-email" class="form-input" required />
+                        <small>Primary contact email for the agency</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="new-agency-phone" class="form-input" />
+                    </div>
+                    <div class="form-group">
+                        <label>Address</label>
+                        <textarea id="new-agency-address" class="form-input" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Subscription Plan</h3>
+                    <div class="form-group">
+                        <label>Plan Type *</label>
+                        <select id="new-agency-plan" class="form-input" required>
+                            <option value="">Select a plan...</option>
+                            <option value="basic">Basic ($99/month - 10 users)</option>
+                            <option value="professional">Professional ($199/month - 50 users)</option>
+                            <option value="enterprise">Enterprise ($399/month - 200 users)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section info-section">
+                    <h3>Agency Setup Information</h3>
+                    <p>After creating the agency:</p>
+                    <ul>
+                        <li>Agency will be active immediately</li>
+                        <li>You can add users through User Management</li>
+                        <li>Agency code will be auto-generated</li>
+                        <li>Billing will start based on selected plan</li>
+                    </ul>
+                    <p class="text-warning">Remember to add at least one admin user after creation</p>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create Agency
+                    </button>
+                    <button type="button" class="btn" onclick="closeCreateAgencyForm()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Create Agency Overlay -->
+    <div id="create-agency-overlay" class="panel-overlay" onclick="closeCreateAgencyForm()"></div>
+
     <script src="./js/main.js"></script>
 </body>
 </html>
