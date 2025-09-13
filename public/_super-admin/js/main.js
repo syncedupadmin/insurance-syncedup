@@ -985,23 +985,39 @@ async function loadDatabaseTables() {
 
         const result = await response.json();
 
-        if (result.ok && result.tables) {
-            const tables = result.tables;
+        // The endpoint returns { tables: [...] } format
+        if (result.tables && Array.isArray(result.tables)) {
+            const tablesData = result.tables;
 
-            if (tables.length === 0) {
+            if (tablesData.length === 0) {
                 tablesList.innerHTML = '<div style="color: #8b92a5;">No tables found in the database</div>';
                 return;
             }
 
+            // Extract table names from the structured data
+            const tableNames = tablesData.map(t => t.name);
+
             // Group tables by category
-            const systemTables = tables.filter(t => t.startsWith('auth') || t.startsWith('storage') || t.startsWith('realtime') || t.startsWith('_'));
-            const customTables = tables.filter(t => !t.startsWith('auth') && !t.startsWith('storage') && !t.startsWith('realtime') && !t.startsWith('_'));
+            const systemTables = tableNames.filter(t =>
+                t.startsWith('auth') ||
+                t.startsWith('storage') ||
+                t.startsWith('realtime') ||
+                t.startsWith('_') ||
+                t.startsWith('pg_')
+            );
+            const customTables = tableNames.filter(t =>
+                !t.startsWith('auth') &&
+                !t.startsWith('storage') &&
+                !t.startsWith('realtime') &&
+                !t.startsWith('_') &&
+                !t.startsWith('pg_')
+            );
 
             let html = '';
 
             if (customTables.length > 0) {
                 html += '<div style="grid-column: 1/-1; margin-bottom: 10px; color: #10b981; font-weight: bold;">Application Tables</div>';
-                customTables.forEach(table => {
+                customTables.sort().forEach(table => {
                     html += `
                         <div style="padding: 10px; background: #1a1a1a; border: 1px solid #444; border-radius: 5px; cursor: pointer;"
                              onclick="showTableInfo('${table}')" title="Click for details">
@@ -1013,7 +1029,7 @@ async function loadDatabaseTables() {
 
             if (systemTables.length > 0) {
                 html += '<div style="grid-column: 1/-1; margin: 20px 0 10px 0; color: #8b92a5; font-weight: bold;">System Tables</div>';
-                systemTables.forEach(table => {
+                systemTables.sort().forEach(table => {
                     html += `
                         <div style="padding: 10px; background: #0f0f0f; border: 1px solid #333; border-radius: 5px; opacity: 0.7;"
                              title="System table">
@@ -1025,7 +1041,7 @@ async function loadDatabaseTables() {
 
             tablesList.innerHTML = html;
         } else {
-            throw new Error(result.error || 'Failed to load tables');
+            throw new Error(result.error || 'Unexpected response format');
         }
     } catch (error) {
         console.error('Error loading tables:', error);
@@ -1620,11 +1636,48 @@ async function loadUserManagement() {
 
         const users = data.users || [];
 
+        // Get agencies for mapping
+        const agenciesResponse = await fetch('/api/super-admin/agencies-management');
+        const agenciesData = await agenciesResponse.json();
+        const agencies = agenciesData.agencies || [];
+
+        // Create agency map for quick lookup
+        const agencyMap = {};
+        agencies.forEach(agency => {
+            agencyMap[agency.id] = agency.name;
+        });
+
+        // Group users by agency
+        const usersByAgency = {};
+        const usersWithoutAgency = [];
+
+        users.forEach(user => {
+            if (user.agency_id) {
+                if (!usersByAgency[user.agency_id]) {
+                    usersByAgency[user.agency_id] = {
+                        name: agencyMap[user.agency_id] || `Agency ${user.agency_id.substring(0, 8)}`,
+                        users: []
+                    };
+                }
+                usersByAgency[user.agency_id].users.push(user);
+            } else {
+                usersWithoutAgency.push(user);
+            }
+        });
+
+        // Sort agencies by name
+        const sortedAgencies = Object.keys(usersByAgency).sort((a, b) =>
+            usersByAgency[a].name.localeCompare(usersByAgency[b].name)
+        );
+
         content.innerHTML = `
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <h2>User Management</h2>
                     <div>
+                        <button class="btn btn-secondary" onclick="toggleUserView()">
+                            <i class="fas fa-list"></i> <span id="view-toggle-text">View as List</span>
+                        </button>
                         <button class="btn btn-primary" onclick="showCreateUserForm()">
                             <i class="fas fa-user-plus"></i> CREATE USER
                         </button>
@@ -1654,60 +1707,171 @@ async function loadUserManagement() {
                 </div>
                 <div class="metric-card">
                     <h4>WITHOUT AGENCY</h4>
-                    <div class="metric-value">${users.filter(u => !u.agency_id).length}</div>
+                    <div class="metric-value">${usersWithoutAgency.length}</div>
                 </div>
             </div>
 
             <div class="card">
-                <h3 class="section-title">All Users</h3>
                 <div style="margin-bottom: 20px;">
-                    <input type="text" id="user-search" placeholder="Search users..."
+                    <input type="text" id="user-search" placeholder="Search users by email or name..."
                            style="padding: 10px; width: 300px; background: #1a1a1a; color: white; border: 1px solid #444;"
                            onkeyup="filterUsers()">
                 </div>
-                <table class="data-table" id="users-table">
-                    <thead>
-                        <tr>
-                            <th>EMAIL</th>
-                            <th>NAME</th>
-                            <th>ROLE</th>
-                            <th>AGENCY</th>
-                            <th>STATUS</th>
-                            <th>LAST LOGIN</th>
-                            <th>ACTIONS</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${users.map(user => `
-                            <tr data-email="${user.email.toLowerCase()}">
-                                <td>${user.email}</td>
-                                <td>${user.full_name || user.name || 'N/A'}</td>
-                                <td>
-                                    <select onchange="changeUserRole('${user.id}', this.value)" style="background: #1a1a1a; color: white; border: 1px solid #444; padding: 5px;">
-                                        <option value="agent" ${user.role === 'agent' ? 'selected' : ''}>Agent</option>
-                                        <option value="manager" ${user.role === 'manager' ? 'selected' : ''}>Manager</option>
-                                        <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
-                                        <option value="customer_service" ${user.role === 'customer_service' ? 'selected' : ''}>Customer Service</option>
-                                        <option value="super_admin" ${user.role === 'super_admin' ? 'selected' : ''}>Super Admin</option>
-                                    </select>
-                                </td>
-                                <td>${user.agency_id ? `Agency ${user.agency_id.substring(0, 8)}` : 'None'}</td>
-                                <td class="${user.is_active ? 'status-active' : 'status-inactive'}">
-                                    ${user.is_active ? 'Active' : 'Inactive'}
-                                </td>
-                                <td>${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
-                                <td>
-                                    <button class="btn btn-sm" onclick="resetUserPassword('${user.id}', '${user.email}')">Reset Password</button>
-                                    <button class="btn btn-sm ${user.is_active ? 'btn-danger' : 'btn-success'}"
-                                            onclick="toggleUserStatus('${user.id}', ${!user.is_active})">
-                                        ${user.is_active ? 'Deactivate' : 'Activate'}
-                                    </button>
-                                    <button class="btn btn-sm" onclick="assignToAgency('${user.id}')">Assign Agency</button>
-                                </td>
+
+                <!-- Grouped View (Default) -->
+                <div id="grouped-view">
+                    ${sortedAgencies.map(agencyId => `
+                        <div class="agency-group" style="margin-bottom: 30px;">
+                            <h3 class="section-title" style="color: #10b981; margin-bottom: 15px;">
+                                <i class="fas fa-building"></i> ${usersByAgency[agencyId].name}
+                                <span style="font-size: 14px; color: #8b92a5; margin-left: 10px;">
+                                    (${usersByAgency[agencyId].users.length} users)
+                                </span>
+                            </h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>EMAIL</th>
+                                        <th>NAME</th>
+                                        <th>ROLE</th>
+                                        <th>STATUS</th>
+                                        <th>LAST LOGIN</th>
+                                        <th>ACTIONS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${usersByAgency[agencyId].users.map(user => `
+                                        <tr data-email="${user.email.toLowerCase()}" data-name="${(user.full_name || user.name || '').toLowerCase()}">
+                                            <td>${user.email}</td>
+                                            <td>${user.full_name || user.name || 'N/A'}</td>
+                                            <td>
+                                                <select onchange="changeUserRole('${user.id}', this.value)" style="background: #1a1a1a; color: white; border: 1px solid #444; padding: 5px;">
+                                                    <option value="agent" ${user.role === 'agent' ? 'selected' : ''}>Agent</option>
+                                                    <option value="manager" ${user.role === 'manager' ? 'selected' : ''}>Manager</option>
+                                                    <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                                                    <option value="customer_service" ${user.role === 'customer_service' ? 'selected' : ''}>Customer Service</option>
+                                                    <option value="super_admin" ${user.role === 'super_admin' ? 'selected' : ''}>Super Admin</option>
+                                                </select>
+                                            </td>
+                                            <td class="${user.is_active ? 'status-active' : 'status-inactive'}">
+                                                ${user.is_active ? 'Active' : 'Inactive'}
+                                            </td>
+                                            <td>${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
+                                            <td>
+                                                <button class="btn btn-sm" onclick="resetUserPassword('${user.id}', '${user.email}')">Reset Password</button>
+                                                <button class="btn btn-sm ${user.is_active ? 'btn-danger' : 'btn-success'}"
+                                                        onclick="toggleUserStatus('${user.id}', ${!user.is_active})">
+                                                    ${user.is_active ? 'Deactivate' : 'Activate'}
+                                                </button>
+                                                <button class="btn btn-sm" onclick="assignToAgency('${user.id}')">Remove from Agency</button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `).join('')}
+
+                    ${usersWithoutAgency.length > 0 ? `
+                        <div class="agency-group" style="margin-bottom: 30px;">
+                            <h3 class="section-title" style="color: #ef4444; margin-bottom: 15px;">
+                                <i class="fas fa-user-slash"></i> Users Without Agency
+                                <span style="font-size: 14px; color: #8b92a5; margin-left: 10px;">
+                                    (${usersWithoutAgency.length} users)
+                                </span>
+                            </h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>EMAIL</th>
+                                        <th>NAME</th>
+                                        <th>ROLE</th>
+                                        <th>STATUS</th>
+                                        <th>LAST LOGIN</th>
+                                        <th>ACTIONS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${usersWithoutAgency.map(user => `
+                                        <tr data-email="${user.email.toLowerCase()}" data-name="${(user.full_name || user.name || '').toLowerCase()}">
+                                            <td>${user.email}</td>
+                                            <td>${user.full_name || user.name || 'N/A'}</td>
+                                            <td>
+                                                <select onchange="changeUserRole('${user.id}', this.value)" style="background: #1a1a1a; color: white; border: 1px solid #444; padding: 5px;">
+                                                    <option value="agent" ${user.role === 'agent' ? 'selected' : ''}>Agent</option>
+                                                    <option value="manager" ${user.role === 'manager' ? 'selected' : ''}>Manager</option>
+                                                    <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                                                    <option value="customer_service" ${user.role === 'customer_service' ? 'selected' : ''}>Customer Service</option>
+                                                    <option value="super_admin" ${user.role === 'super_admin' ? 'selected' : ''}>Super Admin</option>
+                                                </select>
+                                            </td>
+                                            <td class="${user.is_active ? 'status-active' : 'status-inactive'}">
+                                                ${user.is_active ? 'Active' : 'Inactive'}
+                                            </td>
+                                            <td>${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
+                                            <td>
+                                                <button class="btn btn-sm" onclick="resetUserPassword('${user.id}', '${user.email}')">Reset Password</button>
+                                                <button class="btn btn-sm ${user.is_active ? 'btn-danger' : 'btn-success'}"
+                                                        onclick="toggleUserStatus('${user.id}', ${!user.is_active})">
+                                                    ${user.is_active ? 'Deactivate' : 'Activate'}
+                                                </button>
+                                                <button class="btn btn-sm btn-primary" onclick="assignToAgency('${user.id}')">Assign to Agency</button>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    ` : ''}
+                </div>
+
+                <!-- List View (Hidden by default) -->
+                <div id="list-view" style="display: none;">
+                    <h3 class="section-title">All Users</h3>
+                    <table class="data-table" id="users-table">
+                        <thead>
+                            <tr>
+                                <th>EMAIL</th>
+                                <th>NAME</th>
+                                <th>ROLE</th>
+                                <th>AGENCY</th>
+                                <th>STATUS</th>
+                                <th>LAST LOGIN</th>
+                                <th>ACTIONS</th>
                             </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            ${users.map(user => `
+                                <tr data-email="${user.email.toLowerCase()}" data-name="${(user.full_name || user.name || '').toLowerCase()}">
+                                    <td>${user.email}</td>
+                                    <td>${user.full_name || user.name || 'N/A'}</td>
+                                    <td>
+                                        <select onchange="changeUserRole('${user.id}', this.value)" style="background: #1a1a1a; color: white; border: 1px solid #444; padding: 5px;">
+                                            <option value="agent" ${user.role === 'agent' ? 'selected' : ''}>Agent</option>
+                                            <option value="manager" ${user.role === 'manager' ? 'selected' : ''}>Manager</option>
+                                            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                                            <option value="customer_service" ${user.role === 'customer_service' ? 'selected' : ''}>Customer Service</option>
+                                            <option value="super_admin" ${user.role === 'super_admin' ? 'selected' : ''}>Super Admin</option>
+                                        </select>
+                                    </td>
+                                    <td>${user.agency_id ? (agencyMap[user.agency_id] || `Agency ${user.agency_id.substring(0, 8)}`) : 'None'}</td>
+                                    <td class="${user.is_active ? 'status-active' : 'status-inactive'}">
+                                        ${user.is_active ? 'Active' : 'Inactive'}
+                                    </td>
+                                    <td>${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
+                                    <td>
+                                        <button class="btn btn-sm" onclick="resetUserPassword('${user.id}', '${user.email}')">Reset Password</button>
+                                        <button class="btn btn-sm ${user.is_active ? 'btn-danger' : 'btn-success'}"
+                                                onclick="toggleUserStatus('${user.id}', ${!user.is_active})">
+                                            ${user.is_active ? 'Deactivate' : 'Activate'}
+                                        </button>
+                                        <button class="btn btn-sm" onclick="assignToAgency('${user.id}')">Assign Agency</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         `;
     } catch (error) {
@@ -1718,16 +1882,52 @@ async function loadUserManagement() {
 
 function filterUsers() {
     const search = document.getElementById('user-search').value.toLowerCase();
-    const rows = document.querySelectorAll('#users-table tbody tr');
 
-    rows.forEach(row => {
-        const email = row.dataset.email;
-        if (email.includes(search)) {
+    // Filter in both views
+    const allRows = document.querySelectorAll('tr[data-email]');
+
+    allRows.forEach(row => {
+        const email = row.dataset.email || '';
+        const name = row.dataset.name || '';
+
+        if (email.includes(search) || name.includes(search)) {
             row.style.display = '';
         } else {
             row.style.display = 'none';
         }
     });
+
+    // Hide/show agency groups if all users are hidden
+    const agencyGroups = document.querySelectorAll('.agency-group');
+    agencyGroups.forEach(group => {
+        const visibleRows = group.querySelectorAll('tbody tr[style=""], tbody tr:not([style*="none"])');
+        if (visibleRows.length === 0 && search !== '') {
+            group.style.display = 'none';
+        } else {
+            group.style.display = '';
+        }
+    });
+}
+
+// Toggle between grouped and list view
+function toggleUserView() {
+    const groupedView = document.getElementById('grouped-view');
+    const listView = document.getElementById('list-view');
+    const toggleText = document.getElementById('view-toggle-text');
+
+    if (groupedView && listView) {
+        if (groupedView.style.display === 'none') {
+            // Switch to grouped view
+            groupedView.style.display = '';
+            listView.style.display = 'none';
+            if (toggleText) toggleText.textContent = 'View as List';
+        } else {
+            // Switch to list view
+            groupedView.style.display = 'none';
+            listView.style.display = '';
+            if (toggleText) toggleText.textContent = 'View by Agency';
+        }
+    }
 }
 
 async function inviteUser() {
