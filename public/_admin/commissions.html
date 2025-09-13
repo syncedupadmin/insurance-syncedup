@@ -52,6 +52,7 @@
     <title>Commissions - SyncedUp Insurance Admin</title>
     <link rel="stylesheet" href="/admin/admin-global.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/js/role-switcher.js"></script>
     <script src="/js/auth-helper.js"></script>
     <!-- Global Header Components -->
     <script src="/_admin/components/navigation.js"></script>
@@ -993,7 +994,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize global header
             AdminHeader.init({
-                pageTitle: 'Commission Management'
+                pageTitle: 'Commission Management',
+                showRoleSwitcher: true
             });
             
             initializePage();
