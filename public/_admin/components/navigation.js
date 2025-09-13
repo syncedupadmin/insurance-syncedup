@@ -8,16 +8,15 @@
         // Navigation items configuration
         navItems: [
             { href: '/admin/', icon: 'layout-dashboard', text: 'Dashboard' },
-            { href: '/admin/agent-performance.html', icon: 'trending-up', text: 'Agent Performance' },
-            { href: '/admin/users.html', icon: 'users', text: 'Users' },
-            { href: '/admin/licenses.html', icon: 'shield-check', text: 'Licenses' },
-            { href: '/admin/convoso-leads.html', icon: 'users', text: 'Leads' },
-            { href: '/admin/vendors.html', icon: 'building-2', text: 'Vendors' },
-            { href: '/admin/commissions.html', icon: 'dollar-sign', text: 'Commissions' },
-            { href: '/admin/onboarding.html', icon: 'user-plus', text: 'Onboarding' },
-            { href: '/admin/reports.html', icon: 'file-text', text: 'Reports' },
-            { href: '/admin/settings.html', icon: 'settings', text: 'Settings' },
-            { href: '/admin/convoso-monitor.html', icon: 'monitor-speaker', text: 'Convoso' }
+            { href: '/admin/agent-performance', icon: 'trending-up', text: 'Agent Performance' },
+            { href: '/admin/users', icon: 'users', text: 'Users' },
+            { href: '/admin/licenses', icon: 'shield-check', text: 'Licenses' },
+            { href: '/admin/convoso-leads', icon: 'users', text: 'Leads' },
+            { href: '/admin/vendors', icon: 'building-2', text: 'Vendors' },
+            { href: '/admin/commissions', icon: 'dollar-sign', text: 'Commissions' },
+            { href: '/admin/reports', icon: 'file-text', text: 'Reports' },
+            { href: '/admin/settings', icon: 'settings', text: 'Settings' },
+            { href: '/admin/convoso-monitor', icon: 'monitor-speaker', text: 'Convoso' }
         ],
 
         // Initialize navigation
