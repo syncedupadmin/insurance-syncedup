@@ -184,9 +184,15 @@
                 </div>
             `;
             
-            // Add navigation placeholder
+            // Add navigation placeholder with centered styling
             headerContent += `
-                <div id="managerNavigation">
+                <div id="managerNavigation" style="
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 1rem;
+                    padding: 1rem 0;
+                ">
                     <!-- Navigation will be injected by navigation.js -->
                 </div>
             `;

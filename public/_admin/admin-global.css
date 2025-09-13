@@ -747,6 +747,55 @@ input[type="checkbox"]:focus-visible, input[type="radio"]:focus-visible {
     outline-offset: 2px;
 }
 
+/* Theme-specific overrides for Professional and Classic modes */
+body.professional-mode {
+    color: #1a1a1a !important;
+}
+
+body.professional-mode .header,
+body.professional-mode .header h1,
+body.professional-mode .header button,
+body.professional-mode .nav a,
+body.professional-mode .card,
+body.professional-mode .card h3,
+body.professional-mode .stat-card,
+body.professional-mode .quick-actions button,
+body.professional-mode table,
+body.professional-mode th,
+body.professional-mode td {
+    color: #1a1a1a !important;
+}
+
+body.professional-mode .text-secondary,
+body.professional-mode .card-icon {
+    color: #4a5568 !important;
+}
+
+body.professional-mode .nav a.active {
+    background: rgba(0, 0, 0, 0.1) !important;
+    color: #1a1a1a !important;
+}
+
+body.professional-mode .btn {
+    color: white !important;
+}
+
+/* Keep leaderboard button golden in all themes */
+.leaderboard-btn {
+    color: #1a1a1a !important;
+}
+
+/* Classic mode text adjustments */
+body.classic-mode {
+    color: #000080 !important;
+}
+
+body.classic-mode .header,
+body.classic-mode .nav a,
+body.classic-mode .card {
+    color: #000080 !important;
+}
+
 /* Better button focus states */
 .btn:focus-visible {
     outline: 2px solid rgba(255, 255, 255, 0.8);

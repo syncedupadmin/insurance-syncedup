@@ -199,9 +199,15 @@
                 </div>
             `;
             
-            // Add navigation placeholder
+            // Add navigation placeholder with centered styling
             headerContent += `
-                <nav class="nav" id="adminNavigation">
+                <nav class="nav" id="adminNavigation" style="
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 1rem;
+                    padding: 1rem 0;
+                ">
                     <!-- Navigation will be injected by navigation.js -->
                 </nav>
             `;
