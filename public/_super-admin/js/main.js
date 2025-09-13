@@ -979,15 +979,11 @@ async function loadDatabaseTables() {
             }
         });
 
-        // Log the response for debugging
-        console.log('Tables response status:', response.status);
-
         if (!response.ok) {
             // Try to get error details
             let errorMsg = `HTTP ${response.status}`;
             try {
                 const errorData = await response.json();
-                console.error('Error response:', errorData);
                 errorMsg = errorData.error || errorData.message || errorMsg;
             } catch (e) {
                 // Response might not be JSON
@@ -996,7 +992,6 @@ async function loadDatabaseTables() {
         }
 
         const result = await response.json();
-        console.log('Tables result:', result);
 
         // The endpoint returns { tables: [...] } format
         if (result.tables && Array.isArray(result.tables)) {
@@ -2193,18 +2188,13 @@ async function handleCreateUser(e) {
             })
         });
 
-        // Log response for debugging
-        console.log('Create user response status:', response.status);
-
         let result;
         const responseText = await response.text();
-        console.log('Response text:', responseText);
 
         try {
             result = JSON.parse(responseText);
         } catch (parseError) {
-            console.error('JSON parse error:', parseError);
-            console.error('Response was:', responseText);
+            console.error('JSON parse error:', parseError, 'Response:', responseText);
             throw new Error('Invalid response from server');
         }
 
