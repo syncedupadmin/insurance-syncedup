@@ -1554,11 +1554,21 @@ function closeCreateAgencyForm() {
     document.body.style.overflow = 'auto';
 }
 
-// Initialize form submission handler
+// Initialize form submission handlers
 document.addEventListener('DOMContentLoaded', () => {
-    const createForm = document.getElementById('create-agency-form');
-    if (createForm) {
-        createForm.addEventListener('submit', handleCreateAgency);
+    const createAgencyForm = document.getElementById('create-agency-form');
+    if (createAgencyForm) {
+        createAgencyForm.addEventListener('submit', handleCreateAgency);
+    }
+
+    const createUserForm = document.getElementById('create-user-form');
+    if (createUserForm) {
+        createUserForm.addEventListener('submit', handleCreateUser);
+    }
+
+    const editUserForm = document.getElementById('edit-user-form');
+    if (editUserForm) {
+        editUserForm.addEventListener('submit', handleEditUser);
     }
 });
 
@@ -1771,12 +1781,12 @@ async function loadUserManagement() {
                                             </td>
                                             <td>${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
                                             <td>
+                                                <button class="btn btn-sm btn-primary" onclick="editUser('${user.id}')">Edit</button>
                                                 <button class="btn btn-sm" onclick="resetUserPassword('${user.id}', '${user.email}')">Reset Password</button>
                                                 <button class="btn btn-sm ${user.is_active ? 'btn-danger' : 'btn-success'}"
                                                         onclick="toggleUserStatus('${user.id}', ${!user.is_active})">
                                                     ${user.is_active ? 'Deactivate' : 'Activate'}
                                                 </button>
-                                                <button class="btn btn-sm" onclick="assignToAgency('${user.id}')">Remove from Agency</button>
                                             </td>
                                         </tr>
                                     `).join('')}
@@ -1823,12 +1833,12 @@ async function loadUserManagement() {
                                             </td>
                                             <td>${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
                                             <td>
+                                                <button class="btn btn-sm btn-primary" onclick="editUser('${user.id}')">Edit</button>
                                                 <button class="btn btn-sm" onclick="resetUserPassword('${user.id}', '${user.email}')">Reset Password</button>
                                                 <button class="btn btn-sm ${user.is_active ? 'btn-danger' : 'btn-success'}"
                                                         onclick="toggleUserStatus('${user.id}', ${!user.is_active})">
                                                     ${user.is_active ? 'Deactivate' : 'Activate'}
                                                 </button>
-                                                <button class="btn btn-sm btn-primary" onclick="assignToAgency('${user.id}')">Assign to Agency</button>
                                             </td>
                                         </tr>
                                     `).join('')}
@@ -1873,12 +1883,12 @@ async function loadUserManagement() {
                                     </td>
                                     <td>${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
                                     <td>
+                                        <button class="btn btn-sm btn-primary" onclick="editUser('${user.id}')">Edit</button>
                                         <button class="btn btn-sm" onclick="resetUserPassword('${user.id}', '${user.email}')">Reset Password</button>
                                         <button class="btn btn-sm ${user.is_active ? 'btn-danger' : 'btn-success'}"
                                                 onclick="toggleUserStatus('${user.id}', ${!user.is_active})">
                                             ${user.is_active ? 'Deactivate' : 'Activate'}
                                         </button>
-                                        <button class="btn btn-sm" onclick="assignToAgency('${user.id}')">Assign Agency</button>
                                     </td>
                                 </tr>
                             `).join('')}
@@ -2099,18 +2109,67 @@ async function assignToAgency(userId) {
     }
 }
 
-function showCreateUserForm() {
-    const email = prompt('Enter email for new user:');
-    if (!email) return;
+async function showCreateUserForm() {
+    // Load agencies for dropdown
+    try {
+        const response = await fetch('/api/super-admin/agencies-management');
+        const data = await response.json();
 
-    const password = prompt('Enter password (leave blank for auto-generated):');
-    const role = prompt('Enter role (agent/manager/admin/customer_service):') || 'agent';
+        if (data.success) {
+            const agencySelect = document.getElementById('new-user-agency');
+            agencySelect.innerHTML = '<option value="">No agency (assign later)</option>';
 
-    createNewUser(email, password, role);
+            data.agencies.forEach(agency => {
+                agencySelect.innerHTML += `<option value="${agency.id}">${agency.name}</option>`;
+            });
+        }
+    } catch (error) {
+        console.error('Error loading agencies:', error);
+    }
+
+    // Show modal
+    document.getElementById('create-user-modal').classList.add('active');
+    document.getElementById('create-user-overlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    // Reset form
+    document.getElementById('create-user-form').reset();
 }
 
-async function createNewUser(email, password, role) {
+function closeCreateUserForm() {
+    document.getElementById('create-user-modal').classList.remove('active');
+    document.getElementById('create-user-overlay').classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
+
+async function handleCreateUser(e) {
+    e.preventDefault();
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+
     try {
+        // Get form values
+        const formData = {
+            email: document.getElementById('new-user-email').value.trim(),
+            name: document.getElementById('new-user-name').value.trim(),
+            password: document.getElementById('new-user-password').value || undefined,
+            role: document.getElementById('new-user-role').value,
+            agency_id: document.getElementById('new-user-agency').value || undefined,
+            send_email: document.getElementById('new-user-send-email').checked,
+            is_active: document.getElementById('new-user-active').checked
+        };
+
+        // Validate
+        if (!formData.email || !formData.role) {
+            alert('Please fill in all required fields');
+            return;
+        }
+
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating user...';
+
         const token = localStorage.getItem('auth_token');
         const response = await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/users', {
             method: 'POST',
@@ -2120,23 +2179,243 @@ async function createNewUser(email, password, role) {
             },
             body: JSON.stringify({
                 action: 'create',
-                email: email,
-                password: password || undefined,
-                user_metadata: { role: role },
-                app_metadata: { role: role }
+                email: formData.email,
+                password: formData.password,
+                user_metadata: {
+                    role: formData.role,
+                    full_name: formData.name,
+                    agency_id: formData.agency_id
+                },
+                app_metadata: {
+                    role: formData.role,
+                    agency_id: formData.agency_id
+                }
+            })
+        });
+
+        // Log response for debugging
+        console.log('Create user response status:', response.status);
+
+        let result;
+        const responseText = await response.text();
+        console.log('Response text:', responseText);
+
+        try {
+            result = JSON.parse(responseText);
+        } catch (parseError) {
+            console.error('JSON parse error:', parseError);
+            console.error('Response was:', responseText);
+            throw new Error('Invalid response from server');
+        }
+
+        if (response.ok && result.ok) {
+            alert(`User created successfully!\n\nEmail: ${formData.email}\nRole: ${formData.role}${formData.password ? '' : '\n\nA password reset email has been sent.'}`);
+            closeCreateUserForm();
+            loadUserManagement();
+        } else {
+            throw new Error(result.error || result.message || 'Failed to create user');
+        }
+
+    } catch (error) {
+        console.error('Error creating user:', error);
+        alert('Error creating user: ' + error.message);
+    } finally {
+        // Restore button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
+}
+
+// Edit user functions
+async function editUser(userId) {
+    try {
+        // Get user data
+        const response = await fetch('/api/super-admin/users');
+        const data = await response.json();
+        const user = data.users.find(u => u.id === userId);
+
+        if (!user) {
+            alert('User not found');
+            return;
+        }
+
+        // Load agencies for dropdown
+        const agenciesResponse = await fetch('/api/super-admin/agencies-management');
+        const agenciesData = await agenciesResponse.json();
+
+        if (agenciesData.success) {
+            const agencySelect = document.getElementById('edit-user-agency');
+            agencySelect.innerHTML = '<option value="">No agency</option>';
+
+            agenciesData.agencies.forEach(agency => {
+                agencySelect.innerHTML += `<option value="${agency.id}" ${user.agency_id === agency.id ? 'selected' : ''}>${agency.name}</option>`;
+            });
+        }
+
+        // Populate form
+        document.getElementById('edit-user-id').value = user.id;
+        document.getElementById('edit-user-email').value = user.email;
+        document.getElementById('edit-user-name').value = user.full_name || user.name || '';
+        document.getElementById('edit-user-role').value = user.role;
+        document.getElementById('edit-user-status').value = user.is_active ? 'active' : 'inactive';
+
+        // Show modal
+        document.getElementById('edit-user-modal').classList.add('active');
+        document.getElementById('edit-user-overlay').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    } catch (error) {
+        console.error('Error loading user data:', error);
+        alert('Error loading user data: ' + error.message);
+    }
+}
+
+function closeEditUserForm() {
+    document.getElementById('edit-user-modal').classList.remove('active');
+    document.getElementById('edit-user-overlay').classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
+
+async function handleEditUser(e) {
+    e.preventDefault();
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+
+    try {
+        const userId = document.getElementById('edit-user-id').value;
+        const formData = {
+            name: document.getElementById('edit-user-name').value.trim(),
+            role: document.getElementById('edit-user-role').value,
+            agency_id: document.getElementById('edit-user-agency').value || undefined,
+            status: document.getElementById('edit-user-status').value
+        };
+
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        const token = localStorage.getItem('auth_token');
+
+        // Update role
+        if (formData.role) {
+            await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/users', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: 'set_role',
+                    user_id: userId,
+                    role: formData.role
+                })
+            });
+        }
+
+        // Update agency
+        if (formData.agency_id !== undefined) {
+            await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/users', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: 'set_agency',
+                    user_id: userId,
+                    agency_id: formData.agency_id
+                })
+            });
+        }
+
+        alert('User updated successfully!');
+        closeEditUserForm();
+        loadUserManagement();
+
+    } catch (error) {
+        console.error('Error updating user:', error);
+        alert('Error updating user: ' + error.message);
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
+}
+
+async function resetUserPasswordModal() {
+    const userId = document.getElementById('edit-user-id').value;
+    const email = document.getElementById('edit-user-email').value;
+
+    if (confirm(`Reset password for ${email}?\n\nA new password will be generated and sent to the user.`)) {
+        await resetUserPassword(userId, email);
+    }
+}
+
+async function sendPasswordResetEmail() {
+    const email = document.getElementById('edit-user-email').value;
+
+    try {
+        const token = localStorage.getItem('auth_token');
+        const response = await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/users', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                action: 'invite',
+                email: email
             })
         });
 
         const result = await response.json();
 
         if (response.ok && result.ok) {
-            alert(`User created successfully!\nEmail: ${email}\nRole: ${role}`);
-            loadUserManagement();
+            alert(`Password reset email sent to ${email}`);
         } else {
-            throw new Error(result.error || 'Failed to create user');
+            throw new Error(result.error || 'Failed to send email');
         }
     } catch (error) {
-        alert('Error creating user: ' + error.message);
+        alert('Error sending email: ' + error.message);
+    }
+}
+
+async function deleteUser() {
+    const userId = document.getElementById('edit-user-id').value;
+    const email = document.getElementById('edit-user-email').value;
+
+    if (!confirm(`Are you sure you want to DELETE the user "${email}"?\n\nThis action cannot be undone!`)) {
+        return;
+    }
+
+    if (!confirm(`FINAL CONFIRMATION: Delete user "${email}"?`)) {
+        return;
+    }
+
+    try {
+        const token = localStorage.getItem('auth_token');
+        const response = await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/users', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                action: 'delete',
+                user_id: userId
+            })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.ok) {
+            alert(`User "${email}" has been deleted`);
+            closeEditUserForm();
+            loadUserManagement();
+        } else {
+            throw new Error(result.error || 'Failed to delete user');
+        }
+    } catch (error) {
+        alert('Error deleting user: ' + error.message);
     }
 }
 

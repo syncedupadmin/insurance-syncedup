@@ -200,6 +200,164 @@
     <!-- Create Agency Overlay -->
     <div id="create-agency-overlay" class="panel-overlay" onclick="closeCreateAgencyForm()"></div>
 
+    <!-- Create User Modal -->
+    <div id="create-user-modal" class="slide-panel">
+        <div class="panel-header">
+            <h2>Create New User</h2>
+            <button class="close-btn" onclick="closeCreateUserForm()">×</button>
+        </div>
+
+        <div class="panel-content">
+            <form id="create-user-form">
+                <div class="form-section">
+                    <h3>User Information</h3>
+                    <div class="form-group">
+                        <label>Email Address *</label>
+                        <input type="email" id="new-user-email" class="form-input" required />
+                        <small>User will receive login credentials at this email</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="new-user-name" class="form-input" />
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="new-user-password" class="form-input" placeholder="Leave blank for auto-generated" />
+                        <small>If blank, a secure password will be generated</small>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Role & Access</h3>
+                    <div class="form-group">
+                        <label>User Role *</label>
+                        <select id="new-user-role" class="form-input" required>
+                            <option value="">Select a role...</option>
+                            <option value="agent">Agent - Sales and customer management</option>
+                            <option value="manager">Manager - Team oversight and reports</option>
+                            <option value="admin">Admin - Full agency administration</option>
+                            <option value="customer_service">Customer Service - Support and claims</option>
+                            <option value="super_admin">Super Admin - System administration</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Assign to Agency</label>
+                        <select id="new-user-agency" class="form-input">
+                            <option value="">No agency (assign later)</option>
+                        </select>
+                        <small>You can assign to an agency later if needed</small>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Additional Options</h3>
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" id="new-user-send-email" checked style="margin-right: 10px;" />
+                            Send welcome email with credentials
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" id="new-user-active" checked style="margin-right: 10px;" />
+                            Activate account immediately
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Create User
+                    </button>
+                    <button type="button" class="btn" onclick="closeCreateUserForm()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Create User Overlay -->
+    <div id="create-user-overlay" class="panel-overlay" onclick="closeCreateUserForm()"></div>
+
+    <!-- Edit User Modal -->
+    <div id="edit-user-modal" class="slide-panel">
+        <div class="panel-header">
+            <h2>Edit User</h2>
+            <button class="close-btn" onclick="closeEditUserForm()">×</button>
+        </div>
+
+        <div class="panel-content">
+            <form id="edit-user-form">
+                <input type="hidden" id="edit-user-id" />
+
+                <div class="form-section">
+                    <h3>User Information</h3>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="edit-user-email" class="form-input" readonly style="opacity: 0.7;" />
+                        <small>Email cannot be changed</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="edit-user-name" class="form-input" />
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Role & Access</h3>
+                    <div class="form-group">
+                        <label>User Role</label>
+                        <select id="edit-user-role" class="form-input">
+                            <option value="agent">Agent</option>
+                            <option value="manager">Manager</option>
+                            <option value="admin">Admin</option>
+                            <option value="customer_service">Customer Service</option>
+                            <option value="super_admin">Super Admin</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Agency</label>
+                        <select id="edit-user-agency" class="form-input">
+                            <option value="">No agency</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Account Status</label>
+                        <select id="edit-user-status" class="form-input">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="suspended">Suspended</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Account Actions</h3>
+                    <div style="display: grid; gap: 10px;">
+                        <button type="button" class="btn btn-warning" onclick="resetUserPasswordModal()">
+                            <i class="fas fa-key"></i> Reset Password
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="sendPasswordResetEmail()">
+                            <i class="fas fa-envelope"></i> Send Password Reset Email
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="deleteUser()">
+                        <i class="fas fa-trash"></i> Delete User
+                    </button>
+                    <button type="button" class="btn" onclick="closeEditUserForm()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit User Overlay -->
+    <div id="edit-user-overlay" class="panel-overlay" onclick="closeEditUserForm()"></div>
+
     <script src="./js/main.js"></script>
 </body>
 </html>
