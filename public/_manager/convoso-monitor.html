@@ -58,6 +58,8 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="/manager/shared-nav.js"></script>
+    <script src="/manager/components/navigation.js"></script>
+    <script src="/manager/components/global-header.js"></script>
     
     <!-- Manager Global Styles -->
     <link rel="stylesheet" href="/manager/manager-global.css">
@@ -333,6 +335,9 @@
     <!-- Manager Portal Theme Override -->
 </head>
 <body>
+    <!-- Global Header Mount Point -->
+    <div id="global-header-mount"></div>
+    
     <!-- Monitor Header -->
     <div class="monitor-header">
         <div class="monitor-title">
@@ -575,6 +580,12 @@
         
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize global header
+            ManagerHeader.init({
+                pageTitle: 'Convoso Monitor',
+                showRoleSwitcher: false
+            });
+            
             initializePage();
             loadAgentData();
             startAutoRefresh();

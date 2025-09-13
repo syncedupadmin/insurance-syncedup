@@ -54,24 +54,14 @@
     
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="/manager/shared-nav.js"></script>
+    <script src="/manager/components/navigation.js"></script>
+    <script src="/manager/components/global-header.js"></script>
     
     <!-- Manager Portal Theme Override -->
 </head>
 <body>
-    <!-- Header -->
-    <div class="header">
-        <h1>Convoso Dashboard</h1>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <span id="userDisplay">Loading...</span>
-            <button class="btn" onclick="logout()">
-                <i data-lucide="log-out" class="icon"></i>
-                Logout
-            </button>
-        </div>
-    </div>
-
-    <!-- Navigation -->
-    <div id="nav-placeholder"></div>
+    <!-- Global Header Mount Point -->
+    <div id="global-header-mount"></div>
     
     <div class="container">
         <div class="manager-notice">
@@ -161,6 +151,12 @@
         
         // Load data on page load
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize global header
+            ManagerHeader.init({
+                pageTitle: 'Convoso Dashboard',
+                showRoleSwitcher: false
+            });
+            
             loadData();
             
             // Add event listener for time range change
@@ -168,6 +164,11 @@
                 selectedTimeRange = e.target.value;
                 loadData();
             });
+            
+            // Initialize Lucide icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
         });
         
         async function loadData() {
@@ -459,25 +460,14 @@
             }, 5000);
         }
         
-        function logout() {
-            clearAuthCookies();
-            window.location.href = '/login';
-        }
+        // Logout function is now handled by ManagerHeader.logout()
+        // function logout() {
+        //     clearAuthCookies();
+        //     window.location.href = '/login';
+        // }
         
-        // Initialize Lucide icons and user display
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Lucide icons
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
-            
-            // Display user info
-            // Authentication handled by portal-guard
-            if (userData) {
-                const user = JSON.parse(userData);
-                document.getElementById('userDisplay').textContent = user.name || user.email || 'Manager';
-            }
-        });
+        // User display is now handled by ManagerHeader
+        // (Merged with main DOMContentLoaded event above)
     </script>
     <script src="/js/theme-switcher.js"></script>
 </body>

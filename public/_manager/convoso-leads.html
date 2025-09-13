@@ -58,6 +58,8 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="/manager/shared-nav.js"></script>
+    <script src="/manager/components/navigation.js"></script>
+    <script src="/manager/components/global-header.js"></script>
     
     <!-- Manager Global Styles -->
     <link rel="stylesheet" href="/manager/manager-global.css">
@@ -385,20 +387,8 @@
     <!-- Manager Portal Theme Override -->
 </head>
 <body>
-    <!-- Header -->
-    <div class="header">
-        <h1>Lead Management</h1>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <span id="userDisplay">Loading...</span>
-            <button class="btn" onclick="logout()">
-                <i data-lucide="log-out" class="icon"></i>
-                Logout
-            </button>
-        </div>
-    </div>
-    
-    <!-- Navigation -->
-    <div id="nav-placeholder"></div>
+    <!-- Global Header Mount Point -->
+    <div id="global-header-mount"></div>
     
     <!-- Leads Header -->
     <div class="leads-header">
@@ -697,6 +687,12 @@
         
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize global header
+            ManagerHeader.init({
+                pageTitle: 'Convoso Leads',
+                showRoleSwitcher: false
+            });
+            
             initializePage();
             loadInitialData();
             
@@ -1137,14 +1133,14 @@
             hideEditModal();
         });
         
-        // Logout function
-        function logout() {
-            localStorage.clear();
-            sessionStorage.clear();
-            document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            document.cookie = 'user_role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            window.location.href = '/login';
-        }
+        // Logout function is now handled by ManagerHeader.logout()
+        // function logout() {
+        //     localStorage.clear();
+        //     sessionStorage.clear();
+        //     document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        //     document.cookie = 'user_role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        //     window.location.href = '/login';
+        // }
     </script>
     <script src="/js/theme-switcher.js"></script>
 </body>

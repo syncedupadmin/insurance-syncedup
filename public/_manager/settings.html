@@ -52,24 +52,13 @@
     <link rel="stylesheet" href="/css/themes/professional.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="/manager/shared-nav.js"></script>
+    <script src="/manager/components/navigation.js"></script>
+    <script src="/manager/components/global-header.js"></script>
     <!-- Manager Portal Theme Override -->
 </head>
 <body>
-    <!-- Header -->
-    <div class="header">
-        <h1>Manager Settings</h1>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <span id="userDisplay">Loading...</span>
-            <button class="btn" onclick="logout()">
-                <i data-lucide="log-out" class="icon"></i>
-                Logout
-            </button>
-        </div>
-    </div>
-
-    <!-- Navigation -->
-        <!-- Navigation -->
-    <div id="nav-placeholder"></div>
+    <!-- Global Header Mount Point -->
+    <div id="global-header-mount"></div>
     
     <div class="container">
         <!-- Manager Profile Settings -->
@@ -229,15 +218,15 @@
     <script>
         let currentUser = null;
 
-        // Initialize user display
+        // Initialize user display (now handled by ManagerHeader)
         function initializeUserDisplay() {
-            // Server-side portal-guard already verified access
-            document.getElementById('userDisplay').textContent = 'Manager User';
+            // User display is now handled by ManagerHeader
+            // ManagerHeader.refreshUserData() will be called automatically
         }
 
         // Initialize page
         async function initializePage() {
-            initializeUserDisplay();
+            // initializeUserDisplay(); // Now handled by ManagerHeader
             
             // Load user profile data
             loadProfileData();
@@ -306,7 +295,8 @@
                 localStorage.setItem('user', JSON.stringify(updatedUser));
                 currentUser = updatedUser;
                 
-                document.getElementById('userDisplay').textContent = `${updatedUser.firstName} ${updatedUser.lastName} (${updatedUser.role})`;
+                // Update user display through ManagerHeader
+                ManagerHeader.refreshUserData();
                 
                 showSuccess('Profile updated successfully!');
             } catch (error) {
@@ -365,11 +355,11 @@ ${timestamp},--,0,$0,--`;
             }
         }
 
-        // Logout function
-        function logout() {
-            clearAuthCookies();
-            window.location.href = '/login';
-        }
+        // Logout function is now handled by ManagerHeader.logout()
+        // function logout() {
+        //     clearAuthCookies();
+        //     window.location.href = '/login';
+        // }
 
         // Message functions
         function showSuccess(message) {
@@ -482,6 +472,12 @@ ${timestamp},--,0,$0,--`;
 
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize global header
+            ManagerHeader.init({
+                pageTitle: 'Settings',
+                showRoleSwitcher: false
+            });
+            
             initializePage();
             
             // Initialize theme button states after theme system loads

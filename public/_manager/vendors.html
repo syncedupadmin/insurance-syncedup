@@ -52,24 +52,13 @@
     <link rel="stylesheet" href="/css/themes/professional.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="/manager/shared-nav.js"></script>
+    <script src="/manager/components/navigation.js"></script>
+    <script src="/manager/components/global-header.js"></script>
     <!-- Manager Portal Theme Override -->
 </head>
 <body>
-    <!-- Header -->
-    <div class="header">
-        <h1>Vendor Management</h1>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <span id="userDisplay">Loading...</span>
-            <button class="btn" onclick="logout()">
-                <i data-lucide="log-out" class="icon"></i>
-                Logout
-            </button>
-        </div>
-    </div>
-
-    <!-- Navigation -->
-        <!-- Navigation -->
-    <div id="nav-placeholder"></div>
+    <!-- Global Header Mount Point -->
+    <div id="global-header-mount"></div>
     
     <div class="container">
         <div class="manager-notice">
@@ -300,6 +289,12 @@
         const emptyVendorsData = [];
         
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize global header
+            ManagerHeader.init({
+                pageTitle: 'Vendor Management',
+                showRoleSwitcher: false
+            });
+            
             // Server-side portal-guard already verified access
             loadVendorManagement();
             
@@ -709,10 +704,11 @@
             }
         }
         
-        function logout() {
-            clearAuthCookies();
-            window.location.href = '/login';
-        }
+        // Logout function is now handled by ManagerHeader.logout()
+        // function logout() {
+        //     clearAuthCookies();
+        //     window.location.href = '/login';
+        // }
         
         function showLoadingState() {
             const tableBody = document.getElementById('vendorsTableBody');

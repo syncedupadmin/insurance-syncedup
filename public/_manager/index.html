@@ -400,24 +400,24 @@
             await loadManagerDashboard();
         }
         
-        function logout() {
-            document.cookie = 'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-            document.cookie = 'user_role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-            window.location.href = '/login';
-        }
+        // Logout function is now handled by ManagerHeader.logout()
         
-        // Initialize Lucide icons
+        // Initialize page components
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize global header
+            ManagerHeader.init({
+                pageTitle: 'Manager Dashboard',
+                showRoleSwitcher: true
+            });
+            
             // Initialize Lucide icons after page load
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
             }
+            
+            // Manager can assume Agent (handled by header now)
+            // Role switcher will be initialized by the header component
         });
-
-        // Manager can assume Agent
-        window.RoleSwitcher.renderSwitcher('roleSwitcherMount', [
-            { value:'agent', label:'Agent' }
-        ]);
 
     </script>
     

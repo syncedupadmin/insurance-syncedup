@@ -52,28 +52,13 @@
     <link rel="stylesheet" href="/css/themes/professional.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="/manager/shared-nav.js"></script>
+    <script src="/manager/components/navigation.js"></script>
+    <script src="/manager/components/global-header.js"></script>
     <!-- Manager Portal Theme Override -->
 </head>
 <body>
-    <!-- Header -->
-    <div class="header">
-        <h1>Convoso Lead Management</h1>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <div class="live-indicator" id="liveIndicator">
-                <div class="pulse"></div>
-                <span>Live</span>
-            </div>
-            <span id="userDisplay">Loading...</span>
-            <button class="btn" onclick="logout()">
-                <i data-lucide="log-out" class="icon"></i>
-                Logout
-            </button>
-        </div>
-    </div>
-
-    <!-- Navigation -->
-        <!-- Navigation -->
-    <div id="nav-placeholder"></div>
+    <!-- Global Header Mount Point -->
+    <div id="global-header-mount"></div>
     
     <div class="container">
         <div class="manager-notice">
@@ -547,6 +532,12 @@
         let refreshInterval = null;
         
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize global header
+            ManagerHeader.init({
+                pageTitle: 'Lead Management',
+                showRoleSwitcher: false
+            });
+            
             initializeLeadManagement();
             
             // Initialize Lucide icons
@@ -1198,13 +1189,24 @@
             alert(`Lead reassignment interface for ${leadId} would open here with agent selection.`);
         }
         
-        function logout() {
+        // Logout function is now handled by ManagerHeader.logout()
+        // Special cleanup for leads page
+        function handleLeadsPageCleanup() {
             if (refreshInterval) {
                 clearInterval(refreshInterval);
             }
-            clearAuthCookies();
-            window.location.href = '/login';
         }
+        
+        // Register cleanup function with ManagerHeader
+        window.addEventListener('beforeunload', handleLeadsPageCleanup);
+        
+        // function logout() {
+        //     if (refreshInterval) {
+        //         clearInterval(refreshInterval);
+        //     }
+        //     clearAuthCookies();
+        //     window.location.href = '/login';
+        // }
         
         // Close modals when clicking outside
         window.onclick = function(event) {
