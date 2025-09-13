@@ -7,8 +7,7 @@
         { href: '/agent', icon: 'layout-dashboard', text: 'Dashboard' },
         { href: '/agent/quotes', icon: 'calculator', text: 'Quote Products' },
         { href: '/agent/commissions', icon: 'dollar-sign', text: 'My Commissions' },
-        { href: '/agent/settings', icon: 'settings', text: 'Settings' },
-        { href: '/global-leaderboard', icon: 'trophy', text: 'Global Leaderboard' }
+        { href: '/agent/settings', icon: 'settings', text: 'Settings' }
     ];
 
     // Function to render navigation

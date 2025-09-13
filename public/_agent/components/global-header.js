@@ -125,6 +125,14 @@
                 headerContent += `<span id="userDisplay">${userDisplay}</span>`;
             }
             
+            // Add leaderboard button
+            headerContent += `
+                        <button class="btn btn-warning" onclick="window.location.href='/global-leaderboard'" style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i data-lucide="trophy" class="icon"></i>
+                            Leaderboard
+                        </button>
+            `;
+            
             // Add logout button
             headerContent += `
                         <button class="btn" onclick="AgentHeader.logout()">
