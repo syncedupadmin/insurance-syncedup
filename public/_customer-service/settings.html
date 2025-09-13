@@ -396,6 +396,21 @@
                     classicText.textContent = 'Enable Classic Mode';
                 }
             }
+            
+            // Update modern mode button
+            const modernButton = document.getElementById('modernModeToggle');
+            const modernText = document.getElementById('modernModeText');
+            if (modernButton && modernText) {
+                if (currentTheme === 'modern') {
+                    modernButton.classList.remove('btn-warning');
+                    modernButton.classList.add('btn-primary');
+                    modernText.textContent = 'Modern Mode (Active)';
+                } else {
+                    modernButton.classList.remove('btn-primary');
+                    modernButton.classList.add('btn-warning');
+                    modernText.textContent = 'Enable Modern Mode';
+                }
+            }
         }
 
         // Override theme toggle functions to integrate with new theme system
@@ -414,6 +429,17 @@
             if (window.themeSystem && window.themeSystem.applyTheme) {
                 window.themeSystem.applyTheme('classic');
                 showThemeSuccess('Classic');
+                setTimeout(updateThemeButtons, 100); // Update button states after theme change
+            } else {
+                console.error('Theme system not loaded');
+                alert('Theme system not available. Please refresh the page.');
+            }
+        }
+        
+        function toggleModernMode() {
+            if (window.themeSystem && window.themeSystem.applyTheme) {
+                window.themeSystem.applyTheme('modern');
+                showThemeSuccess('Modern');
                 setTimeout(updateThemeButtons, 100); // Update button states after theme change
             } else {
                 console.error('Theme system not loaded');
