@@ -2205,14 +2205,10 @@ async function handleCreateUser(e) {
                 action: 'create',
                 email: formData.email,
                 password: formData.password,
-                user_metadata: {
+                metadata: {
                     role: formData.role,
-                    full_name: formData.name,
-                    agency_id: formData.agency_id
-                },
-                app_metadata: {
-                    role: formData.role,
-                    agency_id: formData.agency_id
+                    full_name: formData.name || formData.email.split('@')[0],
+                    agency_id: formData.agency_id || 'AGENCY001'
                 }
             })
         });
@@ -2227,12 +2223,18 @@ async function handleCreateUser(e) {
             throw new Error('Invalid response from server');
         }
 
-        if (response.ok && result.ok) {
+        console.log('Create user response:', result);
+
+        // The Edge Function returns {user: ...} on success, not {ok: true}
+        if (response.ok && result.user) {
             alert(`User created successfully!\n\nEmail: ${formData.email}\nRole: ${formData.role}${formData.password ? '' : '\n\nA password reset email has been sent.'}`);
             closeCreateUserForm();
             loadUserManagement();
         } else {
-            throw new Error(result.error || result.message || 'Failed to create user');
+            // Show the actual error from the server
+            const errorMsg = result.error || result.message || 'Failed to create user';
+            console.error('User creation failed:', errorMsg);
+            throw new Error(errorMsg);
         }
 
     } catch (error) {
