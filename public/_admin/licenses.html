@@ -56,6 +56,8 @@
     <link href="/admin/admin-global.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/themes/professional.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/_admin/components/navigation.js"></script>
+    <script src="/_admin/components/global-header.js"></script>
     <style>
         /* License Management Specific Styles */
         .license-dashboard {
@@ -641,6 +643,12 @@
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', async function() {
+            // Initialize global header
+            AdminHeader.init({
+                pageTitle: 'License Management',
+                showRoleSwitcher: false
+            });
+            
             // Server-side portal-guard already verified access
             await initializeLicensePage();
             setTimeout(() => {
