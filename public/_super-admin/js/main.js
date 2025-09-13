@@ -979,11 +979,24 @@ async function loadDatabaseTables() {
             }
         });
 
+        // Log the response for debugging
+        console.log('Tables response status:', response.status);
+
         if (!response.ok) {
-            throw new Error('Failed to fetch tables');
+            // Try to get error details
+            let errorMsg = `HTTP ${response.status}`;
+            try {
+                const errorData = await response.json();
+                console.error('Error response:', errorData);
+                errorMsg = errorData.error || errorData.message || errorMsg;
+            } catch (e) {
+                // Response might not be JSON
+            }
+            throw new Error(errorMsg);
         }
 
         const result = await response.json();
+        console.log('Tables result:', result);
 
         // The endpoint returns { tables: [...] } format
         if (result.tables && Array.isArray(result.tables)) {
