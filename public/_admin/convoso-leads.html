@@ -60,6 +60,8 @@
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/_admin/components/navigation.js"></script>
+    <script src="/_admin/components/global-header.js"></script>
     
     <!-- Admin Global Styles -->
     <link rel="stylesheet" href="/admin/admin-global.css">
@@ -748,6 +750,10 @@
         
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
+            AdminHeader.init({
+                pageTitle: 'Lead Management - Convoso Dashboard',
+                showRoleSwitcher: false
+            });
             // Server-side portal-guard already verified access
             initializePage();
             loadInitialData();
