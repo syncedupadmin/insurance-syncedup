@@ -37,30 +37,38 @@ function stopAutoRefresh() {
     }
 }
 
-function refreshCurrentView() {
-    // Add subtle visual indicator
-    showRefreshIndicator();
+async function refreshCurrentView() {
+    // Save state before refresh
+    if (window.SilentRefresh) {
+        window.SilentRefresh.saveViewState();
+        window.SilentRefresh.showSilentRefreshIndicator();
+    }
 
     // Refresh based on current view
     switch(currentView) {
         case 'dashboard':
-            refreshDashboard();
+            await silentRefreshDashboard();
             break;
         case 'agents':
-            refreshAgentPerformance();
+            await silentRefreshAgentPerformance();
             break;
         case 'users':
-            refreshUsersData();
+            await silentRefreshUsersData();
             break;
         case 'licenses':
-            refreshLicensesData();
+            await silentRefreshLicensesData();
             break;
         case 'commissions':
-            refreshCommissionsData();
+            await silentRefreshCommissionsData();
             break;
         case 'reports':
-            refreshReportsData();
+            await silentRefreshReportsData();
             break;
+    }
+
+    // Restore state after refresh
+    if (window.SilentRefresh) {
+        window.SilentRefresh.restoreViewState();
     }
 
     // Update last refresh time
@@ -68,8 +76,43 @@ function refreshCurrentView() {
     updateRefreshStatus();
 }
 
+async function silentRefreshDashboard() {
+    if (!window.SilentRefresh) {
+        // Fallback to old method if core not loaded
+        refreshDashboard();
+        return;
+    }
+
+    const authToken = localStorage.getItem('auth_token');
+    const data = await window.SilentRefresh.silentFetch('/api/admin/dashboard-metrics', authToken);
+
+    if (data && data.data) {
+        // Define mapping of selectors to data paths for Admin portal
+        const updateMap = {
+            '#activeAgents': { path: 'data.activeAgents', format: 'number' },
+            '#mtdRevenue': { path: 'data.mtdRevenue', format: 'currency' },
+            '#policiesSold': { path: 'data.policiesSold', format: 'number' },
+            '#activeLeads': { path: 'data.activeLeads', format: 'number' },
+            '#conversionRate': { path: 'data.conversionRate', format: 'text' },
+            '#totalCommissions': { path: 'data.totalCommissions', format: 'currency' },
+            '#systemStatus': { path: 'data.systemStatus', format: 'text' },
+            // Add metric cards if they exist
+            '.metric-card:nth-child(1) .metric-value': { path: 'data.totalUsers', format: 'number' },
+            '.metric-card:nth-child(2) .metric-value': { path: 'data.activeUsers', format: 'number' },
+            '.metric-card:nth-child(3) .metric-value': { path: 'data.totalRevenue', format: 'currency' },
+            '.metric-card:nth-child(4) .metric-value': { path: 'data.pendingCommissions', format: 'currency' }
+        };
+
+        // Apply differential updates
+        window.SilentRefresh.applyDifferentialUpdates(data, updateMap);
+    } else if (data) {
+        // Fallback to old update method if data structure is different
+        updateDashboardMetrics(data);
+    }
+}
+
 function refreshDashboard() {
-    // Refresh main dashboard metrics
+    // Keep old function as fallback
     fetch('/api/admin/dashboard-metrics', {
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
@@ -84,36 +127,36 @@ function refreshDashboard() {
     .catch(console.error);
 }
 
-function refreshAgentPerformance() {
-    // Refresh agent performance data
+async function silentRefreshAgentPerformance() {
+    // For now, fallback to old method
     if (typeof loadAgentPerformance === 'function') {
         loadAgentPerformance();
     }
 }
 
-function refreshUsersData() {
-    // Refresh users table
+async function silentRefreshUsersData() {
+    // For now, fallback to old method
     if (typeof loadUsersData === 'function') {
         loadUsersData();
     }
 }
 
-function refreshLicensesData() {
-    // Refresh licenses data
+async function silentRefreshLicensesData() {
+    // For now, fallback to old method
     if (typeof loadLicensesData === 'function') {
         loadLicensesData();
     }
 }
 
-function refreshCommissionsData() {
-    // Refresh commissions data
+async function silentRefreshCommissionsData() {
+    // For now, fallback to old method
     if (typeof loadCommissionsData === 'function') {
         loadCommissionsData();
     }
 }
 
-function refreshReportsData() {
-    // Refresh reports
+async function silentRefreshReportsData() {
+    // For now, fallback to old method
     if (typeof generateReports === 'function') {
         generateReports();
     }
@@ -150,39 +193,7 @@ function updateDashboardMetrics(data) {
     }
 }
 
-function showRefreshIndicator() {
-    // Create or get refresh indicator
-    let indicator = document.getElementById('refresh-indicator');
-    if (!indicator) {
-        indicator = document.createElement('div');
-        indicator.id = 'refresh-indicator';
-        indicator.style.cssText = `
-            position: fixed;
-            top: 70px;
-            right: 20px;
-            background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            z-index: 10000;
-            display: none;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        `;
-        indicator.innerHTML = '<i class="fas fa-sync fa-spin"></i> Refreshing...';
-        document.body.appendChild(indicator);
-    }
-
-    // Show indicator
-    indicator.style.display = 'flex';
-
-    // Hide after 1 second
-    setTimeout(() => {
-        indicator.style.display = 'none';
-    }, 1000);
-}
+// Removed showRefreshIndicator - using silent refresh instead
 
 function addRefreshControls() {
     // Find the header or create a container for refresh controls

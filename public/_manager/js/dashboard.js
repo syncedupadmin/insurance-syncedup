@@ -39,24 +39,32 @@ function stopAutoRefresh() {
     }
 }
 
-function refreshCurrentView() {
-    // Add subtle visual indicator
-    showRefreshIndicator();
+async function refreshCurrentView() {
+    // Save state before refresh
+    if (window.SilentRefresh) {
+        window.SilentRefresh.saveViewState();
+        window.SilentRefresh.showSilentRefreshIndicator();
+    }
 
     // Refresh based on current view
     switch(currentView) {
         case 'dashboard':
-            refreshDashboard();
+            await silentRefreshDashboard();
             break;
         case 'team':
-            refreshTeamStats();
+            await silentRefreshTeamStats();
             break;
         case 'performance':
-            refreshPerformanceMetrics();
+            await silentRefreshPerformanceMetrics();
             break;
         case 'leads':
-            refreshLeadsData();
+            await silentRefreshLeadsData();
             break;
+    }
+
+    // Restore state after refresh
+    if (window.SilentRefresh) {
+        window.SilentRefresh.restoreViewState();
     }
 
     // Update last refresh time
@@ -64,8 +72,45 @@ function refreshCurrentView() {
     updateRefreshStatus();
 }
 
+async function silentRefreshDashboard() {
+    if (!window.SilentRefresh) {
+        // Fallback to old method if core not loaded
+        refreshDashboard();
+        return;
+    }
+
+    const authToken = localStorage.getItem('auth_token');
+    const data = await window.SilentRefresh.silentFetch('/api/manager/dashboard-metrics', authToken);
+
+    if (data && data.data) {
+        // Define mapping of selectors to data paths for Manager portal
+        const updateMap = {
+            '#teamPerformance': { path: 'data.teamPerformance', format: 'number' },
+            '#monthlyTarget': { path: 'data.monthlyTarget', format: 'currency' },
+            '#completedTasks': { path: 'data.completedTasks', format: 'number' },
+            '#activeAgents': { path: 'data.activeAgents', format: 'number' },
+            '#mtdSales': { path: 'data.mtdSales', format: 'currency' },
+            '#conversionRate': { path: 'data.conversionRate', format: 'text' },
+            // Add metric cards if they exist
+            '.metric-card:nth-child(1) .metric-value': { path: 'data.teamPerformance', format: 'number' },
+            '.metric-card:nth-child(2) .metric-value': { path: 'data.monthlyTarget', format: 'number' },
+            '.metric-card:nth-child(3) .metric-value': { path: 'data.completedTasks', format: 'number' },
+            '.metric-card:nth-child(4) .metric-value': { path: 'data.pendingLeads', format: 'number' }
+        };
+
+        // Apply differential updates
+        window.SilentRefresh.applyDifferentialUpdates(data, updateMap);
+    } else if (data) {
+        // Fallback to old update method if data structure is different
+        updateDashboardMetrics(data);
+    } else {
+        // If no data, try old method
+        refreshDashboard();
+    }
+}
+
 function refreshDashboard() {
-    // Refresh main dashboard metrics
+    // Keep old function as fallback
     if (typeof loadDashboardData === 'function') {
         loadDashboardData();
     } else {
@@ -87,23 +132,23 @@ function refreshDashboard() {
     }
 }
 
-function refreshTeamStats() {
-    // Refresh team statistics
+async function silentRefreshTeamStats() {
+    // For now, fallback to old method
     const teamTable = document.querySelector('#team-performance-table');
     if (teamTable && typeof loadTeamData === 'function') {
         loadTeamData();
     }
 }
 
-function refreshPerformanceMetrics() {
-    // Refresh performance metrics
+async function silentRefreshPerformanceMetrics() {
+    // For now, fallback to old method
     if (typeof updatePerformanceCharts === 'function') {
         updatePerformanceCharts();
     }
 }
 
-function refreshLeadsData() {
-    // Refresh leads data
+async function silentRefreshLeadsData() {
+    // For now, fallback to old method
     if (typeof loadLeadsData === 'function') {
         loadLeadsData();
     }
@@ -128,39 +173,7 @@ function updateDashboardMetrics(data) {
     });
 }
 
-function showRefreshIndicator() {
-    // Create or get refresh indicator
-    let indicator = document.getElementById('refresh-indicator');
-    if (!indicator) {
-        indicator = document.createElement('div');
-        indicator.id = 'refresh-indicator';
-        indicator.style.cssText = `
-            position: fixed;
-            top: 70px;
-            right: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            z-index: 10000;
-            display: none;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        `;
-        indicator.innerHTML = '<i class="fas fa-sync fa-spin"></i> Refreshing...';
-        document.body.appendChild(indicator);
-    }
-
-    // Show indicator
-    indicator.style.display = 'flex';
-
-    // Hide after 1 second
-    setTimeout(() => {
-        indicator.style.display = 'none';
-    }, 1000);
-}
+// Removed showRefreshIndicator - using silent refresh instead
 
 function addRefreshControls() {
     // Find the header or create a container for refresh controls
