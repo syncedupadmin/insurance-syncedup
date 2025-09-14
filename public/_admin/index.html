@@ -482,52 +482,16 @@
         
         async function loadDashboardData() {
             try {
-                // Load admin dashboard data - try admin endpoints but gracefully handle manager users
-                const [dashboardResponse, analyticsResponse, userStatsResponse, commissionStatsResponse, apiKeysResponse] = await Promise.all([
-                    fetch('/api/manager/dashboard', {
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        credentials: 'include'
-                    }).catch(() => ({ ok: false })),
-                    fetch('/api/admin/analytics?analytics_type=overview', {
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        credentials: 'include'
-                    }).catch(() => ({ ok: false })),
-                    fetch('/api/admin/user-management', {
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        credentials: 'include'
-                    }).catch(() => ({ ok: false })),
-                    fetch('/api/admin/commission-settings', {
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        credentials: 'include'
-                    }).catch(() => ({ ok: false })),
-                    fetch('/api/admin/api-keys', {
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        credentials: 'include'
-                    }).catch(() => ({ ok: false }))
-                ]);
-                
+                // Only load the main dashboard data - removed problematic API calls
+                const dashboardResponse = await fetch('/api/manager/dashboard', {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
+                }).catch(() => ({ ok: false }));
+
                 dashboardData = dashboardResponse.ok ? await dashboardResponse.json() : { ok: false };
-                const analyticsData = analyticsResponse.ok ? await analyticsResponse.json() : { ok: false };
-                const userStats = userStatsResponse.ok ? await userStatsResponse.json() : { ok: false };
-                const commissionStats = commissionStatsResponse.ok ? await commissionStatsResponse.json() : { ok: false };
-                const apiKeysData = apiKeysResponse.ok ? await apiKeysResponse.json() : { ok: false };
-                
-                // Merge admin data with manager data
-                dashboardData.admin_analytics = analyticsData;
-                dashboardData.user_stats = userStats;
-                dashboardData.commission_stats = commissionStats;
-                dashboardData.api_keys_data = apiKeysData;
-                
+
                 updateAdminDashboardUI();
                 
             } catch (error) {

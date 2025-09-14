@@ -9,7 +9,7 @@ let currentView = 'dashboard';
 // Initialize auto-refresh on page load
 document.addEventListener('DOMContentLoaded', () => {
     startAutoRefresh();
-    addRefreshControls();
+    // addRefreshControls(); // Removed - using silent refresh indicator instead
 
     // Track view changes
     setupViewTracking();
@@ -175,6 +175,7 @@ function updateDashboardMetrics(data) {
 
 // Removed showRefreshIndicator - using silent refresh instead
 
+/* Removed timer controls - using silent refresh
 function addRefreshControls() {
     // Find the header or create a container for refresh controls
     const header = document.querySelector('.header') || document.querySelector('header');
@@ -271,6 +272,7 @@ function updateRefreshStatus() {
         statusElement.textContent = `${hours}h ago`;
     }
 }
+*/ // End of removed timer controls
 
 function setupViewTracking() {
     // Track navigation clicks to update current view
