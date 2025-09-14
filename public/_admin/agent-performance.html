@@ -473,14 +473,28 @@
             return { totalAgents, avgPerformance, topPerformer, activeGoals };
         }
 
-        function calculateGoalProgress(agentId, goalId = null) {
-            // Mock goal progress calculation
-            const progress = Math.floor(Math.random() * 100);
-            let color = '#ef4444'; // red
-            if (progress > 75) color = '#10b981'; // green
-            else if (progress > 50) color = '#f59e0b'; // yellow
-            
-            return { percentage: progress, color };
+        async function calculateGoalProgress(agentId, goalId = null) {
+            try {
+                // Fetch real progress from API
+                const response = await fetch(`/api/admin/agents/${agentId}/goal-progress${goalId ? `?goalId=${goalId}` : ''}`, {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const progress = data.percentage || 0;
+                    let color = '#ef4444'; // red
+                    if (progress > 75) color = '#10b981'; // green
+                    else if (progress > 50) color = '#f59e0b'; // yellow
+
+                    return { percentage: progress, color };
+                }
+            } catch (error) {
+                console.error('Failed to calculate goal progress:', error);
+            }
+
+            // Return zero progress if API fails
+            return { percentage: 0, color: '#ef4444' };
         }
 
         function calculateTeamStats() {

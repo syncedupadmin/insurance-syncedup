@@ -193,11 +193,8 @@
             try {
                 tableBody.innerHTML = '';
                 
-                // Mock data if analytics not available
-                const agents = analyticsData?.topAgents || [
-                    { id: 1, name: 'Sample Agent 1', sales: 0, revenue: 0, conversionRate: 0 },
-                    { id: 2, name: 'Sample Agent 2', sales: 0, revenue: 0, conversionRate: 0 }
-                ];
+                // Use real data or show empty state
+                const agents = analyticsData?.topAgents || [];
                 
                 if (agents.length === 0) {
                     tableBody.innerHTML = '<tr><td colspan="5" class="no-data">No agent data available</td></tr>';
@@ -282,11 +279,14 @@
             if (!tableBody) return;
             
             try {
-                // Mock activity data
-                const activities = [
-                    { time: '2:30 PM', agent: 'System', action: 'Dashboard loaded', details: 'Admin portal accessed' }
-                ];
+                // Real activity data should come from API
+                const activities = dashboardData?.recentActivity || [];
                 
+                if (activities.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="4" class="no-data">No recent activity</td></tr>';
+                    return;
+                }
+
                 tableBody.innerHTML = activities.map(activity => `
                     <tr>
                         <td>${activity.time}</td>

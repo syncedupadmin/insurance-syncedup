@@ -120,8 +120,7 @@
                 <input type="date" id="endDate" style="display: none;">
                 <select id="agentFilter" onchange="updateReports()">
                     <option value="">All Agents</option>
-                    <option value="john-doe">John Doe</option>
-                    <option value="jane-smith">Jane Smith</option>
+                    <!-- Agents will be loaded dynamically from API -->
                 </select>
                 <select id="productFilter" onchange="updateReports()">
                     <option value="">All Products</option>
@@ -165,7 +164,7 @@
         <div class="two-column">
             <div class="card">
                 <h3 style="margin-bottom: 1rem;">Sales Trend</h3>
-                <div class="chart-placeholder">Sales Chart - Connect to Chart.js or similar</div>
+                <div class="chart-placeholder" id="salesChart">Loading chart...</div>
                 <div class="export-section">
                     <button class="btn btn-secondary" onclick="exportChart('sales')">Export Chart</button>
                 </div>
@@ -173,7 +172,7 @@
             
             <div class="card">
                 <h3 style="margin-bottom: 1rem;">Product Mix</h3>
-                <div class="chart-placeholder">Product Distribution - Connect to Chart.js</div>
+                <div class="chart-placeholder" id="productChart">Loading chart...</div>
                 <div class="export-section">
                     <button class="btn btn-secondary" onclick="exportChart('products')">Export Chart</button>
                 </div>
@@ -330,45 +329,88 @@
             console.log('Updating reports with filters:', { dateRange, agentFilter, productFilter });
         }
 
-        function updateKeyMetrics() {
-            // Mock data - replace with actual API call
+        async function updateKeyMetrics() {
             const stats = document.querySelectorAll('.stat-value');
-            stats[0].textContent = '$125,450'; // Total Sales
-            stats[1].textContent = '43';       // Policies Sold
-            stats[2].textContent = '$9,408';   // Commissions
-            stats[3].textContent = '12.5%';    // Conversion Rate
-            stats[4].textContent = '$2,917';   // Avg Policy Value
+
+            try {
+                // Fetch real metrics from API
+                const response = await fetch('/api/admin/reports/metrics', {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    stats[0].textContent = data.totalSales ? `$${data.totalSales.toLocaleString()}` : '$0';
+                    stats[1].textContent = data.policiesSold || '0';
+                    stats[2].textContent = data.commissions ? `$${data.commissions.toLocaleString()}` : '$0';
+                    stats[3].textContent = data.conversionRate ? `${data.conversionRate}%` : '0%';
+                    stats[4].textContent = data.avgPolicyValue ? `$${data.avgPolicyValue.toLocaleString()}` : '$0';
+                } else {
+                    // Show loading state or zeros
+                    stats.forEach(stat => stat.textContent = '--');
+                }
+            } catch (error) {
+                console.error('Failed to load metrics:', error);
+                stats.forEach(stat => stat.textContent = '--');
+            }
         }
 
-        function loadRecentReports() {
-            // Mock recent reports data
+        async function loadRecentReports() {
             const tbody = document.getElementById('reportsTableBody');
-            tbody.innerHTML = `
-                <tr>
-                    <td>December Sales Report</td>
-                    <td>Jan 2, 2024</td>
-                    <td>Dec 2023</td>
-                    <td>Completed</td>
-                    <td>
-                        <button class="btn" style="padding: 0.5rem; font-size: 0.8rem;" onclick="downloadReport('dec-sales')">Download</button>
-                        <button class="btn btn-secondary" style="padding: 0.5rem; font-size: 0.8rem;" onclick="viewReport('dec-sales')">View</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Q4 Commission Summary</td>
-                    <td>Jan 1, 2024</td>
-                    <td>Q4 2023</td>
-                    <td>Completed</td>
-                    <td>
-                        <button class="btn" style="padding: 0.5rem; font-size: 0.8rem;" onclick="downloadReport('q4-comm')">Download</button>
-                        <button class="btn btn-secondary" style="padding: 0.5rem; font-size: 0.8rem;" onclick="viewReport('q4-comm')">View</button>
-                    </td>
-                </tr>
-            `;
+
+            try {
+                // Fetch real reports from API
+                const response = await fetch('/api/admin/reports/recent', {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const reports = await response.json();
+
+                    if (reports && reports.length > 0) {
+                        tbody.innerHTML = reports.map(report => `
+                            <tr>
+                                <td>${report.name}</td>
+                                <td>${new Date(report.generatedAt).toLocaleDateString()}</td>
+                                <td>${report.period}</td>
+                                <td>${report.status}</td>
+                                <td>
+                                    <button class="btn" style="padding: 0.5rem; font-size: 0.8rem;" onclick="downloadReport('${report.id}')">Download</button>
+                                    <button class="btn btn-secondary" style="padding: 0.5rem; font-size: 0.8rem;" onclick="viewReport('${report.id}')">View</button>
+                                </td>
+                            </tr>
+                        `).join('');
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #718096;">No reports available</td></tr>';
+                    }
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #718096;">Unable to load reports</td></tr>';
+                }
+            } catch (error) {
+                console.error('Failed to load reports:', error);
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #718096;">Error loading reports</td></tr>';
+            }
         }
 
-        function generateReport(type) {
-            alert(`Generating ${type} report. This functionality will be connected to backend API.`);
+        async function generateReport(type) {
+            try {
+                const response = await fetch('/api/admin/reports/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ type })
+                });
+
+                if (response.ok) {
+                    alert(`Report generation started. You will be notified when complete.`);
+                    loadRecentReports();
+                } else {
+                    alert('Unable to generate report. Please try again.');
+                }
+            } catch (error) {
+                console.error('Report generation failed:', error);
+                alert('Report generation failed. Please try again.');
+            }
         }
 
         function scheduleReport(type) {

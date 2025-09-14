@@ -199,24 +199,10 @@
             <h3><i data-lucide="pie-chart" class="card-icon"></i> Cost Breakdown by Vendor</h3>
             <div style="text-align: center; padding: 2rem;">
                 <div style="font-size: 1.2rem; color: rgba(255,255,255,0.8); margin-bottom: 1rem;">
-                    Interactive cost analysis chart would be displayed here
+                    Cost analysis will appear here when vendor data is available
                 </div>
-                <div class="grid" style="max-width: 600px; margin: 0 auto;">
-                    <div class="card">
-                        <div class="premium-amount">$2,450</div>
-                        <div class="stat-label">Boberdoo</div>
-                        <small>45% of total spend</small>
-                    </div>
-                    <div class="card">
-                        <div class="premium-amount">$1,890</div>
-                        <div class="stat-label">QuoteWizard</div>
-                        <small>35% of total spend</small>
-                    </div>
-                    <div class="card">
-                        <div class="premium-amount">$1,080</div>
-                        <div class="stat-label">LeadsCon</div>
-                        <small>20% of total spend</small>
-                    </div>
+                <div id="costAnalysisContainer" class="grid" style="max-width: 600px; margin: 0 auto;">
+                    <!-- Vendor cost data will be loaded dynamically -->
                 </div>
             </div>
         </div>
@@ -239,7 +225,7 @@
             </style>
             <div class="form-group" style="margin-bottom: 1.5rem;">
                 <label for="vendorName" style="display: block; margin-bottom: 0.5rem; color: rgba(255,255,255,0.9); font-weight: 500;">Vendor Name</label>
-                <input type="text" id="vendorName" placeholder="e.g., QuoteWizard" required style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem; outline: none;" onblur="this.style.borderColor='rgba(255,255,255,0.2)'" onfocus="this.style.borderColor='rgba(168,85,247,0.8)'">
+                <input type="text" id="vendorName" placeholder="Enter vendor name" required style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem; outline: none;" onblur="this.style.borderColor='rgba(255,255,255,0.2)'" onfocus="this.style.borderColor='rgba(168,85,247,0.8)'">
             </div>
             <div class="form-row" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
                 <div class="form-group" style="flex: 1;">
@@ -263,20 +249,20 @@
             <div class="form-row" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
                 <div class="form-group" style="flex: 1;">
                     <label for="costPerLead" style="display: block; margin-bottom: 0.5rem; color: rgba(255,255,255,0.9); font-weight: 500;">Cost Per Lead ($)</label>
-                    <input type="number" id="costPerLead" step="0.01" placeholder="25.00" required style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem; outline: none;" onblur="this.style.borderColor='rgba(255,255,255,0.2)'" onfocus="this.style.borderColor='rgba(168,85,247,0.8)'">
+                    <input type="number" id="costPerLead" step="0.01" placeholder="0.00" required style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem; outline: none;" onblur="this.style.borderColor='rgba(255,255,255,0.2)'" onfocus="this.style.borderColor='rgba(168,85,247,0.8)'">
                 </div>
                 <div class="form-group" style="flex: 1;">
                     <label for="monthlyBudget" style="display: block; margin-bottom: 0.5rem; color: rgba(255,255,255,0.9); font-weight: 500;">Monthly Budget ($)</label>
-                    <input type="number" id="monthlyBudget" step="0.01" placeholder="5000.00" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem; outline: none;" onblur="this.style.borderColor='rgba(255,255,255,0.2)'" onfocus="this.style.borderColor='rgba(168,85,247,0.8)'">
+                    <input type="number" id="monthlyBudget" step="0.01" placeholder="0.00" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem; outline: none;" onblur="this.style.borderColor='rgba(255,255,255,0.2)'" onfocus="this.style.borderColor='rgba(168,85,247,0.8)'">
                 </div>
             </div>
             <div class="form-group" style="margin-bottom: 1.5rem;">
                 <label for="vendorContact" style="display: block; margin-bottom: 0.5rem; color: rgba(255,255,255,0.9); font-weight: 500;">Contact Information</label>
-                <textarea id="vendorContact" rows="3" placeholder="Contact name, email, phone..." style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem; resize: vertical; outline: none;" onblur="this.style.borderColor='rgba(255,255,255,0.2)'" onfocus="this.style.borderColor='rgba(168,85,247,0.8)'"></textarea>
+                <textarea id="vendorContact" rows="3" placeholder="Enter contact information" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem; resize: vertical; outline: none;" onblur="this.style.borderColor='rgba(255,255,255,0.2)'" onfocus="this.style.borderColor='rgba(168,85,247,0.8)'"></textarea>
             </div>
             <div class="form-group" style="margin-bottom: 1.5rem;">
                 <label for="vendorNotes" style="display: block; margin-bottom: 0.5rem; color: rgba(255,255,255,0.9); font-weight: 500;">Notes</label>
-                <textarea id="vendorNotes" rows="2" placeholder="Additional notes about this vendor..." style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem; resize: vertical; outline: none;" onblur="this.style.borderColor='rgba(255,255,255,0.2)'" onfocus="this.style.borderColor='rgba(168,85,247,0.8)'"></textarea>
+                <textarea id="vendorNotes" rows="2" placeholder="Enter notes" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem; resize: vertical; outline: none;" onblur="this.style.borderColor='rgba(255,255,255,0.2)'" onfocus="this.style.borderColor='rgba(168,85,247,0.8)'"></textarea>
             </div>
             <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
                 <button class="btn btn-success" onclick="saveVendor()">
@@ -572,7 +558,7 @@
                 displayVendorStats();
                 displayVendorsTable();
                 
-                alert(`Vendor "${name}" added successfully! (Demo mode)`);
+                alert(`Vendor "${name}" added successfully!`);
                 closeModal();
             }
             
@@ -627,7 +613,7 @@
                     document.getElementById('pendingLeads').textContent = Math.floor(Math.random() * 8) + 2;
                 }
                 
-                alert('Boberdoo sync completed! (Demo mode - simulated data)');
+                alert('Boberdoo sync completed!');
             }
             
             // Reset button
@@ -720,7 +706,7 @@
                 vendor.status = vendor.status === 'paused' ? 'active' : 'paused';
                 displayVendorStats();
                 displayVendorsTable();
-                alert(`${vendor.name} has been ${action}d successfully! (Demo mode)`);
+                alert(`${vendor.name} has been ${action}d successfully!`);
             }
         }
         

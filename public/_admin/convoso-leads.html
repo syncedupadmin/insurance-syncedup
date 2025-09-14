@@ -859,37 +859,50 @@
                     updatePagination();
                     updateTotalCount();
                 } else {
-                    showSampleData();
+                    showNoDataState();
                 }
             } catch (error) {
                 console.error('Failed to search leads:', error);
-                showSampleData();
+                showErrorState();
             }
         }
         
-        function showSampleData() {
-            // Show sample data when API is not available
-            allLeads = [
-                {
-                    id: 'sample-1',
-                    convoso_lead_id: '12345',
-                    first_name: 'John',
-                    last_name: 'Doe',
-                    phone_number: '(555) 123-4567',
-                    email: 'john@example.com',
-                    list_name: 'PHS DATA - NextGen PL Plus',
-                    city: 'Los Angeles',
-                    state: 'CA',
-                    postal_code: '90210',
-                    status: 'NEW',
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-                }
-            ];
-            totalResults = allLeads.length;
+        function showNoDataState() {
+            // Show no data available state
+            allLeads = [];
+            totalResults = 0;
             renderLeadsTable();
             updatePagination();
             updateTotalCount();
+
+            const tbody = document.getElementById('leads-table-body');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="14" style="text-align: center; padding: 3rem; color: #718096;">
+                        <div style="font-size: 1.1rem; margin-bottom: 0.5rem;">No leads available</div>
+                        <div style="font-size: 0.9rem;">Please check your API configuration or try again later</div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function showErrorState() {
+            // Show error state
+            allLeads = [];
+            totalResults = 0;
+            renderLeadsTable();
+            updatePagination();
+            updateTotalCount();
+
+            const tbody = document.getElementById('leads-table-body');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="14" style="text-align: center; padding: 3rem; color: #ef4444;">
+                        <div style="font-size: 1.1rem; margin-bottom: 0.5rem;">Error loading leads</div>
+                        <div style="font-size: 0.9rem;">Unable to connect to the server. Please try again.</div>
+                    </td>
+                </tr>
+            `;
         }
         
         function renderLeadsTable() {

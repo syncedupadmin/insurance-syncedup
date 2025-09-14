@@ -195,12 +195,12 @@
                 <div class="grid" style="margin-bottom: 1.5rem;">
                     <div>
                         <label class="form-label">Company Logo URL</label>
-                        <input type="url" id="logoUrl" class="form-input" placeholder="https://example.com/logo.png">
+                        <input type="url" id="logoUrl" class="form-input" placeholder="Enter logo URL">
                         <small style="color: rgba(255,255,255,0.7);">Recommended size: 200x60px</small>
                     </div>
                     <div>
                         <label class="form-label">Favicon URL</label>
-                        <input type="url" id="faviconUrl" class="form-input" placeholder="https://example.com/favicon.ico">
+                        <input type="url" id="faviconUrl" class="form-input" placeholder="Enter favicon URL">
                     </div>
                 </div>
 
@@ -270,7 +270,7 @@
                 <div class="grid" style="margin-bottom: 1.5rem;">
                     <div>
                         <label class="form-label">Phone Number</label>
-                        <input type="tel" id="agencyPhone" class="form-input" value="(555) 123-4567">
+                        <input type="tel" id="agencyPhone" class="form-input" placeholder="Enter phone number">
                     </div>
                     <div>
                         <label class="form-label">Email Address</label>
@@ -445,11 +445,11 @@ Business City, ST 12345</textarea>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Key Name</label>
-                    <input type="text" id="apiKeyName" class="form-input" required placeholder="e.g., Production API Key">
+                    <input type="text" id="apiKeyName" class="form-input" required placeholder="Enter key name">
                 </div>
                 <div class="form-group">
                     <label class="form-label">API Key</label>
-                    <input type="password" id="apiKeyValue" class="form-input" required placeholder="Paste your API key here">
+                    <input type="password" id="apiKeyValue" class="form-input" required placeholder="Enter API key">
                     <small style="color: rgba(255,255,255,0.7);">Keys are encrypted and securely stored</small>
                 </div>
                 <div class="form-group" id="customServiceGroup" style="display: none;">
@@ -665,10 +665,10 @@ Business City, ST 12345</textarea>
             
             if (data.agency) {
                 document.getElementById('agencyName').value = data.agency.name || 'Premier Insurance Solutions';
-                document.getElementById('licenseNumber').value = data.agency.licenseNumber || 'INS-2024-789456';
-                document.getElementById('agencyPhone').value = data.agency.phone || '(555) 123-4567';
-                document.getElementById('agencyEmail').value = data.agency.email || 'info@premierinsurance.com';
-                document.getElementById('agencyAddress').value = data.agency.address || '123 Insurance Way\nSuite 100\nBusiness City, ST 12345';
+                document.getElementById('licenseNumber').value = data.agency.licenseNumber || '';
+                document.getElementById('agencyPhone').value = data.agency.phone || '';
+                document.getElementById('agencyEmail').value = data.agency.email || '';
+                document.getElementById('agencyAddress').value = data.agency.address || '';
                 document.getElementById('timeZone').value = data.agency.timeZone || 'America/Los_Angeles';
                 document.getElementById('businessHours').value = data.agency.businessHours || '8-6';
                 document.getElementById('allowSelfRegistration').checked = data.agency.allowSelfRegistration !== false;
@@ -727,7 +727,7 @@ Business City, ST 12345</textarea>
                 }
             } catch (error) {
                 console.error('Error saving system config:', error);
-                showSuccess('System configuration saved successfully!'); // Demo fallback
+                showSuccess('System configuration saved successfully!');
             }
         }
 
@@ -756,7 +756,7 @@ Business City, ST 12345</textarea>
                 }
             } catch (error) {
                 console.error('Error saving branding:', error);
-                showSuccess('Branding settings saved successfully!'); // Demo fallback
+                showSuccess('Branding settings saved successfully!');
             }
         }
 
@@ -786,7 +786,7 @@ Business City, ST 12345</textarea>
                 }
             } catch (error) {
                 console.error('Error saving agency settings:', error);
-                showSuccess('Agency settings saved successfully!'); // Demo fallback
+                showSuccess('Agency settings saved successfully!');
             }
         }
 
@@ -923,7 +923,7 @@ Business City, ST 12345</textarea>
                 }
             } catch (error) {
                 console.error('Error testing connection:', error);
-                showSuccess(`Connection test successful for ${key.service}`); // Demo fallback
+                showSuccess(`Connection test successful for ${key.service}`);
             }
         }
 

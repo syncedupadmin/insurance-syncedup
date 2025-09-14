@@ -804,11 +804,11 @@
                     console.error('Failed to load agent data:', response.status, response.statusText);
                     const errorData = await response.text();
                     console.error('Error details:', errorData);
-                    showSampleData();
+                    showErrorState();
                 }
             } catch (error) {
                 console.error('Failed to load agent data:', error);
-                showSampleData();
+                showErrorState();
             }
         }
         
@@ -906,27 +906,38 @@
             renderAgentTable(data.agentList || []);
         }
         
-        function showSampleData() {
-            // Show sample/demo data when API is not available
-            const sampleData = {
+        function showErrorState() {
+            // Show error state when API is not available
+            const errorData = {
                 stats: {
-                    totalCalls: 0,
-                    callsRinging: 0,
-                    outboundWaiting: 0,
-                    inboundWaiting: 1,
-                    messagesPlaying: 0
+                    totalCalls: '--',
+                    callsRinging: '--',
+                    outboundWaiting: '--',
+                    inboundWaiting: '--',
+                    messagesPlaying: '--'
                 },
                 agents: {
-                    loggedIn: 0,
-                    waiting: 0,
-                    inCall: 0,
-                    inDispo: 0,
-                    paused: 0,
-                    deadCall: 0
+                    loggedIn: '--',
+                    waiting: '--',
+                    inCall: '--',
+                    inDispo: '--',
+                    paused: '--',
+                    deadCall: '--'
                 },
                 agentList: []
             };
-            updateDashboard(sampleData);
+            updateDashboard(errorData);
+
+            // Show error message in agent table
+            const tbody = document.getElementById('agent-table-body');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="11" style="text-align: center; padding: 2rem; color: #ef4444;">
+                        <div style="font-size: 1.1rem; margin-bottom: 0.5rem;">Unable to connect to Convoso API</div>
+                        <div style="font-size: 0.9rem; color: #718096;">Please check your API configuration and try again</div>
+                    </td>
+                </tr>
+            `;
         }
         
         function renderAgentTable(agents) {
