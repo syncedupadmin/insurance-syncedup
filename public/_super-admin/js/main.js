@@ -7,6 +7,21 @@ let autoRefreshInterval = null;
 let refreshIntervalTime = 30000; // 30 seconds default
 let lastRefreshTime = null;
 
+// Data cache for silent refresh
+let dataCache = {
+    dashboard: null,
+    agencies: null,
+    users: null,
+    infrastructure: null
+};
+
+// View state preservation
+let viewState = {
+    scrollPosition: 0,
+    expandedItems: new Set(),
+    selectedTab: null
+};
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
@@ -507,7 +522,7 @@ async function loadAgencyManagement() {
                 `<button class="btn btn-sm btn-success" onclick="reactivateAgency('${agency.id}')">REACTIVATE</button>`;
             
             return `
-                <tr>
+                <tr data-agency-id="${agency.id}">
                     <td>${agency.name}</td>
                     <td class="${statusClass}">${statusText}</td>
                     <td>${agency.subscription_plan || 'free'}</td>
@@ -589,7 +604,7 @@ async function loadAgencyManagement() {
                                 `<button class="btn btn-sm btn-success" onclick="reactivateAgency('${agency.id}')">REACTIVATE</button>`;
 
                             return `
-                                <tr>
+                                <tr data-agency-id="${agency.id}">
                                     <td>${agency.name}</td>
                                     <td class="${statusClass}">${statusText}</td>
                                     <td>${agency.subscription_plan || 'free'}</td>
@@ -2679,6 +2694,76 @@ function loadFromHistory(index) {
 }
 // ============= AUTO-REFRESH FUNCTIONS =============
 
+// Silent refresh helper functions
+function saveViewState() {
+    viewState.scrollPosition = window.scrollY;
+    // Save expanded items, selected tabs, etc.
+    const expandedElements = document.querySelectorAll('.expanded');
+    viewState.expandedItems.clear();
+    expandedElements.forEach(el => {
+        if (el.dataset.id) viewState.expandedItems.add(el.dataset.id);
+    });
+}
+
+function restoreViewState() {
+    window.scrollTo(0, viewState.scrollPosition);
+    viewState.expandedItems.forEach(id => {
+        const element = document.querySelector(`[data-id="${id}"]`);
+        if (element) element.classList.add('expanded');
+    });
+}
+
+function updateMetricValue(selector, newValue, animate = true) {
+    const element = document.querySelector(selector);
+    if (!element) return;
+
+    const oldValue = element.textContent;
+    if (oldValue !== newValue.toString()) {
+        if (animate) {
+            element.style.transition = 'opacity 0.3s ease';
+            element.style.opacity = '0.5';
+            setTimeout(() => {
+                element.textContent = newValue;
+                element.style.opacity = '1';
+            }, 150);
+        } else {
+            element.textContent = newValue;
+        }
+    }
+}
+
+function updateTableRow(tableId, rowId, newRowHtml) {
+    const table = document.getElementById(tableId);
+    if (!table) return;
+
+    const existingRow = table.querySelector(`tr[data-id="${rowId}"]`);
+    if (existingRow) {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = `<table><tbody>${newRowHtml}</tbody></table>`;
+        const newRow = tempDiv.querySelector('tr');
+
+        if (existingRow.innerHTML !== newRow.innerHTML) {
+            existingRow.style.transition = 'background-color 0.5s ease';
+            existingRow.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+            existingRow.innerHTML = newRow.innerHTML;
+            setTimeout(() => {
+                existingRow.style.backgroundColor = '';
+            }, 500);
+        }
+    }
+}
+
+async function silentFetch(url) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return await response.json();
+    } catch (error) {
+        console.error('Silent fetch error:', error);
+        return null;
+    }
+}
+
 function startAutoRefresh() {
     // Clear any existing interval
     if (autoRefreshInterval) {
@@ -2702,31 +2787,71 @@ function stopAutoRefresh() {
 }
 
 function refreshCurrentView() {
-    // Add subtle visual indicator
-    showRefreshIndicator();
-    
-    // Refresh based on current view
-    switch(currentView) {
-        case 'dashboard':
-            loadRevenueDashboard();
-            break;
-        case 'users':
-            loadUserManagement();
-            break;
-        case 'agencies':
-            loadAgencyManagement();
-            break;
-        case 'infrastructure':
-            loadInfrastructure();
-            break;
-        case 'database':
-            loadDatabaseTables();
-            break;
+    // Use silent refresh for auto-refresh, regular refresh for manual
+    const isSilent = !event || event.type !== 'click';
+
+    if (isSilent) {
+        silentRefreshCurrentView();
+    } else {
+        // Manual refresh - show indicator
+        showRefreshIndicator();
+
+        // Regular refresh for manual trigger
+        switch(currentView) {
+            case 'dashboard':
+                loadRevenueDashboard();
+                break;
+            case 'users':
+                loadUserManagement();
+                break;
+            case 'agencies':
+                loadAgencyManagement();
+                break;
+            case 'infrastructure':
+                loadInfrastructure();
+                break;
+            case 'database':
+                loadDatabaseTables();
+                break;
+        }
     }
 
     // Update last refresh time
     lastRefreshTime = new Date();
     updateRefreshStatus();
+}
+
+async function silentRefreshCurrentView() {
+    // Save current state
+    saveViewState();
+
+    // Show subtle indicator in corner
+    showSilentRefreshIndicator();
+
+    // Refresh based on current view
+    switch(currentView) {
+        case 'dashboard':
+            await silentRefreshDashboard();
+            break;
+        case 'users':
+            await silentRefreshUsers();
+            break;
+        case 'agencies':
+            await silentRefreshAgencies();
+            break;
+        case 'infrastructure':
+            await silentRefreshInfrastructure();
+            break;
+        case 'database':
+            // Database view doesn't need silent refresh
+            break;
+    }
+
+    // Restore state
+    restoreViewState();
+
+    // Hide indicator
+    hideSilentRefreshIndicator();
 }
 
 function showRefreshIndicator() {
@@ -2760,6 +2885,221 @@ function showRefreshIndicator() {
     setTimeout(() => {
         indicator.style.display = 'none';
     }, 1000);
+}
+
+function showSilentRefreshIndicator() {
+    let indicator = document.getElementById('silent-refresh-indicator');
+    if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.id = 'silent-refresh-indicator';
+        indicator.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #10b981;
+            padding: 6px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        `;
+        indicator.innerHTML = '<i class="fas fa-sync fa-spin" style="font-size: 10px;"></i> Updating...';
+        document.body.appendChild(indicator);
+    }
+
+    indicator.style.display = 'flex';
+    setTimeout(() => {
+        indicator.style.opacity = '0.8';
+    }, 10);
+}
+
+function hideSilentRefreshIndicator() {
+    const indicator = document.getElementById('silent-refresh-indicator');
+    if (indicator) {
+        indicator.style.opacity = '0';
+        setTimeout(() => {
+            indicator.style.display = 'none';
+        }, 300);
+    }
+}
+
+// Silent refresh implementations for each view
+async function silentRefreshDashboard() {
+    const data = await silentFetch('/api/super-admin/revenue-metrics');
+    if (!data || !data.success) return;
+
+    // Only update if we have the dashboard view active
+    const mainContent = document.getElementById('main-content');
+    if (!mainContent || !mainContent.querySelector('.metrics-row')) return;
+
+    // Update metrics with animation
+    const metrics = data.metrics;
+    if (metrics) {
+        // Update MRR
+        const mrrElement = mainContent.querySelector('.metric-card:nth-child(1) .metric-value');
+        if (mrrElement) updateMetricValue('.metric-card:nth-child(1) .metric-value', `$${metrics.mrr.toLocaleString()}`);
+
+        // Update Total Agencies
+        const agenciesElement = mainContent.querySelector('.metric-card:nth-child(2) .metric-value');
+        if (agenciesElement) updateMetricValue('.metric-card:nth-child(2) .metric-value', metrics.total_agencies);
+
+        // Update Active Users
+        const usersElement = mainContent.querySelector('.metric-card:nth-child(3) .metric-value');
+        if (usersElement) updateMetricValue('.metric-card:nth-child(3) .metric-value', metrics.active_users);
+
+        // Update Active Agents
+        const agentsElement = mainContent.querySelector('.metric-card:nth-child(4) .metric-value');
+        if (agentsElement) updateMetricValue('.metric-card:nth-child(4) .metric-value', metrics.active_agents);
+    }
+
+    // Update agencies table rows
+    const tbody = mainContent.querySelector('.data-table tbody');
+    if (tbody && data.agencies) {
+        data.agencies.forEach(agency => {
+            const row = tbody.querySelector(`tr[data-agency-id="${agency.id}"]`);
+            if (row) {
+                // Update status if changed
+                const statusCell = row.querySelector('.status-active, .status-inactive');
+                if (statusCell) {
+                    const newStatusClass = agency.is_active ? 'status-active' : 'status-inactive';
+                    const newStatusText = agency.is_active ? 'Active' : 'Suspended';
+                    if (!statusCell.classList.contains(newStatusClass)) {
+                        statusCell.className = newStatusClass;
+                        statusCell.textContent = newStatusText;
+                    }
+                }
+                // Update user count
+                const userCountCell = row.cells[3];
+                if (userCountCell) {
+                    const newCount = `${agency.user_count || 0} users`;
+                    if (userCountCell.textContent !== newCount) {
+                        userCountCell.style.transition = 'color 0.3s ease';
+                        userCountCell.style.color = '#10b981';
+                        userCountCell.textContent = newCount;
+                        setTimeout(() => {
+                            userCountCell.style.color = '';
+                        }, 300);
+                    }
+                }
+            }
+        });
+    }
+
+    // Cache the data
+    dataCache.dashboard = data;
+}
+
+async function silentRefreshUsers() {
+    const [usersResponse, agenciesResponse] = await Promise.all([
+        silentFetch('/api/super-admin/users'),
+        silentFetch('/api/super-admin/agencies-management')
+    ]);
+
+    if (!usersResponse || !agenciesResponse) return;
+
+    const mainContent = document.getElementById('main-content');
+    if (!mainContent || !mainContent.querySelector('#grouped-view')) return;
+
+    // Update user counts in metrics
+    const totalUsersMetric = mainContent.querySelector('.metric-card:nth-child(1) .metric-value');
+    if (totalUsersMetric && usersResponse.users) {
+        updateMetricValue('.metric-card:nth-child(1) .metric-value', usersResponse.users.length);
+    }
+
+    const activeUsersMetric = mainContent.querySelector('.metric-card:nth-child(2) .metric-value');
+    if (activeUsersMetric && usersResponse.users) {
+        const activeCount = usersResponse.users.filter(u => u.is_active).length;
+        updateMetricValue('.metric-card:nth-child(2) .metric-value', activeCount);
+    }
+
+    // Update individual user rows without rebuilding the entire DOM
+    // This preserves dropdowns, selections, etc.
+    const groupedView = mainContent.querySelector('#grouped-view');
+    if (groupedView && usersResponse.users) {
+        usersResponse.users.forEach(user => {
+            const userRow = groupedView.querySelector(`tr[data-email="${user.email.toLowerCase()}"]`);
+            if (userRow) {
+                // Update status
+                const statusCell = userRow.cells[3];
+                if (statusCell) {
+                    const newStatusClass = user.is_active ? 'status-active' : 'status-inactive';
+                    const newStatusText = user.is_active ? 'Active' : 'Inactive';
+                    if (statusCell.className !== newStatusClass) {
+                        statusCell.className = newStatusClass;
+                        statusCell.textContent = newStatusText;
+                    }
+                }
+                // Update last login
+                const lastLoginCell = userRow.cells[4];
+                if (lastLoginCell) {
+                    const newLastLogin = user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never';
+                    if (lastLoginCell.textContent !== newLastLogin) {
+                        lastLoginCell.textContent = newLastLogin;
+                    }
+                }
+            }
+        });
+    }
+
+    // Cache the data
+    dataCache.users = { users: usersResponse.users, agencies: agenciesResponse.agencies };
+}
+
+async function silentRefreshAgencies() {
+    const data = await silentFetch('/api/super-admin/agencies-management');
+    if (!data || !data.success) return;
+
+    const mainContent = document.getElementById('main-content');
+    if (!mainContent || !mainContent.querySelector('.data-table')) return;
+
+    // Update metrics
+    if (data.agencies) {
+        const totalAgenciesMetric = mainContent.querySelector('.metric-card:nth-child(1) .metric-value');
+        if (totalAgenciesMetric) updateMetricValue('.metric-card:nth-child(1) .metric-value', data.agencies.length);
+
+        const activeAgenciesMetric = mainContent.querySelector('.metric-card:nth-child(2) .metric-value');
+        if (activeAgenciesMetric) {
+            const activeCount = data.agencies.filter(a => a.is_active).length;
+            updateMetricValue('.metric-card:nth-child(2) .metric-value', activeCount);
+        }
+    }
+
+    // Update table rows
+    const tbody = mainContent.querySelector('.data-table tbody');
+    if (tbody && data.agencies) {
+        data.agencies.forEach(agency => {
+            const row = tbody.querySelector(`tr[data-agency-id="${agency.id}"]`);
+            if (row) {
+                // Update cells as needed
+                const statusCell = row.querySelector('.status-active, .status-inactive');
+                if (statusCell) {
+                    const newStatusClass = agency.is_active ? 'status-active' : 'status-inactive';
+                    const newStatusText = agency.is_active ? 'Active' : 'Suspended';
+                    if (!statusCell.classList.contains(newStatusClass)) {
+                        statusCell.className = newStatusClass;
+                        statusCell.textContent = newStatusText;
+                    }
+                }
+            }
+        });
+    }
+
+    // Cache the data
+    dataCache.agencies = data;
+}
+
+async function silentRefreshInfrastructure() {
+    // Infrastructure view typically doesn't need frequent updates
+    // But we can implement if needed
+    const data = await silentFetch('/api/super-admin/infrastructure');
+    if (data) {
+        dataCache.infrastructure = data;
+    }
 }
 
 function addRefreshControls() {
