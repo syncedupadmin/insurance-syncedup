@@ -6,9 +6,43 @@
     (function(){
         var t=localStorage.getItem("adminTheme")||"professional";
         var h=document.documentElement;
-        if(t==="classic"){h.classList.add("classic-mode");h.style.backgroundColor="#008080";}
-        else if(t==="modern"){h.classList.add("modern-mode");h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        h.classList.add(t+"-mode");
+
+        // Load theme CSS immediately
+        var existingTheme = document.querySelector('link[data-theme-css]');
+        if(existingTheme) existingTheme.remove();
+
+        if(t==="modern"){
+            // Load modern base styles (structure only)
+            var baseLink = document.createElement('link');
+            baseLink.rel = 'stylesheet';
+            baseLink.href = '/css/themes/modern-base.css';
+            baseLink.setAttribute('data-theme-css', 'modern-base');
+            document.head.appendChild(baseLink);
+            // Admin portal purple colors are in admin-global.css
+        } else {
+            // Load traditional theme CSS
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = '/css/themes/' + t + '.css';
+            link.setAttribute('data-theme-css', t);
+            document.head.appendChild(link);
+        }
+
+        // Add body class when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            if(document.body) {
+                document.body.classList.add('portal-admin');
+                document.body.classList.add(t+"-mode");
+            }
+        });
+
+        // Set background for immediate visual feedback (purple colors for admin)
+        if(t==="classic"){h.style.background="linear-gradient(-45deg,#6b46c1,#7c3aed,#8b5cf6,#a78bfa)";}
+        else if(t==="modern"){h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        else if(t==="professional"){h.style.background="linear-gradient(-45deg,#4c1d95,#5b21b6,#6d28d9,#7c3aed)";}
         else{h.style.background="linear-gradient(-45deg,#4c1d95,#5b21b6,#6d28d9,#7c3aed)";}
+
         h.style.visibility="hidden";
         setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
     })();
@@ -16,11 +50,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vendor Management - SyncedUp Insurance Admin</title>
-    <link rel="stylesheet" href="/admin/admin-global.css">
+    <link rel="stylesheet" href="admin-global.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="/js/auth-helper.js"></script>
-    <script src="/_admin/components/navigation.js"></script>
-    <script src="/_admin/components/global-header.js"></script>
+    <script src="components/navigation.js"></script>
+    <script src="components/global-header.js"></script>
 </head>
 <body>
     <!-- Global Header Mount Point -->

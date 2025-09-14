@@ -111,8 +111,7 @@
                         <option value="all">All Roles</option>
                         <option value="agent">Agents</option>
                         <option value="manager">Managers</option>
-                        <option value="admin">Admins</option>
-                        <option value="super-admin">Super Admins</option>
+                        <option value="customer_service">Customer Service</option>
                     </select>
                 </div>
                 <div>
@@ -231,8 +230,7 @@
                             <option value="">Select Role...</option>
                             <option value="agent">Agent</option>
                             <option value="manager">Manager</option>
-                            <option value="admin">Admin</option>
-                            <option value="super-admin">Super Admin</option>
+                            <option value="customer_service">Customer Service</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -356,7 +354,12 @@
 
         async function loadUsersData() {
             try {
-                const response = await SyncedUpAuth.authenticatedFetch('/api/admin/users');
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch('/api/admin/users', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 const users = response.ok ? (await response.json()).data || [] : [];
                 usersData = users.length > 0 ? users.map(user => ({
                     user_id: user.id,
@@ -372,18 +375,12 @@
                     last_login: user.lastLogin || 'Never'
                 })) : [];
                 
-                // If no data from API, load fallback data
-                if (usersData.length === 0) {
-                    console.log('No users from API, loading fallback data');
-                    loadFallbackUsersData();
-                }
                 
                 filteredUsers = [...usersData];
             } catch (error) {
                 console.error('Error loading users data:', error);
-                console.log('Loading fallback data due to error');
-                loadFallbackUsersData();
-                filteredUsers = [...usersData];
+                usersData = [];
+                filteredUsers = [];
             }
         }
 
@@ -651,13 +648,23 @@
 
                 let response;
                 if (editingUserId) {
-                    response = await SyncedUpAuth.authenticatedFetch(`/api/admin/users/${editingUserId}`, {
+                    const token = localStorage.getItem('auth_token');
+                    response = await fetch(`/api/admin/users/${editingUserId}`, {
                         method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify(userData)
                     });
                 } else {
-                    response = await SyncedUpAuth.authenticatedFetch('/api/admin/users', {
+                    const token = localStorage.getItem('auth_token');
+                    response = await fetch('/api/admin/users', {
                         method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify(userData)
                     });
                 }
@@ -682,8 +689,12 @@
             }
 
             try {
-                const response = await SyncedUpAuth.authenticatedFetch(`/api/admin/user-management/${userId}`, {
-                    method: 'DELETE'
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch(`/api/admin/users/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
 
                 if (response.ok) {
@@ -720,8 +731,13 @@
             if (selectedUsers.length === 0) return;
             
             try {
-                const response = await SyncedUpAuth.authenticatedFetch('/api/admin/user-management/bulk', {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch('/api/admin/users/bulk', {
                     method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
                         user_ids: selectedUsers,
                         action: 'activate'
@@ -746,8 +762,13 @@
             if (selectedUsers.length === 0) return;
             
             try {
-                const response = await SyncedUpAuth.authenticatedFetch('/api/admin/user-management/bulk', {
+                const token = localStorage.getItem('auth_token');
+                const response = await fetch('/api/admin/users/bulk', {
                     method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
                         user_ids: selectedUsers,
                         action: 'deactivate'
@@ -823,69 +844,6 @@
             showSuccessMessage('Users list refreshed!');
         }
 
-        // Fallback Data
-        function loadFallbackUsersData() {
-            usersData = [
-                {
-                    user_id: '1',
-                    first_name: 'Sarah',
-                    last_name: 'Johnson',
-                    email: 'sarah.johnson@syncedup.com',
-                    role: 'agent',
-                    team: 'alpha',
-                    status: 'active',
-                    phone: '(555) 123-4567',
-                    license_number: 'FL-12345',
-                    license_expiry: '2025-12-31',
-                    last_login: '2024-01-15',
-                    performance_score: 92,
-                    notes: 'Top performer'
-                },
-                {
-                    user_id: '2',
-                    first_name: 'Mike',
-                    last_name: 'Chen',
-                    email: 'mike.chen@syncedup.com',
-                    role: 'agent',
-                    team: 'beta',
-                    status: 'active',
-                    phone: '(555) 234-5678',
-                    license_number: 'FL-23456',
-                    license_expiry: '2025-08-15',
-                    last_login: '2024-01-14',
-                    performance_score: 88,
-                    notes: 'Consistent performer'
-                },
-                {
-                    user_id: '3',
-                    first_name: 'Lisa',
-                    last_name: 'Rodriguez',
-                    email: 'lisa.rodriguez@syncedup.com',
-                    role: 'manager',
-                    team: 'management',
-                    status: 'active',
-                    phone: '(555) 345-6789',
-                    last_login: '2024-01-15',
-                    notes: 'Team lead for Sales Alpha'
-                },
-                {
-                    user_id: '4',
-                    first_name: 'David',
-                    last_name: 'Wilson',
-                    email: 'david.wilson@syncedup.com',
-                    role: 'agent',
-                    team: null,
-                    status: 'pending',
-                    phone: '(555) 456-7890',
-                    license_number: null,
-                    license_expiry: null,
-                    last_login: null,
-                    performance_score: 0,
-                    notes: 'New hire - pending activation'
-                }
-            ];
-            filteredUsers = [...usersData];
-        }
 
         // Utility Functions
         function showSuccessMessage(message) {

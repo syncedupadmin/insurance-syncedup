@@ -2,12 +2,19 @@
 let currentView = 'dashboard';
 let currentUser = null;
 
+// Auto-refresh variables
+let autoRefreshInterval = null;
+let refreshIntervalTime = 30000; // 30 seconds default
+let lastRefreshTime = null;
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     updateTime();
     setInterval(updateTime, 60000);
     loadRevenueDashboard();
+    startAutoRefresh();
+    addRefreshControls();
 });
 
 // Check authentication
@@ -83,7 +90,7 @@ async function testEdgeFunction() {
 
     try {
         // Test stats endpoint
-        const response = await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/stats', {
+        const response = await fetch('/api/super-admin/edge-proxy?endpoint=stats', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -972,7 +979,7 @@ async function loadDatabaseTables() {
 
     try {
         const token = localStorage.getItem('auth_token');
-        const response = await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/tables', {
+        const response = await fetch('/api/super-admin/database-tables', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -1062,7 +1069,7 @@ async function showTableInfo(tableName) {
     const token = localStorage.getItem('auth_token');
 
     try {
-        const response = await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/table-info', {
+        const response = await fetch('/api/super-admin/edge-proxy?endpoint=table-info', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -1132,7 +1139,7 @@ async function copyTableStructure(tableName) {
     const token = localStorage.getItem('auth_token');
 
     try {
-        const response = await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/table-ddl', {
+        const response = await fetch('/api/super-admin/edge-proxy?endpoint=table-ddl', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -1625,6 +1632,12 @@ async function handleCreateAgency(e) {
             // Close form and reload agencies
             closeCreateAgencyForm();
             loadAgencyManagement();
+
+            // Also refresh main dashboard if it's visible
+            const mainContent = document.getElementById('main-content');
+            if (mainContent && mainContent.innerHTML.includes('TOTAL AGENCIES')) {
+                loadRevenueDashboard();
+            }
         } else {
             throw new Error(result.error || 'Failed to create agency');
         }
@@ -1665,20 +1678,23 @@ async function loadUserManagement() {
             agencyMap[agency.id] = agency.name;
         });
 
-        // Group users by agency
+        // Initialize usersByAgency with ALL agencies first
         const usersByAgency = {};
         const usersWithoutAgency = [];
 
+        // Add all agencies to usersByAgency, even if they have no users
+        agencies.forEach(agency => {
+            usersByAgency[agency.id] = {
+                name: agency.name,
+                users: []
+            };
+        });
+
+        // Now add users to their respective agencies
         users.forEach(user => {
-            if (user.agency_id) {
-                if (!usersByAgency[user.agency_id]) {
-                    usersByAgency[user.agency_id] = {
-                        name: agencyMap[user.agency_id] || `Agency ${user.agency_id.substring(0, 8)}`,
-                        users: []
-                    };
-                }
+            if (user.agency_id && usersByAgency[user.agency_id]) {
                 usersByAgency[user.agency_id].users.push(user);
-            } else {
+            } else if (!user.agency_id) {
                 usersWithoutAgency.push(user);
             }
         });
@@ -1777,7 +1793,7 @@ async function loadUserManagement() {
                                             <td>${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
                                             <td>
                                                 <button class="btn btn-sm btn-primary" onclick="editUser('${user.id}')">Edit</button>
-                                                <button class="btn btn-sm" onclick="resetUserPassword('${user.id}', '${user.email}')">Reset Password</button>
+                                                <button class="btn btn-sm" onclick="resetUserPassword('${user.auth_user_id || user.id}', '${user.email}')">Reset Password</button>
                                                 <button class="btn btn-sm ${user.is_active ? 'btn-danger' : 'btn-success'}"
                                                         onclick="toggleUserStatus('${user.id}', ${!user.is_active})">
                                                     ${user.is_active ? 'Deactivate' : 'Activate'}
@@ -1829,7 +1845,7 @@ async function loadUserManagement() {
                                             <td>${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
                                             <td>
                                                 <button class="btn btn-sm btn-primary" onclick="editUser('${user.id}')">Edit</button>
-                                                <button class="btn btn-sm" onclick="resetUserPassword('${user.id}', '${user.email}')">Reset Password</button>
+                                                <button class="btn btn-sm" onclick="resetUserPassword('${user.auth_user_id || user.id}', '${user.email}')">Reset Password</button>
                                                 <button class="btn btn-sm ${user.is_active ? 'btn-danger' : 'btn-success'}"
                                                         onclick="toggleUserStatus('${user.id}', ${!user.is_active})">
                                                     ${user.is_active ? 'Deactivate' : 'Activate'}
@@ -1879,7 +1895,7 @@ async function loadUserManagement() {
                                     <td>${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
                                     <td>
                                         <button class="btn btn-sm btn-primary" onclick="editUser('${user.id}')">Edit</button>
-                                        <button class="btn btn-sm" onclick="resetUserPassword('${user.id}', '${user.email}')">Reset Password</button>
+                                        <button class="btn btn-sm" onclick="resetUserPassword('${user.auth_user_id || user.id}', '${user.email}')">Reset Password</button>
                                         <button class="btn btn-sm ${user.is_active ? 'btn-danger' : 'btn-success'}"
                                                 onclick="toggleUserStatus('${user.id}', ${!user.is_active})">
                                             ${user.is_active ? 'Deactivate' : 'Activate'}
@@ -1954,7 +1970,7 @@ async function inviteUser() {
 
     try {
         const token = localStorage.getItem('auth_token');
-        const response = await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/users', {
+        const response = await fetch('/api/super-admin/edge-proxy?endpoint=users', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -1994,15 +2010,15 @@ async function resetUserPassword(userId, email) {
     try {
         const token = localStorage.getItem('auth_token');
 
-        // Use the actual reset-password endpoint
-        const response = await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/reset-password', {
+        // Use direct API endpoint
+        const response = await fetch('/api/super-admin/reset-password', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                user_id: userId
+                user_id: userId  // Edge Function expects user_id
             })
         });
 
@@ -2041,7 +2057,7 @@ async function resetUserPassword(userId, email) {
 async function changeUserRole(userId, newRole) {
     try {
         const token = localStorage.getItem('auth_token');
-        const response = await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/users', {
+        const response = await fetch('/api/super-admin/edge-proxy?endpoint=users', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -2107,7 +2123,7 @@ async function assignToAgency(userId) {
         if (!selectedAgency) return;
 
         const token = localStorage.getItem('auth_token');
-        const assignResponse = await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/users', {
+        const assignResponse = await fetch('/api/super-admin/edge-proxy?endpoint=users', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -2195,7 +2211,7 @@ async function handleCreateUser(e) {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating user...';
 
         const token = localStorage.getItem('auth_token');
-        const response = await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/users', {
+        const response = await fetch('/api/super-admin/create-user', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -2208,7 +2224,7 @@ async function handleCreateUser(e) {
                 metadata: {
                     role: formData.role,
                     full_name: formData.name || formData.email.split('@')[0],
-                    agency_id: formData.agency_id || 'AGENCY001'
+                    agency_id: formData.agency_id || null
                 }
             })
         });
@@ -2319,7 +2335,7 @@ async function handleEditUser(e) {
 
         // Update role
         if (formData.role) {
-            await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/users', {
+            await fetch('/api/super-admin/edge-proxy?endpoint=users', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -2335,7 +2351,7 @@ async function handleEditUser(e) {
 
         // Update agency
         if (formData.agency_id !== undefined) {
-            await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/users', {
+            await fetch('/api/super-admin/edge-proxy?endpoint=users', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -2376,7 +2392,7 @@ async function sendPasswordResetEmail() {
 
     try {
         const token = localStorage.getItem('auth_token');
-        const response = await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/users', {
+        const response = await fetch('/api/super-admin/edge-proxy?endpoint=users', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -2414,7 +2430,7 @@ async function deleteUser() {
 
     try {
         const token = localStorage.getItem('auth_token');
-        const response = await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/users', {
+        const response = await fetch('/api/super-admin/edge-proxy?endpoint=users', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -2522,7 +2538,7 @@ async function executeSQL() {
 
     try {
         const token = localStorage.getItem('auth_token');
-        const response = await fetch('https://zgkszwkxibpnxhvlenct.supabase.co/functions/v1/admin-gateway/sql', {
+        const response = await fetch('/api/super-admin/edge-proxy?endpoint=sql', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -2661,3 +2677,206 @@ function loadFromHistory(index) {
         document.getElementById('sql-history').style.display = 'none';
     }
 }
+// ============= AUTO-REFRESH FUNCTIONS =============
+
+function startAutoRefresh() {
+    // Clear any existing interval
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+    }
+
+    // Set up new interval
+    autoRefreshInterval = setInterval(() => {
+        refreshCurrentView();
+    }, refreshIntervalTime);
+
+    // Update last refresh time
+    lastRefreshTime = new Date();
+}
+
+function stopAutoRefresh() {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+        autoRefreshInterval = null;
+    }
+}
+
+function refreshCurrentView() {
+    // Add subtle visual indicator
+    showRefreshIndicator();
+    
+    // Refresh based on current view
+    switch(currentView) {
+        case 'dashboard':
+            loadRevenueDashboard();
+            break;
+        case 'users':
+            loadUserManagement();
+            break;
+        case 'agencies':
+            loadAgencyManagement();
+            break;
+        case 'infrastructure':
+            loadInfrastructure();
+            break;
+        case 'database':
+            loadDatabaseTables();
+            break;
+    }
+
+    // Update last refresh time
+    lastRefreshTime = new Date();
+    updateRefreshStatus();
+}
+
+function showRefreshIndicator() {
+    // Create or get refresh indicator
+    let indicator = document.getElementById('refresh-indicator');
+    if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.id = 'refresh-indicator';
+        indicator.style.cssText = `
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        `;
+        indicator.innerHTML = '<i class="fas fa-sync fa-spin"></i> Refreshing...';
+        document.body.appendChild(indicator);
+    }
+
+    // Show indicator
+    indicator.style.display = 'flex';
+    
+    // Hide after 1 second
+    setTimeout(() => {
+        indicator.style.display = 'none';
+    }, 1000);
+}
+
+function addRefreshControls() {
+    // Add refresh controls to header
+    const header = document.querySelector('.header');
+    if (!header) return;
+
+    const refreshControls = document.createElement('div');
+    refreshControls.id = 'refresh-controls';
+    refreshControls.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-left: auto;
+        margin-right: 20px;
+        font-size: 14px;
+    `;
+
+    refreshControls.innerHTML = `
+        <div id="refresh-status" style="color: #8b92a5;">
+            <i class="fas fa-clock"></i> 
+            <span id="last-refresh">Never</span>
+        </div>
+        <select id="refresh-interval" style="
+            background: #1a1a1a;
+            color: white;
+            border: 1px solid #444;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        " onchange="updateRefreshInterval(this.value)">
+            <option value="0">Auto-refresh: OFF</option>
+            <option value="10000">Every 10 seconds</option>
+            <option value="30000" selected>Every 30 seconds</option>
+            <option value="60000">Every 1 minute</option>
+            <option value="300000">Every 5 minutes</option>
+        </select>
+        <button class="btn btn-sm" onclick="refreshCurrentView()" style="
+            padding: 5px 12px;
+            font-size: 12px;
+        ">
+            <i class="fas fa-sync"></i> Refresh Now
+        </button>
+    `;
+
+    // Find the time display and insert after it
+    const timeDisplay = document.getElementById('time');
+    if (timeDisplay && timeDisplay.parentNode) {
+        timeDisplay.parentNode.insertBefore(refreshControls, timeDisplay.nextSibling);
+    } else {
+        header.appendChild(refreshControls);
+    }
+
+    // Start status updates
+    updateRefreshStatus();
+    setInterval(updateRefreshStatus, 1000);
+}
+
+function updateRefreshInterval(value) {
+    refreshIntervalTime = parseInt(value);
+    
+    if (refreshIntervalTime === 0) {
+        stopAutoRefresh();
+        document.getElementById('last-refresh').textContent = 'Auto-refresh disabled';
+    } else {
+        startAutoRefresh();
+        document.getElementById('last-refresh').textContent = 'Just now';
+    }
+}
+
+function updateRefreshStatus() {
+    if (!lastRefreshTime) return;
+    
+    const statusElement = document.getElementById('last-refresh');
+    if (!statusElement) return;
+
+    const now = new Date();
+    const diff = Math.floor((now - lastRefreshTime) / 1000);
+
+    if (diff < 60) {
+        statusElement.textContent = diff === 0 ? 'Just now' : `${diff}s ago`;
+    } else if (diff < 3600) {
+        const minutes = Math.floor(diff / 60);
+        statusElement.textContent = `${minutes}m ago`;
+    } else {
+        const hours = Math.floor(diff / 3600);
+        statusElement.textContent = `${hours}h ago`;
+    }
+}
+
+// Update currentView when navigation happens
+const originalLoadRevenueDashboard = loadRevenueDashboard;
+loadRevenueDashboard = function() {
+    currentView = 'dashboard';
+    return originalLoadRevenueDashboard.apply(this, arguments);
+};
+
+const originalLoadUserManagement = loadUserManagement;
+loadUserManagement = function() {
+    currentView = 'users';
+    return originalLoadUserManagement.apply(this, arguments);
+};
+
+const originalLoadAgencyManagement = loadAgencyManagement;
+loadAgencyManagement = function() {
+    currentView = 'agencies';
+    return originalLoadAgencyManagement.apply(this, arguments);
+};
+
+const originalLoadInfrastructure = loadInfrastructure;
+loadInfrastructure = function() {
+    currentView = 'infrastructure';
+    return originalLoadInfrastructure.apply(this, arguments);
+};
+
+const originalLoadDatabaseTables = loadDatabaseTables;
+loadDatabaseTables = function() {
+    currentView = 'database';
+    return originalLoadDatabaseTables.apply(this, arguments);
+};

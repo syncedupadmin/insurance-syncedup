@@ -17,16 +17,34 @@ async function resetPasswordHandler(req, res) {
         return res.status(400).json({ error: 'User ID is required' });
       }
 
-      // Get the user (only allow password reset for agents)
+      // Get current admin user from request
+      const currentUser = req.user;
+      const isAdmin = currentUser?.role === 'admin';
+      const isSuperAdmin = currentUser?.role === 'super_admin';
+
+      // Get the target user
       const { data: user, error: userError } = await supabase
         .from('portal_users')
         .select('*')
         .eq('id', userId)
-        .eq('role', 'agent')
         .single();
 
       if (userError || !user) {
         return res.status(404).json({ error: 'User not found' });
+      }
+
+      // Permission checks based on role
+      if (isAdmin) {
+        // Admin can only reset passwords for agents/managers in their agency
+        if (user.agency_id !== currentUser.agency_id) {
+          return res.status(403).json({ error: 'Cannot reset password for users in other agencies' });
+        }
+        if (!['agent', 'manager'].includes(user.role)) {
+          return res.status(403).json({ error: 'Cannot reset password for admin users' });
+        }
+      } else if (!isSuperAdmin) {
+        // If not admin or super admin, deny access
+        return res.status(403).json({ error: 'Admin access required' });
       }
 
       // Generate new temporary password

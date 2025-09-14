@@ -51,7 +51,7 @@ export default async function handler(req, res) {
     .eq('id', user.id)
     .single();
 
-  // Super admin access required for user management
+  // Admin or Super admin access required for user management
   // Normalize role to handle different formats
   const normalizeRole = (role) => {
     const roleMap = {
@@ -60,10 +60,13 @@ export default async function handler(req, res) {
     };
     return roleMap[role] || role;
   };
-  
+
   const normalizedRole = normalizeRole(currentUser?.role || '');
-  if (!currentUser || normalizedRole !== 'super_admin') {
-    return res.status(403).json({ error: 'Super admin access required' });
+  const isAdmin = normalizedRole === 'admin';
+  const isSuperAdmin = normalizedRole === 'super_admin';
+
+  if (!currentUser || (!isAdmin && !isSuperAdmin)) {
+    return res.status(403).json({ error: 'Admin access required' });
   }
 
   const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown';
@@ -81,9 +84,18 @@ export default async function handler(req, res) {
       const status = req.query.status || '';
       const offset = (page - 1) * limit;
 
-      // Create agency-filtered query
-      let query = createAgencySecureQuery(supabase, 'portal_users', userContext)
-        .select('id, email, name, role, agent_code, is_active, last_login, created_at, two_factor_enabled, login_attempts, agency_id', { count: 'exact' });
+      // Create agency-filtered query - admins only see their agency, super admins see all
+      let query;
+      if (isAdmin) {
+        // Admin: filter by their agency
+        query = supabase.from('portal_users')
+          .select('id, email, name, role, agent_code, is_active, last_login, created_at, two_factor_enabled, login_attempts, agency_id', { count: 'exact' })
+          .eq('agency_id', currentUser.agency_id);
+      } else {
+        // Super admin: see all users
+        query = supabase.from('portal_users')
+          .select('id, email, name, role, agent_code, is_active, last_login, created_at, two_factor_enabled, login_attempts, agency_id', { count: 'exact' });
+      }
 
       // Apply filters
       if (search) {
@@ -144,6 +156,13 @@ export default async function handler(req, res) {
       // Validation
       if (!email || !name || !role) {
         return res.status(400).json({ error: 'Email, name, and role are required' });
+      }
+
+      // Role validation for admins - they can only create agents, managers, and customer service
+      if (isAdmin && !['agent', 'manager', 'customer_service'].includes(role)) {
+        return res.status(403).json({
+          error: 'Admins can only create agent, manager, and customer service accounts'
+        });
       }
 
       // Check if user already exists
@@ -264,9 +283,21 @@ export default async function handler(req, res) {
         return res.status(404).json({ error: 'User not found' });
       }
 
-      // Prevent modifying super admin unless you are super admin
-      if (existingUser.role === 'super_admin' && currentUser.role !== 'super_admin') {
-        return res.status(403).json({ error: 'Cannot modify super admin user' });
+      // Agency validation for admins
+      if (isAdmin && existingUser.agency_id !== currentUser.agency_id) {
+        return res.status(403).json({ error: 'Cannot modify users from other agencies' });
+      }
+
+      // Prevent modifying super admin or admin users unless you are super admin
+      if ((existingUser.role === 'super_admin' || existingUser.role === 'admin') && !isSuperAdmin) {
+        return res.status(403).json({ error: 'Cannot modify admin users' });
+      }
+
+      // Role update validation for admins
+      if (isAdmin && updates.role && !['agent', 'manager', 'customer_service'].includes(updates.role)) {
+        return res.status(403).json({
+          error: 'Admins can only assign agent, manager, or customer service roles'
+        });
       }
 
       // Hash password if provided
@@ -328,7 +359,7 @@ export default async function handler(req, res) {
       // Get user to be deleted
       const { data: userToDelete } = await supabase
         .from('portal_users')
-        .select('role, email, name')
+        .select('role, email, name, agency_id')
         .eq('id', userId)
         .single();
 
@@ -336,9 +367,19 @@ export default async function handler(req, res) {
         return res.status(404).json({ error: 'User not found' });
       }
 
-      // Prevent deleting super admin
-      if (userToDelete.role === 'super_admin') {
-        return res.status(403).json({ error: 'Cannot delete super admin user' });
+      // Agency validation for admins
+      if (isAdmin && userToDelete.agency_id !== currentUser.agency_id) {
+        return res.status(403).json({ error: 'Cannot delete users from other agencies' });
+      }
+
+      // Prevent deleting super admin or admin users unless you are super admin
+      if ((userToDelete.role === 'super_admin' || userToDelete.role === 'admin') && !isSuperAdmin) {
+        return res.status(403).json({ error: 'Cannot delete admin users' });
+      }
+
+      // Admins can only delete agents, managers, and customer service
+      if (isAdmin && !['agent', 'manager', 'customer_service'].includes(userToDelete.role)) {
+        return res.status(403).json({ error: 'Cannot delete this user type' });
       }
 
       // Prevent self-deletion
