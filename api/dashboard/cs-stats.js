@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_KEY
+    process.env.SUPABASE_SERVICE_ROLE_KEY
   );
   
   const agencyId = req.headers['x-agency-id'] || 'PHS001';

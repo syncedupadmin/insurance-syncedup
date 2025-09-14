@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Critical Theme Flash Prevention -->
+    <script>
+    (function(){
+        var t=localStorage.getItem("adminTheme")||"professional";
+        var h=document.documentElement;
+        h.classList.add(t+"-mode");
+        
+        // Load theme CSS immediately
+        var existingTheme = document.querySelector('link[data-theme-css]');
+        if(existingTheme) existingTheme.remove();
+        
+        if(t==="modern"){
+            // Load modern base styles (structure only)
+            var baseLink = document.createElement('link');
+            baseLink.rel = 'stylesheet';
+            baseLink.href = '/css/themes/modern-base.css';
+            baseLink.setAttribute('data-theme-css', 'modern-base');
+            document.head.appendChild(baseLink);
+            // Admin portal purple colors are in admin-global.css
+        } else {
+            // Load traditional theme CSS
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = '/css/themes/' + t + '.css';
+            link.setAttribute('data-theme-css', t);
+            document.head.appendChild(link);
+        }
+        
+        // Add body class when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            if(document.body) {
+                document.body.classList.add('portal-admin');
+                document.body.classList.add(t+"-mode");
+            }
+        });
+        
+        // Set background for immediate visual feedback (purple colors for admin)
+        if(t==="classic"){h.style.background="linear-gradient(-45deg,#6b46c1,#7c3aed,#8b5cf6,#a78bfa)";}
+        else if(t==="modern"){h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        else if(t==="professional"){h.style.background="linear-gradient(-45deg,#4c1d95,#5b21b6,#6d28d9,#7c3aed)";}
+        else{h.style.background="linear-gradient(-45deg,#4c1d95,#5b21b6,#6d28d9,#7c3aed)";}
+        
+        h.style.visibility="hidden";
+        setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
+    })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports & Analytics - SyncedUp Insurance</title>
+    
+    <script src="/js/auth-helper.js"></script>
+    
+    <!-- Favicons - Purple for Admin Portal -->
+    <link rel="icon" type="image/png" sizes="50x50" href="/favicons/admin-50x50.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/admin-180x180.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicons/admin-512x512.png">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/_admin/components/navigation.js"></script>
+    <script src="/_admin/components/global-header.js"></script>
+    
+    <!-- Admin Global Styles -->
+    <link rel="stylesheet" href="/_admin/admin-global.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .nav { display: flex; gap: 2rem; padding: 0 2rem; background: white; border-bottom: 1px solid #e2e8f0; overflow-x: auto; }
+        .nav a { padding: 1rem; text-decoration: none; color: #2d3748; font-weight: 500; white-space: nowrap; }
+        .nav a.active { color: #667eea; border-bottom: 2px solid #667eea; }
+        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+        .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
+        .btn { padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 0.25rem; }
+        .btn:hover { background: #5a67d8; }
+        .btn-success { background: #48bb78; }
+        .btn-warning { background: #ed8936; }
+        .btn-secondary { background: #718096; }
+        .report-grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-bottom: 2rem; }
+        .report-card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 4px solid #667eea; }
+        .report-title { font-size: 1.1rem; font-weight: 600; color: #2d3748; margin-bottom: 0.5rem; }
+        .report-desc { color: #718096; font-size: 0.9rem; margin-bottom: 1rem; }
+        .chart-placeholder { height: 200px; background: #f7fafc; border: 2px dashed #e2e8f0; display: flex; align-items: center; justify-content: center; color: #718096; border-radius: 6px; margin: 1rem 0; }
+        .filters { display: flex; gap: 1rem; margin-bottom: 1.5rem; align-items: center; flex-wrap: wrap; }
+        .filters select, .filters input { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; }
+        .section-title { font-size: 1.25rem; font-weight: 600; color: #2d3748; margin: 2rem 0 1rem 0; }
+        .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin: 1rem 0; }
+        .stat-item { text-align: center; padding: 1rem; background: #f7fafc; border-radius: 6px; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: #667eea; }
+        .stat-label { color: #718096; font-size: 0.8rem; margin-top: 0.25rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .table-container { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        th { background: #f7fafc; padding: 0.75rem; text-align: left; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 0.75rem; border-bottom: 1px solid #e2e8f0; }
+        .export-section { background: #f7fafc; padding: 1rem; border-radius: 6px; margin: 1rem 0; }
+        .two-column { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; }
+        @media (max-width: 768px) { .two-column { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <!-- Global Header Mount Point -->
+    <div id="global-header-mount"></div>
+    
+    <div class="container">
+        <!-- Report Filters -->
+        <div class="card">
+            <h3 style="margin-bottom: 1rem;">Report Filters</h3>
+            <div class="filters">
+                <select id="dateRange" onchange="updateReports()">
+                    <option value="7d">Last 7 Days</option>
+                    <option value="30d" selected>Last 30 Days</option>
+                    <option value="90d">Last 3 Months</option>
+                    <option value="1y">Last Year</option>
+                    <option value="custom">Custom Range</option>
+                </select>
+                <input type="date" id="startDate" style="display: none;">
+                <input type="date" id="endDate" style="display: none;">
+                <select id="agentFilter" onchange="updateReports()">
+                    <option value="">All Agents</option>
+                    <option value="john-doe">John Doe</option>
+                    <option value="jane-smith">Jane Smith</option>
+                </select>
+                <select id="productFilter" onchange="updateReports()">
+                    <option value="">All Products</option>
+                    <option value="auto">Auto Insurance</option>
+                    <option value="home">Home Insurance</option>
+                    <option value="life">Life Insurance</option>
+                    <option value="commercial">Commercial</option>
+                </select>
+                <button class="btn" onclick="updateReports()">Update Reports</button>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="card">
+            <h3 style="margin-bottom: 1rem;">Key Metrics Overview</h3>
+            <div class="stat-row">
+                <div class="stat-item">
+                    <div class="stat-value">$0</div>
+                    <div class="stat-label">Total Sales</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Policies Sold</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">$0</div>
+                    <div class="stat-label">Commissions</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">0%</div>
+                    <div class="stat-label">Conversion Rate</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">$0</div>
+                    <div class="stat-label">Avg Policy Value</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="two-column">
+            <div class="card">
+                <h3 style="margin-bottom: 1rem;">Sales Trend</h3>
+                <div class="chart-placeholder">Sales Chart - Connect to Chart.js or similar</div>
+                <div class="export-section">
+                    <button class="btn btn-secondary" onclick="exportChart('sales')">Export Chart</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 style="margin-bottom: 1rem;">Product Mix</h3>
+                <div class="chart-placeholder">Product Distribution - Connect to Chart.js</div>
+                <div class="export-section">
+                    <button class="btn btn-secondary" onclick="exportChart('products')">Export Chart</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Available Reports -->
+        <div class="section-title">Available Reports</div>
+        <div class="report-grid">
+            <div class="report-card">
+                <div class="report-title">Sales Performance Report</div>
+                <div class="report-desc">Detailed analysis of sales by agent, product, and time period</div>
+                <button class="btn" onclick="generateReport('sales')">Generate Report</button>
+                <button class="btn btn-secondary" onclick="scheduleReport('sales')">Schedule</button>
+            </div>
+            
+            <div class="report-card">
+                <div class="report-title">Commission Summary</div>
+                <div class="report-desc">Commission calculations, payouts, and agent earnings</div>
+                <button class="btn" onclick="generateReport('commissions')">Generate Report</button>
+                <button class="btn btn-secondary" onclick="scheduleReport('commissions')">Schedule</button>
+            </div>
+            
+            <div class="report-card">
+                <div class="report-title">Agent Performance</div>
+                <div class="report-desc">Individual agent metrics, rankings, and productivity</div>
+                <button class="btn" onclick="generateReport('agents')">Generate Report</button>
+                <button class="btn btn-secondary" onclick="scheduleReport('agents')">Schedule</button>
+            </div>
+            
+            <div class="report-card">
+                <div class="report-title">License Compliance</div>
+                <div class="report-desc">License status, expirations, and compliance tracking</div>
+                <button class="btn" onclick="generateReport('licensing')">Generate Report</button>
+                <button class="btn btn-secondary" onclick="scheduleReport('licensing')">Schedule</button>
+            </div>
+            
+            <div class="report-card">
+                <div class="report-title">Product Analytics</div>
+                <div class="report-desc">Product performance, pricing analysis, and market trends</div>
+                <button class="btn" onclick="generateReport('products')">Generate Report</button>
+                <button class="btn btn-secondary" onclick="scheduleReport('products')">Schedule</button>
+            </div>
+            
+            <div class="report-card">
+                <div class="report-title">Customer Analytics</div>
+                <div class="report-desc">Customer demographics, retention, and lifetime value</div>
+                <button class="btn" onclick="generateReport('customers')">Generate Report</button>
+                <button class="btn btn-secondary" onclick="scheduleReport('customers')">Schedule</button>
+            </div>
+        </div>
+
+        <!-- Recent Reports -->
+        <div class="section-title">Recent Reports</div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Report Name</th>
+                        <th>Generated</th>
+                        <th>Period</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="reportsTableBody">
+                    <tr><td colspan="5" style="text-align: center;">No recent reports</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Export Options -->
+        <div class="card">
+            <h3 style="margin-bottom: 1rem;">Bulk Export Options</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <button class="btn btn-success" onclick="exportData('all-sales')">Export All Sales Data</button>
+                <button class="btn btn-success" onclick="exportData('all-agents')">Export Agent Data</button>
+                <button class="btn btn-success" onclick="exportData('all-commissions')">Export Commission Data</button>
+                <button class="btn btn-success" onclick="exportData('all-licenses')">Export License Data</button>
+            </div>
+            
+            <div class="export-section">
+                <h4 style="margin: 1rem 0 0.5rem 0;">Export Formats:</h4>
+                <div style="display: flex; gap: 1rem;">
+                    <label><input type="radio" name="exportFormat" value="csv" checked> CSV</label>
+                    <label><input type="radio" name="exportFormat" value="xlsx"> Excel</label>
+                    <label><input type="radio" name="exportFormat" value="pdf"> PDF</label>
+                    <label><input type="radio" name="exportFormat" value="json"> JSON</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scheduled Reports -->
+        <div class="section-title">Scheduled Reports</div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Report</th>
+                        <th>Frequency</th>
+                        <th>Recipients</th>
+                        <th>Next Run</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Monthly Sales Summary</td>
+                        <td>Monthly</td>
+                        <td>admin@syncedup.com</td>
+                        <td>Feb 1, 2024</td>
+                        <td>Active</td>
+                        <td>
+                            <button class="btn" style="padding: 0.5rem; font-size: 0.8rem;">Edit</button>
+                            <button class="btn btn-secondary" style="padding: 0.5rem; font-size: 0.8rem;">Pause</button>
+                        </td>
+                    </tr>
+                    <tr><td colspan="6" style="text-align: center;">No other scheduled reports</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            AdminHeader.init({
+                pageTitle: 'Reports & Analytics',
+                showRoleSwitcher: false
+            });
+            updateReports();
+            loadRecentReports();
+            
+            // Show/hide custom date fields
+            document.getElementById('dateRange').addEventListener('change', function() {
+                const customFields = document.querySelectorAll('#startDate, #endDate');
+                if (this.value === 'custom') {
+                    customFields.forEach(field => field.style.display = 'block');
+                } else {
+                    customFields.forEach(field => field.style.display = 'none');
+                }
+            });
+        });
+
+        function updateReports() {
+            // Simulate updating reports with filters
+            const dateRange = document.getElementById('dateRange').value;
+            const agentFilter = document.getElementById('agentFilter').value;
+            const productFilter = document.getElementById('productFilter').value;
+            
+            // Update key metrics based on filters
+            updateKeyMetrics();
+            
+            console.log('Updating reports with filters:', { dateRange, agentFilter, productFilter });
+        }
+
+        function updateKeyMetrics() {
+            // Mock data - replace with actual API call
+            const stats = document.querySelectorAll('.stat-value');
+            stats[0].textContent = '$125,450'; // Total Sales
+            stats[1].textContent = '43';       // Policies Sold
+            stats[2].textContent = '$9,408';   // Commissions
+            stats[3].textContent = '12.5%';    // Conversion Rate
+            stats[4].textContent = '$2,917';   // Avg Policy Value
+        }
+
+        function loadRecentReports() {
+            // Mock recent reports data
+            const tbody = document.getElementById('reportsTableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td>December Sales Report</td>
+                    <td>Jan 2, 2024</td>
+                    <td>Dec 2023</td>
+                    <td>Completed</td>
+                    <td>
+                        <button class="btn" style="padding: 0.5rem; font-size: 0.8rem;" onclick="downloadReport('dec-sales')">Download</button>
+                        <button class="btn btn-secondary" style="padding: 0.5rem; font-size: 0.8rem;" onclick="viewReport('dec-sales')">View</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Q4 Commission Summary</td>
+                    <td>Jan 1, 2024</td>
+                    <td>Q4 2023</td>
+                    <td>Completed</td>
+                    <td>
+                        <button class="btn" style="padding: 0.5rem; font-size: 0.8rem;" onclick="downloadReport('q4-comm')">Download</button>
+                        <button class="btn btn-secondary" style="padding: 0.5rem; font-size: 0.8rem;" onclick="viewReport('q4-comm')">View</button>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function generateReport(type) {
+            alert(`Generating ${type} report. This functionality will be connected to backend API.`);
+        }
+
+        function scheduleReport(type) {
+            alert(`Scheduling ${type} report. This functionality will be connected to backend API.`);
+        }
+
+        function exportChart(chartType) {
+            alert(`Exporting ${chartType} chart. This functionality will be connected to chart library.`);
+        }
+
+        function exportData(dataType) {
+            const format = document.querySelector('input[name="exportFormat"]:checked').value;
+            alert(`Exporting ${dataType} as ${format.toUpperCase()}. This functionality will be connected to backend API.`);
+        }
+
+        function downloadReport(reportId) {
+            alert(`Downloading report ${reportId}. This functionality will be connected to backend API.`);
+        }
+
+        function viewReport(reportId) {
+            alert(`Viewing report ${reportId}. This functionality will be connected to backend API.`);
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+        }
+    </script>
+    
+    <!-- Professional Theme System -->
+    <script src="/js/theme-switcher.js"></script>
+    <script src="/assets/session-prod.js"></script>
+</body>
+</html>

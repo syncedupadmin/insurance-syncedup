@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Critical Theme Flash Prevention -->
+    <script>
+    (function(){
+        var t=localStorage.getItem("adminTheme")||"professional";
+        var h=document.documentElement;
+        h.classList.add(t+"-mode");
+        
+        // Load theme CSS immediately
+        var existingTheme = document.querySelector('link[data-theme-css]');
+        if(existingTheme) existingTheme.remove();
+        
+        if(t==="modern"){
+            // Load modern base styles (structure only)
+            var baseLink = document.createElement('link');
+            baseLink.rel = 'stylesheet';
+            baseLink.href = '/css/themes/modern-base.css';
+            baseLink.setAttribute('data-theme-css', 'modern-base');
+            document.head.appendChild(baseLink);
+            // Admin portal purple colors are in admin-global.css
+        } else {
+            // Load traditional theme CSS
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = '/css/themes/' + t + '.css';
+            link.setAttribute('data-theme-css', t);
+            document.head.appendChild(link);
+        }
+        
+        // Add body class when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            if(document.body) {
+                document.body.classList.add('portal-admin');
+                document.body.classList.add(t+"-mode");
+            }
+        });
+        
+        // Set background for immediate visual feedback (purple colors for admin)
+        if(t==="classic"){h.style.background="linear-gradient(-45deg,#6b46c1,#7c3aed,#8b5cf6,#a78bfa)";}
+        else if(t==="modern"){h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        else if(t==="professional"){h.style.background="linear-gradient(-45deg,#4c1d95,#5b21b6,#6d28d9,#7c3aed)";}
+        else{h.style.background="linear-gradient(-45deg,#4c1d95,#5b21b6,#6d28d9,#7c3aed)";}
+        
+        h.style.visibility="hidden";
+        setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
+    })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Performance - SyncedUp Insurance Admin</title>
+    <script src="/js/auth-helper.js"></script>
+    <link rel="stylesheet" href="/admin/admin-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/_admin/components/navigation.js"></script>
+    <script src="/_admin/components/global-header.js"></script>
+</head>
+<body>
+    <!-- Global Header Mount Point -->
+    <div id="global-header-mount"></div>
+
+    <div class="container">
+        <!-- Performance Overview Cards -->
+        <div class="grid">
+            <div class="card">
+                <div class="stat-value" id="totalAgents">0</div>
+                <div class="stat-label">Total Agents</div>
+            </div>
+            <div class="card">
+                <div class="stat-value" id="avgPerformance">0%</div>
+                <div class="stat-label">Avg Performance</div>
+            </div>
+            <div class="card">
+                <div class="stat-value" id="topPerformer">-</div>
+                <div class="stat-label">Top Performer</div>
+            </div>
+            <div class="card">
+                <div class="stat-value" id="activeGoals">0</div>
+                <div class="stat-label">Active Goals</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button class="btn btn-primary" onclick="showSetGoalModal()">
+                <i data-lucide="target" class="icon"></i>Set New Goal
+            </button>
+            <button class="btn btn-success" onclick="exportPerformanceReport()">
+                <i data-lucide="download" class="icon"></i>Export Report
+            </button>
+            <button class="btn" onclick="refreshData()">
+                <i data-lucide="refresh-cw" class="icon"></i>Refresh Data
+            </button>
+        </div>
+
+        <!-- Performance Rankings -->
+        <div class="card">
+            <h3><i data-lucide="trophy" class="card-icon"></i>Agent Performance Rankings</h3>
+            <div style="margin-bottom: 1rem;">
+                <select class="form-select" id="timeframeSelect" onchange="filterByTimeframe()" style="width: 200px; display: inline-block;">
+                    <option value="month">This Month</option>
+                    <option value="quarter">This Quarter</option>
+                    <option value="year">This Year</option>
+                </select>
+            </div>
+            <table id="performanceTable">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Agent</th>
+                        <th>Sales</th>
+                        <th>Revenue</th>
+                        <th>Conversion Rate</th>
+                        <th>Goal Progress</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="performanceTableBody">
+                    <tr><td colspan="7" class="text-center loading">
+                        <div class="spinner"></div>Loading performance data...
+                    </td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Individual Agent Scorecard -->
+        <div class="card" id="agentScorecard" style="display: none;">
+            <h3><i data-lucide="user" class="card-icon"></i>Agent Scorecard</h3>
+            <div id="scorecardContent">
+                <!-- Dynamic scorecard content -->
+            </div>
+        </div>
+
+        <!-- Goal Setting Interface -->
+        <div class="card">
+            <h3><i data-lucide="target" class="card-icon"></i>Active Goals</h3>
+            <div style="margin-bottom: 1rem;">
+                <button class="btn btn-primary" onclick="showSetGoalModal()">
+                    <i data-lucide="plus" class="icon"></i>Set New Goal
+                </button>
+            </div>
+            <div id="goalsContainer">
+                <div class="loading">
+                    <div class="spinner"></div>Loading goals...
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Progress Tracking -->
+        <div class="card">
+            <h3><i data-lucide="bar-chart-3" class="card-icon"></i>Team Progress Overview</h3>
+            <div id="teamProgress">
+                <div class="loading">
+                    <div class="spinner"></div>Loading team progress...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Goal Setting Modal -->
+    <div id="goalModal" class="modal hidden">
+        <div class="modal-content card" style="max-width: 500px; margin: 5% auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="margin-bottom: 0;">Set New Goal</h3>
+                <button class="btn" onclick="closeGoalModal()" style="padding: 0.5rem;">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            
+            <form id="goalForm" onsubmit="submitGoal(event)">
+                <div class="form-group">
+                    <label class="form-label">Agent</label>
+                    <select class="form-select" id="goalAgent" required>
+                        <option value="">Select Agent...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Goal Type</label>
+                    <select class="form-select" id="goalType" required>
+                        <option value="sales">Sales Target</option>
+                        <option value="revenue">Revenue Target</option>
+                        <option value="conversion">Conversion Rate</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Target Value</label>
+                    <input type="number" class="form-input" id="goalTarget" required placeholder="Enter target value">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Timeframe</label>
+                    <select class="form-select" id="goalTimeframe" required>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="quarterly">Quarterly</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Notes (Optional)</label>
+                    <textarea class="form-textarea" id="goalNotes" placeholder="Add any additional notes..."></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn" onclick="closeGoalModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Set Goal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let performanceData = null;
+        let goalsData = null;
+        let currentUser = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize global header
+            AdminHeader.init({
+                pageTitle: 'Agent Performance Dashboard'
+            });
+            
+            // Server-side portal-guard already verified access
+            initializePage();
+        });
+
+        async function initializePage() {
+            // Initialize Lucide icons with delay to allow navigation to load
+            setTimeout(() => {
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }, 200);
+            
+            // Load all data
+            await Promise.all([
+                loadPerformanceData(),
+                loadGoalsData(),
+                loadAgentsList()
+            ]);
+            
+            updateUI();
+        }
+
+        async function loadPerformanceData() {
+            try {
+                const response = await fetch('/api/admin/analytics?analytics_type=team_performance', {
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    performanceData = await response.json();
+                } else {
+                    throw new Error('Failed to load performance data');
+                }
+            } catch (error) {
+                console.error('Error loading performance data:', error);
+                loadFallbackPerformanceData();
+            }
+        }
+
+        async function loadGoalsData() {
+            try {
+                const response = await fetch('/api/manager/goals', {
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    goalsData = await response.json();
+                } else {
+                    throw new Error('Failed to load goals data');
+                }
+            } catch (error) {
+                console.error('Error loading goals data:', error);
+                loadFallbackGoalsData();
+            }
+        }
+
+        async function loadAgentsList() {
+            try {
+                const response = await fetch('/api/admin/user-management?role=agent', {
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const userData = await response.json();
+                    populateAgentsList(userData.users || []);
+                } else {
+                    throw new Error('Failed to load agents list');
+                }
+            } catch (error) {
+                console.error('Error loading agents list:', error);
+                populateAgentsList(getFallbackAgents());
+            }
+        }
+
+        function updateUI() {
+            updateOverviewCards();
+            updatePerformanceTable();
+            updateGoalsDisplay();
+            updateTeamProgress();
+        }
+
+        function updateOverviewCards() {
+            const stats = calculateOverviewStats();
+            document.getElementById('totalAgents').textContent = stats.totalAgents;
+            document.getElementById('avgPerformance').textContent = `${stats.avgPerformance}%`;
+            document.getElementById('topPerformer').textContent = stats.topPerformer;
+            document.getElementById('activeGoals').textContent = stats.activeGoals;
+        }
+
+        function updatePerformanceTable() {
+            const tableBody = document.getElementById('performanceTableBody');
+            tableBody.innerHTML = '';
+
+            if (!performanceData || !performanceData.agents) {
+                tableBody.innerHTML = '<tr><td colspan="7" class="text-center">No performance data available</td></tr>';
+                return;
+            }
+
+            performanceData.agents.forEach((agent, index) => {
+                const row = document.createElement('tr');
+                const goalProgress = calculateGoalProgress(agent.agent_id);
+                
+                row.innerHTML = `
+                    <td><strong>#${index + 1}</strong></td>
+                    <td>
+                        <div>
+                            <strong>${agent.agent_name}</strong>
+                            <div style="font-size: 0.8rem; opacity: 0.7;">${agent.agent_code || 'N/A'}</div>
+                        </div>
+                    </td>
+                    <td><strong>${agent.sales_count || 0}</strong></td>
+                    <td><strong>$${(agent.total_sales || 0).toLocaleString()}</strong></td>
+                    <td>
+                        <span style="color: ${agent.conversion_rate > 25 ? '#10b981' : agent.conversion_rate > 15 ? '#f59e0b' : '#ef4444'}">
+                            ${(agent.conversion_rate || 0).toFixed(1)}%
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="flex: 1; background: rgba(255,255,255,0.2); border-radius: 10px; height: 8px;">
+                                <div style="background: ${goalProgress.color}; width: ${goalProgress.percentage}%; height: 100%; border-radius: 10px;"></div>
+                            </div>
+                            <span style="font-size: 0.8rem;">${goalProgress.percentage}%</span>
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 
+                                onclick="viewAgentDetails('${agent.agent_id}', '${agent.agent_name}')">
+                            <i data-lucide="eye" style="width: 14px; height: 14px; margin-right: 4px;"></i>View
+                        </button>
+                        <button class="btn btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" 
+                                onclick="setGoalForAgent('${agent.agent_id}', '${agent.agent_name}')">
+                            <i data-lucide="target" style="width: 14px; height: 14px; margin-right: 4px;"></i>Goal
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            // Re-initialize icons for new content
+            lucide.createIcons();
+        }
+
+        function updateGoalsDisplay() {
+            const container = document.getElementById('goalsContainer');
+            
+            if (!goalsData || !goalsData.goals || goalsData.goals.length === 0) {
+                container.innerHTML = '<p class="text-center" style="color: rgba(255,255,255,0.7);">No active goals set</p>';
+                return;
+            }
+
+            let goalsHTML = '<div style="display: grid; gap: 1rem;">';
+            goalsData.goals.forEach(goal => {
+                const progress = calculateGoalProgress(goal.agent_id, goal.goal_id);
+                const daysRemaining = Math.max(0, Math.ceil((new Date(goal.target_date) - new Date()) / (1000 * 60 * 60 * 24)));
+                
+                goalsHTML += `
+                    <div class="card" style="padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div style="flex: 1;">
+                                <h4 style="margin-bottom: 0.5rem; color: rgba(255,255,255,0.95);">${goal.title}</h4>
+                                <p style="margin-bottom: 0.5rem; opacity: 0.8;">${goal.agent_name}</p>
+                                <p style="font-size: 0.9rem; opacity: 0.7;">${daysRemaining} days remaining</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 1.5rem; font-weight: bold; color: rgba(255,255,255,0.95);">
+                                    ${goal.goal_type === 'revenue' ? '$' : ''}${goal.target_value.toLocaleString()}${goal.goal_type === 'conversion' ? '%' : ''}
+                                </div>
+                                <div style="font-size: 0.8rem; opacity: 0.7;">${goal.goal_type} target</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.9rem;">Progress</span>
+                                <span style="font-size: 0.9rem;">${progress.percentage}%</span>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.2); border-radius: 10px; height: 10px;">
+                                <div style="background: ${progress.color}; width: ${progress.percentage}%; height: 100%; border-radius: 10px; transition: width 0.3s ease;"></div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: flex-end;">
+                            <button class="btn" style="padding: 0.5rem 1rem; font-size: 0.8rem;" onclick="editGoal('${goal.goal_id}')">
+                                <i data-lucide="edit" style="width: 14px; height: 14px; margin-right: 4px;"></i>Edit
+                            </button>
+                            <button class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.8rem;" onclick="deleteGoal('${goal.goal_id}')">
+                                <i data-lucide="trash" style="width: 14px; height: 14px; margin-right: 4px;"></i>Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            goalsHTML += '</div>';
+            
+            container.innerHTML = goalsHTML;
+            lucide.createIcons();
+        }
+
+        function updateTeamProgress() {
+            const container = document.getElementById('teamProgress');
+            const teamStats = calculateTeamStats();
+            
+            container.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                    <div style="text-align: center; padding: 1.5rem; background: rgba(255,255,255,0.1); border-radius: 12px;">
+                        <div style="font-size: 2rem; font-weight: bold; color: rgba(255,255,255,0.95);">${teamStats.totalSales}</div>
+                        <div style="font-size: 0.9rem; opacity: 0.8;">Total Sales</div>
+                    </div>
+                    <div style="text-align: center; padding: 1.5rem; background: rgba(255,255,255,0.1); border-radius: 12px;">
+                        <div style="font-size: 2rem; font-weight: bold; color: rgba(255,255,255,0.95);">$${teamStats.totalRevenue.toLocaleString()}</div>
+                        <div style="font-size: 0.9rem; opacity: 0.8;">Total Revenue</div>
+                    </div>
+                    <div style="text-align: center; padding: 1.5rem; background: rgba(255,255,255,0.1); border-radius: 12px;">
+                        <div style="font-size: 2rem; font-weight: bold; color: rgba(255,255,255,0.95);">${teamStats.avgConversion}%</div>
+                        <div style="font-size: 0.9rem; opacity: 0.8;">Avg Conversion</div>
+                    </div>
+                    <div style="text-align: center; padding: 1.5rem; background: rgba(255,255,255,0.1); border-radius: 12px;">
+                        <div style="font-size: 2rem; font-weight: bold; color: rgba(255,255,255,0.95);">${teamStats.goalsOnTrack}</div>
+                        <div style="font-size: 0.9rem; opacity: 0.8;">Goals on Track</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Helper Functions
+        function calculateOverviewStats() {
+            if (!performanceData || !performanceData.agents) {
+                return { totalAgents: 0, avgPerformance: 0, topPerformer: '-', activeGoals: 0 };
+            }
+
+            const agents = performanceData.agents;
+            const totalAgents = agents.length;
+            const avgPerformance = totalAgents > 0 ? 
+                (agents.reduce((sum, agent) => sum + (agent.conversion_rate || 0), 0) / totalAgents).toFixed(1) : 0;
+            const topPerformer = agents.length > 0 ? 
+                agents.reduce((top, agent) => (agent.total_sales || 0) > (top.total_sales || 0) ? agent : top).agent_name : '-';
+            const activeGoals = goalsData ? (goalsData.goals?.length || 0) : 0;
+
+            return { totalAgents, avgPerformance, topPerformer, activeGoals };
+        }
+
+        function calculateGoalProgress(agentId, goalId = null) {
+            // Mock goal progress calculation
+            const progress = Math.floor(Math.random() * 100);
+            let color = '#ef4444'; // red
+            if (progress > 75) color = '#10b981'; // green
+            else if (progress > 50) color = '#f59e0b'; // yellow
+            
+            return { percentage: progress, color };
+        }
+
+        function calculateTeamStats() {
+            if (!performanceData || !performanceData.agents) {
+                return { totalSales: 0, totalRevenue: 0, avgConversion: 0, goalsOnTrack: 0 };
+            }
+
+            const agents = performanceData.agents;
+            const totalSales = agents.reduce((sum, agent) => sum + (agent.sales_count || 0), 0);
+            const totalRevenue = agents.reduce((sum, agent) => sum + (agent.total_sales || 0), 0);
+            const avgConversion = agents.length > 0 ? 
+                (agents.reduce((sum, agent) => sum + (agent.conversion_rate || 0), 0) / agents.length).toFixed(1) : 0;
+            const goalsOnTrack = goalsData ? (goalsData.goals?.filter(goal => calculateGoalProgress(goal.agent_id).percentage > 75).length || 0) : 0;
+
+            return { totalSales, totalRevenue, avgConversion, goalsOnTrack };
+        }
+
+        function populateAgentsList(agents) {
+            const select = document.getElementById('goalAgent');
+            select.innerHTML = '<option value="">Select Agent...</option>';
+            
+            agents.forEach(agent => {
+                const option = document.createElement('option');
+                option.value = agent.user_id;
+                option.textContent = `${agent.first_name} ${agent.last_name}`;
+                select.appendChild(option);
+            });
+        }
+
+        // Modal Functions
+        function showSetGoalModal() {
+            document.getElementById('goalModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeGoalModal() {
+            document.getElementById('goalModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            document.getElementById('goalForm').reset();
+        }
+
+        function setGoalForAgent(agentId, agentName) {
+            showSetGoalModal();
+            document.getElementById('goalAgent').value = agentId;
+        }
+
+        async function submitGoal(event) {
+            event.preventDefault();
+            
+            const goalData = {
+                agent_id: document.getElementById('goalAgent').value,
+                goal_type: document.getElementById('goalType').value,
+                target_value: parseFloat(document.getElementById('goalTarget').value),
+                timeframe: document.getElementById('goalTimeframe').value,
+                notes: document.getElementById('goalNotes').value
+            };
+
+            try {
+                const response = await fetch('/api/manager/goals', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(goalData)
+                });
+
+                if (response.ok) {
+                    showSuccessMessage('Goal set successfully!');
+                    closeGoalModal();
+                    await loadGoalsData();
+                    updateGoalsDisplay();
+                } else {
+                    throw new Error('Failed to set goal');
+                }
+            } catch (error) {
+                console.error('Error setting goal:', error);
+                showErrorMessage('Failed to set goal. Please try again.');
+            }
+        }
+
+        // Action Functions
+        function viewAgentDetails(agentId, agentName) {
+            // Show detailed scorecard
+            const scorecard = document.getElementById('agentScorecard');
+            const content = document.getElementById('scorecardContent');
+            
+            const agent = performanceData.agents.find(a => a.agent_id === agentId);
+            if (!agent) return;
+
+            content.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                        <div style="font-size: 1.5rem; font-weight: bold;">${agent.sales_count || 0}</div>
+                        <div style="font-size: 0.8rem; opacity: 0.8;">Total Sales</div>
+                    </div>
+                    <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                        <div style="font-size: 1.5rem; font-weight: bold;">$${(agent.total_sales || 0).toLocaleString()}</div>
+                        <div style="font-size: 0.8rem; opacity: 0.8;">Revenue</div>
+                    </div>
+                    <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                        <div style="font-size: 1.5rem; font-weight: bold;">${(agent.conversion_rate || 0).toFixed(1)}%</div>
+                        <div style="font-size: 0.8rem; opacity: 0.8;">Conversion Rate</div>
+                    </div>
+                    <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                        <div style="font-size: 1.5rem; font-weight: bold;">${agent.leads_count || 0}</div>
+                        <div style="font-size: 0.8rem; opacity: 0.8;">Leads Assigned</div>
+                    </div>
+                </div>
+            `;
+            
+            scorecard.style.display = 'block';
+            scorecard.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function exportPerformanceReport() {
+            try {
+                showSuccessMessage('Performance report exported successfully!');
+            } catch (error) {
+                showErrorMessage('Failed to export report. Please try again.');
+            }
+        }
+
+        async function refreshData() {
+            document.getElementById('performanceTableBody').innerHTML = '<tr><td colspan="7" class="text-center loading"><div class="spinner"></div>Refreshing data...</td></tr>';
+            
+            await Promise.all([
+                loadPerformanceData(),
+                loadGoalsData()
+            ]);
+            
+            updateUI();
+            showSuccessMessage('Data refreshed successfully!');
+        }
+
+        function filterByTimeframe() {
+            const timeframe = document.getElementById('timeframeSelect').value;
+            // Implement timeframe filtering logic
+            refreshData();
+        }
+
+        // Fallback Data Functions
+        function loadFallbackPerformanceData() {
+            performanceData = {
+                agents: []
+            };
+        }
+
+        function loadFallbackGoalsData() {
+            goalsData = {
+                goals: [
+                    {
+                        goal_id: '1',
+                        agent_id: '1',
+                        agent_name: 'Sarah Johnson',
+                        title: 'Monthly Sales Target',
+                        goal_type: 'sales',
+                        target_value: 20,
+                        target_date: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString()
+                    },
+                    {
+                        goal_id: '2',
+                        agent_id: '2',
+                        agent_name: 'Mike Chen',
+                        title: 'Revenue Goal Q1',
+                        goal_type: 'revenue',
+                        target_value: 35000,
+                        target_date: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString()
+                    }
+                ]
+            };
+        }
+
+        function getFallbackAgents() {
+            return [
+                { user_id: '1', first_name: 'Sarah', last_name: 'Johnson' },
+                { user_id: '2', first_name: 'Mike', last_name: 'Chen' },
+                { user_id: '3', first_name: 'Lisa', last_name: 'Rodriguez' }
+            ];
+        }
+
+        // Utility Functions
+        function showSuccessMessage(message) {
+            const div = document.createElement('div');
+            div.className = 'success-message';
+            div.textContent = message;
+            div.style.position = 'fixed';
+            div.style.top = '20px';
+            div.style.right = '20px';
+            div.style.zIndex = '1000';
+            document.body.appendChild(div);
+            
+            setTimeout(() => {
+                document.body.removeChild(div);
+            }, 3000);
+        }
+
+        function showErrorMessage(message) {
+            const div = document.createElement('div');
+            div.className = 'error-message';
+            div.textContent = message;
+            div.style.position = 'fixed';
+            div.style.top = '20px';
+            div.style.right = '20px';
+            div.style.zIndex = '1000';
+            document.body.appendChild(div);
+            
+            setTimeout(() => {
+                document.body.removeChild(div);
+            }, 3000);
+        }
+
+        // Logout function now handled by AdminHeader.logout()
+        // function logout() {
+        //     clearAuthCookies();
+        //     window.location.href = '/login';
+        // }
+
+        // Modal styling
+        const modalStyles = `
+            .modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                backdrop-filter: blur(5px);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .modal-content {
+                max-height: 80vh;
+                overflow-y: auto;
+                animation: modalAppear 0.3s ease;
+            }
+            @keyframes modalAppear {
+                from { opacity: 0; transform: scale(0.9); }
+                to { opacity: 1; transform: scale(1); }
+            }
+        `;
+        
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = modalStyles;
+        document.head.appendChild(styleSheet);
+    </script>
+    
+    <!-- Professional Theme System -->
+    <script src="/js/theme-switcher.js"></script>
+    <script src="/assets/session-prod.js"></script>
+</body>
+</html>

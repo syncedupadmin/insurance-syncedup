@@ -27,7 +27,7 @@ export default async function handler(req, res) {
       },
       env: {
         hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-        hasSupabaseKey: !!process.env.SUPABASE_SERVICE_KEY,
+        hasSupabaseKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
         hasAuthSecret: !!process.env.AUTH_SECRET
       }
     };

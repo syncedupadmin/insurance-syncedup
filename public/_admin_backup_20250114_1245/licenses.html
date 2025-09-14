@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Critical Theme Flash Prevention -->
+    <script>
+    (function(){
+        var t=localStorage.getItem("adminTheme")||"professional";
+        var h=document.documentElement;
+        h.classList.add(t+"-mode");
+        
+        // Load theme CSS immediately
+        var existingTheme = document.querySelector('link[data-theme-css]');
+        if(existingTheme) existingTheme.remove();
+        
+        if(t==="modern"){
+            // Load modern base styles (structure only)
+            var baseLink = document.createElement('link');
+            baseLink.rel = 'stylesheet';
+            baseLink.href = '/css/themes/modern-base.css';
+            baseLink.setAttribute('data-theme-css', 'modern-base');
+            document.head.appendChild(baseLink);
+            // Admin portal purple colors are in admin-global.css
+        } else {
+            // Load traditional theme CSS
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = '/css/themes/' + t + '.css';
+            link.setAttribute('data-theme-css', t);
+            document.head.appendChild(link);
+        }
+        
+        // Add body class when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            if(document.body) {
+                document.body.classList.add('portal-admin');
+                document.body.classList.add(t+"-mode");
+            }
+        });
+        
+        // Set background for immediate visual feedback (purple colors for admin)
+        if(t==="classic"){h.style.background="linear-gradient(-45deg,#6b46c1,#7c3aed,#8b5cf6,#a78bfa)";}
+        else if(t==="modern"){h.style.background="linear-gradient(135deg,#667eea 0%,#764ba2 100%)";}
+        else if(t==="professional"){h.style.background="linear-gradient(-45deg,#4c1d95,#5b21b6,#6d28d9,#7c3aed)";}
+        else{h.style.background="linear-gradient(-45deg,#4c1d95,#5b21b6,#6d28d9,#7c3aed)";}
+        
+        h.style.visibility="hidden";
+        setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
+    })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>License Management - SyncedUp Insurance Admin</title>
+    
+    <script src="/js/auth-helper.js"></script>
+    
+    <link href="/admin/admin-global.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/themes/professional.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/_admin/components/navigation.js"></script>
+    <script src="/_admin/components/global-header.js"></script>
+    <style>
+        /* License Management Specific Styles */
+        .license-dashboard {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .license-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .license-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .license-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .sync-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sync-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .sync-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .summary-card.expired {
+            border-color: rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .summary-card.expiring {
+            border-color: rgba(245, 158, 11, 0.3);
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .summary-card.compliant {
+            border-color: rgba(16, 185, 129, 0.3);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .card-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .filters-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .filter-input, .filter-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .filter-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .clear-filters {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--text-secondary);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clear-filters:hover {
+            border-color: var(--primary);
+            color: var(--text-primary);
+        }
+
+        .licenses-table-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .licenses-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .licenses-table th {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .licenses-table th:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .licenses-table th .sort-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.5;
+        }
+
+        .licenses-table th.sorted .sort-icon {
+            opacity: 1;
+        }
+
+        .licenses-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        .licenses-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .license-row.expired {
+            border-left: 4px solid #ef4444;
+        }
+
+        .license-row.expiring-soon {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .license-row.renewal-needed {
+            border-left: 4px solid #f97316;
+        }
+
+        .license-row.valid {
+            border-left: 4px solid #10b981;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .status-expired {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .status-suspended {
+            background: rgba(156, 163, 175, 0.2);
+            color: #9ca3af;
+        }
+
+        .expiry-days {
+            font-weight: 600;
+        }
+
+        .expiry-days.expired {
+            color: #ef4444;
+        }
+
+        .expiry-days.expiring-soon {
+            color: #f59e0b;
+        }
+
+        .expiry-days.renewal-needed {
+            color: #f97316;
+        }
+
+        .expiry-days.valid {
+            color: #10b981;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .pagination-info {
+            color: var(--text-secondary);
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .pagination-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .license-actions-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .actions-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--text-primary);
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .actions-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .actions-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            min-width: 150px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: none;
+        }
+
+        .actions-dropdown.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sync-status {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            color: var(--text-primary);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: none;
+        }
+
+        .sync-status.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .license-dashboard {
+                padding: 1rem;
+            }
+
+            .license-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .licenses-table-container {
+                overflow-x: auto;
+            }
+
+            .licenses-table {
+                min-width: 800px;
+            }
+
+            .pagination {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+    <script src="/admin/shared-nav.js"></script>
+</head>
+<body>
+    <!-- Global Header Mount Point -->
+    <div id="global-header-mount"></div>
+
+    <div class="container">
+        <div class="license-dashboard">
+        <!-- Header Section -->
+        <div class="license-header">
+            <h1 class="license-title">License Management</h1>
+            <div class="license-actions">
+                <button class="sync-button" id="syncButton">
+                    <i data-lucide="refresh-cw"></i>
+                    Sync with NIPR
+                </button>
+                <button class="sync-button" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);" onclick="exportToCSV()">
+                    <i data-lucide="download"></i>
+                    Export CSV
+                </button>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card compliant">
+                <div class="card-value" id="totalLicenses">-</div>
+                <div class="card-label">Total Licenses</div>
+            </div>
+            <div class="summary-card compliant">
+                <div class="card-value" id="activeLicenses">-</div>
+                <div class="card-label">Active Licenses</div>
+            </div>
+            <div class="summary-card expiring">
+                <div class="card-value" id="expiringLicenses">-</div>
+                <div class="card-label">Expiring This Month</div>
+            </div>
+            <div class="summary-card expired">
+                <div class="card-value" id="expiredLicenses">-</div>
+                <div class="card-label">Expired Licenses</div>
+            </div>
+            <div class="summary-card compliant">
+                <div class="card-value" id="complianceRate">-</div>
+                <div class="card-label">Compliance Rate</div>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Search</label>
+                    <input type="text" id="searchInput" class="filter-input" placeholder="Search by name, license number, or state...">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">State</label>
+                    <select id="stateFilter" class="filter-select" multiple>
+                        <option value="">All States</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">License Type</label>
+                    <select id="typeFilter" class="filter-select" multiple>
+                        <option value="">All Types</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Status</label>
+                    <select id="statusFilter" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="Active">Active</option>
+                        <option value="Expired">Expired</option>
+                        <option value="Suspended">Suspended</option>
+                    </select>
+                </div>
+                <button class="clear-filters" onclick="clearFilters()">
+                    <i data-lucide="x"></i>
+                    Clear
+                </button>
+            </div>
+        </div>
+
+        <!-- Licenses Table -->
+        <div class="licenses-table-container">
+            <table class="licenses-table">
+                <thead>
+                    <tr>
+                        <th data-sort="agent_name">
+                            Agent Name
+                            <i data-lucide="chevron-up" class="sort-icon"></i>
+                        </th>
+                        <th data-sort="license_number">
+                            License Number
+                            <i data-lucide="chevron-up" class="sort-icon"></i>
+                        </th>
+                        <th data-sort="state">
+                            State
+                            <i data-lucide="chevron-up" class="sort-icon"></i>
+                        </th>
+                        <th data-sort="license_type">
+                            Type
+                            <i data-lucide="chevron-up" class="sort-icon"></i>
+                        </th>
+                        <th data-sort="issue_date">
+                            Issue Date
+                            <i data-lucide="chevron-up" class="sort-icon"></i>
+                        </th>
+                        <th data-sort="expiration_date">
+                            Expiration Date
+                            <i data-lucide="chevron-up" class="sort-icon"></i>
+                        </th>
+                        <th data-sort="status">
+                            Status
+                            <i data-lucide="chevron-up" class="sort-icon"></i>
+                        </th>
+                        <th data-sort="days_until_expiry">
+                            Days Until Expiry
+                            <i data-lucide="chevron-up" class="sort-icon"></i>
+                        </th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="licensesTableBody">
+                    <tr>
+                        <td colspan="9" class="loading-state">
+                            <i data-lucide="loader" class="animate-spin"></i>
+                            Loading licenses...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <div class="pagination-info" id="paginationInfo">
+                    Showing 0 of 0 licenses
+                </div>
+                <div class="pagination-controls">
+                    <button class="pagination-btn" id="prevButton" onclick="previousPage()">
+                        <i data-lucide="chevron-left"></i>
+                        Previous
+                    </button>
+                    <button class="pagination-btn" id="nextButton" onclick="nextPage()">
+                        Next
+                        <i data-lucide="chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Sync Status Notification -->
+    <div class="sync-status" id="syncStatus">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <i data-lucide="loader" class="animate-spin"></i>
+            <span id="syncStatusText">Syncing with NIPR...</span>
+        </div>
+    </div>
+
+    <script>
+        // License Management State
+        let currentPage = 0;
+        let currentLimit = 50;
+        let currentSort = { field: 'expiration_date', order: 'asc' };
+        let currentFilters = {
+            search: '',
+            state: '',
+            license_type: '',
+            status: ''
+        };
+        let allLicenses = [];
+        let licenseTypes = [];
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Initialize global header
+            AdminHeader.init({
+                pageTitle: 'License Management',
+                showRoleSwitcher: false
+            });
+            
+            // Server-side portal-guard already verified access
+            await initializeLicensePage();
+            setTimeout(() => {
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }, 200);
+        });
+
+        // Initialize license management page
+        async function initializeLicensePage() {
+            try {
+                // Load initial data
+                await Promise.all([
+                    loadLicenseSummary(),
+                    loadLicenseTypes(),
+                    loadLicenses()
+                ]);
+
+                // Setup event listeners
+                setupEventListeners();
+                
+                // Initialize icons
+                lucide.createIcons();
+                
+            } catch (error) {
+                console.error('Failed to initialize license page:', error);
+                showNotification('Failed to load license data', 'error');
+            }
+        }
+
+        // Load license summary for dashboard cards
+        async function loadLicenseSummary() {
+            try {
+                const response = await fetch('/api/admin/licenses?action=summary', {
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const data = result.data;
+
+                    document.getElementById('totalLicenses').textContent = data.total_licenses || 0;
+                    document.getElementById('activeLicenses').textContent = data.active_licenses || 0;
+                    document.getElementById('expiringLicenses').textContent = data.expiring_soon || 0;
+                    document.getElementById('expiredLicenses').textContent = data.expired_licenses || 0;
+                    document.getElementById('complianceRate').textContent = `${data.compliance_rate || 0}%`;
+                } else {
+                    throw new Error('Failed to load summary');
+                }
+            } catch (error) {
+                console.error('Error loading license summary:', error);
+                // Set default values on error
+                document.getElementById('totalLicenses').textContent = '0';
+                document.getElementById('activeLicenses').textContent = '0';
+                document.getElementById('expiringLicenses').textContent = '0';
+                document.getElementById('expiredLicenses').textContent = '0';
+                document.getElementById('complianceRate').textContent = '0%';
+            }
+        }
+
+        // Load license types for filters
+        async function loadLicenseTypes() {
+            try {
+                const response = await fetch('/api/admin/license-types', {
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    licenseTypes = result.data;
+                    populateTypeFilter();
+                } else {
+                    console.error('Failed to load license types');
+                }
+            } catch (error) {
+                console.error('Error loading license types:', error);
+            }
+        }
+
+        // Populate the type filter dropdown
+        function populateTypeFilter() {
+            const typeFilter = document.getElementById('typeFilter');
+            typeFilter.innerHTML = '<option value="">All Types</option>';
+            
+            licenseTypes.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type.type_code;
+                option.textContent = type.type_name;
+                typeFilter.appendChild(option);
+            });
+        }
+
+        // Load licenses with current filters and pagination
+        async function loadLicenses() {
+            try {
+                // Build query parameters
+                const params = new URLSearchParams({
+                    limit: currentLimit.toString(),
+                    offset: (currentPage * currentLimit).toString(),
+                    sort_by: currentSort.field,
+                    sort_order: currentSort.order
+                });
+
+                // Add filters
+                Object.keys(currentFilters).forEach(key => {
+                    if (currentFilters[key]) {
+                        params.append(key, currentFilters[key]);
+                    }
+                });
+
+                const response = await fetch(`/api/admin/licenses?${params}`, {
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    allLicenses = result.data;
+                    displayLicenses(allLicenses);
+                    updatePagination(result.pagination);
+                } else {
+                    throw new Error('Failed to load licenses');
+                }
+            } catch (error) {
+                console.error('Error loading licenses:', error);
+                displayEmptyState();
+            }
+        }
+
+        // Display licenses in the table
+        function displayLicenses(licenses) {
+            const tbody = document.getElementById('licensesTableBody');
+            
+            if (!licenses || licenses.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="empty-state">
+                            <i data-lucide="file-text" style="margin-bottom: 1rem;"></i>
+                            <div>No licenses found</div>
+                        </td>
+                    </tr>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            tbody.innerHTML = licenses.map(license => {
+                const expirationCategory = getExpirationCategory(license.days_until_expiry);
+                const statusClass = getStatusClass(license.status);
+                
+                return `
+                    <tr class="license-row ${expirationCategory}" data-license-id="${license.id}">
+                        <td>${license.agent_name || 'N/A'}</td>
+                        <td>${license.license_number}</td>
+                        <td>${license.state}</td>
+                        <td>${getLicenseTypeName(license.license_type)}</td>
+                        <td>${formatDate(license.issue_date)}</td>
+                        <td>${formatDate(license.expiration_date)}</td>
+                        <td>
+                            <span class="status-badge ${statusClass}">${license.status}</span>
+                        </td>
+                        <td>
+                            <span class="expiry-days ${expirationCategory}">
+                                ${formatExpirationDays(license.days_until_expiry)}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="license-actions-dropdown">
+                                <button class="actions-btn" onclick="toggleActionsDropdown('${license.id}')">
+                                    <i data-lucide="more-horizontal"></i>
+                                </button>
+                                <div class="actions-dropdown" id="actions-${license.id}">
+                                    <div class="dropdown-item" onclick="viewLicenseDetails('${license.id}')">
+                                        <i data-lucide="eye"></i>
+                                        View Details
+                                    </div>
+                                    <div class="dropdown-item" onclick="editLicense('${license.id}')">
+                                        <i data-lucide="edit"></i>
+                                        Edit License
+                                    </div>
+                                    <div class="dropdown-item" onclick="sendReminder('${license.id}')">
+                                        <i data-lucide="mail"></i>
+                                        Send Reminder
+                                    </div>
+                                    <div class="dropdown-item" onclick="deleteLicense('${license.id}')" style="color: #ef4444;">
+                                        <i data-lucide="trash"></i>
+                                        Delete
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        // Get expiration category for styling
+        function getExpirationCategory(daysUntilExpiry) {
+            if (daysUntilExpiry < 0) return 'expired';
+            if (daysUntilExpiry <= 30) return 'expiring-soon';
+            if (daysUntilExpiry <= 60) return 'renewal-needed';
+            return 'valid';
+        }
+
+        // Get status class for badge styling
+        function getStatusClass(status) {
+            return `status-${status.toLowerCase()}`;
+        }
+
+        // Get license type name from code
+        function getLicenseTypeName(typeCode) {
+            const type = licenseTypes.find(t => t.type_code === typeCode);
+            return type ? type.type_name : typeCode;
+        }
+
+        // Format date for display
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            return new Date(dateString).toLocaleDateString();
+        }
+
+        // Format expiration days
+        function formatExpirationDays(days) {
+            if (days < 0) return `Expired ${Math.abs(days)} days ago`;
+            if (days === 0) return 'Expires today';
+            if (days === 1) return 'Expires tomorrow';
+            return `${days} days`;
+        }
+
+        // Display empty state
+        function displayEmptyState() {
+            const tbody = document.getElementById('licensesTableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="empty-state">
+                        <i data-lucide="alert-circle" style="margin-bottom: 1rem;"></i>
+                        <div>Failed to load licenses</div>
+                    </td>
+                </tr>
+            `;
+            lucide.createIcons();
+        }
+
+        // Update pagination info and controls
+        function updatePagination(pagination) {
+            const info = document.getElementById('paginationInfo');
+            const prevBtn = document.getElementById('prevButton');
+            const nextBtn = document.getElementById('nextButton');
+
+            if (pagination) {
+                const start = pagination.offset + 1;
+                const end = Math.min(pagination.offset + pagination.limit, pagination.total);
+                info.textContent = `Showing ${start}-${end} of ${pagination.total} licenses`;
+
+                prevBtn.disabled = pagination.offset === 0;
+                nextBtn.disabled = !pagination.has_more;
+            } else {
+                info.textContent = 'Showing 0 of 0 licenses';
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Search input
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', debounce(() => {
+                currentFilters.search = searchInput.value;
+                currentPage = 0;
+                loadLicenses();
+            }, 500));
+
+            // Filter dropdowns
+            ['stateFilter', 'typeFilter', 'statusFilter'].forEach(filterId => {
+                const filter = document.getElementById(filterId);
+                filter.addEventListener('change', () => {
+                    const filterKey = filterId.replace('Filter', '');
+                    currentFilters[filterKey === 'type' ? 'license_type' : filterKey] = filter.value;
+                    currentPage = 0;
+                    loadLicenses();
+                });
+            });
+
+            // Table sorting
+            document.querySelectorAll('th[data-sort]').forEach(th => {
+                th.addEventListener('click', () => {
+                    const field = th.dataset.sort;
+                    if (currentSort.field === field) {
+                        currentSort.order = currentSort.order === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSort.field = field;
+                        currentSort.order = 'asc';
+                    }
+                    updateSortIcons();
+                    loadLicenses();
+                });
+            });
+
+            // Sync button
+            const syncButton = document.getElementById('syncButton');
+            syncButton.addEventListener('click', syncWithNIPR);
+
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.license-actions-dropdown')) {
+                    document.querySelectorAll('.actions-dropdown.show').forEach(dropdown => {
+                        dropdown.classList.remove('show');
+                    });
+                }
+            });
+        }
+
+        // Update sort icons
+        function updateSortIcons() {
+            document.querySelectorAll('th[data-sort]').forEach(th => {
+                const icon = th.querySelector('.sort-icon');
+                th.classList.remove('sorted');
+                
+                if (th.dataset.sort === currentSort.field) {
+                    th.classList.add('sorted');
+                    icon.setAttribute('data-lucide', currentSort.order === 'asc' ? 'chevron-up' : 'chevron-down');
+                } else {
+                    icon.setAttribute('data-lucide', 'chevron-up');
+                }
+            });
+            lucide.createIcons();
+        }
+
+        // Pagination functions
+        function previousPage() {
+            if (currentPage > 0) {
+                currentPage--;
+                loadLicenses();
+            }
+        }
+
+        function nextPage() {
+            currentPage++;
+            loadLicenses();
+        }
+
+        // Clear all filters
+        function clearFilters() {
+            currentFilters = {
+                search: '',
+                state: '',
+                license_type: '',
+                status: ''
+            };
+            
+            document.getElementById('searchInput').value = '';
+            document.getElementById('stateFilter').value = '';
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            
+            currentPage = 0;
+            loadLicenses();
+        }
+
+        // Toggle actions dropdown
+        function toggleActionsDropdown(licenseId) {
+            const dropdown = document.getElementById(`actions-${licenseId}`);
+            const isShow = dropdown.classList.contains('show');
+            
+            // Close all dropdowns
+            document.querySelectorAll('.actions-dropdown.show').forEach(d => {
+                d.classList.remove('show');
+            });
+            
+            // Toggle current dropdown
+            if (!isShow) {
+                dropdown.classList.add('show');
+            }
+        }
+
+        // License action functions
+        function viewLicenseDetails(licenseId) {
+            const license = allLicenses.find(l => l.id === licenseId);
+            if (license) {
+                alert(`License Details:\n\nAgent: ${license.agent_name}\nNumber: ${license.license_number}\nState: ${license.state}\nType: ${getLicenseTypeName(license.license_type)}\nExpires: ${formatDate(license.expiration_date)}\nStatus: ${license.status}`);
+            }
+        }
+
+        function editLicense(licenseId) {
+            showNotification('License editing functionality coming soon', 'info');
+        }
+
+        function sendReminder(licenseId) {
+            showNotification('Sending renewal reminder...', 'info');
+            // Implement reminder sending logic
+        }
+
+        function deleteLicense(licenseId) {
+            if (confirm('Are you sure you want to delete this license? This action cannot be undone.')) {
+                // Implement delete logic
+                showNotification('License deleted successfully', 'success');
+                loadLicenses();
+            }
+        }
+
+        // Sync with NIPR
+        async function syncWithNIPR() {
+            const syncButton = document.getElementById('syncButton');
+            const syncStatus = document.getElementById('syncStatus');
+            const syncStatusText = document.getElementById('syncStatusText');
+            
+            try {
+                // Show sync status
+                syncButton.disabled = true;
+                syncStatus.classList.add('show');
+                syncStatusText.textContent = 'Syncing with NIPR...';
+
+                const response = await fetch('/api/admin/licenses?action=sync', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ force_sync: true })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    syncStatusText.textContent = `Sync complete! Updated ${result.data.synced_licenses} licenses`;
+                    
+                    // Reload data
+                    await loadLicenseSummary();
+                    await loadLicenses();
+                    
+                    setTimeout(() => {
+                        syncStatus.classList.remove('show');
+                    }, 3000);
+                    
+                } else {
+                    throw new Error('Sync failed');
+                }
+                
+            } catch (error) {
+                console.error('Sync error:', error);
+                syncStatusText.textContent = 'Sync failed. Please try again.';
+                setTimeout(() => {
+                    syncStatus.classList.remove('show');
+                }, 3000);
+            } finally {
+                syncButton.disabled = false;
+            }
+        }
+
+        // Export to CSV
+        function exportToCSV() {
+            if (!allLicenses || allLicenses.length === 0) {
+                showNotification('No data to export', 'warning');
+                return;
+            }
+
+            const headers = [
+                'Agent Name', 'License Number', 'State', 'License Type', 
+                'Issue Date', 'Expiration Date', 'Status', 'Days Until Expiry'
+            ];
+
+            const csvContent = [
+                headers.join(','),
+                ...allLicenses.map(license => [
+                    `"${license.agent_name || 'N/A'}"`,
+                    `"${license.license_number}"`,
+                    `"${license.state}"`,
+                    `"${getLicenseTypeName(license.license_type)}"`,
+                    `"${formatDate(license.issue_date)}"`,
+                    `"${formatDate(license.expiration_date)}"`,
+                    `"${license.status}"`,
+                    `"${license.days_until_expiry}"`
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `licenses-export-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            showNotification('License data exported successfully', 'success');
+        }
+
+        // Utility functions
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function showNotification(message, type = 'info') {
+            // Simple notification implementation
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 1rem;
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+                color: white;
+                border-radius: 8px;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function logout() {
+            clearAuthCookies();
+            window.location.href = '/login';
+        }
+    </script>
+    <script src="/js/theme-switcher.js"></script>
+</body>
+</html>

@@ -30,7 +30,7 @@ export default async function handler(req, res) {
             'R2_BUCKET_NAME',
             'JWT_SECRET',
             'NEXT_PUBLIC_SUPABASE_URL',
-            'SUPABASE_SERVICE_KEY'
+            'SUPABASE_SERVICE_ROLE_KEY'
         ];
 
         requiredEnvVars.forEach(envVar => {
@@ -72,12 +72,12 @@ export default async function handler(req, res) {
         }
 
         // Check Supabase connection
-        if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) {
+        if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
             try {
                 const { createClient } = await import('@supabase/supabase-js');
                 const supabase = createClient(
                     process.env.NEXT_PUBLIC_SUPABASE_URL,
-                    process.env.SUPABASE_SERVICE_KEY
+                    process.env.SUPABASE_SERVICE_ROLE_KEY
                 );
                 
                 // Test connection with a simple query

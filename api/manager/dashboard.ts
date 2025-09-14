@@ -13,7 +13,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const authed = Boolean(bearer || cookieToken);
 
     // Bulletproof environment check - list exact keys needed
-    const REQUIRED = ["NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_SERVICE_KEY"];
+    const REQUIRED = ["NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"];
     const missing = REQUIRED.filter(k => !process.env[k]);
     if (missing.length) {
       console.warn('[dashboard] env-missing', missing);
@@ -30,7 +30,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.SUPABASE_SERVICE_KEY;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     // TODO: plug in real DB query; keep try/catch and return zeros on error.
     const kpis = await getKPIs(timeframe).catch((e)=>{ console.error('[dashboard] db', e); return empty(); });

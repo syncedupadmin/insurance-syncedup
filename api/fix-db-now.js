@@ -20,17 +20,17 @@ export default async function handler(req, res) {
 
   try {
     // Environment validation
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       return res.status(500).json({ 
         error: 'Missing Supabase configuration',
-        message: 'NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_KEY required'
+        message: 'NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY required'
       });
     }
 
     console.log('🚨 EMERGENCY DATABASE FIX STARTING');
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const serviceKey = process.env.SUPABASE_SERVICE_KEY;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     
     const fixResults = {
       timestamp: new Date().toISOString(),

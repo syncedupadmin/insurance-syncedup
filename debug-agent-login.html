@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Agent Login</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #fff; }
+        button { padding: 10px 20px; margin: 10px; cursor: pointer; }
+        pre { background: #2a2a2a; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        .success { color: #4ade80; }
+        .error { color: #ef4444; }
+        .info { color: #60a5fa; }
+    </style>
+</head>
+<body>
+    <h1>Debug Agent Login - agent1@phsagency.com</h1>
+
+    <div>
+        <button onclick="testDirectSupabase()">1. Test Direct Supabase Auth</button>
+        <button onclick="testAPIEndpoint()">2. Test API Endpoint</button>
+        <button onclick="checkUserMetadata()">3. Check User Metadata</button>
+        <button onclick="testFullLoginFlow()">4. Test Full Login Flow</button>
+    </div>
+
+    <pre id="output"></pre>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+        const SUPABASE_URL = 'https://zgkszwkxibpnxhvlenct.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpna3N6d2t4aWJwbnhodmxlbmN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMTk3OTMsImV4cCI6MjA3MTg5NTc5M30.1n7a1TYOM2zWiCUfGFhQnfPb8fjvDkDa_ba3CKZEB98';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const output = document.getElementById('output');
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+            output.innerHTML += `<span class="${type}">[${timestamp}] ${message}</span>\n`;
+        }
+
+        window.testDirectSupabase = async function() {
+            output.innerHTML = '';
+            log('Testing direct Supabase authentication...');
+
+            const password = prompt('Enter password for agent1@phsagency.com:');
+            if (!password) {
+                log('Password required', 'error');
+                return;
+            }
+
+            try {
+                log('Calling supabase.auth.signInWithPassword...');
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: 'agent1@phsagency.com',
+                    password: password
+                });
+
+                if (error) {
+                    log(`Supabase Error: ${error.message}`, 'error');
+                    log(`Error code: ${error.code || 'none'}`, 'error');
+                    log(`Error status: ${error.status || 'none'}`, 'error');
+                    return;
+                }
+
+                log('SUCCESS! Authentication successful', 'success');
+                log(`User ID: ${data.user.id}`, 'success');
+                log(`Email: ${data.user.email}`, 'success');
+                log(`Role (user_metadata): ${JSON.stringify(data.user.user_metadata)}`, 'info');
+                log(`Role (app_metadata): ${JSON.stringify(data.user.app_metadata)}`, 'info');
+                log(`Access Token: ${data.session.access_token.slice(0, 50)}...`, 'info');
+
+                // Store for further tests
+                window.testToken = data.session.access_token;
+                window.testUser = data.user;
+
+            } catch (err) {
+                log(`Exception: ${err.message}`, 'error');
+                console.error(err);
+            }
+        };
+
+        window.testAPIEndpoint = async function() {
+            output.innerHTML = '';
+            log('Testing /api/auth/login endpoint...');
+
+            const password = prompt('Enter password for agent1@phsagency.com:');
+            if (!password) {
+                log('Password required', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'agent1@phsagency.com',
+                        password: password
+                    }),
+                    credentials: 'include'
+                });
+
+                log(`Response Status: ${response.status} ${response.statusText}`, response.ok ? 'success' : 'error');
+
+                const responseText = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch {
+                    log(`Raw Response: ${responseText}`, 'error');
+                    return;
+                }
+
+                log(`Response Body: ${JSON.stringify(data, null, 2)}`, response.ok ? 'info' : 'error');
+
+                if (response.ok && data.success) {
+                    log('Login successful!', 'success');
+                    log(`Redirect URL: ${data.redirect}`, 'success');
+                    log(`User Role: ${data.user?.role}`, 'success');
+                }
+
+            } catch (err) {
+                log(`Network Error: ${err.message}`, 'error');
+                console.error(err);
+            }
+        };
+
+        window.checkUserMetadata = async function() {
+            output.innerHTML = '';
+            log('Checking user metadata in database...');
+
+            if (!window.testToken) {
+                log('Please run "Test Direct Supabase Auth" first', 'error');
+                return;
+            }
+
+            try {
+                // Get the user data
+                const { data: userData, error } = await supabase.auth.getUser(window.testToken);
+
+                if (error) {
+                    log(`Error getting user: ${error.message}`, 'error');
+                    return;
+                }
+
+                log('User Metadata:', 'info');
+                log(`ID: ${userData.user.id}`, 'info');
+                log(`Email: ${userData.user.email}`, 'info');
+                log(`Created: ${userData.user.created_at}`, 'info');
+                log(`Last Sign In: ${userData.user.last_sign_in_at}`, 'info');
+                log('', 'info');
+                log('user_metadata:', 'info');
+                log(JSON.stringify(userData.user.user_metadata, null, 2), 'info');
+                log('', 'info');
+                log('app_metadata:', 'info');
+                log(JSON.stringify(userData.user.app_metadata, null, 2), 'info');
+
+                // Check what role would be extracted
+                const role = userData.user.user_metadata?.role ??
+                           userData.user.app_metadata?.role ??
+                           'agent';
+
+                log('', 'info');
+                log(`Extracted Role: ${role}`, role === 'agent' ? 'success' : 'error');
+                log(`Expected Redirect: /agent/`, 'info');
+
+            } catch (err) {
+                log(`Exception: ${err.message}`, 'error');
+                console.error(err);
+            }
+        };
+
+        window.testFullLoginFlow = async function() {
+            output.innerHTML = '';
+            log('Testing full login flow simulation...');
+
+            const password = prompt('Enter password for agent1@phsagency.com:');
+            if (!password) {
+                log('Password required', 'error');
+                return;
+            }
+
+            try {
+                // Step 1: Direct Supabase auth
+                log('Step 1: Supabase authentication...', 'info');
+                const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                    email: 'agent1@phsagency.com',
+                    password: password
+                });
+
+                if (authError) {
+                    log(`Auth failed: ${authError.message}`, 'error');
+                    return;
+                }
+
+                log('✓ Supabase auth successful', 'success');
+
+                // Step 2: Extract role
+                const role = authData.user.user_metadata?.role ??
+                           authData.user.app_metadata?.role ??
+                           'agent';
+
+                log(`Step 2: Role extraction: ${role}`, 'info');
+
+                // Step 3: Determine redirect
+                const redirectMap = {
+                    'super_admin': '/super-admin/',
+                    'admin': '/admin/',
+                    'manager': '/manager/',
+                    'agent': '/agent/',
+                    'customer_service': '/customer-service/'
+                };
+                const redirect = redirectMap[role] || '/agent/';
+
+                log(`Step 3: Redirect determination: ${redirect}`, 'info');
+
+                // Step 4: Test the redirect URL
+                log('Step 4: Testing redirect URL...', 'info');
+                const testResponse = await fetch(redirect, {
+                    method: 'HEAD',
+                    headers: {
+                        'Authorization': `Bearer ${authData.session.access_token}`
+                    }
+                });
+
+                log(`Redirect URL status: ${testResponse.status}`, testResponse.ok ? 'success' : 'error');
+
+                log('', 'info');
+                log('=== SUMMARY ===', 'info');
+                log(`User: agent1@phsagency.com`, 'success');
+                log(`Role: ${role}`, 'success');
+                log(`Should redirect to: ${redirect}`, 'success');
+                log(`Token: ${authData.session.access_token.slice(0, 30)}...`, 'info');
+
+            } catch (err) {
+                log(`Exception: ${err.message}`, 'error');
+                console.error(err);
+            }
+        };
+    </script>
+</body>
+</html>

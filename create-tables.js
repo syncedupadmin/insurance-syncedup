@@ -3,7 +3,7 @@ require('dotenv').config({ path: '.env.local' });
 
 async function createTables() {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     
     if (!supabaseUrl || !supabaseKey) {
         console.error('Missing Supabase credentials');
