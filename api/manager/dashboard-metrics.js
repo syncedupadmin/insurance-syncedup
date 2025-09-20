@@ -1,7 +1,8 @@
 const { createClient } = require('@supabase/supabase-js');
+const { verifyCookieAuth } = require('../_utils/cookie-auth.js');
 
 const supabase = createClient(
-    process.env.SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
@@ -11,17 +12,19 @@ module.exports = async (req, res) => {
     }
 
     try {
-        // Get auth token
-        const token = req.headers.authorization?.replace('Bearer ', '');
-        if (!token) {
-            return res.status(401).json({ error: 'No authorization token' });
+        // Verify authentication using cookie-based auth
+        const auth = await verifyCookieAuth(req);
+        if (!auth.success) {
+            return res.status(401).json({ error: auth.error });
         }
 
-        // Verify user and get their info
-        const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-        if (authError || !user) {
-            return res.status(401).json({ error: 'Invalid token' });
+        // Check for manager, admin, or super_admin role
+        const allowedRoles = ['manager', 'admin', 'super_admin'];
+        if (!allowedRoles.includes(auth.user.normalizedRole)) {
+            return res.status(403).json({ error: 'Manager access required' });
         }
+
+        const user = auth.user;
 
         // Get user's portal info including agency_id
         const { data: managerUser, error: managerError } = await supabase

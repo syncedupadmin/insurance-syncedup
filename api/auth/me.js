@@ -1,10 +1,8 @@
 const { verifyToken } = require('../../lib/auth-bridge.js');
-import { createClient } from '@supabase/supabase-js';
-import cookie from 'cookie';
+const { createClient } = require('@supabase/supabase-js');
+const cookie = require('cookie');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-change-in-production';
-
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // CORS headers
   const origin = req.headers.origin || '*';
   res.setHeader('Access-Control-Allow-Origin', origin);
@@ -19,14 +17,18 @@ export default async function handler(req, res) {
   try {
     // Parse cookies from request
     const cookies = cookie.parse(req.headers.cookie || '');
-    const token = cookies['auth-token'];
+    const token = cookies['auth_token']; // Changed from 'auth-token' to match login.js
 
     if (!token) {
       return res.status(401).json({ authenticated: false, error: 'No authentication token' });
     }
 
     // Verify JWT token
-    const payload = await verifyToken(, ["auth_token","auth-token","user_role","user_roles","assumed_role"]);
+    const payload = await verifyToken(token);
+
+    if (!payload) {
+      return res.status(401).json({ authenticated: false, error: 'Invalid token' });
+    }
 
     // Optional DB cross-check to ensure user still exists/active
     const supabase = createClient(
@@ -44,23 +46,34 @@ export default async function handler(req, res) {
     if (error || !dbUser) {
       // Handle system users that don't exist in database
       const systemUsers = {
-        'super-admin-main': { 
-          id: 'super-admin-main', 
-          email: 'admin@syncedupsolutions.com', 
-          name: 'Super Administrator', 
-          role: 'super-admin', 
-          agency_id: 'SYSTEM', 
-          is_active: true, 
-          must_change_password: false, 
-          login_count: 0 
+        'super-admin-main': {
+          id: 'super-admin-main',
+          email: 'admin@syncedupsolutions.com',
+          name: 'Super Administrator',
+          role: 'super-admin',
+          agency_id: 'SYSTEM',
+          is_active: true,
+          must_change_password: false,
+          login_count: 0
         }
       };
-      
+
       const systemUser = systemUsers[payload.id];
       if (!systemUser) {
-        return res.status(403).json({ authenticated: false, error: 'User not found' });
+        // For users not in database, use payload data
+        user = {
+          id: payload.id,
+          email: payload.email,
+          name: payload.email?.split('@')[0] || 'User',
+          role: payload.role || 'agent',
+          agency_id: payload.agency_id || payload.agencyId,
+          is_active: true,
+          must_change_password: false,
+          login_count: 0
+        };
+      } else {
+        user = systemUser;
       }
-      user = systemUser;
     } else if (dbUser.is_active === false) {
       return res.status(403).json({ authenticated: false, error: 'User inactive' });
     } else {
