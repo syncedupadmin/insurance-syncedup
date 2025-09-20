@@ -37,9 +37,9 @@ module.exports = async function handler(req, res) {
     );
 
     const { data: dbUser, error } = await supabase
-      .from('users')
-      .select('id,email,name,role,agency_id,is_active,must_change_password,login_count')
-      .eq('id', payload.id)
+      .from('portal_users')
+      .select('id,email,full_name,role,agency_id,is_active,must_change_password')
+      .eq('auth_user_id', payload.sub || payload.id)
       .single();
 
     let user;
@@ -91,8 +91,8 @@ module.exports = async function handler(req, res) {
     const responseUser = {
       id: user.id,
       email: user.email,
-      firstName: user.name?.split(' ')[0] || 'User',
-      lastName: user.name?.split(' ').slice(1).join(' ') || '',
+      firstName: (user.full_name || user.name)?.split(' ')[0] || 'User',
+      lastName: (user.full_name || user.name)?.split(' ').slice(1).join(' ') || '',
       role: normalizedRole,
       agency_id: user.agency_id,
       mustChangePassword: user.must_change_password || false,
