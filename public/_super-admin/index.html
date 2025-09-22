@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Admin Console</title>
-    <link rel="stylesheet" href="./css/super-admin.css">
+    <link rel="stylesheet" href="/_super-admin/css/super-admin.css">
+    <script src="/js/auth-check.js?v=3" defer></script>
 </head>
 <body>
     <div class="admin-console">
@@ -358,6 +359,198 @@
     <!-- Edit User Overlay -->
     <div id="edit-user-overlay" class="panel-overlay" onclick="closeEditUserForm()"></div>
 
-    <script src="./js/main.js"></script>
+    <!-- Password Reset Modal -->
+    <div id="password-reset-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-key"></i> Reset Password</h2>
+                <button class="close-btn" onclick="closePasswordResetModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="password-reset-confirm" style="display: block;">
+                    <p>Are you sure you want to reset the password for:</p>
+                    <p class="user-email" id="reset-email"></p>
+                    <p class="warning-text">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        This will generate a new password and invalidate all existing sessions.
+                    </p>
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" onclick="confirmPasswordReset()">
+                            <i class="fas fa-check"></i> Yes, Reset Password
+                        </button>
+                        <button class="btn" onclick="closePasswordResetModal()">Cancel</button>
+                    </div>
+                </div>
+                <div id="password-reset-result" style="display: none;">
+                    <div class="success-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3>Password Reset Successful!</h3>
+                    <p>New password for <span id="result-email"></span>:</p>
+                    <div class="password-display">
+                        <input type="text" id="new-password-display" readonly />
+                        <button class="btn-copy" onclick="copyPassword()">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <p class="info-text">
+                        <i class="fas fa-info-circle"></i>
+                        Please share this password securely with the user.
+                        All existing sessions have been invalidated.
+                    </p>
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" onclick="closePasswordResetModal()">Done</button>
+                    </div>
+                </div>
+                <div id="password-reset-loading" style="display: none;">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    <p>Resetting password...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Reset Modal Styles -->
+    <style>
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: #1a1f2e;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #2a3142;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .user-email {
+            font-size: 18px;
+            color: #64b5f6;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .warning-text {
+            background: rgba(255, 152, 0, 0.1);
+            border: 1px solid rgba(255, 152, 0, 0.3);
+            color: #ff9800;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .success-icon {
+            text-align: center;
+            font-size: 48px;
+            color: #4caf50;
+            margin-bottom: 20px;
+        }
+
+        .password-display {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .password-display input {
+            flex: 1;
+            padding: 12px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            color: #58a6ff;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            border-radius: 6px;
+        }
+
+        .btn-copy {
+            padding: 12px 20px;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-copy:hover {
+            background: #2ea043;
+        }
+
+        .info-text {
+            background: rgba(64, 169, 255, 0.1);
+            border: 1px solid rgba(64, 169, 255, 0.3);
+            color: #58a6ff;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            font-size: 48px;
+            color: #64b5f6;
+            margin-bottom: 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+
+    <script src="/_super-admin/js/main.js"></script>
 </body>
 </html>

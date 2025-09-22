@@ -1,5 +1,5 @@
 // Request password reset API endpoint - Using Supabase Auth
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -23,7 +23,7 @@ function bad(res, code, msg) {
   res.status(code).end(JSON.stringify({ error: msg }));
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return bad(res, 405, 'Method Not Allowed');
 
   try {

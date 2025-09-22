@@ -51,7 +51,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reports & Analytics - SyncedUp Insurance</title>
     
-    <script src="/js/auth-helper.js"></script>
     
     <!-- Favicons - Purple for Admin Portal -->
     <link rel="icon" type="image/png" sizes="50x50" href="/favicons/admin-50x50.png">
@@ -99,6 +98,7 @@
         .two-column { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; }
         @media (max-width: 768px) { .two-column { grid-template-columns: 1fr; } }
     </style>
+    <script src="/js/auth-check.js?v=3" defer></script>
 </head>
 <body>
     <!-- Global Header Mount Point -->
@@ -442,6 +442,5 @@
     
     <!-- Professional Theme System -->
     <script src="/js/theme-switcher.js"></script>
-    <script src="/assets/session-prod.js"></script>
 </body>
 </html>

@@ -1,9 +1,22 @@
-// DISABLED: // DISABLED: // DISABLED: // DISABLED: import { requireAuth, logAction } from '../_middleware/authCheck.js';
-import { createClient } from '@supabase/supabase-js';
-import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
+const { createClient } = require('@supabase/supabase-js');
+const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
+const { verifyCookieAuth } = require('../_utils/cookie-auth.js');
 
 async function resetPasswordHandler(req, res) {
+  // Verify authentication using cookie-based auth
+  const auth = await verifyCookieAuth(req);
+  if (!auth.success) {
+    return res.status(401).json({ error: auth.error });
+  }
+
+  // Check for admin or super_admin role
+  const allowedRoles = ['admin', 'super_admin'];
+  if (!allowedRoles.includes(auth.user.normalizedRole)) {
+    return res.status(403).json({ error: 'Admin access required' });
+  }
+
+  const user = auth.user;
   const supabase = req.supabase || createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -17,8 +30,8 @@ async function resetPasswordHandler(req, res) {
         return res.status(400).json({ error: 'User ID is required' });
       }
 
-      // Get current admin user from request
-      const currentUser = req.user;
+      // Get current admin user from auth
+      const currentUser = user;
       const isAdmin = currentUser?.role === 'admin';
       const isSuperAdmin = currentUser?.role === 'super_admin';
 
@@ -133,4 +146,4 @@ async function resetPasswordHandler(req, res) {
 }
 
 // DISABLED: export default requireAuth.*Handler);
-export default resetPasswordHandler;
+module.exports = resetPasswordHandler;

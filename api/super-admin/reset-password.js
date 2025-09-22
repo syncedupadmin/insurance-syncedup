@@ -1,9 +1,16 @@
 const { createClient } = require('@supabase/supabase-js');
+const { verifyToken } = require('../../lib/auth-bridge.js');
+const crypto = require('crypto');
 
 const supabase = createClient(
-    process.env.SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY
 );
+
+function getCookie(req, name) {
+    const m = (req.headers.cookie || "").match(new RegExp(`(?:^|; )${name}=([^;]+)`));
+    return m ? decodeURIComponent(m[1]) : null;
+}
 
 module.exports = async (req, res) => {
     if (req.method !== 'POST') {
@@ -11,20 +18,21 @@ module.exports = async (req, res) => {
     }
 
     try {
-        // Check if user is super admin
-        const token = req.headers.authorization?.replace('Bearer ', '');
+        // Check cookie-based authentication
+        const token = getCookie(req, "auth_token");
         if (!token) {
             return res.status(401).json({ error: 'No authorization token' });
         }
 
         // Verify the token and check role
-        const { data: { user }, error } = await supabase.auth.getUser(token);
-        if (error || !user) {
+        const payload = await verifyToken(token);
+        if (!payload) {
             return res.status(401).json({ error: 'Invalid token' });
         }
 
-        // Check if user is super admin
-        if (user.user_metadata?.role !== 'super_admin' && user.app_metadata?.role !== 'super_admin') {
+        // Check if user is super admin (normalize role names)
+        const userRole = payload.role?.toLowerCase().replace(/-/g, '_');
+        if (userRole !== 'super_admin') {
             return res.status(403).json({ error: 'Unauthorized - Super Admin access required' });
         }
 
@@ -35,17 +43,71 @@ module.exports = async (req, res) => {
 
         // Generate strong random password
         const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=";
-        const randomBytes = Array.from(crypto.getRandomValues(new Uint8Array(24)));
-        const new_password = randomBytes.map(b => alphabet[b % alphabet.length]).join('');
+        const randomBytes = crypto.randomBytes(24);
+        const new_password = Array.from(randomBytes).map(b => alphabet[b % alphabet.length]).join('');
 
-        // Update user password using admin API
-        const { error: updateError } = await supabase.auth.admin.updateUserById(user_id, {
-            password: new_password
-        });
+        // First, try to get the user by email (since user_id might be from a different system)
+        let authUser = null;
 
-        if (updateError) {
-            console.error('Password update error:', updateError);
-            return res.status(400).json({ error: updateError.message });
+        // Search for user by user_id first (in case it's a Supabase auth ID)
+        try {
+            const { data: userById } = await supabase.auth.admin.getUserById(user_id);
+            if (userById && userById.user) {
+                authUser = userById.user;
+            }
+        } catch (e) {
+            // User not found by ID, will try by email
+        }
+
+        // If no user found by ID, we need to get email from somewhere
+        // Check if user_id is actually an email
+        let userEmail = null;
+        if (user_id.includes('@')) {
+            userEmail = user_id;
+        } else {
+            // Try to get user info from portal_users table
+            const { data: portalUser } = await supabase
+                .from('portal_users')
+                .select('email')
+                .eq('id', user_id)
+                .single();
+
+            if (portalUser) {
+                userEmail = portalUser.email;
+            }
+        }
+
+        if (!authUser && userEmail) {
+            // Try to find user by email
+            const { data: userList } = await supabase.auth.admin.listUsers();
+            authUser = userList?.users?.find(u => u.email === userEmail);
+        }
+
+        // Now update or create the user
+        if (authUser) {
+            // User exists, update password
+            const { error: updateError } = await supabase.auth.admin.updateUserById(authUser.id, {
+                password: new_password
+            });
+
+            if (updateError) {
+                console.error('Password update error:', updateError);
+                return res.status(400).json({ error: updateError.message });
+            }
+        } else if (userEmail) {
+            // User doesn't exist in Supabase Auth, create them
+            const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
+                email: userEmail,
+                password: new_password,
+                email_confirm: true
+            });
+
+            if (createError) {
+                console.error('User creation error:', createError);
+                return res.status(400).json({ error: createError.message });
+            }
+        } else {
+            return res.status(400).json({ error: 'Could not find user email' });
         }
 
         // Invalidate all refresh tokens

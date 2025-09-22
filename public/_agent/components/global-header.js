@@ -56,10 +56,13 @@
         // Get current user data
         getUserData: async function() {
             try {
-                // First, try to get from localStorage (most up-to-date)
-                const localUser = localStorage.getItem('user');
-                if (localUser) {
-                    const userData = JSON.parse(localUser);
+                // Use cookie-based authentication to get user data
+                const response = await fetch('/api/auth/verify', {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    const userData = await response.json();
                     if (userData.firstName && userData.lastName) {
                         return {
                             role: userData.role || 'agent',

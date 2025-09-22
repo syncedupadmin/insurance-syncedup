@@ -65,13 +65,13 @@
     <link rel="stylesheet" href="/css/themes/agent-modern.css">
     
     <!-- Load auth helper for user context -->
-    <script src="/js/auth-helper.js"></script>
     <!-- Load role switcher if available -->
     <script src="/js/role-switcher.js"></script>
     <!-- Load navigation component -->
-    <script src="/agent/components/navigation.js"></script>
+    <script src="/_agent/components/navigation.js"></script>
     <!-- Load global header component -->
-    <script src="/agent/components/global-header.js"></script>
+    <script src="/_agent/components/global-header.js"></script>
+    <script src="/js/auth-check.js?v=3" defer></script>
 </head>
 <body class="portal-agent">
     <!-- Global Header Mount Point -->
@@ -208,59 +208,24 @@
 
         // Authentication check
         async function checkAuth() {
-            // Server-side portal guard already verified agent access
-            try {
-                // First check localStorage for user data
-                const localUser = localStorage.getItem('user');
-                if (localUser) {
-                    const userData = JSON.parse(localUser);
-                    currentUser = userData;
-                    
+            // Use SyncedUpAuth for authentication
+            if (window.SyncedUpAuth) {
+                const isAuthed = await window.SyncedUpAuth.requireAuth({ role: 'agent' });
+                if (isAuthed) {
+                    currentUser = await window.SyncedUpAuth.getCurrentUser();
                     // Update global header if available
                     if (window.AgentHeader && window.AgentHeader.refreshUserData) {
                         await window.AgentHeader.refreshUserData();
                     }
-                    return true;
                 }
-                
-                // Try to get from server
-                const userResponse = await fetch('/api/auth/verify', { credentials: 'include' });
-                if (userResponse.ok) {
-                    const { user } = await userResponse.json();
-                    currentUser = user;
-                    
-                    // Save to localStorage for persistence
-                    if (user) {
-                        localStorage.setItem('user', JSON.stringify(user));
-                    }
-                    
-                    // Update global header
-                    if (window.AgentHeader && window.AgentHeader.refreshUserData) {
-                        await window.AgentHeader.refreshUserData();
-                    }
-                    return true;
-                } else {
-                    // Fallback if verify endpoint fails - use role cookie
-                    const roleCookie = document.cookie.split(';').find(c => c.trim().startsWith('user_role='));
-                    const userRole = roleCookie ? decodeURIComponent(roleCookie.split('=')[1]) : 'agent';
-                    currentUser = { role: userRole };
-                    
-                    // Update global header
-                    if (window.AgentHeader && window.AgentHeader.refreshUserData) {
-                        await window.AgentHeader.refreshUserData();
-                    }
-                    return true;
-                }
-            } catch (error) {
-                console.error('Auth verification failed:', error);
-                currentUser = { role: 'agent' };
-                return true;
+                return isAuthed;
             }
+            return true; // Fallback if auth helper not loaded
         }
 
         // Initialize page
         async function initializePage() {
-            if (!checkAuth()) return;
+            if (!await checkAuth()) return;
             
             // Load dashboard data
             await loadDashboardData();
@@ -402,6 +367,5 @@
     <!-- Professional Theme System -->
     <script src="/js/theme-switcher.js"></script>
     <script src="/js/role-switcher.js"></script>
-    <script src="/assets/session-prod.js"></script>
 </body>
 </html>

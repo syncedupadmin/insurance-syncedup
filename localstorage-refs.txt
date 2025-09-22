@@ -1,0 +1,9 @@
+public/js/portal-access-control.js:22:      localStorage.setItem('auth-token', cookieToken);
+public/js/portal-access-control.js:26:      if (!localStorage.getItem('syncedup_user')) {
+public/js/portal-access-control.js:39:            localStorage.setItem('syncedup_user', JSON.stringify(userData));
+public/js/portal-access-control.js:46:    } else if (localStorage.getItem('auth-token')) {
+public/js/portal-access-control.js:156:      const token = localStorage.getItem('auth-token') || sessionStorage.getItem('auth-token');
+public/js/portal-access-control.js:406:  const token = localStorage.getItem('auth-token') || sessionStorage.getItem('auth-token');
+public/assets/dashboard.js:3:    const token = localStorage.getItem('syncedup_token') || localStorage.getItem('token');
+public/assets/common.js:2:const token = localStorage.getItem('syncedup_token') || localStorage.getItem('token');
+public/assets/common.js:3:const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');

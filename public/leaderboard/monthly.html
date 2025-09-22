@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Leaders - SyncedUp Insurance</title>
+    <link rel="stylesheet" href="leaderboard-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Monthly Leaders</h1>
+        <div class="header-info">
+            <span>📅 <span id="currentMonth">Loading...</span></span>
+            <span>📊 Updated: <span id="lastUpdated">Loading...</span></span>
+            <button id="classicModeToggle" class="btn btn-secondary classic-toggle" onclick="toggleClassicMode()">
+                <i data-lucide="gamepad-2" class="icon"></i>
+                Classic Mode
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="index.html" class="nav-link">
+            <i data-lucide="trophy" class="icon"></i>
+            Overall Rankings
+        </a>
+        <a href="monthly.html" class="nav-link active">
+            <i data-lucide="calendar" class="icon"></i>
+            Monthly Leaders
+        </a>
+        <a href="teams.html" class="nav-link">
+            <i data-lucide="users" class="icon"></i>
+            Team Rankings
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Month Selection -->
+        <div class="card">
+            <h3><i data-lucide="calendar-days" class="card-icon"></i>Select Month & Year</h3>
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="monthSelect">Month</label>
+                    <select id="monthSelect" class="filter-select" onchange="loadMonthlyData()">
+                        <option value="12">December 2025</option>
+                        <option value="11">November 2025</option>
+                        <option value="10">October 2025</option>
+                        <option value="9" selected>September 2025</option>
+                        <option value="8">August 2025</option>
+                        <option value="7">July 2025</option>
+                        <option value="6">June 2025</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="categorySelect">Category</label>
+                    <select id="categorySelect" class="filter-select" onchange="loadMonthlyData()">
+                        <option value="sales" selected>Total Sales</option>
+                        <option value="commissions">Commissions Earned</option>
+                        <option value="policies">Policies Sold</option>
+                        <option value="growth">Growth Rate</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Champions -->
+        <div class="card">
+            <h2><i data-lucide="star" class="card-icon"></i>Monthly Champions</h2>
+            <div class="grid">
+                <div class="card" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1));">
+                    <div style="text-align: center;">
+                        <div style="font-size: 4rem; margin-bottom: 0.5rem;">👑</div>
+                        <h3 style="color: var(--lb-accent); margin-bottom: 0.5rem;">Monthly Winner</h3>
+                        <h4 id="monthlyWinnerName" style="color: var(--lb-text-primary); margin-bottom: 0.5rem;">Loading...</h4>
+                        <div class="stat-value" style="font-size: 2rem;" id="monthlyWinnerSales">$0</div>
+                        <div class="stat-label" id="monthlyWinnerOffice">Office</div>
+                        <div style="margin-top: 1rem;">
+                            <span class="achievement achievement-gold">Monthly Champion</span>
+                            <span class="achievement achievement-gold" id="monthlyWinnerStreak">Streak</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3><i data-lucide="trending-up" class="card-icon"></i>Most Improved</h3>
+                    <div id="mostImproved">
+                        <div style="text-align: center; color: var(--lb-text-muted); padding: 2rem;">
+                            <div class="loading"></div>
+                            Loading improvement data...
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3><i data-lucide="target" class="card-icon"></i>Goal Achievers</h3>
+                    <div id="goalAchievers">
+                        <div style="text-align: center; color: var(--lb-text-muted); padding: 2rem;">
+                            <div class="loading"></div>
+                            Loading goal data...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Stats Comparison -->
+        <div class="grid">
+            <div class="card">
+                <h3><i data-lucide="bar-chart" class="card-icon"></i>Month Performance</h3>
+                <div class="grid grid-4">
+                    <div style="text-align: center;">
+                        <div class="stat-value" style="font-size: 1.8rem;" id="monthTotalSales">$0</div>
+                        <div class="stat-label">Total Sales</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-value" style="font-size: 1.8rem;" id="monthAvgSale">$0</div>
+                        <div class="stat-label">Avg Sale</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-value" style="font-size: 1.8rem;" id="monthActiveDays">0</div>
+                        <div class="stat-label">Active Days</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-value" style="font-size: 1.8rem;" id="monthGrowth">0%</div>
+                        <div class="stat-label">vs Last Month</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h3><i data-lucide="activity" class="card-icon"></i>Daily Breakdown</h3>
+                <div id="dailyBreakdown">
+                    <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; margin-bottom: 1rem;">
+                        <div style="text-align: center; font-weight: 600; color: var(--lb-text-secondary); font-size: 0.8rem;">MON</div>
+                        <div style="text-align: center; font-weight: 600; color: var(--lb-text-secondary); font-size: 0.8rem;">TUE</div>
+                        <div style="text-align: center; font-weight: 600; color: var(--lb-text-secondary); font-size: 0.8rem;">WED</div>
+                        <div style="text-align: center; font-weight: 600; color: var(--lb-text-secondary); font-size: 0.8rem;">THU</div>
+                        <div style="text-align: center; font-weight: 600; color: var(--lb-text-secondary); font-size: 0.8rem;">FRI</div>
+                        <div style="text-align: center; font-weight: 600; color: var(--lb-text-secondary); font-size: 0.8rem;">SAT</div>
+                        <div style="text-align: center; font-weight: 600; color: var(--lb-text-secondary); font-size: 0.8rem;">SUN</div>
+                    </div>
+                    <div id="calendarGrid">
+                        <!-- Calendar days will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Leaderboard -->
+        <div class="card">
+            <h3><i data-lucide="list" class="card-icon"></i>Monthly Rankings <span id="monthlyRankingCount">(Loading...)</span></h3>
+            <div class="leaderboard-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="text-align: center;">Rank</th>
+                            <th>Agent</th>
+                            <th>Office</th>
+                            <th style="text-align: right;">Monthly Sales</th>
+                            <th style="text-align: right;">Growth</th>
+                            <th style="text-align: right;">Goal %</th>
+                            <th style="text-align: center;">Days Active</th>
+                            <th style="text-align: center;">Awards</th>
+                        </tr>
+                    </thead>
+                    <tbody id="monthlyLeaderboardBody">
+                        <tr>
+                            <td colspan="8" style="text-align: center; color: var(--lb-text-muted); padding: 3rem;">
+                                <div class="loading"></div>
+                                Loading monthly rankings...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Monthly Highlights -->
+        <div class="card">
+            <h3><i data-lucide="sparkles" class="card-icon"></i>Monthly Highlights</h3>
+            <div id="monthlyHighlights">
+                <div style="text-align: center; color: var(--lb-text-muted); padding: 2rem;">
+                    <div class="loading"></div>
+                    Loading monthly highlights...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let monthlyData = [];
+        let currentMonthSelection = '9'; // September 2025
+        let currentCategory = 'sales';
+
+        // Authentication check
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+            
+            if (!token || !user.email) {
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            if (!['agent', 'manager', 'admin', 'customer-service', 'super-admin'].includes(user.role)) {
+                alert('Access denied. Valid account required to view leaderboard.');
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            return true;
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            // Set current month display
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                               'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('currentMonth').textContent = `${monthNames[parseInt(currentMonthSelection) - 1]} 2025`;
+            
+            // Load monthly data
+            await loadMonthlyData();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Load monthly data
+        async function loadMonthlyData() {
+            try {
+                currentMonthSelection = document.getElementById('monthSelect').value;
+                currentCategory = document.getElementById('categorySelect').value;
+                
+                // Update timestamp
+                document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+                
+                // Load all monthly components
+                await loadMonthlyStats();
+                await loadMonthlyRankings();
+                await loadMonthlyChampion();
+                await loadMostImproved();
+                await loadGoalAchievers();
+                await loadDailyBreakdown();
+                await loadMonthlyHighlights();
+                
+            } catch (error) {
+                console.error('Error loading monthly data:', error);
+                loadFallbackData();
+            }
+        }
+
+        // Load monthly statistics
+        async function loadMonthlyStats() {
+            const stats = {
+                totalSales: 2450000,
+                avgSale: 15680,
+                activeDays: 22,
+                growth: 12.5
+            };
+            
+            document.getElementById('monthTotalSales').textContent = '$' + (stats.totalSales / 1000000).toFixed(1) + 'M';
+            document.getElementById('monthAvgSale').textContent = '$' + stats.avgSale.toLocaleString();
+            document.getElementById('monthActiveDays').textContent = stats.activeDays;
+            document.getElementById('monthGrowth').textContent = '+' + stats.growth + '%';
+        }
+
+        // Load monthly rankings
+        async function loadMonthlyRankings() {
+            monthlyData = [
+                {
+                    rank: 1,
+                    name: 'Sarah Chen',
+                    office: 'West Coast HQ',
+                    monthlySales: 185000,
+                    growth: 25.8,
+                    goalPercent: 247,
+                    activeDays: 22,
+                    awards: ['Monthly Champion', 'Goal Crusher']
+                },
+                {
+                    rank: 2,
+                    name: 'Michael Rodriguez',
+                    office: 'East Coast',
+                    monthlySales: 172000,
+                    growth: 18.4,
+                    goalPercent: 229,
+                    activeDays: 21,
+                    awards: ['Consistent Performer']
+                },
+                {
+                    rank: 3,
+                    name: 'Emily Watson',
+                    office: 'Midwest Central',
+                    monthlySales: 165000,
+                    growth: 22.1,
+                    goalPercent: 220,
+                    activeDays: 20,
+                    awards: ['Most Improved']
+                },
+                {
+                    rank: 4,
+                    name: 'David Kim',
+                    office: 'South Region',
+                    monthlySales: 158000,
+                    growth: 15.2,
+                    goalPercent: 211,
+                    activeDays: 19,
+                    awards: ['Rising Star']
+                },
+                {
+                    rank: 5,
+                    name: 'Jessica Martinez',
+                    office: 'Headquarters',
+                    monthlySales: 145000,
+                    growth: 31.5,
+                    goalPercent: 193,
+                    activeDays: 18,
+                    awards: ['Breakthrough Performance']
+                }
+            ];
+
+            displayMonthlyRankings();
+        }
+
+        // Display monthly rankings
+        function displayMonthlyRankings() {
+            const tableBody = document.getElementById('monthlyLeaderboardBody');
+            const count = document.getElementById('monthlyRankingCount');
+            
+            count.textContent = `(${monthlyData.length} agents)`;
+
+            const tableHTML = monthlyData.map((agent, index) => {
+                const rank = index + 1;
+                const rankClass = rank <= 3 ? `rank-${rank}` : '';
+                const rankBadgeClass = rank <= 3 ? `rank-badge rank-badge-${rank}` : 'rank-badge';
+                
+                const awards = agent.awards.map(award => 
+                    `<span class="achievement achievement-${rank <= 3 ? ['gold', 'silver', 'bronze'][rank-1] : 'bronze'}">${award}</span>`
+                ).join(' ');
+
+                const growthColor = agent.growth >= 20 ? 'var(--lb-accent)' : agent.growth >= 10 ? 'var(--lb-text-primary)' : 'var(--lb-text-secondary)';
+
+                return `
+                    <tr onclick="viewAgentMonthlyProfile('${agent.name}')">
+                        <td class="rank ${rankClass}">
+                            ${rank <= 3 ? `<span class="${rankBadgeClass}">#${rank}</span>` : rank}
+                        </td>
+                        <td>
+                            <div class="agent-profile">
+                                <div class="agent-avatar">
+                                    ${agent.name.split(' ').map(n => n[0]).join('')}
+                                </div>
+                                <div class="agent-info">
+                                    <h4>${agent.name}</h4>
+                                    <p>${agent.activeDays} active days</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${agent.office}</td>
+                        <td style="text-align: right; font-weight: 600;">$${agent.monthlySales.toLocaleString()}</td>
+                        <td style="text-align: right; color: ${growthColor};">+${agent.growth}%</td>
+                        <td style="text-align: right; color: var(--lb-accent);">${agent.goalPercent}%</td>
+                        <td style="text-align: center;">${agent.activeDays}/22</td>
+                        <td style="text-align: center;">
+                            <div style="max-width: 200px;">${awards}</div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            tableBody.innerHTML = tableHTML;
+            lucide.createIcons();
+        }
+
+        // Load monthly champion
+        async function loadMonthlyChampion() {
+            if (monthlyData.length > 0) {
+                const champion = monthlyData[0];
+                document.getElementById('monthlyWinnerName').textContent = champion.name;
+                document.getElementById('monthlyWinnerSales').textContent = '$' + (champion.monthlySales / 1000).toFixed(0) + 'K';
+                document.getElementById('monthlyWinnerOffice').textContent = champion.office;
+                document.getElementById('monthlyWinnerStreak').textContent = '3 Month Streak';
+            }
+        }
+
+        // Load most improved
+        async function loadMostImproved() {
+            const improved = [
+                { name: 'Jessica Martinez', improvement: '+31.5%', reason: 'Breakthrough month' },
+                { name: 'Emily Watson', improvement: '+22.1%', reason: 'New strategy working' },
+                { name: 'Sarah Chen', improvement: '+25.8%', reason: 'Consistent excellence' }
+            ];
+
+            const improvedHTML = improved.map(agent => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px; margin-bottom: 0.5rem;">
+                    <div>
+                        <div style="font-weight: 600; color: var(--lb-text-primary);">${agent.name}</div>
+                        <div style="font-size: 0.85rem; color: var(--lb-text-muted);">${agent.reason}</div>
+                    </div>
+                    <div style="color: var(--lb-accent); font-weight: 600;">${agent.improvement}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('mostImproved').innerHTML = improvedHTML;
+        }
+
+        // Load goal achievers
+        async function loadGoalAchievers() {
+            const achievers = [
+                { name: 'Sarah Chen', percentage: 247, status: 'Exceeded' },
+                { name: 'Michael Rodriguez', percentage: 229, status: 'Exceeded' },
+                { name: 'Emily Watson', percentage: 220, status: 'Exceeded' }
+            ];
+
+            const achieversHTML = achievers.map(achiever => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(255, 215, 0, 0.1); border-radius: 8px; margin-bottom: 0.5rem;">
+                    <div>
+                        <div style="font-weight: 600; color: var(--lb-text-primary);">${achiever.name}</div>
+                        <div style="font-size: 0.85rem; color: var(--lb-accent);">${achiever.status}</div>
+                    </div>
+                    <div style="color: var(--lb-accent); font-weight: 600;">${achiever.percentage}%</div>
+                </div>
+            `).join('');
+
+            document.getElementById('goalAchievers').innerHTML = achieversHTML;
+        }
+
+        // Load daily breakdown
+        async function loadDailyBreakdown() {
+            const days = Array.from({length: 30}, (_, i) => {
+                const sales = Math.floor(Math.random() * 50000) + 10000;
+                const intensity = sales > 40000 ? 'high' : sales > 25000 ? 'medium' : 'low';
+                return { day: i + 1, sales, intensity };
+            });
+
+            const calendarHTML = days.map(day => {
+                const bgColor = day.intensity === 'high' ? 'rgba(255, 215, 0, 0.8)' : 
+                               day.intensity === 'medium' ? 'rgba(255, 215, 0, 0.4)' : 
+                               'rgba(255, 255, 255, 0.1)';
+                const textColor = day.intensity === 'high' ? '#000' : 'var(--lb-text-primary)';
+                
+                return `
+                    <div style="
+                        aspect-ratio: 1; 
+                        background: ${bgColor}; 
+                        border-radius: 4px; 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        font-size: 0.8rem; 
+                        font-weight: 600; 
+                        color: ${textColor};
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    " 
+                    title="Day ${day.day}: $${day.sales.toLocaleString()}"
+                    onmouseover="this.style.transform='scale(1.1)'"
+                    onmouseout="this.style.transform='scale(1)'"
+                    >
+                        ${day.day}
+                    </div>
+                `;
+            }).join('');
+
+            const gridStyle = `
+                display: grid; 
+                grid-template-columns: repeat(7, 1fr); 
+                gap: 0.25rem;
+            `;
+
+            document.getElementById('calendarGrid').innerHTML = `<div style="${gridStyle}">${calendarHTML}</div>`;
+        }
+
+        // Load monthly highlights
+        async function loadMonthlyHighlights() {
+            const highlights = [
+                { text: '🎉 Sarah Chen achieved the highest monthly sales record of $185K!', type: 'achievement' },
+                { text: '🚀 Jessica Martinez improved by 31.5% - biggest growth of the month!', type: 'improvement' },
+                { text: '🏆 West Coast HQ leads in total office performance for September', type: 'office' },
+                { text: '📈 Overall company monthly sales increased by 12.5% vs August', type: 'company' },
+                { text: '⭐ 5 agents exceeded 200% of their monthly goals', type: 'goals' }
+            ];
+
+            const highlightsHTML = highlights.map(highlight => `
+                <div style="display: flex; align-items: center; padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px; margin-bottom: 0.75rem; border-left: 3px solid var(--lb-accent);">
+                    <div style="color: var(--lb-text-primary); line-height: 1.5;">${highlight.text}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('monthlyHighlights').innerHTML = highlightsHTML;
+        }
+
+        // View agent monthly profile
+        function viewAgentMonthlyProfile(agentName) {
+            alert(`View monthly profile for ${agentName} - This would show detailed monthly performance breakdown`);
+        }
+
+        // Fallback data
+        function loadFallbackData() {
+            document.getElementById('monthTotalSales').textContent = '$2.0M';
+            document.getElementById('monthAvgSale').textContent = '$12K';
+            document.getElementById('monthActiveDays').textContent = '20';
+            document.getElementById('monthGrowth').textContent = '+10%';
+        }
+
+        // Initialize when page loads
+        // Classic Mode Toggle Functions
+        function toggleClassicMode() {
+            const body = document.body;
+            const toggle = document.getElementById('classicModeToggle');
+            const icon = toggle.querySelector('.icon');
+            
+            if (body.classList.contains('classic-mode')) {
+                // Exit classic mode
+                body.classList.remove('classic-mode');
+                toggle.innerHTML = '<i data-lucide="gamepad-2" class="icon"></i>Classic Mode';
+                localStorage.setItem('leaderboard-classic-mode', 'false');
+                playPacmanSound('exit');
+            } else {
+                // Enter classic mode
+                body.classList.add('classic-mode');
+                toggle.innerHTML = '<i data-lucide="zap" class="icon"></i>Modern Mode';
+                localStorage.setItem('leaderboard-classic-mode', 'true');
+                playPacmanSound('enter');
+            }
+            
+            // Reinitialize lucide icons
+            lucide.createIcons();
+        }
+
+        function initializeClassicMode() {
+            const isClassicMode = localStorage.getItem('leaderboard-classic-mode') === 'true';
+            if (isClassicMode) {
+                document.body.classList.add('classic-mode');
+                const toggle = document.getElementById('classicModeToggle');
+                toggle.innerHTML = '<i data-lucide="zap" class="icon"></i>Modern Mode';
+            }
+        }
+
+        function playPacmanSound(type) {
+            // Create audio context for retro sound effects
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                
+                oscillator.connect(gain);
+                gain.connect(audioContext.destination);
+                
+                if (type === 'enter') {
+                    // Pac-Man startup sound sequence
+                    oscillator.frequency.setValueAtTime(264, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(297, audioContext.currentTime + 0.1);
+                    oscillator.frequency.setValueAtTime(330, audioContext.currentTime + 0.2);
+                    oscillator.frequency.setValueAtTime(352, audioContext.currentTime + 0.3);
+                } else {
+                    // Exit sound
+                    oscillator.frequency.setValueAtTime(352, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(264, audioContext.currentTime + 0.1);
+                }
+                
+                oscillator.type = 'square';
+                gain.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+                
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.4);
+            } catch (e) {
+                console.log('Audio context not available');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+            initializeClassicMode();
+        });
+    </script>
+
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
+</body>
+</html>

@@ -1,5 +1,7 @@
 // API endpoint for admin dashboard metrics
-export default async function handler(req, res) {
+const { verifyCookieAuth } = require('../_utils/cookie-auth.js');
+
+module.exports = async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -14,15 +16,24 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Get authorization header to determine account type
-    const authHeader = req.headers.authorization || '';
-    const token = authHeader.replace('Bearer ', '');
-    
-    // Determine if this is a demo or production account
-    const isDemoAccount = token.startsWith('demo-') || token === 'demo';
-    const isProductionAccount = token.startsWith('prod-');
-    
-    console.log(`Dashboard metrics request - Token: ${token.substring(0, 10)}..., isDemo: ${isDemoAccount}, isProd: ${isProductionAccount}`);
+    // Verify authentication
+    const auth = await verifyCookieAuth(req);
+    if (!auth.success) {
+      return res.status(401).json({ error: auth.error });
+    }
+
+    // Check for admin or super_admin role
+    const allowedRoles = ['admin', 'super_admin'];
+    if (!allowedRoles.includes(auth.user.normalizedRole)) {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    // For now, treat all authenticated admins as production
+    const isDemoAccount = false;
+    const isProductionAccount = true;
+
+    // Remove debug log that references undefined token variable
+    // console.log(`Dashboard metrics request - Token: ${token.substring(0, 10)}..., isDemo: ${isDemoAccount}, isProd: ${isProductionAccount}`);
     
     let metrics;
     

@@ -1,11 +1,12 @@
-const { verifyToken } = require('../lib/auth-bridge.js');
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
+const { verifyCookieAuth } = require('../_utils/cookie-auth.js');
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-export default async function settingsHandler(req, res) {
+module.exports = async function settingsHandler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -15,14 +16,25 @@ export default async function settingsHandler(req, res) {
   }
 
   try {
-    // Get user info from token
-    const token = req.headers.authorization?.replace('Bearer ', '');
-    let agencyId = null;
-    let role = 'admin';
+    // Verify authentication using cookie-based auth
+    const auth = await verifyCookieAuth(req);
+    if (!auth.success) {
+      return res.status(401).json({ error: auth.error });
+    }
 
-    if (token) {
+    // Check for admin or super_admin role
+    const allowedRoles = ['admin', 'super_admin'];
+    if (!allowedRoles.includes(auth.user.normalizedRole)) {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const user = auth.user;
+    let agencyId = user.agency_id;
+    let role = user.normalizedRole;
+
+    if (true) {  // Keep the existing structure
       try {
-        const decoded = await verifyToken(, ["auth_token","auth-token","user_role","user_roles","assumed_role"]);
+        const decoded = user;  // Use the verified user from auth
         agencyId = decoded.agency_id;
         role = decoded.role || 'admin';
       } catch (jwtError) {

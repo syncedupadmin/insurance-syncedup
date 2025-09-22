@@ -84,15 +84,40 @@ export default async function handler(req, res) {
 }
 
 function detectWebhookType(data) {
-  if (data.call_id || data.disposition || data.duration) {
+  // Check for call-related fields
+  if (data.call_id || data.disposition || data.duration || data.call_duration) {
     return 'call_disposition';
   }
-  if (data.lead_id && (data.status || data.list_id)) {
+
+  // Check for lead data with multiple possible field names
+  if (data.lead_id || data.id || data.leadId) {
+    // If it has personal info, it's likely a lead update
+    if (data.first_name || data.last_name || data.phone_number || data.email) {
+      return 'lead_update';
+    }
+    // If it has status fields, it's a lead update
+    if (data.status || data.list_id || data.campaign_id) {
+      return 'lead_update';
+    }
+  }
+
+  // Check for agent status updates
+  if (data.agent_id || data.user_id) {
+    if (data.agent_status || data.status_label || data.queue_name) {
+      return 'agent_status';
+    }
+  }
+
+  // Check for campaign updates
+  if (data.campaign_id && (data.campaign_status || data.campaign_name)) {
+    return 'campaign_status';
+  }
+
+  // Default to lead_update if we have any lead-identifying fields
+  if (data.phone_number || data.email || data.first_name || data.last_name) {
     return 'lead_update';
   }
-  if (data.agent_id && (data.agent_status || data.queue_name)) {
-    return 'agent_status';
-  }
+
   return 'unknown';
 }
 
@@ -100,14 +125,14 @@ async function handleCallCompleted(agency, data) {
   try {
     const callData = {
       agency_id: agency.id,
-      convoso_lead_id: data.lead_id?.toString(),
+      convoso_lead_id: (data.lead_id || data.id)?.toString(),
       call_id: data.call_id?.toString(),
-      duration: parseInt(data.duration) || 0,
-      disposition: data.disposition,
-      recording_url: data.recording_url,
-      agent_id: data.agent_id?.toString(),
-      agent_name: data.agent_name,
-      call_time: data.call_time ? new Date(data.call_time) : new Date()
+      duration: parseInt(data.duration || data.call_duration) || 0,
+      disposition: data.disposition || data.status,
+      recording_url: data.recording_url || data.recorded_url,
+      agent_id: (data.agent_id || data.user_id)?.toString(),
+      agent_name: data.agent_name || data.user_name || data.user_full_name,
+      call_time: data.call_time || data.last_called || data.created_at ? new Date(data.call_time || data.last_called || data.created_at) : new Date()
     };
     
     const { error } = await supabase
@@ -140,15 +165,30 @@ async function handleCallCompleted(agency, data) {
 
 async function handleLeadUpdated(agency, data) {
   try {
+    // Build update object with all available fields
+    const updateData = {
+      updated_at: new Date().toISOString()
+    };
+
+    // Add all relevant fields that exist in the data
+    if (data.status) updateData.status = data.status;
+    if (data.disposition) updateData.last_disposition = data.disposition;
+    if (data.first_name) updateData.first_name = data.first_name;
+    if (data.last_name) updateData.last_name = data.last_name;
+    if (data.email) updateData.email = data.email;
+    if (data.phone_number) updateData.phone_number = data.phone_number;
+    if (data.address1) updateData.address1 = data.address1;
+    if (data.city) updateData.city = data.city;
+    if (data.state) updateData.state = data.state;
+    if (data.postal_code || data.zip_code) updateData.zip_code = data.postal_code || data.zip_code;
+
+    const leadId = (data.lead_id || data.id)?.toString();
+
     const { error } = await supabase
       .from('convoso_leads')
-      .update({
-        status: data.status,
-        last_disposition: data.disposition,
-        updated_at: new Date().toISOString()
-      })
+      .update(updateData)
       .eq('agency_id', agency.id)
-      .eq('convoso_lead_id', data.lead_id.toString());
+      .eq('convoso_lead_id', leadId);
     
     if (error) {
       console.error('Failed to update lead:', error);

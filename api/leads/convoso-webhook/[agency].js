@@ -39,6 +39,24 @@ function validateWebhookSignature(payload, signature, secret) {
 }
 
 /**
+ * Extract all custom fields from Convoso data
+ * @param {object} leadData - Lead data from Convoso
+ * @returns {object} Object containing all custom fields
+ */
+function extractCustomFields(leadData) {
+    const customFields = {};
+
+    // Extract all field_N fields from Convoso
+    Object.keys(leadData).forEach(key => {
+        if (key.startsWith('field_')) {
+            customFields[key] = leadData[key];
+        }
+    });
+
+    return customFields;
+}
+
+/**
  * Normalize lead data from Convoso webhook payload
  * @param {object} webhookData - Raw webhook payload
  * @param {string} agencyId - Agency identifier
@@ -60,8 +78,8 @@ function normalizeLeadData(webhookData, agencyId) {
         last_name: leadData.last_name || leadData.lastName || leadData.lname,
         
         // Address information
-        address_line1: leadData.address || leadData.address_line1 || leadData.street,
-        address_line2: leadData.address_line2 || leadData.apartment,
+        address_line1: leadData.address1 || leadData.address || leadData.address_line1 || leadData.street,
+        address_line2: leadData.address2 || leadData.address_line2 || leadData.apartment,
         city: leadData.city,
         state: leadData.state || leadData.province,
         zip_code: leadData.zip_code || leadData.zipCode || leadData.postal_code || leadData.zip,
@@ -100,8 +118,8 @@ function normalizeLeadData(webhookData, agencyId) {
         engagement_score: parseInt(leadData.engagement_score || 50),
         
         // Status and priority
-        status: 'new',
-        sub_status: leadData.sub_status || leadData.status,
+        status: leadData.status || 'new',
+        sub_status: leadData.sub_status,
         priority: leadData.priority || (parseInt(leadData.lead_score || 50) > 80 ? 'high' : 'normal'),
         lead_temperature: leadData.lead_temperature || 
                          (parseInt(leadData.lead_score || 50) > 80 ? 'hot' : 
@@ -121,13 +139,28 @@ function normalizeLeadData(webhookData, agencyId) {
         landing_page: leadData.landing_page || leadData.landing_url,
         
         // Notes and additional data
-        notes: leadData.notes || leadData.comments || leadData.description,
+        notes: leadData.notes || leadData.comments || leadData.description || leadData.field_29,
         tags: Array.isArray(leadData.tags) ? leadData.tags : [],
-        
+
+        // Custom Convoso fields
+        custom_field_1: leadData.field_1,
+        custom_field_2: leadData.field_2,
+        custom_field_3: leadData.field_3,
+        custom_field_4: leadData.field_4,
+        custom_field_5: leadData.field_5,
+        custom_fields: extractCustomFields(leadData),
+
+        // Call tracking from Convoso
+        called_count: parseInt(leadData.called_count) || 0,
+        called_count_inbound: parseInt(leadData.called_count_inbound) || 0,
+        last_called: leadData.last_called,
+        first_dialed_at: leadData.first_dialed_at,
+        first_contacted_at: leadData.first_contacted_at,
+
         // Timestamps
         received_at: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        created_at: leadData.created_at || new Date().toISOString(),
+        updated_at: leadData.modified_at || leadData.updated_at || new Date().toISOString()
     };
     
     // Store additional unmapped fields
@@ -155,7 +188,13 @@ function normalizeLeadData(webhookData, agencyId) {
         'notes', 'comments', 'description', 'tags'
     ];
     
-    mappedFields.forEach(field => delete additionalData[field]);
+    // Also remove Convoso custom fields from additionalData
+    const customFieldPattern = /^field_\d+$/;
+    Object.keys(additionalData).forEach(field => {
+        if (mappedFields.includes(field) || customFieldPattern.test(field)) {
+            delete additionalData[field];
+        }
+    });
     normalized.additional_data = additionalData;
     
     return normalized;

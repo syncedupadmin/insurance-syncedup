@@ -6,7 +6,18 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     
     if (req.method === 'OPTIONS') return res.status(200).end();
-    
+
+    // Check authentication from cookie
+    const getCookie = (name) => {
+        const match = (req.headers.cookie || '').match(new RegExp(`(?:^|; )${name}=([^;]+)`));
+        return match ? decodeURIComponent(match[1]) : null;
+    };
+
+    const token = getCookie('auth_token');
+    if (!token) {
+        return res.status(401).json({ error: 'Authentication required' });
+    }
+
     // Initialize Supabase client
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;

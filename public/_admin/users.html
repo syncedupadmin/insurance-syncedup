@@ -52,9 +52,9 @@
     <title>User Management - SyncedUp Insurance Admin</title>
     <link rel="stylesheet" href="/_admin/admin-global.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    <script src="/js/auth-helper.js"></script>
     <script src="/_admin/components/navigation.js"></script>
     <script src="/_admin/components/global-header.js"></script>
+    <script src="/js/auth-check.js?v=3" defer></script>
 </head>
 <body>
     <!-- Global Header Mount Point -->
@@ -354,7 +354,7 @@
 
         async function loadUsersData() {
             try {
-                const token = localStorage.getItem('auth_token');
+                // Use cookie-based authentication
                 const response = await fetch('/api/admin/users', {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -648,7 +648,7 @@
 
                 let response;
                 if (editingUserId) {
-                    const token = localStorage.getItem('auth_token');
+                    // Use cookie-based authentication
                     response = await fetch(`/api/admin/users/${editingUserId}`, {
                         method: 'PUT',
                         headers: {
@@ -658,7 +658,7 @@
                         body: JSON.stringify(userData)
                     });
                 } else {
-                    const token = localStorage.getItem('auth_token');
+                    // Use cookie-based authentication
                     response = await fetch('/api/admin/users', {
                         method: 'POST',
                         headers: {
@@ -689,7 +689,7 @@
             }
 
             try {
-                const token = localStorage.getItem('auth_token');
+                // Use cookie-based authentication
                 const response = await fetch(`/api/admin/users/${userId}`, {
                     method: 'DELETE',
                     headers: {
@@ -731,13 +731,13 @@
             if (selectedUsers.length === 0) return;
             
             try {
-                const token = localStorage.getItem('auth_token');
+                // Use cookie-based authentication
                 const response = await fetch('/api/admin/users/bulk', {
                     method: 'PUT',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     },
+                    credentials: 'include',
                     body: JSON.stringify({
                         user_ids: selectedUsers,
                         action: 'activate'
@@ -762,13 +762,13 @@
             if (selectedUsers.length === 0) return;
             
             try {
-                const token = localStorage.getItem('auth_token');
+                // Use cookie-based authentication
                 const response = await fetch('/api/admin/users/bulk', {
                     method: 'PUT',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     },
+                    credentials: 'include',
                     body: JSON.stringify({
                         user_ids: selectedUsers,
                         action: 'deactivate'
@@ -915,6 +915,5 @@
     
     <!-- Professional Theme System -->
     <script src="/js/theme-switcher.js"></script>
-    <script src="/assets/session-prod.js"></script>
 </body>
 </html>

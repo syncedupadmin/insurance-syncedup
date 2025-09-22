@@ -79,8 +79,8 @@ async function silentRefreshDashboard() {
         return;
     }
 
-    const authToken = localStorage.getItem('auth_token');
-    const data = await window.SilentRefresh.silentFetch('/api/manager/dashboard-metrics', authToken);
+    // Use cookie-based authentication
+    const data = await window.SilentRefresh.silentFetch('/api/manager/dashboard-metrics');
 
     if (data && data.data) {
         // Define mapping of selectors to data paths for Manager portal
@@ -119,9 +119,7 @@ function refreshDashboard() {
         if (metricsCards.length > 0) {
             // Reload dashboard data via API
             fetch('/api/manager/dashboard-metrics', {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-                }
+                credentials: 'include'
             })
             .then(res => res.json())
             .then(data => {

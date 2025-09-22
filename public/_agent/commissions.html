@@ -43,7 +43,6 @@
         setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
     })();
     </script>
-    <script src="/js/auth-helper.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Commissions - SyncedUp Insurance</title>
@@ -330,12 +329,12 @@
     <!-- Agent Portal Theme Override -->
     <link rel="stylesheet" href="/css/themes/agent-modern.css">
     
-    <!-- Load auth helper for user context -->
-    <script src="/js/auth-helper.js"></script>
+    <!-- Auth helper already loaded above -->
     <!-- Load navigation component -->
-    <script src="/agent/components/navigation.js"></script>
+    <script src="/_agent/components/navigation.js"></script>
     <!-- Load global header component -->
-    <script src="/agent/components/global-header.js"></script>
+    <script src="/_agent/components/global-header.js"></script>
+    <script src="/js/auth-check.js?v=3" defer></script>
 </head>
 <body class="portal-agent">
     <!-- Global Header Mount Point -->
@@ -502,15 +501,17 @@
         let commissionChart = null;
 
         // Authentication check
-        function checkAuth() {
-            // Authentication is now handled server-side via portal-guard
-            // Just proceed with page initialization
-            return true;
+        async function checkAuth() {
+            // Use SyncedUpAuth for authentication
+            if (window.SyncedUpAuth) {
+                return await window.SyncedUpAuth.requireAuth({ role: 'agent' });
+            }
+            return true; // Fallback if auth helper not loaded
         }
 
         // Initialize page
         async function initializePage() {
-            if (!checkAuth()) return;
+            if (!await checkAuth()) return;
             
             // Load commission data
             await loadCommissionData();
@@ -904,9 +905,7 @@
             document.cookie = 'user_email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
             document.cookie = 'agency_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
             
-            // Clear localStorage
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('user');
+            // Clear any remaining localStorage (keeping for theme preferences only)
         }
 
         // Logout is now handled by global header component
@@ -917,6 +916,5 @@
 
     <!-- Professional Theme System -->
     <script src="/js/theme-switcher.js"></script>
-    <script src="/assets/session-prod.js"></script>
 </body>
 </html>

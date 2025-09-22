@@ -1,10 +1,9 @@
 // Load dashboard data
 async function loadDashboardData() {
-    const token = localStorage.getItem('syncedup_token') || localStorage.getItem('token');
-    
+    // Use cookie-based auth - no localStorage
     try {
         const response = await fetch('/api/agent/dashboard', {
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include'
         });
         
         if (response.ok) {

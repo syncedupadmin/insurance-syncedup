@@ -13,11 +13,10 @@ module.exports = async (req, res) => {
   // Map portal routes
   const portals = {
     "/admin": "admin",
-    "/manager": "manager", 
+    "/manager": "manager",
     "/agent": "agent",
     "/customer-service": "customer-service",
-    "/super-admin": "super-admin",
-    "/dashboard": "dashboard"
+    "/super-admin": "super-admin"
   };
   
   const portal = portals[url];
@@ -36,7 +35,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const payload = await verifyToken(, ["auth_token","auth-token","user_role","user_roles","assumed_role"]);
+    const payload = await verifyToken(token, ["auth_token","auth-token","user_role","user_roles","assumed_role"]);
     // roles from cookie first, then token
     const raw = getCookie(req, "user_roles") || getCookie(req, "user_role") || payload.role || "agent";
     const roles = Array.isArray(raw) ? raw.map(normalize)

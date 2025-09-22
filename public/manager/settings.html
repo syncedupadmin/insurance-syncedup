@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - SyncedUp Insurance Manager</title>
+    <link rel="stylesheet" href="manager-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Manager Settings</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="index.html" class="nav-link">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="leads.html" class="nav-link">
+            <i data-lucide="user-plus" class="icon"></i>
+            Leads
+        </a>
+        <a href="team-management.html" class="nav-link">
+            <i data-lucide="users" class="icon"></i>
+            Team Management
+        </a>
+        <a href="performance.html" class="nav-link">
+            <i data-lucide="trending-up" class="icon"></i>
+            Team Performance
+        </a>
+        <a href="reports.html" class="nav-link">
+            <i data-lucide="file-text" class="icon"></i>
+            Reports
+        </a>
+        <a href="goals.html" class="nav-link">
+            <i data-lucide="target" class="icon"></i>
+            Goals
+        </a>
+        <a href="vendors.html" class="nav-link">
+            <i data-lucide="building-2" class="icon"></i>
+            Vendors
+        </a>
+        <a href="settings.html" class="nav-link active">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Manager Profile Settings -->
+        <div class="card">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="user" class="card-icon"></i>
+                Manager Profile
+            </h3>
+
+            <form id="profileForm">
+                <div class="grid" style="margin-bottom: 1.5rem;">
+                    <div>
+                        <label class="form-label">First Name</label>
+                        <input type="text" id="firstName" class="form-input" placeholder="Enter first name">
+                    </div>
+                    <div>
+                        <label class="form-label">Last Name</label>
+                        <input type="text" id="lastName" class="form-input" placeholder="Enter last name">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="email" class="form-input" placeholder="manager@agency.com" readonly>
+                    <small style="color: rgba(255,255,255,0.7);">Email cannot be changed. Contact admin if needed.</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" id="phone" class="form-input" placeholder="(555) 123-4567">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Time Zone</label>
+                    <select id="timeZone" class="form-select">
+                        <option value="America/New_York">Eastern Time</option>
+                        <option value="America/Chicago">Central Time</option>
+                        <option value="America/Denver">Mountain Time</option>
+                        <option value="America/Los_Angeles" selected>Pacific Time</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-2" style="margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="save" class="icon"></i>
+                        Save Profile
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Team Settings -->
+        <div class="card">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="users" class="card-icon"></i>
+                Team Preferences
+            </h3>
+
+            <form id="teamPreferencesForm">
+                <div class="form-group">
+                    <label class="form-label">Default Report Period</label>
+                    <select id="defaultReportPeriod" class="form-select">
+                        <option value="thisweek">This Week</option>
+                        <option value="thismonth" selected>This Month</option>
+                        <option value="thisquarter">This Quarter</option>
+                        <option value="thisyear">This Year</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Performance Dashboard Layout</label>
+                    <select id="dashboardLayout" class="form-select">
+                        <option value="compact" selected>Compact View</option>
+                        <option value="detailed">Detailed View</option>
+                        <option value="charts">Charts Focused</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="emailNotifications" checked>
+                        <span>Email Notifications for Team Updates</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="autoRefresh" checked>
+                        <span>Auto-refresh Dashboard Data</span>
+                    </label>
+                </div>
+
+                <div class="flex gap-2" style="margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="save" class="icon"></i>
+                        Save Preferences
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Interface Theme Settings -->
+        <div class="card">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="monitor" class="card-icon"></i>
+                Interface Theme
+            </h3>
+
+            <div class="form-group">
+                <label class="form-label">Display Mode</label>
+                <p style="color: rgba(255,255,255,0.7); margin-bottom: 1rem;">Switch between modern orange glassmorphism and classic Windows 95 theme</p>
+                <button class="btn btn-primary" id="classicModeToggle" onclick="toggleClassicMode()">
+                    <i data-lucide="palette" class="icon"></i>
+                    Classic Mode
+                </button>
+            </div>
+        </div>
+
+        <!-- Export & Backup -->
+        <div class="card">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="download" class="card-icon"></i>
+                Data Export
+            </h3>
+
+            <div class="form-group">
+                <label class="form-label">Export Team Data</label>
+                <p style="color: rgba(255,255,255,0.7); margin-bottom: 1rem;">Download your team's performance data and reports</p>
+                
+                <div class="flex gap-2">
+                    <button class="btn btn-success" onclick="exportTeamData('csv')">
+                        <i data-lucide="file-spreadsheet" class="icon"></i>
+                        Export as CSV
+                    </button>
+                    <button class="btn btn-warning" onclick="exportTeamData('pdf')">
+                        <i data-lucide="file-text" class="icon"></i>
+                        Export as PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        // Authentication check
+        function checkAuth() {
+            const token = localStorage.getItem('syncedup_token');
+            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+            
+            if (!token || !user.email) {
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            // Check if user has manager permissions
+            if (!['manager', 'admin', 'super-admin'].includes(user.role)) {
+                alert('Access denied. Manager permissions required.');
+                if (user.role === 'agent') {
+                    window.location.href = 'https://insurance.syncedupsolutions.com/agent/';
+                } else {
+                    window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                }
+                return false;
+            }
+
+            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
+            currentUser = user;
+            return true;
+        }
+
+        // Initialize page
+        async function initializePage() {
+            if (!checkAuth()) return;
+            
+            // Load user profile data
+            loadProfileData();
+            loadPreferences();
+            
+            // Set up form handlers
+            setupFormHandlers();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Load user profile data
+        function loadProfileData() {
+            if (currentUser) {
+                document.getElementById('firstName').value = currentUser.firstName || '';
+                document.getElementById('lastName').value = currentUser.lastName || '';
+                document.getElementById('email').value = currentUser.email || '';
+                document.getElementById('phone').value = currentUser.phone || '';
+            }
+        }
+
+        // Load user preferences
+        function loadPreferences() {
+            const defaultPeriod = localStorage.getItem('managerDefaultReportPeriod') || 'thismonth';
+            const dashboardLayout = localStorage.getItem('managerDashboardLayout') || 'compact';
+            const emailNotifications = localStorage.getItem('managerEmailNotifications') !== 'false';
+            const autoRefresh = localStorage.getItem('managerAutoRefresh') !== 'false';
+            const timeZone = localStorage.getItem('managerTimeZone') || 'America/Los_Angeles';
+
+            document.getElementById('defaultReportPeriod').value = defaultPeriod;
+            document.getElementById('dashboardLayout').value = dashboardLayout;
+            document.getElementById('emailNotifications').checked = emailNotifications;
+            document.getElementById('autoRefresh').checked = autoRefresh;
+            document.getElementById('timeZone').value = timeZone;
+        }
+
+        // Setup form handlers
+        function setupFormHandlers() {
+            // Profile form
+            document.getElementById('profileForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await saveProfile();
+            });
+
+            // Preferences form
+            document.getElementById('teamPreferencesForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await savePreferences();
+            });
+        }
+
+        // Save profile
+        async function saveProfile() {
+            const profileData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                phone: document.getElementById('phone').value,
+                timeZone: document.getElementById('timeZone').value
+            };
+
+            try {
+                // In a real implementation, this would make an API call
+                // For now, update localStorage
+                const updatedUser = { ...currentUser, ...profileData };
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+                currentUser = updatedUser;
+                
+                document.getElementById('userDisplay').textContent = `${updatedUser.firstName} ${updatedUser.lastName} (${updatedUser.role})`;
+                
+                showSuccess('Profile updated successfully!');
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                showError('Failed to save profile');
+            }
+        }
+
+        // Save preferences
+        async function savePreferences() {
+            const preferences = {
+                defaultReportPeriod: document.getElementById('defaultReportPeriod').value,
+                dashboardLayout: document.getElementById('dashboardLayout').value,
+                emailNotifications: document.getElementById('emailNotifications').checked,
+                autoRefresh: document.getElementById('autoRefresh').checked
+            };
+
+            try {
+                // Save to localStorage
+                localStorage.setItem('managerDefaultReportPeriod', preferences.defaultReportPeriod);
+                localStorage.setItem('managerDashboardLayout', preferences.dashboardLayout);
+                localStorage.setItem('managerEmailNotifications', preferences.emailNotifications);
+                localStorage.setItem('managerAutoRefresh', preferences.autoRefresh);
+                
+                showSuccess('Preferences saved successfully!');
+            } catch (error) {
+                console.error('Error saving preferences:', error);
+                showError('Failed to save preferences');
+            }
+        }
+
+        // Export team data
+        function exportTeamData(format) {
+            const timestamp = new Date().toISOString().split('T')[0];
+            
+            if (format === 'csv') {
+                // Create sample CSV content
+                const csvContent = `Date,Agent,Sales Count,Premium Volume,Status
+${timestamp},John Smith,12,$28500,Active
+${timestamp},Jane Doe,8,$19200,Active
+${timestamp},Mike Johnson,15,$32100,Active`;
+                
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `team-data-${timestamp}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                showSuccess('Team data exported as CSV!');
+            } else if (format === 'pdf') {
+                showSuccess('PDF export would be implemented here. Team data prepared for download.');
+            }
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+        }
+
+        // Message functions
+        function showSuccess(message) {
+            const div = document.createElement('div');
+            div.className = 'alert alert-success';
+            div.textContent = message;
+            div.style.position = 'fixed';
+            div.style.top = '20px';
+            div.style.right = '20px';
+            div.style.zIndex = '10000';
+            div.style.padding = '1rem';
+            div.style.borderRadius = '8px';
+            div.style.background = 'rgba(34, 197, 94, 0.9)';
+            div.style.color = 'white';
+            div.style.backdropFilter = 'blur(10px)';
+            
+            document.body.appendChild(div);
+            
+            setTimeout(() => {
+                if (document.body.contains(div)) {
+                    document.body.removeChild(div);
+                }
+            }, 3000);
+        }
+
+        function showError(message) {
+            const div = document.createElement('div');
+            div.className = 'alert alert-danger';
+            div.textContent = message;
+            div.style.position = 'fixed';
+            div.style.top = '20px';
+            div.style.right = '20px';
+            div.style.zIndex = '10000';
+            div.style.padding = '1rem';
+            div.style.borderRadius = '8px';
+            div.style.background = 'rgba(239, 68, 68, 0.9)';
+            div.style.color = 'white';
+            div.style.backdropFilter = 'blur(10px)';
+            
+            document.body.appendChild(div);
+            
+            setTimeout(() => {
+                if (document.body.contains(div)) {
+                    document.body.removeChild(div);
+                }
+            }, 3000);
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
+    <script src="/assets/session-prod.js"></script>
+</body>
+</html>

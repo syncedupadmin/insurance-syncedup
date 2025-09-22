@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Dashboard - SyncedUp Platform</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+        .stats-grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 2rem; }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); text-align: center; }
+        .stat-value { font-size: 2rem; font-weight: bold; color: #667eea; }
+        .stat-label { color: #718096; margin-top: 0.5rem; }
+        .stat-change { font-size: 0.85rem; font-weight: 500; margin-top: 0.25rem; }
+        .stat-change.positive { color: #48bb78; }
+        .stat-change.negative { color: #f56565; }
+        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        .btn { padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 0.25rem; }
+        .btn:hover { background: #5a67d8; }
+        .btn-success { background: #48bb78; }
+        .btn-warning { background: #ed8936; }
+        .btn-danger { background: #f56565; }
+        .btn-info { background: #4299e1; }
+        .btn-secondary { background: #718096; }
+        .btn-sm { padding: 0.5rem 1rem; font-size: 0.85rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #4a5568; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .table-container { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        th { background: #f7fafc; padding: 0.75rem; text-align: left; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 0.75rem; border-bottom: 1px solid #e2e8f0; }
+        tr:hover { background: #f7fafc; }
+        .status-active { color: #48bb78; font-weight: 500; }
+        .status-inactive { color: #f56565; font-weight: 500; }
+        .actions { display: flex; gap: 0.5rem; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { background: white; margin: 5% auto; padding: 2rem; border-radius: 8px; max-width: 600px; position: relative; max-height: 80vh; overflow-y: auto; }
+        .close { position: absolute; top: 1rem; right: 1rem; font-size: 1.5rem; cursor: pointer; color: #718096; }
+        .alert { padding: 1rem; margin: 1rem 0; border-radius: 6px; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .search-bar { display: flex; gap: 1rem; margin-bottom: 1rem; align-items: center; }
+        .search-bar input, .search-bar select { padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; }
+        
+        /* Enhanced Analytics Styles */
+        .nav-tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 2rem; }
+        .nav-tab { padding: 1rem 2rem; background: none; border: none; cursor: pointer; font-weight: 500; color: #718096; border-bottom: 2px solid transparent; }
+        .nav-tab.active { color: #667eea; border-bottom-color: #667eea; }
+        .nav-tab:hover { color: #667eea; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .chart-container { position: relative; height: 300px; margin: 1rem 0; background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .chart-large { height: 400px; }
+        .metric-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .metric-card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 4px solid #667eea; }
+        .metric-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; font-size: 1.2rem; }
+        .metric-value { font-size: 1.8rem; font-weight: bold; color: #4a5568; }
+        .metric-label { color: #718096; margin: 0.5rem 0; }
+        .metric-change { font-size: 0.85rem; font-weight: 500; }
+        .metric-change.positive { color: #48bb78; }
+        .metric-change.negative { color: #f56565; }
+        .live-indicator { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #48bb78; }
+        .live-dot { width: 8px; height: 8px; background: #48bb78; border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .leaderboard-item { display: flex; align-items: center; padding: 1rem; background: white; border-radius: 8px; margin-bottom: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .leaderboard-rank { font-size: 1.2rem; font-weight: bold; width: 40px; color: #667eea; }
+        .leaderboard-info { flex: 1; margin-left: 1rem; }
+        .leaderboard-value { font-size: 1.1rem; font-weight: 600; color: #48bb78; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Super Admin Dashboard</h1>
+        <div>
+            <span style="margin-right: 1rem;">Welcome, Super Admin</span>
+            <button class="btn" style="background: transparent; border: 1px solid white;" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Enhanced Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('overview')">📊 Overview</button>
+            <button class="nav-tab" onclick="showTab('analytics')">📈 Analytics</button>
+            <button class="nav-tab" onclick="showTab('revenue')">💰 Revenue</button>
+            <button class="nav-tab" onclick="showTab('users')">👥 Users</button>
+            <button class="nav-tab" onclick="showTab('leaderboard')">🏆 Leaderboard</button>
+            <button class="nav-tab" onclick="showTab('management')">⚙️ Management</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <!-- Enhanced Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalRevenue">$0</div>
+                    <div class="stat-label">Total Revenue</div>
+                    <div class="stat-change positive" id="revenueChange">+0% from last month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalAgencies">0</div>
+                    <div class="stat-label">Total Agencies</div>
+                    <div class="stat-change positive" id="agenciesChange">+0 this month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalUsers">0</div>
+                    <div class="stat-label">Total Users</div>
+                    <div class="stat-change positive" id="usersChange">+0% active today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="apiCalls">0</div>
+                    <div class="stat-label">API Calls/Hour</div>
+                    <div class="stat-change positive" id="apiChange">Avg response: 0ms</div>
+                </div>
+            </div>
+
+            <!-- Real-time Updates Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div class="live-indicator">
+                    <div class="live-dot"></div>
+                    Real-time Updates: <span id="lastUpdate">Now</span>
+                </div>
+                <button class="btn" onclick="refreshAllData()">🔄 Refresh All</button>
+            </div>
+
+            <!-- Revenue Chart -->
+            <div class="card">
+                <h3>Revenue Trends</h3>
+                <div class="chart-container chart-large">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <!-- System Activity -->
+            <div class="card">
+                <h3>Recent System Activity</h3>
+                <div id="systemActivity" style="max-height: 300px; overflow-y: auto;"></div>
+            </div>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div id="analytics" class="tab-content">
+            <!-- System Metrics -->
+            <div class="metric-row">
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: rgba(102,126,234,0.1); color: #667eea;">🖥️</div>
+                    <div class="metric-value" id="cpuUsage">0%</div>
+                    <div class="metric-label">CPU Usage</div>
+                    <div class="metric-change" id="cpuChange">Current load</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: rgba(237,137,54,0.1); color: #ed8936;">💾</div>
+                    <div class="metric-value" id="memoryUsage">0%</div>
+                    <div class="metric-label">Memory Usage</div>
+                    <div class="metric-change" id="memoryChange">Available: 0GB</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: rgba(72,187,120,0.1); color: #48bb78;">🔗</div>
+                    <div class="metric-value" id="dbConnections">0</div>
+                    <div class="metric-label">DB Connections</div>
+                    <div class="metric-change" id="dbChange">Pool: 0/100</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: rgba(245,101,101,0.1); color: #f56565;">⚠️</div>
+                    <div class="metric-value" id="errorRate">0%</div>
+                    <div class="metric-label">Error Rate</div>
+                    <div class="metric-change" id="errorChange">Last 24h</div>
+                </div>
+            </div>
+
+            <!-- Performance Charts -->
+            <div class="form-row">
+                <div class="card">
+                    <h3>API Response Times</h3>
+                    <div class="chart-container">
+                        <canvas id="responseChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>System Performance</h3>
+                    <div class="chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Alerts -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3>System Alerts</h3>
+                    <button class="btn btn-warning" onclick="clearAlerts()">Clear All</button>
+                </div>
+                <div id="systemAlerts"></div>
+            </div>
+        </div>
+
+        <!-- Revenue Tab -->
+        <div id="revenue" class="tab-content">
+            <!-- Financial KPIs -->
+            <div class="metric-row">
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: rgba(72,187,120,0.1); color: #48bb78;">💰</div>
+                    <div class="metric-value" id="mrr">$0</div>
+                    <div class="metric-label">Monthly Recurring Revenue</div>
+                    <div class="metric-change positive" id="mrrChange">+0% this month</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: rgba(102,126,234,0.1); color: #667eea;">📈</div>
+                    <div class="metric-value" id="arr">$0</div>
+                    <div class="metric-label">Annual Recurring Revenue</div>
+                    <div class="metric-change positive" id="arrChange">Projected growth</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: rgba(237,137,54,0.1); color: #ed8936;">🎯</div>
+                    <div class="metric-value" id="ltv">$0</div>
+                    <div class="metric-label">Customer LTV</div>
+                    <div class="metric-change" id="ltvChange">Average lifetime value</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: rgba(245,101,101,0.1); color: #f56565;">📊</div>
+                    <div class="metric-value" id="cac">$0</div>
+                    <div class="metric-label">Customer Acquisition Cost</div>
+                    <div class="metric-change" id="cacChange">LTV:CAC ratio</div>
+                </div>
+            </div>
+
+            <!-- Revenue Analytics -->
+            <div class="form-row">
+                <div class="card">
+                    <h3>Revenue Forecasting</h3>
+                    <div class="chart-container">
+                        <canvas id="forecastChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Subscription Analytics</h3>
+                    <div class="chart-container">
+                        <canvas id="subscriptionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Billing Overview -->
+            <div class="card">
+                <h3>Billing Operations</h3>
+                <div class="form-row">
+                    <div class="metric-card">
+                        <div class="metric-value" id="upcomingRenewals">0</div>
+                        <div class="metric-label">Upcoming Renewals</div>
+                        <button class="btn btn-info" onclick="showRenewals()">View Details</button>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="failedPayments">0</div>
+                        <div class="metric-label">Failed Payments</div>
+                        <button class="btn btn-warning" onclick="retryFailedPayments()">Retry All</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="users" class="tab-content">
+            <!-- User Metrics -->
+            <div class="metric-row">
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: rgba(102,126,234,0.1); color: #667eea;">👥</div>
+                    <div class="metric-value" id="totalUsersCount">0</div>
+                    <div class="metric-label">Total Users</div>
+                    <div class="metric-change positive" id="totalUsersGrowth">All roles</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: rgba(72,187,120,0.1); color: #48bb78;">✅</div>
+                    <div class="metric-value" id="activeUsersDaily">0</div>
+                    <div class="metric-label">Daily Active Users</div>
+                    <div class="metric-change positive" id="dauChange">+0% from yesterday</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: rgba(237,137,54,0.1); color: #ed8936;">📈</div>
+                    <div class="metric-value" id="userGrowthRate">0%</div>
+                    <div class="metric-label">Growth Rate</div>
+                    <div class="metric-change positive" id="growthChange">Monthly growth</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: rgba(245,101,101,0.1); color: #f56565;">🔒</div>
+                    <div class="metric-value" id="lockedAccounts">0</div>
+                    <div class="metric-label">Locked Accounts</div>
+                    <div class="metric-change" id="lockedChange">Requires attention</div>
+                </div>
+            </div>
+
+            <!-- User Activity Chart -->
+            <div class="card">
+                <h3>User Activity Trends</h3>
+                <div class="chart-container">
+                    <canvas id="userActivityChart"></canvas>
+                </div>
+            </div>
+
+            <!-- User Management Tools -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3>User Administration</h3>
+                    <div>
+                        <button class="btn btn-success" onclick="createUser()">+ Create User</button>
+                        <button class="btn btn-info" onclick="exportUserData()">📊 Export Data</button>
+                    </div>
+                </div>
+                <div id="userManagementActions">User management tools will load here...</div>
+            </div>
+        </div>
+
+        <!-- Leaderboard Tab -->
+        <div id="leaderboard" class="tab-content">
+            <!-- Leaderboard Stats -->
+            <div class="metric-row">
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: rgba(102,126,234,0.1); color: #667eea;">🏆</div>
+                    <div class="metric-value" id="topPerformer">Loading...</div>
+                    <div class="metric-label">Top Performer</div>
+                    <div class="metric-change positive" id="topPerformerValue">$0 revenue</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: rgba(72,187,120,0.1); color: #48bb78;">🎯</div>
+                    <div class="metric-value" id="totalCompetitions">0</div>
+                    <div class="metric-label">Active Competitions</div>
+                    <div class="metric-change" id="competitionsChange">This month</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: rgba(237,137,54,0.1); color: #ed8936;">🏅</div>
+                    <div class="metric-value" id="badgesAwarded">0</div>
+                    <div class="metric-label">Badges Awarded</div>
+                    <div class="metric-change positive" id="badgesChange">This quarter</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: rgba(245,101,101,0.1); color: #f56565;">💎</div>
+                    <div class="metric-value" id="milestoneAchievers">0</div>
+                    <div class="metric-label">Milestone Achievers</div>
+                    <div class="metric-change positive" id="milestonesChange">Recent achievements</div>
+                </div>
+            </div>
+
+            <!-- Leaderboards -->
+            <div class="form-row">
+                <div class="card">
+                    <h3>🏢 Top Agencies</h3>
+                    <div id="agencyLeaderboard"></div>
+                </div>
+                <div class="card">
+                    <h3>👤 Top Agents</h3>
+                    <div id="agentLeaderboard"></div>
+                </div>
+            </div>
+
+            <!-- Gamification Management -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3>Gamification Management</h3>
+                    <div>
+                        <button class="btn btn-success" onclick="createCompetition()">🏆 Create Competition</button>
+                        <button class="btn btn-info" onclick="manageBadges()">🏅 Manage Badges</button>
+                    </div>
+                </div>
+                <div id="gamificationTools">Gamification tools will load here...</div>
+            </div>
+        </div>
+
+        <!-- Management Tab -->
+        <div id="management" class="tab-content">
+            <!-- System Settings -->
+            <div class="card">
+                <h3>System Configuration</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="maintenanceMode" onchange="toggleMaintenance()">
+                            Maintenance Mode
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>API Rate Limit (requests/hour)</label>
+                        <input type="number" id="apiRateLimit" value="1000" onchange="updateRateLimit()">
+                    </div>
+                </div>
+                <button class="btn" onclick="saveSystemSettings()">Save Settings</button>
+            </div>
+
+            <!-- Demo Login Shortcuts -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3>Demo Account Login Shortcuts</h3>
+                    <span style="color: #718096; font-size: 0.9rem;">Quick access for testing different user roles</span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                    <button class="btn" onclick="loginAsDemo('agent@demo.com', 'agent')" style="background: #48bb78; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        👤 Agent Demo
+                    </button>
+                    <button class="btn" onclick="loginAsDemo('manager@demo.com', 'manager')" style="background: #ed8936; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        📊 Manager Demo
+                    </button>
+                    <button class="btn" onclick="loginAsDemo('admin@demo.com', 'admin')" style="background: #667eea; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        ⚙️ Admin Demo
+                    </button>
+                    <button class="btn" onclick="loginAsDemo('customerservice@demo.com', 'customer_service')" style="background: #9f7aea; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        🎧 Support Demo
+                    </button>
+                    <button class="btn" onclick="loginAsDemo('superadmin@demo.com', 'super_admin')" style="background: #f56565; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        🔒 Super Admin Demo
+                    </button>
+                </div>
+                <p style="color: #718096; font-size: 0.85rem; text-align: center;">All demo accounts use password: <strong>demo123!</strong> and are tied to DEMO001 agency with realistic test data.</p>
+            </div>
+
+            <!-- Create Agency Form -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3>Create New Agency</h3>
+                    <button class="btn btn-success" onclick="openCreateModal()">+ Create Agency</button>
+                </div>
+                <p style="color: #718096;">Create and manage insurance agencies with admin accounts and email notifications.</p>
+            </div>
+
+            <!-- Agencies Table -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3>Agency Management</h3>
+                    <button class="btn" onclick="loadAgencies()">🔄 Refresh</button>
+                </div>
+                
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Search agencies..." onkeyup="filterAgencies()">
+                    <select id="statusFilter" onchange="filterAgencies()">
+                        <option value="">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    <select id="planFilter" onchange="filterAgencies()">
+                        <option value="">All Plans</option>
+                        <option value="starter">Starter</option>
+                        <option value="professional">Professional</option>
+                        <option value="enterprise">Enterprise</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Agency Name</th>
+                                <th>Admin</th>
+                                <th>Users</th>
+                                <th>Plan</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="agenciesTableBody">
+                            <tr><td colspan="7" style="text-align: center;">Loading agencies...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Agency Modal -->
+    <div id="agencyModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3 id="modalTitle">Create New Agency</h3>
+            <div id="modalAlert"></div>
+            
+            <form id="agencyForm">
+                <input type="hidden" id="agencyId">
+                
+                <div class="form-group">
+                    <label for="agencyName">Agency Name *</label>
+                    <input type="text" id="agencyName" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="adminName">Admin Name *</label>
+                        <input type="text" id="adminName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminEmail">Admin Email *</label>
+                        <input type="email" id="adminEmail" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="agencyPhone">Phone</label>
+                        <input type="tel" id="agencyPhone">
+                    </div>
+                    <div class="form-group">
+                        <label for="agencyWebsite">Website</label>
+                        <input type="url" id="agencyWebsite" placeholder="https://">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="agencyAddress">Address</label>
+                    <textarea id="agencyAddress" rows="3"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="subscriptionPlan">Subscription Plan</label>
+                        <select id="subscriptionPlan">
+                            <option value="starter">Starter - $29/month</option>
+                            <option value="professional" selected>Professional - $99/month</option>
+                            <option value="enterprise">Enterprise - $299/month</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="agencyStatus">Status</label>
+                        <select id="agencyStatus">
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="submit" class="btn btn-success">Save Agency</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Password Reset Modal -->
+    <div id="resetModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeResetModal()">&times;</span>
+            <h3>Reset Admin Password</h3>
+            <div id="resetAlert"></div>
+            
+            <p style="margin-bottom: 1rem;">This will generate a new temporary password for the agency admin.</p>
+            
+            <div class="form-group">
+                <label>Agency</label>
+                <input type="text" id="resetAgencyName" readonly style="background: #f7fafc;">
+            </div>
+            
+            <div class="form-group">
+                <label>Admin Email</label>
+                <input type="email" id="resetAdminEmail" readonly style="background: #f7fafc;">
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button class="btn btn-warning" onclick="confirmPasswordReset()">Reset Password & Send Email</button>
+                <button class="btn btn-secondary" onclick="closeResetModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        if (!token || (user.role !== 'super_admin' && user.role !== 'super-admin')) {
+            window.location.href = '/login.html';
+        }
+
+        let agencies = [];
+        let currentEditingAgency = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAgencies();
+            loadInitialData();
+            initializeCharts();
+        });
+
+        // Enhanced Analytics Functions
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            loadTabData(tabName);
+        }
+
+        function loadTabData(tabName) {
+            switch(tabName) {
+                case 'analytics':
+                    loadAnalyticsData();
+                    break;
+                case 'revenue':
+                    loadRevenueData();
+                    break;
+                case 'users':
+                    loadUserData();
+                    break;
+                case 'leaderboard':
+                    loadLeaderboardData();
+                    break;
+            }
+        }
+
+        function updateRealTimeMetrics() {
+            const apiCalls = Math.floor(Math.random() * 1000) + 500;
+            const responseTime = Math.floor(Math.random() * 50) + 25;
+            
+            if (document.getElementById('apiCalls')) {
+                document.getElementById('apiCalls').textContent = apiCalls.toLocaleString();
+                document.getElementById('apiChange').textContent = `Avg response: ${responseTime}ms`;
+            }
+            
+            const cpuUsage = Math.floor(Math.random() * 30) + 20;
+            const memoryUsage = Math.floor(Math.random() * 40) + 30;
+            
+            if (document.getElementById('cpuUsage')) {
+                document.getElementById('cpuUsage').textContent = `${cpuUsage}%`;
+                document.getElementById('memoryUsage').textContent = `${memoryUsage}%`;
+                document.getElementById('memoryChange').textContent = `Available: ${(16 - (memoryUsage * 16 / 100)).toFixed(1)}GB`;
+            }
+        }
+
+        function updateTimestamp() {
+            const now = new Date();
+            if (document.getElementById('lastUpdate')) {
+                document.getElementById('lastUpdate').textContent = now.toLocaleTimeString();
+            }
+        }
+
+        function refreshAllData() {
+            loadAgencies();
+            updateStats();
+            updateRealTimeMetrics();
+            showAlert('Data refreshed successfully!', 'success');
+        }
+
+        function loadInitialData() {
+            updateEnhancedStats();
+            loadSystemActivity();
+            setInterval(() => {
+                updateRealTimeMetrics();
+                updateTimestamp();
+            }, 5000);
+        }
+
+        function updateEnhancedStats() {
+            if (document.getElementById('totalRevenue')) {
+                document.getElementById('totalRevenue').textContent = '$0';
+                document.getElementById('revenueChange').textContent = 'No data available';
+            }
+            
+            if (document.getElementById('cpuUsage')) {
+                document.getElementById('cpuUsage').textContent = '0%';
+                document.getElementById('memoryUsage').textContent = '0%';
+                document.getElementById('dbConnections').textContent = '0';
+                document.getElementById('errorRate').textContent = '0%';
+            }
+            
+            if (document.getElementById('mrr')) {
+                document.getElementById('mrr').textContent = '$0';
+                document.getElementById('arr').textContent = '$0';
+                document.getElementById('ltv').textContent = '$0';
+                document.getElementById('cac').textContent = '$0';
+            }
+            
+            if (document.getElementById('totalUsersCount')) {
+                document.getElementById('totalUsersCount').textContent = '0';
+                document.getElementById('activeUsersDaily').textContent = '0';
+                document.getElementById('userGrowthRate').textContent = '0%';
+                document.getElementById('lockedAccounts').textContent = '0';
+            }
+
+            if (document.getElementById('topPerformer')) {
+                document.getElementById('topPerformer').textContent = 'Sarah Johnson';
+                document.getElementById('topPerformerValue').textContent = '$45K revenue';
+                document.getElementById('totalCompetitions').textContent = '3';
+                document.getElementById('badgesAwarded').textContent = '28';
+                document.getElementById('milestoneAchievers').textContent = '7';
+            }
+        }
+
+        function loadSystemActivity() {
+            const activityHtml = `
+                <div style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between;">
+                    <div><strong>New agency registration</strong><br><small>Premium Insurance Solutions signed up</small></div>
+                    <small>2 min ago</small>
+                </div>
+                <div style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between;">
+                    <div><strong>Payment processed</strong><br><small>$2,999 from Enterprise plan renewal</small></div>
+                    <small>5 min ago</small>
+                </div>
+                <div style="padding: 0.75rem; display: flex; justify-content: space-between;">
+                    <div><strong>System backup completed</strong><br><small>Daily backup successful - 2.3GB</small></div>
+                    <small>1 hour ago</small>
+                </div>
+            `;
+            if (document.getElementById('systemActivity')) {
+                document.getElementById('systemActivity').innerHTML = activityHtml;
+            }
+        }
+
+        function loadAnalyticsData() {
+            const alertsHtml = `
+                <div style="padding: 1rem; border-left: 4px solid #ed8936; background: rgba(237,137,54,0.1); margin-bottom: 0.5rem;">
+                    <div style="font-weight: 600; color: #ed8936;">⚠️ High Memory Usage</div>
+                    <div style="font-size: 0.9rem;">Memory usage exceeded 80% on server-01</div>
+                </div>
+                <div style="padding: 1rem; border-left: 4px solid #667eea; background: rgba(102,126,234,0.1);">
+                    <div style="font-weight: 600; color: #667eea;">ℹ️ Backup Complete</div>
+                    <div style="font-size: 0.9rem;">Daily backup completed successfully</div>
+                </div>
+            `;
+            if (document.getElementById('systemAlerts')) {
+                document.getElementById('systemAlerts').innerHTML = alertsHtml;
+            }
+        }
+
+        function loadRevenueData() {
+            if (document.getElementById('upcomingRenewals')) {
+                document.getElementById('upcomingRenewals').textContent = '12';
+                document.getElementById('failedPayments').textContent = '3';
+            }
+        }
+
+        function loadUserData() {
+            const userActionsHtml = `
+                <div style="padding: 1rem; background: #f7fafc; border-radius: 8px;">
+                    <p>User administration tools:</p>
+                    <div style="margin-top: 1rem;">
+                        <button class="btn" onclick="showUserStats()">📊 User Statistics</button>
+                        <button class="btn btn-warning" onclick="auditUserAccess()">🔍 Audit Access</button>
+                        <button class="btn btn-info" onclick="bulkUserOperations()">⚡ Bulk Operations</button>
+                    </div>
+                </div>
+            `;
+            if (document.getElementById('userManagementActions')) {
+                document.getElementById('userManagementActions').innerHTML = userActionsHtml;
+            }
+        }
+
+        function loadLeaderboardData() {
+            const agencyLeaderboardHtml = `
+                <div class="leaderboard-item">
+                    <div class="leaderboard-rank">🥇</div>
+                    <div class="leaderboard-info">
+                        <div style="font-weight: 600;">Elite Insurance Group</div>
+                        <div style="font-size: 0.85rem; color: #718096;">15% growth this quarter</div>
+                    </div>
+                    <div class="leaderboard-value">$45,000</div>
+                </div>
+                <div class="leaderboard-item">
+                    <div class="leaderboard-rank">🥈</div>
+                    <div class="leaderboard-info">
+                        <div style="font-weight: 600;">Metro Insurance Solutions</div>
+                        <div style="font-size: 0.85rem; color: #718096;">12% growth this quarter</div>
+                    </div>
+                    <div class="leaderboard-value">$28,000</div>
+                </div>
+            `;
+            
+            const agentLeaderboardHtml = `
+                <div class="leaderboard-item">
+                    <div class="leaderboard-rank">🥇</div>
+                    <div class="leaderboard-info">
+                        <div style="font-weight: 600;">Sarah Johnson</div>
+                        <div style="font-size: 0.85rem; color: #718096;">Metro Insurance Solutions</div>
+                    </div>
+                    <div class="leaderboard-value">$12,500</div>
+                </div>
+                <div class="leaderboard-item">
+                    <div class="leaderboard-rank">🥈</div>
+                    <div class="leaderboard-info">
+                        <div style="font-weight: 600;">Mike Chen</div>
+                        <div style="font-size: 0.85rem; color: #718096;">Elite Insurance Group</div>
+                    </div>
+                    <div class="leaderboard-value">$11,200</div>
+                </div>
+            `;
+            
+            if (document.getElementById('agencyLeaderboard')) {
+                document.getElementById('agencyLeaderboard').innerHTML = agencyLeaderboardHtml;
+            }
+            if (document.getElementById('agentLeaderboard')) {
+                document.getElementById('agentLeaderboard').innerHTML = agentLeaderboardHtml;
+            }
+        }
+
+        function initializeCharts() {
+            setTimeout(() => {
+                if (typeof Chart !== 'undefined') {
+                    if (document.getElementById('revenueChart')) initializeRevenueChart();
+                    if (document.getElementById('responseChart')) initializeResponseChart();
+                    if (document.getElementById('performanceChart')) initializePerformanceChart();
+                    if (document.getElementById('forecastChart')) initializeForecastChart();
+                    if (document.getElementById('userActivityChart')) initializeUserActivityChart();
+                }
+            }, 1000);
+        }
+
+        function initializeRevenueChart() {
+            const ctx = document.getElementById('revenueChart');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [85000, 92000, 78000, 105000, 115000, 120000, 125000, 118000, 130000, 125000, 135000, 142000],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: false, ticks: { callback: function(value) { return '$' + (value / 1000) + 'K'; } } } } }
+            });
+        }
+
+        function initializeResponseChart() {
+            const ctx = document.getElementById('responseChart');
+            new Chart(ctx, {
+                type: 'line',
+                data: { labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'], datasets: [{ label: 'Response Time (ms)', data: [45, 38, 52, 67, 58, 42], borderColor: '#48bb78', backgroundColor: 'rgba(72, 187, 120, 0.1)', fill: true }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function initializePerformanceChart() {
+            const ctx = document.getElementById('performanceChart');
+            new Chart(ctx, { type: 'doughnut', data: { labels: ['CPU', 'Memory', 'Disk'], datasets: [{ data: [45, 62, 38], backgroundColor: ['#667eea', '#ed8936', '#48bb78'] }] }, options: { responsive: true, maintainAspectRatio: false } });
+        }
+
+        function initializeForecastChart() {
+            const ctx = document.getElementById('forecastChart');
+            new Chart(ctx, { type: 'line', data: { labels: ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'], datasets: [{ label: 'Actual', data: [125000, 135000, 142000, null, null, null], borderColor: '#48bb78' }, { label: 'Forecast', data: [null, null, 142000, 148000, 155000, 162000], borderColor: '#667eea', borderDash: [5, 5] }] }, options: { responsive: true, maintainAspectRatio: false } });
+        }
+
+        function initializeUserActivityChart() {
+            const ctx = document.getElementById('userActivityChart');
+            new Chart(ctx, { type: 'bar', data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'Active Users', data: [189, 165, 178, 198, 210, 145, 132], backgroundColor: '#48bb78' }] }, options: { responsive: true, maintainAspectRatio: false } });
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            const container = document.querySelector('.container');
+            container.insertBefore(alertDiv, container.firstChild);
+            setTimeout(() => alertDiv.remove(), 3000);
+        }
+
+        // Action handlers
+        function clearAlerts() { if (document.getElementById('systemAlerts')) { document.getElementById('systemAlerts').innerHTML = '<div style="text-align: center; color: #718096;">All alerts cleared</div>'; } showAlert('System alerts cleared', 'success'); }
+        function showRenewals() { showAlert('Showing upcoming renewals', 'success'); }
+        function retryFailedPayments() { showAlert('Retrying failed payments...', 'success'); }
+        function createUser() { showAlert('Create user modal would open', 'success'); }
+        function exportUserData() { showAlert('Exporting user data...', 'success'); }
+        function createCompetition() { showAlert('Creating new competition...', 'success'); }
+        function manageBadges() { showAlert('Opening badge management...', 'success'); }
+        function showUserStats() { showAlert('Loading user statistics...', 'success'); }
+        function auditUserAccess() { showAlert('Starting access audit...', 'success'); }
+        function bulkUserOperations() { showAlert('Opening bulk operations...', 'success'); }
+        function toggleMaintenance() { const isEnabled = document.getElementById('maintenanceMode').checked; showAlert(`Maintenance mode ${isEnabled ? 'enabled' : 'disabled'}`, isEnabled ? 'error' : 'success'); }
+        function updateRateLimit() { const limit = document.getElementById('apiRateLimit').value; showAlert(`API rate limit updated to ${limit} requests/hour`, 'success'); }
+        function saveSystemSettings() { showAlert('System settings saved successfully', 'success'); }
+
+        // Original agency management functions
+        async function loadAgencies() {
+            try {
+                const response = await fetch('/api/super-admin/agencies', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load agencies');
+                }
+                
+                const data = await response.json();
+                agencies = data.agencies || [];
+                
+                displayAgencies();
+                updateStats();
+                
+            } catch (error) {
+                console.error('Error loading agencies:', error);
+                document.getElementById('agenciesTableBody').innerHTML = 
+                    '<tr><td colspan="7" style="text-align: center; color: #f56565;">Failed to load agencies</td></tr>';
+            }
+        }
+
+        function displayAgencies(filteredAgencies = null) {
+            const agenciesToShow = filteredAgencies || agencies;
+            const tbody = document.getElementById('agenciesTableBody');
+            
+            if (agenciesToShow.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No agencies found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = agenciesToShow.map(agency => {
+                const adminUser = agency.profiles?.find(p => p.role === 'admin') || agency.admin_user;
+                return `
+                    <tr>
+                        <td>
+                            <strong>${agency.name}</strong>
+                            ${agency.website ? `<br><small><a href="${agency.website}" target="_blank">${agency.website}</a></small>` : ''}
+                        </td>
+                        <td>
+                            ${adminUser ? `
+                                <div>${adminUser.name}</div>
+                                <div style="font-size: 0.9rem; color: #718096;">${adminUser.email}</div>
+                            ` : 'No admin'}
+                        </td>
+                        <td>
+                            <span style="font-weight: bold;">${agency.user_count || 0}</span>
+                            ${agency.active_users ? `<span style="color: #48bb78;"> (${agency.active_users} active)</span>` : ''}
+                        </td>
+                        <td>
+                            <span style="text-transform: capitalize; font-weight: 500;">
+                                ${agency.subscription_plan || 'starter'}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-${agency.is_active ? 'active' : 'inactive'}">
+                                ${agency.is_active ? 'Active' : 'Inactive'}
+                            </span>
+                        </td>
+                        <td>${new Date(agency.created_at).toLocaleDateString()}</td>
+                        <td class="actions">
+                            <button class="btn btn-sm" onclick="editAgency('${agency.id}')">Edit</button>
+                            <button class="btn btn-warning btn-sm" onclick="resetPassword('${agency.id}')">Reset PW</button>
+                            <button class="btn ${agency.is_active ? 'btn-danger' : 'btn-success'} btn-sm" onclick="toggleAgencyStatus('${agency.id}', ${!agency.is_active})">
+                                ${agency.is_active ? 'Deactivate' : 'Activate'}
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateStats() {
+            const totalAgenciesElement = document.getElementById('totalAgencies');
+            const activeUsersElement = document.getElementById('activeUsers');
+            
+            if (totalAgenciesElement) {
+                totalAgenciesElement.textContent = agencies.length;
+            }
+            
+            const totalUsers = agencies.reduce((sum, agency) => sum + (agency.user_count || 0), 0);
+            const activeUsersCount = agencies.reduce((sum, agency) => sum + (agency.active_users || 0), 0);
+            
+            if (document.getElementById('totalUsers')) {
+                document.getElementById('totalUsers').textContent = totalUsers;
+            }
+            if (activeUsersElement) {
+                activeUsersElement.textContent = activeUsersCount;
+            }
+        }
+
+        function filterAgencies() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const planFilter = document.getElementById('planFilter').value;
+            
+            const filtered = agencies.filter(agency => {
+                const matchesSearch = !searchTerm || 
+                    agency.name.toLowerCase().includes(searchTerm) ||
+                    (agency.admin_user && agency.admin_user.email.toLowerCase().includes(searchTerm));
+                
+                const matchesStatus = !statusFilter || 
+                    (statusFilter === 'active' && agency.is_active) ||
+                    (statusFilter === 'inactive' && !agency.is_active);
+                
+                const matchesPlan = !planFilter || agency.subscription_plan === planFilter;
+                
+                return matchesSearch && matchesStatus && matchesPlan;
+            });
+            
+            displayAgencies(filtered);
+        }
+
+        function openCreateModal() {
+            document.getElementById('modalTitle').textContent = 'Create New Agency';
+            document.getElementById('agencyForm').reset();
+            document.getElementById('agencyId').value = '';
+            document.getElementById('modalAlert').innerHTML = '';
+            document.getElementById('agencyModal').style.display = 'block';
+            currentEditingAgency = null;
+        }
+
+        function closeModal() {
+            document.getElementById('agencyModal').style.display = 'none';
+            currentEditingAgency = null;
+        }
+
+        function closeResetModal() {
+            document.getElementById('resetModal').style.display = 'none';
+            window.currentResetAgency = null;
+        }
+
+        async function editAgency(agencyId) {
+            try {
+                const response = await fetch(`/api/super-admin/agencies?agency_id=${agencyId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const agency = await response.json();
+                const adminUser = agency.profiles?.find(p => p.role === 'admin');
+                
+                document.getElementById('modalTitle').textContent = 'Edit Agency';
+                document.getElementById('agencyId').value = agency.id;
+                document.getElementById('agencyName').value = agency.name;
+                document.getElementById('adminName').value = adminUser?.name || '';
+                document.getElementById('adminEmail').value = adminUser?.email || '';
+                document.getElementById('agencyPhone').value = agency.phone || '';
+                document.getElementById('agencyWebsite').value = agency.website || '';
+                document.getElementById('agencyAddress').value = agency.address || '';
+                document.getElementById('subscriptionPlan').value = agency.subscription_plan || 'starter';
+                document.getElementById('agencyStatus').value = agency.is_active.toString();
+                
+                document.getElementById('modalAlert').innerHTML = '';
+                document.getElementById('agencyModal').style.display = 'block';
+                currentEditingAgency = agency;
+                
+            } catch (error) {
+                console.error('Error loading agency details:', error);
+                alert('Failed to load agency details');
+            }
+        }
+
+        async function resetPassword(agencyId) {
+            const agency = agencies.find(a => a.id === agencyId);
+            if (!agency) return;
+            
+            const adminUser = agency.profiles?.find(p => p.role === 'admin') || agency.admin_user;
+            
+            document.getElementById('resetAgencyName').value = agency.name;
+            document.getElementById('resetAdminEmail').value = adminUser?.email || '';
+            document.getElementById('resetAlert').innerHTML = '';
+            document.getElementById('resetModal').style.display = 'block';
+            
+            window.currentResetAgency = agency;
+        }
+
+        async function confirmPasswordReset() {
+            const agency = window.currentResetAgency;
+            if (!agency) return;
+            
+            const adminUser = agency.profiles?.find(p => p.role === 'admin') || agency.admin_user;
+            
+            try {
+                const response = await fetch('/api/super-admin/reset-password', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: adminUser.id,
+                        send_email: true
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('resetAlert').innerHTML = 
+                        '<div class="alert alert-success">Password reset successfully! New credentials sent via email.</div>';
+                    setTimeout(() => closeResetModal(), 2000);
+                } else {
+                    document.getElementById('resetAlert').innerHTML = 
+                        `<div class="alert alert-error">Error: ${result.error}</div>`;
+                }
+                
+            } catch (error) {
+                console.error('Error resetting password:', error);
+                document.getElementById('resetAlert').innerHTML = 
+                    '<div class="alert alert-error">Failed to reset password</div>';
+            }
+        }
+
+        async function toggleAgencyStatus(agencyId, newStatus) {
+            try {
+                const response = await fetch(`/api/super-admin/agencies?agency_id=${agencyId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ is_active: newStatus })
+                });
+                
+                if (response.ok) {
+                    await loadAgencies();
+                } else {
+                    const error = await response.json();
+                    alert(`Error: ${error.error}`);
+                }
+                
+            } catch (error) {
+                console.error('Error updating agency status:', error);
+                alert('Failed to update agency status');
+            }
+        }
+
+        // Form submission
+        document.getElementById('agencyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const isEdit = !!currentEditingAgency;
+            const agencyId = document.getElementById('agencyId').value;
+            
+            const formData = {
+                name: document.getElementById('agencyName').value,
+                admin_name: document.getElementById('adminName').value,
+                admin_email: document.getElementById('adminEmail').value,
+                phone: document.getElementById('agencyPhone').value,
+                website: document.getElementById('agencyWebsite').value,
+                address: document.getElementById('agencyAddress').value,
+                subscription_plan: document.getElementById('subscriptionPlan').value,
+                is_active: document.getElementById('agencyStatus').value === 'true'
+            };
+            
+            try {
+                const url = isEdit ? `/api/super-admin/agencies?agency_id=${agencyId}` : '/api/super-admin/agencies';
+                const method = isEdit ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    const alertType = isEdit ? 'Agency updated successfully!' : `Agency created successfully! Admin password: <strong>${result.temp_password}</strong>`;
+                    document.getElementById('modalAlert').innerHTML = 
+                        `<div class="alert alert-success">${alertType}</div>`;
+                    
+                    await loadAgencies();
+                    
+                    if (!isEdit) {
+                        setTimeout(() => closeModal(), 10000);
+                    } else {
+                        setTimeout(() => closeModal(), 2000);
+                    }
+                    
+                } else {
+                    document.getElementById('modalAlert').innerHTML = 
+                        `<div class="alert alert-error">Error: ${result.error}</div>`;
+                }
+                
+            } catch (error) {
+                console.error('Error saving agency:', error);
+                document.getElementById('modalAlert').innerHTML = 
+                    '<div class="alert alert-error">Failed to save agency</div>';
+            }
+        });
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const agencyModal = document.getElementById('agencyModal');
+            const resetModal = document.getElementById('resetModal');
+            
+            if (event.target === agencyModal) {
+                closeModal();
+            }
+            if (event.target === resetModal) {
+                closeResetModal();
+            }
+        }
+
+        async function loginAsDemo(email, role) {
+            try {
+                localStorage.clear();
+                
+                const buttons = document.querySelectorAll('button[onclick*="loginAsDemo"]');
+                buttons.forEach(btn => {
+                    btn.disabled = true;
+                    btn.innerHTML = '⏳ Logging in...';
+                });
+                
+                const response = await fetch('/api/super-admin/demo-login', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, role })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    localStorage.setItem('token', result.token);
+                    localStorage.setItem('user', JSON.stringify(result.user));
+                    
+                    const dashboardUrls = {
+                        'agent': '/agent.html',
+                        'manager': '/manager.html', 
+                        'admin': '/admin.html',
+                        'customer_service': '/customer-service.html',
+                        'super_admin': '/super-admin.html'
+                    };
+                    
+                    window.location.href = dashboardUrls[role] || '/dashboard.html';
+                } else {
+                    alert(`Demo login failed: ${result.error || 'Unknown error'}`);
+                    restoreDemoButtons();
+                }
+                
+            } catch (error) {
+                console.error('Demo login error:', error);
+                alert('Demo login failed. Please try again.');
+                restoreDemoButtons();
+            }
+        }
+        
+        function restoreDemoButtons() {
+            const buttonConfigs = [
+                { selector: 'agent@demo.com', text: '👤 Agent Demo', bg: '#48bb78' },
+                { selector: 'manager@demo.com', text: '📊 Manager Demo', bg: '#ed8936' },
+                { selector: 'admin@demo.com', text: '⚙️ Admin Demo', bg: '#667eea' },
+                { selector: 'customerservice@demo.com', text: '🎧 Support Demo', bg: '#9f7aea' },
+                { selector: 'superadmin@demo.com', text: '🔒 Super Admin Demo', bg: '#f56565' }
+            ];
+            
+            buttonConfigs.forEach(config => {
+                const button = document.querySelector(`button[onclick*="${config.selector}"]`);
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = config.text;
+                    button.style.background = config.bg;
+                }
+            });
+        }
+
+        function goToNewPortal() {
+            window.location.href = '/super-admin-portal.html';
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/login.html';
+        }
+    </script>
+</body>
+</html>

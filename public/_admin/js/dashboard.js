@@ -83,8 +83,8 @@ async function silentRefreshDashboard() {
         return;
     }
 
-    const authToken = localStorage.getItem('auth_token');
-    const data = await window.SilentRefresh.silentFetch('/api/admin/dashboard-metrics', authToken);
+    // Use cookie-based authentication
+    const data = await window.SilentRefresh.silentFetch('/api/admin/dashboard-metrics');
 
     if (data && data.data) {
         // Define mapping of selectors to data paths for Admin portal
@@ -114,9 +114,7 @@ async function silentRefreshDashboard() {
 function refreshDashboard() {
     // Keep old function as fallback
     fetch('/api/admin/dashboard-metrics', {
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-        }
+        credentials: 'include'
     })
     .then(res => res.json())
     .then(data => {

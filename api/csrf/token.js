@@ -1,7 +1,6 @@
-const { verifyToken } = require('../lib/auth-bridge.js');
-const CSRF_SECRET = process.env.JWT_SECRET + '_csrf' || 'csrf-fallback-secret';
+const { getCSRFToken } = require('../../lib/csrf-protection.js');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -16,23 +15,6 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  try {
-    // Generate CSRF token
-    const csrfToken = jwt.sign(
-      { 
-        type: 'csrf',
-        timestamp: Date.now() 
-      },
-      CSRF_SECRET,
-      { expiresIn: '1h' }
-    );
-
-    return res.status(200).json({
-      success: true,
-      csrfToken: csrfToken
-    });
-  } catch (error) {
-    console.error('CSRF token generation error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
-  }
+  // Use the centralized CSRF token handler
+  getCSRFToken(req, res);
 }

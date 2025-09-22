@@ -54,10 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (res.ok) {
         const data = await res.json().catch(() => ({}));
         if (data.success && data.redirect) {
-          // Store token in localStorage for Edge Function access
-          if (data.token) {
-            localStorage.setItem('auth_token', data.token);
-          }
+          // Server handles all authentication via cookies
           window.location.assign(data.redirect);           // ← do the page navigation
           return;
         }

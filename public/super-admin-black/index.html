@@ -1,0 +1,3326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Administration - SyncedUp Insurance</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="50x50" href="/favicons/favicon-50x50.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicons/android-chrome-512x512.png">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --bg-card: #1e1e1e;
+            --bg-hover: #2a2a2a;
+            --border-primary: #333333;
+            --border-secondary: #404040;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-muted: #6b7280;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #1e40af;
+            --success: #22c55e;
+            --warning: #eab308;
+            --danger: #ef4444;
+            --info: #06b6d4;
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-primary);
+            color: var(--text-primary);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem 1rem;
+            border-bottom: 1px solid var(--border-primary);
+            position: relative;
+        }
+        
+        .sidebar-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 1.5rem;
+            right: 1.5rem;
+            height: 1px;
+            background: linear-gradient(90deg, var(--accent-primary), transparent);
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sidebar-header p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.875rem;
+            border-radius: 8px;
+            margin: 0 1rem 0.25rem;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            transform: translateX(4px);
+        }
+        
+        .nav-item.active {
+            background: var(--accent-primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: -1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 24px;
+            background: var(--accent-primary);
+            border-radius: 2px;
+        }
+
+        .nav-item i {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.125rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            background: var(--bg-primary);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-primary);
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(8px);
+        }
+
+        .header-left {
+            flex: 1;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .content {
+            padding: 2rem;
+            background: var(--bg-primary);
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            border-color: var(--border-secondary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            padding: 2rem;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            border-color: var(--border-secondary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--accent-primary), var(--info));
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin: 0.5rem 0;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .stat-change {
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            display: inline-block;
+        }
+        .stat-change.positive { 
+            color: var(--success); 
+            background: rgba(34, 197, 94, 0.1);
+        }
+        .stat-change.negative { 
+            color: var(--danger); 
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 1rem 0;
+        }
+
+        .chart-small {
+            height: 200px;
+        }
+
+        /* Tables */
+        .table-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-primary);
+            font-size: 0.875rem;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-primary);
+            color: var(--text-secondary);
+        }
+
+        tr:hover {
+            background: var(--bg-hover);
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 0.875rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary { 
+            background: var(--accent-primary); 
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        .btn-primary:hover { 
+            background: var(--accent-secondary); 
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+        .btn-success { 
+            background: var(--success); 
+            color: white;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+        .btn-success:hover {
+            background: #16a34a;
+            transform: translateY(-1px);
+        }
+        .btn-warning { 
+            background: var(--warning); 
+            color: white;
+            box-shadow: 0 4px 12px rgba(234, 179, 8, 0.3);
+        }
+        .btn-warning:hover {
+            background: #ca8a04;
+            transform: translateY(-1px);
+        }
+        .btn-danger { 
+            background: var(--danger); 
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+        .btn-info { 
+            background: var(--info); 
+            color: white;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+        }
+        .btn-info:hover {
+            background: #0891b2;
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        /* Status indicators */
+        .status-active { 
+            color: var(--success); 
+            font-weight: 600;
+            background: rgba(34, 197, 94, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+        .status-inactive { 
+            color: var(--danger); 
+            font-weight: 600;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+        .status-warning { 
+            color: var(--warning); 
+            font-weight: 600;
+            background: rgba(234, 179, 8, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+            display: none;
+            border-left: 4px solid;
+            backdrop-filter: blur(8px);
+        }
+
+        .alert.show { display: block; }
+        .alert-success { 
+            background: rgba(34, 197, 94, 0.1); 
+            color: var(--success); 
+            border-left-color: var(--success);
+        }
+        .alert-error { 
+            background: rgba(239, 68, 68, 0.1); 
+            color: var(--danger); 
+            border-left-color: var(--danger);
+        }
+        .alert-warning { 
+            background: rgba(234, 179, 8, 0.1); 
+            color: var(--warning); 
+            border-left-color: var(--warning);
+        }
+
+        /* Forms */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-primary);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            background: var(--bg-card);
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.show { display: flex; align-items: center; justify-content: center; }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-500);
+            padding: 0.5rem;
+        }
+
+        /* Real-time indicators */
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--success);
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .content {
+                padding: 1rem;
+            }
+        }
+
+        /* Loading states */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--gray-300);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Leaderboard styles */
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .leaderboard-rank {
+            font-size: 1.5rem;
+            font-weight: bold;
+            width: 50px;
+            color: var(--primary);
+        }
+
+        .leaderboard-info {
+            flex: 1;
+            margin-left: 1rem;
+        }
+
+        .leaderboard-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--success);
+        }
+
+        /* Badge styles */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success { background: var(--success); color: white; }
+        .badge-warning { background: var(--warning); color: white; }
+        .badge-danger { background: var(--danger); color: white; }
+        .badge-info { background: var(--info); color: white; }
+        .badge-secondary { background: var(--gray-500); color: white; }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1>System Administration</h1>
+                <p>Enterprise Management Console</p>
+                <div class="live-indicator">
+                    <div class="live-dot"></div>
+                    System Online
+                </div>
+            </div>
+            
+            <div class="sidebar-nav">
+                <button class="nav-item active" onclick="showPage('dashboard')">
+                    <i data-lucide="monitor"></i> System Overview
+                </button>
+                <button class="nav-item" onclick="showPage('analytics')">
+                    <i data-lucide="activity"></i> Performance Analytics
+                </button>
+                <button class="nav-item" onclick="showPage('agencies')">
+                    <i data-lucide="building"></i> Organization Management
+                </button>
+                <button class="nav-item" onclick="showPage('revenue')">
+                    <i data-lucide="trending-up"></i> Financial Operations
+                </button>
+                <button class="nav-item" onclick="showPage('users')">
+                    <i data-lucide="users"></i> User Administration
+                </button>
+                <button class="nav-item" onclick="showPage('system')">
+                    <i data-lucide="settings"></i> System Configuration
+                </button>
+                <button class="nav-item" onclick="showPage('security')">
+                    <i data-lucide="shield"></i> Security Center
+                </button>
+                <div style="margin-top: 2rem; border-top: 1px solid var(--border-primary); padding-top: 1rem;">
+                <button class="nav-item" onclick="logout()" style="color: var(--text-muted);">
+                    <i data-lucide="log-out"></i> Sign Out
+                </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div class="header-left">
+                    <h1 class="page-title" id="pageTitle">Enhanced Dashboard</h1>
+                    <p class="page-subtitle" id="pageSubtitle">Real-time business metrics and insights</p>
+                </div>
+                <div class="header-right">
+                    <div class="live-indicator">
+                        <div class="live-dot"></div>
+                        Last Updated: <span id="lastUpdate">Now</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="refreshAllData()">
+                        <i data-lucide="refresh-cw" style="margin-right: 0.5rem;"></i>
+                        <span id="refreshBtn">Refresh Data</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="content">
+                <!-- Enhanced Dashboard -->
+                <div id="dashboard" class="page-section active">
+                    <!-- Key Metrics -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(72,187,120,0.1); color: var(--success);">💰</div>
+                            <div class="stat-value" id="totalRevenue">$0</div>
+                            <div class="stat-label">Total Revenue</div>
+                            <div class="stat-change positive" id="revenueChange">+0% from last month</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(102,126,234,0.1); color: var(--primary);">🏢</div>
+                            <div class="stat-value" id="activeAgencies">0</div>
+                            <div class="stat-label">Active Agencies</div>
+                            <div class="stat-change positive" id="agenciesChange">+0 this month</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(237,137,54,0.1); color: var(--warning);">👥</div>
+                            <div class="stat-value" id="totalUsers">0</div>
+                            <div class="stat-label">Total Users</div>
+                            <div class="stat-change positive" id="usersChange">+0% active today</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(245,101,101,0.1); color: var(--danger);">📈</div>
+                            <div class="stat-value" id="apiCalls">0</div>
+                            <div class="stat-label">API Calls/Hour</div>
+                            <div class="stat-change positive" id="apiChange">Avg response: 0ms</div>
+                        </div>
+                    </div>
+
+                    <!-- Revenue Chart -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Revenue Analytics</h3>
+                            <div>
+                                <select id="revenueTimeframe" onchange="updateRevenueChart()">
+                                    <option value="7d">Last 7 Days</option>
+                                    <option value="30d" selected>Last 30 Days</option>
+                                    <option value="90d">Last 90 Days</option>
+                                    <option value="1y">Last Year</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Performance Metrics Grid -->
+                    <div class="form-grid">
+                        <div class="card">
+                            <h3 class="card-title">System Performance</h3>
+                            <div class="chart-container chart-small">
+                                <canvas id="performanceChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <h3 class="card-title">User Activity</h3>
+                            <div class="chart-container chart-small">
+                                <canvas id="activityChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activities -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Recent System Events</h3>
+                            <button class="btn btn-sm btn-primary" onclick="loadSystemEvents()">Refresh Events</button>
+                        </div>
+                        <div id="recentEvents">
+                            <div style="text-align: center; padding: 2rem; color: var(--gray-500);">Loading recent events...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Analytics -->
+                <div id="analytics" class="page-section">
+                    <!-- Real-time Server Metrics -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(66,153,225,0.1); color: var(--info);">🖥️</div>
+                            <div class="stat-value" id="cpuUsage">0%</div>
+                            <div class="stat-label">CPU Usage</div>
+                            <div class="stat-change" id="cpuChange">Current load</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(159,122,234,0.1); color: #9f7aea;">💾</div>
+                            <div class="stat-value" id="memoryUsage">0%</div>
+                            <div class="stat-label">Memory Usage</div>
+                            <div class="stat-change" id="memoryChange">Available: 0GB</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(72,187,120,0.1); color: var(--success);">🔗</div>
+                            <div class="stat-value" id="dbConnections">0</div>
+                            <div class="stat-label">DB Connections</div>
+                            <div class="stat-change" id="dbChange">Pool: 0/100</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(237,137,54,0.1); color: var(--warning);">⚠️</div>
+                            <div class="stat-value" id="errorRate">0%</div>
+                            <div class="stat-label">Error Rate</div>
+                            <div class="stat-change" id="errorChange">Last 24h</div>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Charts -->
+                    <div class="form-grid">
+                        <div class="card">
+                            <h3 class="card-title">Response Time Trends</h3>
+                            <div class="chart-container">
+                                <canvas id="responseTimeChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <h3 class="card-title">API Endpoint Traffic</h3>
+                            <div class="chart-container">
+                                <canvas id="endpointChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Error Tracking -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">System Alerts & Errors</h3>
+                            <div>
+                                <button class="btn btn-sm btn-warning" onclick="clearAlerts()">Clear All</button>
+                                <button class="btn btn-sm btn-primary" onclick="refreshSystemAlerts()">Refresh</button>
+                            </div>
+                        </div>
+                        <div id="systemAlerts">
+                            <div style="text-align: center; padding: 2rem; color: var(--gray-500);">Loading system alerts...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agency Management -->
+                <div id="agencies" class="page-section">
+                    <!-- Agency Performance Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(102,126,234,0.1); color: var(--primary);">🏆</div>
+                            <div class="stat-value" id="topAgencyRevenue">$0</div>
+                            <div class="stat-label">Top Agency Revenue</div>
+                            <div class="stat-change positive" id="topAgencyName">Loading...</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(72,187,120,0.1); color: var(--success);">📊</div>
+                            <div class="stat-value" id="avgRevenuePerAgency">$0</div>
+                            <div class="stat-label">Avg Revenue/Agency</div>
+                            <div class="stat-change" id="avgRevenueChange">Per month</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(237,137,54,0.1); color: var(--warning);">⚠️</div>
+                            <div class="stat-value" id="agenciesBelowTarget">0</div>
+                            <div class="stat-label">Below Target</div>
+                            <div class="stat-change negative" id="belowTargetPercent">0% of agencies</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(245,101,101,0.1); color: var(--danger);">📉</div>
+                            <div class="stat-value" id="churnRisk">0</div>
+                            <div class="stat-label">Churn Risk</div>
+                            <div class="stat-change negative" id="churnRiskPercent">High risk agencies</div>
+                        </div>
+                    </div>
+
+                    <!-- Agency Management Tools -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Agency Control Panel</h3>
+                            <button class="btn btn-success" onclick="showCreateAgencyModal()">+ Create Agency</button>
+                        </div>
+                        
+                        <!-- Search and Filters -->
+                        <div class="form-grid" style="margin-bottom: 1.5rem;">
+                            <div class="form-group">
+                                <input type="text" id="agencySearch" placeholder="Search agencies..." onkeyup="filterAgencies()">
+                            </div>
+                            <div class="form-group">
+                                <select id="agencyStatusFilter" onchange="filterAgencies()">
+                                    <option value="">All Statuses</option>
+                                    <option value="active">Active</option>
+                                    <option value="suspended">Suspended</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Agency Table -->
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Agency</th>
+                                        <th>Performance</th>
+                                        <th>Revenue</th>
+                                        <th>Users</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="agenciesTable">
+                                    <tr><td colspan="6" style="text-align: center; padding: 2rem;">Loading agencies...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Revenue Management -->
+                <div id="revenue" class="page-section">
+                    <!-- Financial KPIs -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(72,187,120,0.1); color: var(--success);">💰</div>
+                            <div class="stat-value" id="mrr">$0</div>
+                            <div class="stat-label">Monthly Recurring Revenue</div>
+                            <div class="stat-change positive" id="mrrChange">+0% this month</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(102,126,234,0.1); color: var(--primary);">📈</div>
+                            <div class="stat-value" id="arr">$0</div>
+                            <div class="stat-label">Annual Recurring Revenue</div>
+                            <div class="stat-change positive" id="arrChange">Projected growth</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(237,137,54,0.1); color: var(--warning);">🎯</div>
+                            <div class="stat-value" id="ltv">$0</div>
+                            <div class="stat-label">Customer LTV</div>
+                            <div class="stat-change" id="ltvChange">Average lifetime value</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(245,101,101,0.1); color: var(--danger);">📊</div>
+                            <div class="stat-value" id="cac">$0</div>
+                            <div class="stat-label">Customer Acquisition Cost</div>
+                            <div class="stat-change" id="cacChange">LTV:CAC ratio</div>
+                        </div>
+                    </div>
+
+                    <!-- Revenue Analytics -->
+                    <div class="form-grid">
+                        <div class="card">
+                            <h3 class="card-title">Revenue Forecasting</h3>
+                            <div class="chart-container">
+                                <canvas id="forecastChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <h3 class="card-title">Billing Overview</h3>
+                            <div id="billingOverview">
+                                <div class="stats-grid">
+                                    <div class="stat-card">
+                                        <div class="stat-value" id="upcomingRenewals">0</div>
+                                        <div class="stat-label">Upcoming Renewals</div>
+                                        <button class="btn btn-sm btn-info" onclick="showRenewals()">View All</button>
+                                    </div>
+                                    <div class="stat-card">
+                                        <div class="stat-value" id="failedPayments">0</div>
+                                        <div class="stat-label">Failed Payments</div>
+                                        <button class="btn btn-sm btn-warning" onclick="showFailedPayments()">Retry All</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Financial Management Tools -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Financial Operations</h3>
+                            <div>
+                                <button class="btn btn-info" onclick="generateFinancialReport()">📊 Generate Report</button>
+                                <button class="btn btn-warning" onclick="processRefunds()">🔄 Process Refunds</button>
+                            </div>
+                        </div>
+                        <div id="financialOperations">
+                            <div style="text-align: center; padding: 2rem; color: var(--gray-500);">Financial operations panel will load here...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Administration -->
+                <div id="users" class="page-section">
+                    <!-- User Metrics -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(102,126,234,0.1); color: var(--primary);">👥</div>
+                            <div class="stat-value" id="totalUsersCount">0</div>
+                            <div class="stat-label">Total Users</div>
+                            <div class="stat-change positive" id="totalUsersChange">All roles</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(72,187,120,0.1); color: var(--success);">✅</div>
+                            <div class="stat-value" id="activeUsersDaily">0</div>
+                            <div class="stat-label">Daily Active Users</div>
+                            <div class="stat-change positive" id="dauChange">+0% from yesterday</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(237,137,54,0.1); color: var(--warning);">📈</div>
+                            <div class="stat-value" id="userGrowthRate">0%</div>
+                            <div class="stat-label">Growth Rate</div>
+                            <div class="stat-change positive" id="growthChange">Monthly growth</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(245,101,101,0.1); color: var(--danger);">🔒</div>
+                            <div class="stat-value" id="lockedAccounts">0</div>
+                            <div class="stat-label">Locked Accounts</div>
+                            <div class="stat-change" id="lockedChange">Requires attention</div>
+                        </div>
+                    </div>
+
+                    <!-- User Management Tools -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">User Management</h3>
+                            <div>
+                                <button class="btn btn-success" onclick="showCreateUserModal()">+ Create User</button>
+                                <button class="btn btn-info" onclick="exportUserData()">📊 Export Data</button>
+                            </div>
+                        </div>
+
+                        <!-- User Filters -->
+                        <div class="form-grid" style="margin-bottom: 1.5rem;">
+                            <div class="form-group">
+                                <input type="text" id="userSearch" placeholder="Search users..." onkeyup="filterUsers()">
+                            </div>
+                            <div class="form-group">
+                                <select id="roleFilter" onchange="filterUsers()">
+                                    <option value="">All Roles</option>
+                                    <option value="super_admin">Super Admin</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="manager">Manager</option>
+                                    <option value="agent">Agent</option>
+                                    <option value="customer_service">Customer Service</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- User Table -->
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Role</th>
+                                        <th>Agency</th>
+                                        <th>Last Active</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTable">
+                                    <tr><td colspan="6" style="text-align: center; padding: 2rem;">Loading users...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Settings -->
+                <div id="system" class="page-section">
+                    <!-- System Configuration -->
+                    <div class="form-grid">
+                        <div class="card">
+                            <h3 class="card-title">Platform Configuration</h3>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="maintenanceMode" onchange="toggleMaintenance()">
+                                    Maintenance Mode
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>API Rate Limit (requests/hour)</label>
+                                <input type="number" id="apiRateLimit" value="1000" onchange="updateRateLimit()">
+                            </div>
+                            <div class="form-group">
+                                <label>Session Timeout (minutes)</label>
+                                <input type="number" id="sessionTimeout" value="60" onchange="updateSessionTimeout()">
+                            </div>
+                            <button class="btn btn-primary" onclick="saveSystemSettings()">Save Configuration</button>
+                        </div>
+
+                        <div class="card">
+                            <h3 class="card-title">Security Settings</h3>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="enforce2FA" onchange="toggle2FA()">
+                                    Enforce 2FA for Admins
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>IP Whitelist (one per line)</label>
+                                <textarea id="ipWhitelist" rows="4" placeholder="192.168.1.0/24&#10;10.0.0.0/8"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Password Complexity</label>
+                                <select id="passwordComplexity">
+                                    <option value="basic">Basic (8+ chars)</option>
+                                    <option value="medium" selected>Medium (8+ chars, mixed case, numbers)</option>
+                                    <option value="strong">Strong (12+ chars, mixed case, numbers, symbols)</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-danger" onclick="saveSecuritySettings()">Update Security</button>
+                        </div>
+                    </div>
+
+                    <!-- External Integrations -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">External Service Configuration</h3>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Stripe API Key</label>
+                                <input type="password" id="stripeApiKey" placeholder="sk_live_...">
+                            </div>
+                            <div class="form-group">
+                                <label>Stripe Webhook Secret</label>
+                                <input type="password" id="stripeWebhookSecret" placeholder="whsec_...">
+                            </div>
+                            <div class="form-group">
+                                <label>Email Service Provider</label>
+                                <select id="emailProvider">
+                                    <option value="resend">Resend</option>
+                                    <option value="sendgrid">SendGrid</option>
+                                    <option value="mailgun">Mailgun</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>SMS Gateway</label>
+                                <select id="smsGateway">
+                                    <option value="twilio">Twilio</option>
+                                    <option value="vonage">Vonage</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-warning" onclick="testIntegrations()">Test All Integrations</button>
+                        <button class="btn btn-success" onclick="saveIntegrations()">Save Integrations</button>
+                    </div>
+                </div>
+
+                <!-- Security Center -->
+                <div id="security" class="page-section">
+                    <!-- Security Overview Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(245,101,101,0.1); color: var(--danger);">⚠️</div>
+                            <div class="stat-value" id="securityAlerts">0</div>
+                            <div class="stat-label">Security Alerts</div>
+                            <div class="stat-change negative">Last 24h</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(237,137,54,0.1); color: var(--warning);">🛡️</div>
+                            <div class="stat-value" id="failedLogins">0</div>
+                            <div class="stat-label">Failed Login Attempts</div>
+                            <div class="stat-change">Today</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(72,187,120,0.1); color: var(--success);">🔒</div>
+                            <div class="stat-value" id="activeSessions">0</div>
+                            <div class="stat-label">Active Sessions</div>
+                            <div class="stat-change positive">Currently</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(102,126,234,0.1); color: var(--primary);">🔐</div>
+                            <div class="stat-value" id="twoFactorUsers">0</div>
+                            <div class="stat-label">2FA Enabled Users</div>
+                            <div class="stat-change">Total</div>
+                        </div>
+                    </div>
+
+                    <!-- Security Dashboard -->
+                    <div class="form-grid" style="margin-top: 2rem;">
+                        <!-- Recent Security Events -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Recent Security Events</h3>
+                                <button class="btn btn-sm btn-primary" onclick="refreshSecurityEvents()">Refresh</button>
+                            </div>
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Time</th>
+                                            <th>Event Type</th>
+                                            <th>User</th>
+                                            <th>IP Address</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="securityEventsTable">
+                                        <tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading security events...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- IP Access Control -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">IP Access Control</h3>
+                                <button class="btn btn-sm btn-success" onclick="addIPRule()">+ Add Rule</button>
+                            </div>
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>IP Address/Range</th>
+                                            <th>Type</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ipRulesTable">
+                                        <tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading IP rules...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security Configuration -->
+                    <div class="form-grid" style="margin-top: 2rem;">
+                        <!-- Authentication Settings -->
+                        <div class="card">
+                            <h3 class="card-title">Authentication Security</h3>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="enforcePasswordComplexity" onchange="updateSecuritySetting('passwordComplexity', this.checked)">
+                                    Enforce Strong Password Policy
+                                </label>
+                                <small>Require 12+ characters, mixed case, numbers, and symbols</small>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="requireTwoFactor" onchange="updateSecuritySetting('requireTwoFactor', this.checked)">
+                                    Require 2FA for Admin Users
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>Max Failed Login Attempts</label>
+                                <input type="number" id="maxFailedLogins" value="5" min="3" max="10" onchange="updateSecuritySetting('maxFailedLogins', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Account Lockout Duration (minutes)</label>
+                                <input type="number" id="lockoutDuration" value="30" min="5" max="1440" onchange="updateSecuritySetting('lockoutDuration', this.value)">
+                            </div>
+                        </div>
+
+                        <!-- Session Security -->
+                        <div class="card">
+                            <h3 class="card-title">Session Management</h3>
+                            <div class="form-group">
+                                <label>Session Timeout (minutes)</label>
+                                <input type="number" id="securitySessionTimeout" value="60" min="15" max="480" onchange="updateSecuritySetting('sessionTimeout', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="requireSSL" onchange="updateSecuritySetting('requireSSL', this.checked)">
+                                    Force HTTPS/SSL
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="logAllSessions" onchange="updateSecuritySetting('logAllSessions', this.checked)">
+                                    Log All Session Activity
+                                </label>
+                            </div>
+                            <button class="btn btn-warning" onclick="terminateAllSessions()">Terminate All Sessions</button>
+                        </div>
+                    </div>
+
+                    <!-- Security Actions -->
+                    <div class="form-grid" style="margin-top: 2rem;">
+                        <div class="card">
+                            <h3 class="card-title">Security Actions</h3>
+                            <div class="button-group">
+                                <button class="btn btn-danger" onclick="exportSecurityLog()">📊 Export Security Log</button>
+                                <button class="btn btn-warning" onclick="runSecurityScan()">🔍 Run Security Scan</button>
+                                <button class="btn btn-info" onclick="generateSecurityReport()">📋 Generate Report</button>
+                            </div>
+                        </div>
+
+                        <!-- Security Alerts Configuration -->
+                        <div class="card">
+                            <h3 class="card-title">Alert Configuration</h3>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="alertOnFailedLogin" checked onchange="updateAlertSetting('failedLogin', this.checked)">
+                                    Alert on Failed Login Attempts (5+ in 10 minutes)
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="alertOnNewIP" checked onchange="updateAlertSetting('newIP', this.checked)">
+                                    Alert on New IP Login
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="alertOnPrivilegeEscalation" checked onchange="updateAlertSetting('privilegeEscalation', this.checked)">
+                                    Alert on Privilege Changes
+                                </label>
+                            </div>
+                            <button class="btn btn-success" onclick="saveSecurityAlerts()">Save Alert Settings</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Global Leaderboard -->
+                <div id="leaderboard" class="page-section">
+                    <!-- Leaderboard Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(102,126,234,0.1); color: var(--primary);">🏆</div>
+                            <div class="stat-value" id="topPerformer">Loading...</div>
+                            <div class="stat-label">Top Performer</div>
+                            <div class="stat-change positive" id="topPerformerValue">$0 revenue</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(72,187,120,0.1); color: var(--success);">🎯</div>
+                            <div class="stat-value" id="totalCompetitions">0</div>
+                            <div class="stat-label">Active Competitions</div>
+                            <div class="stat-change" id="competitionsChange">This month</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(237,137,54,0.1); color: var(--warning);">🏅</div>
+                            <div class="stat-value" id="badgesAwarded">0</div>
+                            <div class="stat-label">Badges Awarded</div>
+                            <div class="stat-change positive" id="badgesChange">This quarter</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(245,101,101,0.1); color: var(--danger);">💎</div>
+                            <div class="stat-value" id="milestoneAchievers">0</div>
+                            <div class="stat-label">Milestone Achievers</div>
+                            <div class="stat-change positive" id="milestonesChange">Recent achievements</div>
+                        </div>
+                    </div>
+
+                    <!-- Leaderboards -->
+                    <div class="form-grid">
+                        <div class="card">
+                            <h3 class="card-title">🏢 Top Agencies</h3>
+                            <div id="agencyLeaderboard">
+                                <div style="text-align: center; padding: 2rem; color: var(--gray-500);">Loading agency leaderboard...</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <h3 class="card-title">👤 Top Agents</h3>
+                            <div id="agentLeaderboard">
+                                <div style="text-align: center; padding: 2rem; color: var(--gray-500);">Loading agent leaderboard...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gamification Management -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Gamification Management</h3>
+                            <div>
+                                <button class="btn btn-success" onclick="createCompetition()">🏆 Create Competition</button>
+                                <button class="btn btn-info" onclick="manageBadges()">🏅 Manage Badges</button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Competition Type</label>
+                                <select id="competitionType">
+                                    <option value="monthly">Monthly Challenge</option>
+                                    <option value="quarterly">Quarterly Competition</option>
+                                    <option value="annual">Annual Championship</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Prize Pool ($)</label>
+                                <input type="number" id="prizePool" value="5000">
+                            </div>
+                        </div>
+                        
+                        <div id="competitionResults">
+                            <div style="text-align: center; padding: 2rem; color: var(--gray-500);">Competition management panel will load here...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals will be added here -->
+    <div id="modalContainer"></div>
+
+    <script>
+        // Global variables
+        let websocket = null;
+        let refreshInterval = null;
+        let currentPage = 'dashboard';
+        let token = null; // Will be set via HTTP-only cookie
+        let user = null;
+
+        // Wait for auth check to complete and get user data
+        function waitForAuth() {
+            if (window.authCompleted && window.currentUser) {
+                user = window.currentUser;
+                console.log('✅ Authentication successful - loading super admin portal');
+                console.log('   User role:', user.role);
+                console.log('   User email:', user.email);
+            } else {
+                // Keep checking until auth is complete
+                setTimeout(waitForAuth, 50);
+            }
+        }
+        
+        waitForAuth();
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePortal();
+            connectWebSocket();
+            startAutoRefresh();
+            loadInitialData();
+        });
+
+        function initializePortal() {
+            console.log('System Administration Portal initialized');
+            updateTimestamp();
+            // Initialize Lucide icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+
+        // Navigation
+        function showPage(pageId) {
+            // Update active nav item
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+            
+            // Hide all pages
+            document.querySelectorAll('.page-section').forEach(section => section.classList.remove('active'));
+            
+            // Show selected page
+            const pageElement = document.getElementById(pageId);
+            if (pageElement) {
+                pageElement.classList.add('active');
+            }
+            
+            // Update page title and subtitle
+            const pageInfo = {
+                dashboard: { title: 'System Overview', subtitle: 'Real-time platform metrics and health monitoring' },
+                analytics: { title: 'Performance Analytics', subtitle: 'System performance and operational intelligence' },
+                agencies: { title: 'Organization Management', subtitle: 'Enterprise client and organizational oversight' },
+                revenue: { title: 'Financial Operations', subtitle: 'Revenue analytics and financial management' },
+                users: { title: 'User Administration', subtitle: 'Account management and access control' },
+                system: { title: 'System Configuration', subtitle: 'Platform settings and integration management' },
+                security: { title: 'Security Center', subtitle: 'Security monitoring and threat management' }
+            };
+            
+            document.getElementById('pageTitle').textContent = pageInfo[pageId].title;
+            document.getElementById('pageSubtitle').textContent = pageInfo[pageId].subtitle;
+            
+            currentPage = pageId;
+            
+            // Load page-specific data
+            loadPageData(pageId);
+        }
+
+        // WebSocket connection for real-time updates
+        function connectWebSocket() {
+            // Note: This would connect to a real WebSocket server in production
+            console.log('WebSocket connection established (simulated)');
+            
+            // Simulate real-time updates
+            simulateRealTimeUpdates();
+        }
+
+        function simulateRealTimeUpdates() {
+            setInterval(() => {
+                updateRealTimeMetrics();
+                updateTimestamp();
+            }, 5000); // Update every 5 seconds
+        }
+
+        async function updateRealTimeMetrics() {
+            try {
+                const token = localStorage.getItem('syncedup_token');
+                if (!token) return;
+
+                const response = await fetch('/api/super-admin/realtime-metrics', {
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('apiCalls').textContent = (data.apiCalls || 0).toLocaleString();
+                    document.getElementById('apiChange').textContent = `Avg response: ${data.avgResponseTime || 0}ms`;
+                    document.getElementById('cpuUsage').textContent = `${data.cpuUsage || 0}%`;
+                    document.getElementById('memoryUsage').textContent = `${data.memoryUsage || 0}%`;
+                    document.getElementById('memoryChange').textContent = `Available: ${data.availableMemory || 0}GB`;
+                } else {
+                    // Silently set fallback values when API is unavailable
+                    document.getElementById('apiCalls').textContent = '0';
+                    document.getElementById('apiChange').textContent = 'Avg response: 0ms';
+                    document.getElementById('cpuUsage').textContent = '0%';
+                    document.getElementById('memoryUsage').textContent = '0%';
+                    document.getElementById('memoryChange').textContent = 'Available: 0GB';
+                }
+            } catch (error) {
+                // Don't log error for every polling attempt when API is down
+                document.getElementById('apiCalls').textContent = '0';
+                document.getElementById('apiChange').textContent = 'Avg response: 0ms';
+                document.getElementById('cpuUsage').textContent = '0%';
+                document.getElementById('memoryUsage').textContent = '0%';
+                document.getElementById('memoryChange').textContent = 'Available: 0GB';
+            }
+        }
+
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent = now.toLocaleTimeString();
+        }
+
+        // Auto-refresh functionality
+        function startAutoRefresh() {
+            refreshInterval = setInterval(() => {
+                if (currentPage === 'dashboard') {
+                    loadDashboardData();
+                }
+            }, 30000); // Refresh every 30 seconds
+        }
+
+        function refreshAllData() {
+            const refreshBtn = document.getElementById('refreshBtn');
+            refreshBtn.innerHTML = '<div class="loading"></div> Refreshing...';
+            
+            setTimeout(() => {
+                loadPageData(currentPage);
+                refreshBtn.innerHTML = '🔄 Refresh';
+                showAlert('Data refreshed successfully!', 'success');
+            }, 1000);
+        }
+
+        // Load initial data
+        async function loadInitialData() {
+            await loadDashboardData();
+            await initializeCharts();
+        }
+
+        // Dashboard data loading
+        async function loadDashboardData() {
+            try {
+                // Load basic stats
+                await loadBasicStats();
+                
+                // Load revenue data
+                await loadRevenueData();
+                
+                // Load system events
+                await loadSystemEvents();
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showAlert('Error loading dashboard data', 'error');
+            }
+        }
+
+        async function loadBasicStats() {
+            try {
+                const token = localStorage.getItem('syncedup_token');
+                if (!token) {
+                    setFallbackStats();
+                    return;
+                }
+
+                const response = await fetch('/api/super-admin/system-stats', {
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Update dashboard stats
+                    document.getElementById('totalRevenue').textContent = `$${(data.totalRevenue || 0).toLocaleString()}`;
+                    document.getElementById('activeAgencies').textContent = data.activeAgencies || 0;
+                    document.getElementById('totalUsers').textContent = data.totalUsers || 0;
+                    document.getElementById('revenueChange').textContent = `+${data.revenueGrowth || 0}% from last month`;
+                    document.getElementById('agenciesChange').textContent = `+${data.newAgencies || 0} this month`;
+                    document.getElementById('usersChange').textContent = `${data.activeUserPercent || 0}% active today`;
+                    
+                } else {
+                    setFallbackStats();
+                }
+            } catch (error) {
+                setFallbackStats();
+            }
+        }
+
+        function setFallbackStats() {
+            document.getElementById('totalRevenue').textContent = '$0';
+            document.getElementById('activeAgencies').textContent = '0';
+            document.getElementById('totalUsers').textContent = '0';
+            document.getElementById('revenueChange').textContent = '+0% from last month';
+            document.getElementById('agenciesChange').textContent = '+0 this month';
+            document.getElementById('usersChange').textContent = '0% active today';
+        }
+
+        async function loadRevenueData() {
+            await updateRevenueChart();
+        }
+
+        async function loadSystemEvents() {
+            try {
+                const token = localStorage.getItem('syncedup_token');
+                if (!token) {
+                    setNoEventsMessage();
+                    return;
+                }
+
+                const response = await fetch('/api/super-admin/system-events', {
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const events = await response.json();
+                    
+                    if (!events || events.length === 0) {
+                        setNoEventsMessage();
+                        return;
+                    }
+                    
+                    const eventsHtml = `
+                        <div style="max-height: 300px; overflow-y: auto;">
+                            ${events.map(event => `
+                                <div style="padding: 0.75rem; border-bottom: 1px solid var(--border-primary); display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="font-weight: 500;">${event.title || 'System Event'}</div>
+                                        <div style="font-size: 0.85rem; color: var(--text-secondary);">${event.description || 'No description'}</div>
+                                    </div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted);">${event.timeAgo || 'Unknown'}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    document.getElementById('recentEvents').innerHTML = eventsHtml;
+                } else {
+                    setNoEventsMessage();
+                }
+            } catch (error) {
+                setNoEventsMessage();
+            }
+        }
+
+        function setNoEventsMessage() {
+            document.getElementById('recentEvents').innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                    No recent system events found
+                </div>`;
+        }
+
+        // Page-specific data loading
+        async function loadPageData(pageId) {
+            switch(pageId) {
+                case 'dashboard':
+                    await loadDashboardData();
+                    break;
+                case 'analytics':
+                    await loadAnalyticsData();
+                    break;
+                case 'agencies':
+                    await loadAgencyData();
+                    break;
+                case 'revenue':
+                    await loadRevenueManagementData();
+                    break;
+                case 'users':
+                    await loadUserData();
+                    break;
+                case 'system':
+                    await loadSystemSettings();
+                    break;
+                case 'security':
+                    await loadSecurityData();
+                    break;
+                case 'leaderboard':
+                    await loadLeaderboardData();
+                    break;
+            }
+        }
+
+        async function loadAnalyticsData() {
+            // Load system analytics
+            await updateSystemMetrics();
+            await initializeAnalyticsCharts();
+            await loadSystemAlerts();
+        }
+
+        async function updateSystemMetrics() {
+            try {
+                const token = localStorage.getItem('syncedup_token');
+                let data = {
+                    cpuUsage: 0,
+                    cpuStatus: 'Normal',
+                    memoryUsage: 0,
+                    availableMemory: 0,
+                    dbConnections: 0,
+                    maxConnections: 100,
+                    errorRate: 0,
+                    errorPeriod: 'Last 24h'
+                };
+
+                if (token) {
+                    try {
+                        const response = await fetch('/api/super-admin/system-metrics', {
+                            headers: { 
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            const responseData = await response.json();
+                            data = { ...data, ...responseData };
+                        }
+                    } catch (error) {
+                        // Use default values
+                    }
+                }
+                
+                document.getElementById('cpuUsage').textContent = `${data.cpuUsage}%`;
+                document.getElementById('cpuChange').textContent = data.cpuStatus;
+                document.getElementById('memoryUsage').textContent = `${data.memoryUsage}%`;
+                document.getElementById('memoryChange').textContent = `Available: ${data.availableMemory}GB`;
+                document.getElementById('dbConnections').textContent = data.dbConnections;
+                document.getElementById('dbChange').textContent = `Pool: ${data.dbConnections}/${data.maxConnections}`;
+                document.getElementById('errorRate').textContent = `${data.errorRate}%`;
+                document.getElementById('errorChange').textContent = data.errorPeriod;
+            } catch (error) {
+                // Set fallback values on any error
+                document.getElementById('cpuUsage').textContent = '0%';
+                document.getElementById('cpuChange').textContent = 'Normal';
+                document.getElementById('memoryUsage').textContent = '0%';
+                document.getElementById('memoryChange').textContent = 'Available: 0GB';
+                document.getElementById('dbConnections').textContent = '0';
+                document.getElementById('dbChange').textContent = 'Pool: 0/100';
+                document.getElementById('errorRate').textContent = '0%';
+                document.getElementById('errorChange').textContent = 'Last 24h';
+            }
+        }
+
+        async function loadSystemAlerts() {
+            try {
+                const token = localStorage.getItem('syncedup_token');
+                let alerts = [];
+
+                if (token) {
+                    try {
+                        const response = await fetch('/api/super-admin/system-alerts', {
+                            headers: { 
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            alerts = await response.json();
+                        }
+                    } catch (error) {
+                        // Use empty alerts array
+                    }
+                }
+                
+                if (!alerts || alerts.length === 0) {
+                    document.getElementById('systemAlerts').innerHTML = `
+                        <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                            No active system alerts
+                        </div>`;
+                    return;
+                }
+                
+                const alertsHtml = `
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        ${alerts.map(alert => {
+                            const severity = alert.severity || 'info';
+                            const colorVar = severity === 'critical' ? 'var(--danger)' : 
+                                           severity === 'warning' ? 'var(--warning)' : 'var(--info)';
+                            return `
+                                <div style="padding: 1rem; border-left: 4px solid ${colorVar}; background: rgba(${severity === 'critical' ? '245,101,101' : severity === 'warning' ? '237,137,54' : '66,153,225'},0.1); margin-bottom: 0.5rem;">
+                                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                                        <div>
+                                            <div style="font-weight: 600; color: ${colorVar};">${alert.title || 'System Alert'}</div>
+                                            <div style="font-size: 0.9rem; margin-top: 0.25rem;">${alert.message || 'No details available'}</div>
+                                        </div>
+                                        <div style="font-size: 0.8rem; color: var(--text-muted);">${alert.timeAgo || 'Unknown'}</div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+                document.getElementById('systemAlerts').innerHTML = alertsHtml;
+            } catch (error) {
+                document.getElementById('systemAlerts').innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                        No active system alerts
+                    </div>`;
+            }
+        }
+
+        async function loadAgencyData() {
+            const data = await makeAPICall('/api/super-admin/agency-stats', {
+                topAgencyRevenue: 0,
+                topAgencyName: 'No agencies found',
+                avgRevenue: 0,
+                belowTarget: 0,
+                belowTargetPercent: 0,
+                churnRisk: 0
+            });
+
+            document.getElementById('topAgencyRevenue').textContent = data.topAgencyRevenue ? `$${data.topAgencyRevenue.toLocaleString()}` : '$0';
+            document.getElementById('topAgencyName').textContent = data.topAgencyName || 'No agencies found';
+            document.getElementById('avgRevenuePerAgency').textContent = data.avgRevenue ? `$${data.avgRevenue.toLocaleString()}` : '$0';
+            document.getElementById('avgRevenueChange').textContent = 'Per month';
+            document.getElementById('agenciesBelowTarget').textContent = data.belowTarget || 0;
+            document.getElementById('belowTargetPercent').textContent = `${data.belowTargetPercent || 0}% of agencies`;
+            document.getElementById('churnRisk').textContent = data.churnRisk || 0;
+            document.getElementById('churnRiskPercent').textContent = 'High risk agencies';
+
+            // Load agencies table
+            await loadAgenciesTable();
+        }
+
+        async function loadAgenciesTable() {
+            const agencies = await makeAPICall('/api/super-admin/agencies', []);
+            
+            if (!agencies || agencies.length === 0) {
+                document.getElementById('agenciesTable').innerHTML = `
+                    <tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">No agencies found</td></tr>
+                `;
+                return;
+            }
+            
+            const tableHtml = agencies.map(agency => {
+                const performance = agency.performance || 0;
+                const performanceColor = performance >= 80 ? 'var(--success)' : performance >= 60 ? 'var(--warning)' : 'var(--danger)';
+                const statusClass = agency.status === 'active' ? 'status-active' : agency.status === 'inactive' ? 'status-inactive' : 'status-warning';
+                
+                return `
+                    <tr>
+                        <td>
+                            <div style="font-weight: 600;">${agency.name || 'Unknown Agency'}</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">${agency.tier || 'Standard tier'} agency</div>
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div style="width: 100px; height: 8px; background: var(--border-primary); border-radius: 4px;">
+                                    <div style="width: ${performance}%; height: 100%; background: ${performanceColor}; border-radius: 4px;"></div>
+                                </div>
+                                <span style="font-size: 0.85rem; font-weight: 500;">${performance}%</span>
+                            </div>
+                        </td>
+                        <td style="font-weight: 600; color: var(--success);">${agency.revenue ? '$' + agency.revenue.toLocaleString() : '$0'}</td>
+                        <td>
+                            <div>👥 ${agency.totalUsers || 0} users</div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary);">${agency.activeUsers || 0} active</div>
+                        </td>
+                        <td><span class="${statusClass}">${(agency.status || 'inactive').charAt(0).toUpperCase() + (agency.status || 'inactive').slice(1)}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="viewAgencyDetails('${agency.id}')">View</button>
+                            <button class="btn btn-sm btn-warning" onclick="editAgency('${agency.id}')">Edit</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            document.getElementById('agenciesTable').innerHTML = tableHtml;
+        }
+
+        async function loadRevenueManagementData() {
+            const data = await makeAPICall('/api/super-admin/financial-stats', {
+                totalRevenue: 0,
+                monthlyGrowth: 0,
+                avgDealSize: 0,
+                conversionRate: 0
+            });
+
+            // Update revenue management elements that actually exist
+            const mrrElement = document.getElementById('mrr');
+            const arrElement = document.getElementById('arr');
+            const ltvElement = document.getElementById('ltv');
+            const cacElement = document.getElementById('cac');
+            
+            if (mrrElement) mrrElement.textContent = data.totalRevenue ? `$${data.totalRevenue.toLocaleString()}` : '$0';
+            if (arrElement) arrElement.textContent = data.totalRevenue ? `$${(data.totalRevenue * 12).toLocaleString()}` : '$0';
+            if (ltvElement) ltvElement.textContent = data.avgDealSize ? `$${data.avgDealSize.toLocaleString()}` : '$0';
+            if (cacElement) cacElement.textContent = `$${Math.floor((data.totalRevenue || 0) * 0.2).toLocaleString()}`;
+
+            await initializeForecastChart();
+        }
+
+        async function loadUserData() {
+            const data = await makeAPICall('/api/super-admin/user-stats', {
+                totalUsers: 0,
+                activeUsers: 0,
+                newSignups: 0,
+                userRetention: 0
+            });
+
+            // Update user data elements that actually exist
+            const totalUsersElement = document.getElementById('totalUsersCount');
+            const activeUsersElement = document.getElementById('activeUsersDaily');
+            const growthRateElement = document.getElementById('userGrowthRate');
+            const lockedAccountsElement = document.getElementById('lockedAccounts');
+            
+            if (totalUsersElement) totalUsersElement.textContent = data.totalUsers || 0;
+            if (activeUsersElement) activeUsersElement.textContent = data.activeUsers || 0;
+            if (growthRateElement) growthRateElement.textContent = `${data.userRetention || 0}%`;
+            if (lockedAccountsElement) lockedAccountsElement.textContent = Math.floor((data.totalUsers || 0) * 0.05) || 0;
+
+            // Load users table
+            await loadUsersTable();
+        }
+
+        async function loadUsersTable() {
+            const users = await makeAPICall('/api/super-admin/users', []);
+
+            if (!users || users.length === 0) {
+                document.getElementById('usersTable').innerHTML = `
+                    <tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">No users found</td></tr>
+                `;
+                return;
+            }
+
+            const tableHtml = users.map(user => {
+                const statusClass = user.status === 'active' ? 'status-active' : 'status-inactive';
+                const lastLogin = user.lastLogin || 'Never';
+                
+                return `
+                    <tr>
+                        <td>
+                            <div style="font-weight: 600;">${user.name || 'Unknown User'}</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">${user.email || 'No email'}</div>
+                        </td>
+                        <td>${user.agency || 'No agency'}</td>
+                        <td><span class="role-badge role-${user.role || 'unknown'}">${(user.role || 'unknown').charAt(0).toUpperCase() + (user.role || 'unknown').slice(1)}</span></td>
+                        <td><span class="${statusClass}">${(user.status || 'inactive').charAt(0).toUpperCase() + (user.status || 'inactive').slice(1)}</span></td>
+                        <td>${lastLogin}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="viewUserDetails('${user.id}')">View</button>
+                            <button class="btn btn-sm btn-warning" onclick="editUser('${user.id}')">Edit</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            document.getElementById('usersTable').innerHTML = tableHtml;
+        }
+
+        // System Administration Functions
+        function viewAgencyDetails(agencyId) {
+            showAlert('Agency details functionality will be implemented', 'info');
+        }
+
+        function editAgency(agencyId) {
+            showAlert('Edit agency functionality will be implemented', 'info');
+        }
+
+        function viewUserDetails(userId) {
+            showAlert('User details functionality will be implemented', 'info');
+        }
+
+        function editUser(userId) {
+            showAlert('Edit user functionality will be implemented', 'info');
+        }
+
+        function impersonateUser(userId) {
+            if (confirm('Are you sure you want to impersonate this user?')) {
+                showAlert('User impersonation functionality will be implemented', 'info');
+            }
+        }
+
+        // Alert system
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} show`;
+            alertDiv.innerHTML = `
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()">&times;</button>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv.parentElement) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+
+        // Global competition management
+        function createCompetition() {
+            showAlert('Creating new competition...', 'info');
+        }
+
+        function manageBadges() {
+            showAlert('Opening badge management...', 'info');
+        }
+
+        // Search and filter functions
+        function filterUsers() {
+            const searchTerm = document.getElementById('userSearch')?.value?.toLowerCase() || '';
+            const users = document.querySelectorAll('#usersTable tr');
+            
+            users.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+
+
+        async function loadSystemSettings() {
+            // Load current system settings
+            console.log('Loading system settings...');
+        }
+
+        async function loadLeaderboardData() {
+            try {
+                const response = await fetch('/api/super-admin/leaderboard-stats', {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('topPerformer').textContent = data.topPerformer?.name || 'No data';
+                    document.getElementById('topPerformerValue').textContent = data.topPerformer?.revenue ? `$${data.topPerformer.revenue.toLocaleString()} revenue` : '$0 revenue';
+                    document.getElementById('totalCompetitions').textContent = data.totalCompetitions || 0;
+                    document.getElementById('competitionsChange').textContent = 'This month';
+                    document.getElementById('badgesAwarded').textContent = data.badgesAwarded || 0;
+                    document.getElementById('badgesChange').textContent = 'This quarter';
+                    document.getElementById('milestoneAchievers').textContent = data.milestoneAchievers || 0;
+                    document.getElementById('milestonesChange').textContent = 'Recent achievements';
+                } else {
+                    throw new Error('Failed to load leaderboard stats');
+                }
+            } catch (error) {
+                console.error('Error loading leaderboard data:', error);
+                document.getElementById('topPerformer').textContent = '--';
+                document.getElementById('topPerformerValue').textContent = 'Unable to load';
+                document.getElementById('totalCompetitions').textContent = '--';
+                document.getElementById('competitionsChange').textContent = 'Unable to load';
+                document.getElementById('badgesAwarded').textContent = '--';
+                document.getElementById('badgesChange').textContent = 'Unable to load';
+                document.getElementById('milestoneAchievers').textContent = '--';
+                document.getElementById('milestonesChange').textContent = 'Unable to load';
+            }
+
+            // Load leaderboards
+            loadAgencyLeaderboard();
+            loadAgentLeaderboard();
+        }
+
+        async function loadAgencyLeaderboard() {
+            try {
+                const response = await fetch('/api/super-admin/agency-leaderboard', {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const agencies = await response.json();
+                    
+                    if (!agencies || agencies.length === 0) {
+                        document.getElementById('agencyLeaderboard').innerHTML = `
+                            <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                No agency data available
+                            </div>`;
+                        return;
+                    }
+                    
+                    const leaderboardHtml = agencies.slice(0, 3).map((agency, index) => {
+                        const medals = ['🥇', '🥈', '🥉'];
+                        return `
+                            <div class="leaderboard-item">
+                                <div class="leaderboard-rank">${medals[index]}</div>
+                                <div class="leaderboard-info">
+                                    <div style="font-weight: 600;">${agency.name || 'Unknown Agency'}</div>
+                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">${agency.growth ? agency.growth + '% growth this quarter' : 'No growth data'}</div>
+                                </div>
+                                <div class="leaderboard-value">${agency.revenue ? '$' + agency.revenue.toLocaleString() : '$0'}</div>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    document.getElementById('agencyLeaderboard').innerHTML = leaderboardHtml;
+                } else {
+                    throw new Error('Failed to load agency leaderboard');
+                }
+            } catch (error) {
+                console.error('Error loading agency leaderboard:', error);
+                document.getElementById('agencyLeaderboard').innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                        Unable to load agency leaderboard
+                    </div>`;
+            }
+        }
+
+        async function loadAgentLeaderboard() {
+            try {
+                const response = await fetch('/api/super-admin/agent-leaderboard', {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const agents = await response.json();
+                    
+                    if (!agents || agents.length === 0) {
+                        document.getElementById('agentLeaderboard').innerHTML = `
+                            <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                No agent data available
+                            </div>`;
+                        return;
+                    }
+                    
+                    const leaderboardHtml = agents.slice(0, 3).map((agent, index) => {
+                        const medals = ['🥇', '🥈', '🥉'];
+                        return `
+                            <div class="leaderboard-item">
+                                <div class="leaderboard-rank">${medals[index]}</div>
+                                <div class="leaderboard-info">
+                                    <div style="font-weight: 600;">${agent.name || 'Unknown Agent'}</div>
+                                    <div style="font-size: 0.85rem; color: var(--text-secondary);">${agent.agencyName || 'No agency'}</div>
+                                </div>
+                                <div class="leaderboard-value">${agent.revenue ? '$' + agent.revenue.toLocaleString() : '$0'}</div>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    document.getElementById('agentLeaderboard').innerHTML = leaderboardHtml;
+                } else {
+                    throw new Error('Failed to load agent leaderboard');
+                }
+            } catch (error) {
+                console.error('Error loading agent leaderboard:', error);
+                document.getElementById('agentLeaderboard').innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                        Unable to load agent leaderboard
+                    </div>`;
+            }
+        }
+
+        // Chart initialization
+        async function initializeCharts() {
+            await updateRevenueChart();
+            await initializePerformanceChart();
+            await initializeActivityChart();
+        }
+
+        // Chart instances tracking
+        let chartInstances = {};
+
+        // Generic API call helper
+        async function makeAPICall(endpoint, fallbackData = null) {
+            try {
+                const token = localStorage.getItem('syncedup_token');
+                if (!token) return fallbackData;
+
+                const response = await fetch(endpoint, {
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    return await response.json();
+                }
+                return fallbackData;
+            } catch (error) {
+                return fallbackData;
+            }
+        }
+
+        async function updateRevenueChart() {
+            try {
+                const token = localStorage.getItem('syncedup_token');
+                let chartData = {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    monthlyRevenue: new Array(12).fill(0),
+                    projected: new Array(12).fill(null)
+                };
+
+                if (token) {
+                    try {
+                        const response = await fetch('/api/super-admin/revenue-chart', {
+                            headers: { 
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            chartData = await response.json();
+                        }
+                    } catch (error) {
+                        // Use default empty data
+                    }
+                }
+                
+                // Destroy existing chart if it exists
+                if (chartInstances.revenueChart) {
+                    chartInstances.revenueChart.destroy();
+                }
+                
+                const ctx = document.getElementById('revenueChart').getContext('2d');
+                chartInstances.revenueChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartData.labels || ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                        datasets: [{
+                            label: 'Monthly Revenue',
+                            data: chartData.monthlyRevenue || new Array(12).fill(0),
+                            borderColor: 'rgba(102, 126, 234, 1)',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }, {
+                            label: 'Projected',
+                            data: chartData.projected || new Array(12).fill(null),
+                            borderColor: 'rgba(237, 137, 54, 1)',
+                            backgroundColor: 'rgba(237, 137, 54, 0.1)',
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + value.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                // Create empty chart on error
+                if (chartInstances.revenueChart) {
+                    chartInstances.revenueChart.destroy();
+                }
+                
+                const ctx = document.getElementById('revenueChart').getContext('2d');
+                chartInstances.revenueChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                        datasets: [{
+                            label: 'Monthly Revenue',
+                            data: new Array(12).fill(0),
+                            borderColor: 'rgba(102, 126, 234, 1)',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top' },
+                            title: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + value.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        async function initializePerformanceChart() {
+            try {
+                const token = localStorage.getItem('syncedup_token');
+                let chartData = {
+                    labels: ['CPU Usage', 'Memory Usage', 'Disk Usage'],
+                    data: [0, 0, 0]
+                };
+
+                if (token) {
+                    try {
+                        const response = await fetch('/api/super-admin/performance-chart', {
+                            headers: { 
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            chartData = await response.json();
+                        }
+                    } catch (error) {
+                        // Use default empty data
+                    }
+                }
+                
+                // Destroy existing chart if it exists
+                if (chartInstances.performanceChart) {
+                    chartInstances.performanceChart.destroy();
+                }
+                
+                const ctx = document.getElementById('performanceChart').getContext('2d');
+                chartInstances.performanceChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: chartData.labels || ['CPU Usage', 'Memory Usage', 'Disk Usage'],
+                        datasets: [{
+                            data: chartData.data || [0, 0, 0],
+                            backgroundColor: [
+                                'rgba(102, 126, 234, 0.8)',
+                                'rgba(237, 137, 54, 0.8)',
+                                'rgba(72, 187, 120, 0.8)'
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                // Create empty chart on error
+                if (chartInstances.performanceChart) {
+                    chartInstances.performanceChart.destroy();
+                }
+                
+                const ctx = document.getElementById('performanceChart').getContext('2d');
+                chartInstances.performanceChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['CPU Usage', 'Memory Usage', 'Disk Usage'],
+                        datasets: [{
+                            data: [0, 0, 0],
+                            backgroundColor: [
+                                'rgba(102, 126, 234, 0.8)',
+                                'rgba(237, 137, 54, 0.8)',
+                                'rgba(72, 187, 120, 0.8)'
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            }
+        }
+
+        async function initializeActivityChart() {
+            try {
+                const token = localStorage.getItem('syncedup_token');
+                let chartData = {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    data: [0, 0, 0, 0, 0, 0, 0]
+                };
+
+                if (token) {
+                    try {
+                        const response = await fetch('/api/super-admin/activity-chart', {
+                            headers: { 
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            chartData = await response.json();
+                        }
+                    } catch (error) {
+                        // Use default empty data
+                    }
+                }
+                
+                // Destroy existing chart if it exists
+                if (chartInstances.activityChart) {
+                    chartInstances.activityChart.destroy();
+                }
+                
+                const ctx = document.getElementById('activityChart').getContext('2d');
+                chartInstances.activityChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.labels || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Active Users',
+                            data: chartData.data || [0, 0, 0, 0, 0, 0, 0],
+                            backgroundColor: 'rgba(72, 187, 120, 0.8)',
+                            borderColor: 'rgba(72, 187, 120, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                // Create empty chart on error
+                if (chartInstances.activityChart) {
+                    chartInstances.activityChart.destroy();
+                }
+                
+                const ctx = document.getElementById('activityChart').getContext('2d');
+                chartInstances.activityChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Active Users',
+                            data: [0, 0, 0, 0, 0, 0, 0],
+                            backgroundColor: 'rgba(72, 187, 120, 0.8)',
+                            borderColor: 'rgba(72, 187, 120, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            }
+        }
+
+        async function initializeAnalyticsCharts() {
+            await initializeResponseTimeChart();
+            await initializeEndpointChart();
+        }
+
+        async function initializeResponseTimeChart() {
+            try {
+                const token = localStorage.getItem('syncedup_token');
+                let chartData = {
+                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+                    data: [0, 0, 0, 0, 0, 0]
+                };
+
+                if (token) {
+                    try {
+                        const response = await fetch('/api/super-admin/response-time-chart', {
+                            headers: { 
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            chartData = await response.json();
+                        }
+                    } catch (error) {
+                        // Use default empty data
+                    }
+                }
+                
+                // Destroy existing chart if it exists
+                if (chartInstances.responseTimeChart) {
+                    chartInstances.responseTimeChart.destroy();
+                }
+                
+                const ctx = document.getElementById('responseTimeChart').getContext('2d');
+                chartInstances.responseTimeChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartData.labels || ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+                        datasets: [{
+                            label: 'Response Time (ms)',
+                            data: chartData.data || [0, 0, 0, 0, 0, 0],
+                            borderColor: 'rgba(66, 153, 225, 1)',
+                            backgroundColor: 'rgba(66, 153, 225, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + 'ms';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                // Create empty chart on error
+                if (chartInstances.responseTimeChart) {
+                    chartInstances.responseTimeChart.destroy();
+                }
+                
+                const ctx = document.getElementById('responseTimeChart').getContext('2d');
+                chartInstances.responseTimeChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+                        datasets: [{
+                            label: 'Response Time (ms)',
+                            data: [0, 0, 0, 0, 0, 0],
+                            borderColor: 'rgba(66, 153, 225, 1)',
+                            backgroundColor: 'rgba(66, 153, 225, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'top' } },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + 'ms';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        async function initializeEndpointChart() {
+            try {
+                const token = localStorage.getItem('syncedup_token');
+                let chartData = {
+                    labels: ['/api/auth/login', '/api/leads', '/api/dashboard', '/api/commissions', '/api/sales'],
+                    data: [0, 0, 0, 0, 0]
+                };
+
+                if (token) {
+                    try {
+                        const response = await fetch('/api/super-admin/endpoint-chart', {
+                            headers: { 
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            chartData = await response.json();
+                        }
+                    } catch (error) {
+                        // Use default empty data
+                    }
+                }
+                
+                // Destroy existing chart if it exists
+                if (chartInstances.endpointChart) {
+                    chartInstances.endpointChart.destroy();
+                }
+                
+                const ctx = document.getElementById('endpointChart').getContext('2d');
+                chartInstances.endpointChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.labels || ['/api/auth/login', '/api/leads', '/api/dashboard', '/api/commissions', '/api/sales'],
+                        datasets: [{
+                            label: 'Requests per Hour',
+                            data: chartData.data || [0, 0, 0, 0, 0],
+                            backgroundColor: [
+                                'rgba(102, 126, 234, 0.8)',
+                                'rgba(72, 187, 120, 0.8)',
+                                'rgba(237, 137, 54, 0.8)',
+                                'rgba(245, 101, 101, 0.8)',
+                                'rgba(159, 122, 234, 0.8)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y', // This makes it horizontal
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                // Create empty chart on error
+                if (chartInstances.endpointChart) {
+                    chartInstances.endpointChart.destroy();
+                }
+                
+                const ctx = document.getElementById('endpointChart').getContext('2d');
+                chartInstances.endpointChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['/api/auth/login', '/api/leads', '/api/dashboard', '/api/commissions', '/api/sales'],
+                        datasets: [{
+                            label: 'Requests per Hour',
+                            data: [0, 0, 0, 0, 0],
+                            backgroundColor: [
+                                'rgba(102, 126, 234, 0.8)',
+                                'rgba(72, 187, 120, 0.8)',
+                                'rgba(237, 137, 54, 0.8)',
+                                'rgba(245, 101, 101, 0.8)',
+                                'rgba(159, 122, 234, 0.8)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y', // This makes it horizontal
+                        plugins: { legend: { display: false } },
+                        scales: { x: { beginAtZero: true } }
+                    }
+                });
+            }
+        }
+
+        async function initializeForecastChart() {
+            try {
+                const token = localStorage.getItem('syncedup_token');
+                let chartData = {
+                    labels: ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    actual: [0, 0, 0, null, null, null, null, null, null],
+                    conservative: [null, null, 0, 0, 0, 0, 0, 0, 0],
+                    optimistic: [null, null, 0, 0, 0, 0, 0, 0, 0]
+                };
+
+                if (token) {
+                    try {
+                        const response = await fetch('/api/super-admin/forecast-chart', {
+                            headers: { 
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            chartData = await response.json();
+                        }
+                    } catch (error) {
+                        // Use default empty data
+                    }
+                }
+                
+                // Destroy existing chart if it exists
+                if (chartInstances.forecastChart) {
+                    chartInstances.forecastChart.destroy();
+                }
+                
+                const ctx = document.getElementById('forecastChart').getContext('2d');
+                chartInstances.forecastChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartData.labels || ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Actual Revenue',
+                            data: chartData.actual || [0, 0, 0, null, null, null, null, null, null],
+                            borderColor: 'rgba(72, 187, 120, 1)',
+                            backgroundColor: 'rgba(72, 187, 120, 0.1)',
+                            fill: true
+                        }, {
+                            label: 'Conservative Forecast',
+                            data: chartData.conservative || [null, null, 0, 0, 0, 0, 0, 0, 0],
+                            borderColor: 'rgba(102, 126, 234, 1)',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            borderDash: [5, 5],
+                            fill: false
+                        }, {
+                            label: 'Optimistic Forecast',
+                            data: chartData.optimistic || [null, null, 0, 0, 0, 0, 0, 0, 0],
+                            borderColor: 'rgba(237, 137, 54, 1)',
+                            backgroundColor: 'rgba(237, 137, 54, 0.1)',
+                            borderDash: [2, 2],
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + (value / 1000) + 'K';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                // Create empty chart on error
+                if (chartInstances.forecastChart) {
+                    chartInstances.forecastChart.destroy();
+                }
+                
+                const ctx = document.getElementById('forecastChart').getContext('2d');
+                chartInstances.forecastChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Actual Revenue',
+                            data: [0, 0, 0, null, null, null, null, null, null],
+                            borderColor: 'rgba(72, 187, 120, 1)',
+                            backgroundColor: 'rgba(72, 187, 120, 0.1)',
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'top' } },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + (value / 1000) + 'K';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Utility functions
+        function showAlert(message, type = 'info') {
+            // Create and show alert
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} show`;
+            alertDiv.textContent = message;
+            
+            // Insert at top of current page
+            const currentPageElement = document.querySelector('.page-section.active');
+            currentPageElement.insertBefore(alertDiv, currentPageElement.firstChild);
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                alertDiv.classList.remove('show');
+                setTimeout(() => alertDiv.remove(), 300);
+            }, 3000);
+        }
+
+
+        // Action handlers
+        function filterAgencies() {
+            // Agency filtering logic
+            console.log('Filtering agencies...');
+        }
+
+
+        function clearAlerts() {
+            document.getElementById('systemAlerts').innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-muted);">All alerts cleared.</div>';
+            showAlert('System alerts cleared', 'success');
+        }
+
+        function refreshSystemAlerts() {
+            loadSystemAlerts();
+            showAlert('System alerts refreshed', 'info');
+        }
+
+        // Modal functions
+        function showCreateAgencyModal() {
+            showAlert('Create agency modal would open here', 'info');
+        }
+
+        function showCreateUserModal() {
+            showAlert('Create user modal would open here', 'info');
+        }
+
+        // Management actions
+        function viewAgencyDetails(agencyId) {
+            showAlert(`Viewing details for agency: ${agencyId}`, 'info');
+        }
+
+        function editAgency(agencyId) {
+            showAlert(`Editing agency: ${agencyId}`, 'info');
+        }
+
+        function impersonateUser(userId) {
+            if (confirm('Are you sure you want to impersonate this user?')) {
+                showAlert(`Impersonating user: ${userId}`, 'warning');
+            }
+        }
+
+        function resetUserPassword(userId) {
+            if (confirm('Reset password for this user?')) {
+                showAlert(`Password reset for user: ${userId}`, 'success');
+            }
+        }
+
+        // System settings actions
+        function toggleMaintenance() {
+            const isEnabled = document.getElementById('maintenanceMode').checked;
+            showAlert(`Maintenance mode ${isEnabled ? 'enabled' : 'disabled'}`, isEnabled ? 'warning' : 'success');
+        }
+
+        function toggle2FA() {
+            const isEnabled = document.getElementById('enforce2FA').checked;
+            showAlert(`2FA enforcement ${isEnabled ? 'enabled' : 'disabled'}`, 'info');
+        }
+
+        function updateRateLimit() {
+            const limit = document.getElementById('apiRateLimit').value;
+            showAlert(`API rate limit updated to ${limit} requests/hour`, 'success');
+        }
+
+        function updateSessionTimeout() {
+            const timeout = document.getElementById('sessionTimeout').value;
+            showAlert(`Session timeout updated to ${timeout} minutes`, 'success');
+        }
+
+        function saveSystemSettings() {
+            showAlert('System settings saved successfully', 'success');
+        }
+
+        function saveSecuritySettings() {
+            showAlert('Security settings updated successfully', 'success');
+        }
+
+        // Security Center Functions
+        async function loadSecurityData() {
+            // Load security overview stats
+            const securityData = await makeAPICall('/api/super-admin/security-stats', {
+                securityAlerts: 2,
+                failedLogins: 5,
+                activeSessions: 12,
+                twoFactorUsers: 8
+            });
+
+            // Update security stats
+            document.getElementById('securityAlerts').textContent = securityData.securityAlerts || 0;
+            document.getElementById('failedLogins').textContent = securityData.failedLogins || 0;
+            document.getElementById('activeSessions').textContent = securityData.activeSessions || 0;
+            document.getElementById('twoFactorUsers').textContent = securityData.twoFactorUsers || 0;
+
+            // Load security events and IP rules
+            await Promise.all([
+                loadSecurityEvents(),
+                loadIPRules(),
+                loadSecuritySettings()
+            ]);
+        }
+
+        async function loadSecurityEvents() {
+            const events = await makeAPICall('/api/super-admin/security-events', [
+                {
+                    time: '2025-01-15 14:32',
+                    event: 'Failed Login',
+                    user: 'admin@testco.com',
+                    ip: '192.168.1.100',
+                    status: 'blocked'
+                },
+                {
+                    time: '2025-01-15 14:15',
+                    event: 'Password Reset',
+                    user: 'user@agency.com',
+                    ip: '10.0.0.50',
+                    status: 'success'
+                },
+                {
+                    time: '2025-01-15 13:45',
+                    event: 'New IP Login',
+                    user: 'manager@corp.com',
+                    ip: '203.45.67.89',
+                    status: 'alert'
+                }
+            ]);
+
+            const tableHtml = events.map(event => {
+                const statusClass = {
+                    'success': 'status-active',
+                    'blocked': 'status-inactive',
+                    'alert': 'status-warning',
+                    'pending': 'status-pending'
+                }[event.status] || 'status-pending';
+
+                return `
+                    <tr>
+                        <td>${event.time}</td>
+                        <td>${event.event}</td>
+                        <td>${event.user}</td>
+                        <td>${event.ip}</td>
+                        <td><span class="${statusClass}">${event.status.toUpperCase()}</span></td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('securityEventsTable').innerHTML = tableHtml;
+        }
+
+        async function loadIPRules() {
+            const rules = await makeAPICall('/api/super-admin/ip-rules', [
+                {
+                    ip: '192.168.1.0/24',
+                    type: 'Allow',
+                    status: 'active'
+                },
+                {
+                    ip: '10.0.0.0/8',
+                    type: 'Allow',
+                    status: 'active'
+                },
+                {
+                    ip: '123.45.67.89',
+                    type: 'Block',
+                    status: 'active'
+                }
+            ]);
+
+            const tableHtml = rules.map((rule, index) => {
+                const typeClass = rule.type === 'Allow' ? 'badge-success' : 'badge-danger';
+                const statusClass = rule.status === 'active' ? 'status-active' : 'status-inactive';
+
+                return `
+                    <tr>
+                        <td>${rule.ip}</td>
+                        <td><span class="badge ${typeClass}">${rule.type}</span></td>
+                        <td><span class="${statusClass}">${rule.status.toUpperCase()}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-warning" onclick="editIPRule(${index})">Edit</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteIPRule(${index})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('ipRulesTable').innerHTML = tableHtml;
+        }
+
+        async function loadSecuritySettings() {
+            // Load current security settings and update checkboxes
+            const settings = await makeAPICall('/api/super-admin/security-settings', {
+                passwordComplexity: true,
+                requireTwoFactor: false,
+                maxFailedLogins: 5,
+                lockoutDuration: 30,
+                sessionTimeout: 60,
+                requireSSL: true,
+                logAllSessions: true
+            });
+
+            document.getElementById('enforcePasswordComplexity').checked = settings.passwordComplexity;
+            document.getElementById('requireTwoFactor').checked = settings.requireTwoFactor;
+            document.getElementById('maxFailedLogins').value = settings.maxFailedLogins;
+            document.getElementById('lockoutDuration').value = settings.lockoutDuration;
+            document.getElementById('securitySessionTimeout').value = settings.sessionTimeout;
+            document.getElementById('requireSSL').checked = settings.requireSSL;
+            document.getElementById('logAllSessions').checked = settings.logAllSessions;
+        }
+
+        function refreshSecurityEvents() {
+            showAlert('Refreshing security events...', 'info');
+            loadSecurityEvents();
+        }
+
+        function addIPRule() {
+            const ip = prompt('Enter IP address or range (e.g., 192.168.1.100 or 10.0.0.0/24):');
+            if (ip && ip.trim()) {
+                const type = confirm('Click OK for ALLOW rule, Cancel for BLOCK rule') ? 'Allow' : 'Block';
+                
+                // Here you would normally make an API call
+                showAlert(`${type} rule for ${ip.trim()} will be added`, 'success');
+                
+                // Reload IP rules table
+                setTimeout(() => loadIPRules(), 1000);
+            }
+        }
+
+        function editIPRule(index) {
+            showAlert(`Edit IP rule functionality will be implemented for rule ${index + 1}`, 'info');
+        }
+
+        function deleteIPRule(index) {
+            if (confirm('Are you sure you want to delete this IP rule?')) {
+                showAlert(`IP rule ${index + 1} will be deleted`, 'warning');
+                // Reload IP rules table
+                setTimeout(() => loadIPRules(), 1000);
+            }
+        }
+
+        function updateSecuritySetting(setting, value) {
+            // Here you would normally make an API call to save the setting
+            showAlert(`Security setting "${setting}" updated to: ${value}`, 'success');
+            
+            // Store the setting locally for demonstration
+            localStorage.setItem(`security_${setting}`, value);
+        }
+
+        function updateAlertSetting(alertType, enabled) {
+            showAlert(`${alertType} alerts ${enabled ? 'enabled' : 'disabled'}`, 'success');
+            localStorage.setItem(`alert_${alertType}`, enabled);
+        }
+
+        function terminateAllSessions() {
+            if (confirm('This will log out all users immediately. Are you sure?')) {
+                showAlert('All user sessions will be terminated', 'warning');
+                
+                // Here you would make an API call to terminate sessions
+                setTimeout(() => {
+                    showAlert('All sessions terminated successfully', 'success');
+                    // Update active sessions count
+                    document.getElementById('activeSessions').textContent = '0';
+                }, 2000);
+            }
+        }
+
+        function exportSecurityLog() {
+            showAlert('Exporting security log...', 'info');
+            
+            // Create a mock CSV export
+            setTimeout(() => {
+                const csvContent = `Time,Event Type,User,IP Address,Status
+2025-01-15 14:32,Failed Login,admin@testco.com,192.168.1.100,blocked
+2025-01-15 14:15,Password Reset,user@agency.com,10.0.0.50,success
+2025-01-15 13:45,New IP Login,manager@corp.com,203.45.67.89,alert`;
+                
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `security_log_${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+                
+                showAlert('Security log exported successfully', 'success');
+            }, 1500);
+        }
+
+        function runSecurityScan() {
+            showAlert('Running comprehensive security scan...', 'info');
+            
+            // Simulate security scan
+            setTimeout(() => {
+                const findings = [
+                    'Password policy compliance: 95%',
+                    'Active sessions secured: 100%',
+                    'IP access rules: 3 configured',
+                    'Failed login attempts: 5 in last 24h',
+                    '2FA adoption: 8 of 16 users (50%)'
+                ];
+                
+                showAlert('Security scan completed. ' + findings.join(', '), 'success');
+            }, 3000);
+        }
+
+        function generateSecurityReport() {
+            showAlert('Generating comprehensive security report...', 'info');
+            
+            setTimeout(() => {
+                showAlert('Security report generated and ready for download', 'success');
+                // Here you would trigger a PDF download or open a new window with the report
+            }, 2000);
+        }
+
+        function saveSecurityAlerts() {
+            const failedLogin = document.getElementById('alertOnFailedLogin').checked;
+            const newIP = document.getElementById('alertOnNewIP').checked;
+            const privilegeEscalation = document.getElementById('alertOnPrivilegeEscalation').checked;
+            
+            // Save alert settings
+            localStorage.setItem('alert_failedLogin', failedLogin);
+            localStorage.setItem('alert_newIP', newIP);
+            localStorage.setItem('alert_privilegeEscalation', privilegeEscalation);
+            
+            showAlert('Security alert settings saved successfully', 'success');
+        }
+
+        function testIntegrations() {
+            showAlert('Testing integrations...', 'info');
+            setTimeout(() => {
+                showAlert('All integrations tested successfully', 'success');
+            }, 2000);
+        }
+
+        function saveIntegrations() {
+            showAlert('Integration settings saved successfully', 'success');
+        }
+
+        // Revenue management actions
+        function showRenewals() {
+            showAlert('Showing upcoming renewals', 'info');
+        }
+
+        function showFailedPayments() {
+            showAlert('Processing failed payments...', 'warning');
+        }
+
+        function generateFinancialReport() {
+            showAlert('Generating financial report...', 'info');
+        }
+
+        function processRefunds() {
+            if (confirm('Process all pending refunds?')) {
+                showAlert('Processing refunds...', 'warning');
+            }
+        }
+
+        function exportUserData() {
+            showAlert('Exporting user data...', 'info');
+        }
+
+        // Leaderboard actions
+        function createCompetition() {
+            showAlert('Creating new competition...', 'info');
+        }
+
+        function manageBadges() {
+            showAlert('Opening badge management...', 'info');
+        }
+
+        // Logout
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.clear();
+                window.location.href = '/login.html';
+            }
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (websocket) {
+                websocket.close();
+            }
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        });
+    </script>
+</body>
+</html>

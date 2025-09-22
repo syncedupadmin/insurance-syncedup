@@ -2,18 +2,25 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
 
-    { "source": "/admin", "destination": "/api/portal-guard" },
-    { "source": "/manager", "destination": "/api/portal-guard" },
-    { "source": "/agent", "destination": "/api/portal-guard" },
-    { "source": "/customer-service", "destination": "/api/portal-guard" },
-    { "source": "/super-admin", "destination": "/api/portal-guard" },
-    { "source": "/dashboard", "destination": "/api/portal-guard" },
+    { "source": "/admin", "destination": "/_admin/index.html" },
+    { "source": "/admin/", "destination": "/_admin/index.html" },
+    { "source": "/manager", "destination": "/_manager/index.html" },
+    { "source": "/manager/", "destination": "/_manager/index.html" },
+    { "source": "/agent", "destination": "/_agent/index.html" },
+    { "source": "/agent/", "destination": "/_agent/index.html" },
+    { "source": "/customer-service", "destination": "/_customer-service/index.html" },
+    { "source": "/customer-service/", "destination": "/_customer-service/index.html" },
+    { "source": "/super-admin", "destination": "/_super-admin/index.html" },
+    { "source": "/super-admin/", "destination": "/_super-admin/index.html" },
+    { "source": "/leaderboard", "destination": "/_leaderboard/index.html" },
+    { "source": "/leaderboard/", "destination": "/_leaderboard/index.html" },
 
-    { "source": "/admin/(\\w[\\w-]*)", "destination": "/_admin/$1.html" },
-    { "source": "/manager/(\\w[\\w-]*)", "destination": "/_manager/$1.html" },
-    { "source": "/agent/(\\w[\\w-]*)", "destination": "/_agent/$1.html" },
-    { "source": "/customer-service/(\\w[\\w-]*)", "destination": "/_customer-service/$1.html" },
-    { "source": "/super-admin/(\\w[\\w-]*)", "destination": "/_super-admin/$1.html" },
+    { "source": "/admin/:page", "destination": "/_admin/:page.html" },
+    { "source": "/manager/:page", "destination": "/_manager/:page.html" },
+    { "source": "/agent/:page", "destination": "/_agent/:page.html" },
+    { "source": "/customer-service/:page", "destination": "/_customer-service/:page.html" },
+    { "source": "/super-admin/:page", "destination": "/_super-admin/:page.html" },
+    { "source": "/leaderboard/:page", "destination": "/_leaderboard/:page.html" },
 
     { "source": "/admin/(.*)", "destination": "/_admin/$1" },
     { "source": "/manager/(.*)", "destination": "/_manager/$1" },
@@ -27,16 +34,26 @@
     { "source": "/pricing", "destination": "/pricing.html" },
     { "source": "/trial", "destination": "/signup.html" },
     { "source": "/signup", "destination": "/signup.html" },
-    { "source": "/dashboard", "destination": "/dashboard.html" },
     { "source": "/global-leaderboard", "destination": "/_leaderboard/index.html" },
     { "source": "/global-leaderboard-demo", "destination": "/global-leaderboard-demo.html" },
     { "source": "/test-upload-simple", "destination": "/test-upload-simple.html" },
     { "source": "/document-upload", "destination": "/document-upload.html" },
     { "source": "/test-worker-url", "destination": "/test-worker-url.html" },
-    { "source": "/encrypted-upload", "destination": "/encrypted-upload.html" }
+    { "source": "/encrypted-upload", "destination": "/encrypted-upload.html" },
+    { "source": "/agencyonboarding", "destination": "/agencyonboarding.html" }
   ],
   "redirects": [
-    { "source": "/public/:path*", "destination": "/:path*", "permanent": true }
+    { "source": "/public/:path*", "destination": "/:path*", "permanent": true },
+    { "source": "/_admin", "destination": "/admin", "permanent": false },
+    { "source": "/_admin/", "destination": "/admin", "permanent": false },
+    { "source": "/_manager", "destination": "/manager", "permanent": false },
+    { "source": "/_manager/", "destination": "/manager", "permanent": false },
+    { "source": "/_agent", "destination": "/agent", "permanent": false },
+    { "source": "/_agent/", "destination": "/agent", "permanent": false },
+    { "source": "/_customer-service", "destination": "/customer-service", "permanent": false },
+    { "source": "/_customer-service/", "destination": "/customer-service", "permanent": false },
+    { "source": "/_super-admin", "destination": "/super-admin", "permanent": false },
+    { "source": "/_super-admin/", "destination": "/super-admin", "permanent": false }
   ],
   "headers": [
     {

@@ -1,11 +1,12 @@
-import { createClient } from '@supabase/supabase-js';
-import bcrypt from 'bcryptjs';
-import { Resend } from 'resend';
-import { EMAIL_CONFIG } from '../email/config.js';
-import speakeasy from 'speakeasy';
-import QRCode from 'qrcode';
-import { setCORSHeaders, handleCORSPreflight } from '../_utils/cors.js';
-import { validateUserContext, createAgencySecureQuery, logSecurityViolation } from '../_utils/agency-isolation.js';
+const { createClient } = require('@supabase/supabase-js');
+const bcrypt = require('bcryptjs');
+const { Resend } = require('resend');
+const { EMAIL_CONFIG } = require('../email/config.js');
+// const speakeasy = require('speakeasy'); // Not used
+// const QRCode = require('qrcode'); // Not used
+const { setCORSHeaders, handleCORSPreflight } = require('../_utils/cors.js');
+const { validateUserContext, createAgencySecureQuery, logSecurityViolation } = require('../_utils/agency-isolation.js');
+const { verifyCookieAuth } = require('../_utils/cookie-auth.js');
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -28,48 +29,32 @@ async function logAudit(userId, action, details, ipAddress, userAgent = 'API') {
   }
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Handle CORS preflight  
   if (handleCORSPreflight(req, res)) return;
   
   // Set secure CORS headers
   setCORSHeaders(req, res);
 
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  if (!token) {
-    return res.status(401).json({ error: 'No authorization token' });
+  // Verify authentication using cookie-based auth
+  const auth = await verifyCookieAuth(req);
+  if (!auth.success) {
+    return res.status(401).json({ error: auth.error });
   }
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-  if (authError || !user) {
-    return res.status(401).json({ error: 'Invalid token' });
-  }
-
-  const { data: currentUser } = await supabase
-    .from('portal_users')
-    .select('role, agency_id, id')
-    .eq('id', user.id)
-    .single();
-
-  // Admin or Super admin access required for user management
-  // Normalize role to handle different formats
-  const normalizeRole = (role) => {
-    const roleMap = {
-      'super-admin': 'super_admin',
-      'customer-service': 'customer_service'
-    };
-    return roleMap[role] || role;
-  };
-
-  const normalizedRole = normalizeRole(currentUser?.role || '');
-  const isAdmin = normalizedRole === 'admin';
-  const isSuperAdmin = normalizedRole === 'super_admin';
-
-  if (!currentUser || (!isAdmin && !isSuperAdmin)) {
+  // Check for admin or super_admin role
+  const allowedRoles = ['admin', 'super_admin'];
+  if (!allowedRoles.includes(auth.user.normalizedRole)) {
     return res.status(403).json({ error: 'Admin access required' });
   }
 
-  const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown';
+  const user = auth.user;
+  const currentUser = user;
+  const normalizedRole = user.normalizedRole;
+  const isAdmin = normalizedRole === 'admin';
+  const isSuperAdmin = normalizedRole === 'super_admin';
+
+  const clientIP = req.headers['x-forwarded-for'] || req.connection?.remoteAddress || 'unknown';
   const userAgent = req.headers['user-agent'] || 'unknown';
   const resend = new Resend(process.env.RESEND_API_KEY);
 

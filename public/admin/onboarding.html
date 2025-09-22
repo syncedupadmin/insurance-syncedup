@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convoso Integration Onboarding - Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .glass { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .step-active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .step-completed { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .step-inactive { background: #e5e7eb; color: #6b7280; }
+        .input-focus:focus { box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); border-color: #667eea; }
+        .tooltip { position: relative; }
+        .tooltip:hover .tooltip-text { visibility: visible; opacity: 1; }
+        .tooltip-text { visibility: hidden; opacity: 0; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -60px; background: #1f2937; color: white; text-center; padding: 5px; border-radius: 6px; font-size: 12px; transition: opacity 0.3s; }
+        .spinner { border: 2px solid #f3f4f6; border-top: 2px solid #667eea; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation Header -->
+    <nav class="gradient-bg shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/admin/" class="text-white font-bold text-xl">
+                        <i class="fas fa-arrow-left mr-3"></i>Admin Dashboard
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-white text-sm">Convoso Integration Setup</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Progress Steps -->
+    <div class="max-w-4xl mx-auto px-4 py-6">
+        <div class="flex items-center justify-center mb-8">
+            <div class="flex items-center space-x-4">
+                <!-- Step 1 -->
+                <div class="flex items-center">
+                    <div id="step1" class="step-active text-white rounded-full h-10 w-10 flex items-center justify-center font-bold">
+                        1
+                    </div>
+                    <span class="ml-2 font-medium text-gray-700">Credentials</span>
+                </div>
+                <div class="h-1 w-16 bg-gray-300"></div>
+                
+                <!-- Step 2 -->
+                <div class="flex items-center">
+                    <div id="step2" class="step-inactive rounded-full h-10 w-10 flex items-center justify-center font-bold">
+                        2
+                    </div>
+                    <span class="ml-2 font-medium text-gray-700">Validation</span>
+                </div>
+                <div class="h-1 w-16 bg-gray-300"></div>
+                
+                <!-- Step 3 -->
+                <div class="flex items-center">
+                    <div id="step3" class="step-inactive rounded-full h-10 w-10 flex items-center justify-center font-bold">
+                        3
+                    </div>
+                    <span class="ml-2 font-medium text-gray-700">Configuration</span>
+                </div>
+                <div class="h-1 w-16 bg-gray-300"></div>
+                
+                <!-- Step 4 -->
+                <div class="flex items-center">
+                    <div id="step4" class="step-inactive rounded-full h-10 w-10 flex items-center justify-center font-bold">
+                        4
+                    </div>
+                    <span class="ml-2 font-medium text-gray-700">Complete</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <!-- Step 1: Credentials Form -->
+            <div id="credentials-form" class="step-content">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                    <i class="fas fa-key text-blue-500 mr-3"></i>
+                    Convoso API Credentials
+                </h2>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-blue-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-blue-800">Getting Your Convoso Credentials</h3>
+                            <div class="mt-2 text-sm text-blue-700">
+                                <p>To complete this setup, you'll need the following from your Convoso dashboard:</p>
+                                <ul class="list-disc ml-5 mt-2">
+                                    <li><strong>API Key:</strong> Found in Settings → API Access</li>
+                                    <li><strong>Account ID:</strong> Your Convoso account identifier</li>
+                                    <li><strong>Webhook Secret:</strong> For secure webhook validation (optional)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="credentials-form-element" class="space-y-6">
+                    <!-- Agency Selection -->
+                    <div>
+                        <label for="agencyId" class="block text-sm font-medium text-gray-700 mb-2">
+                            Agency ID <span class="text-red-500">*</span>
+                            <div class="tooltip inline-block ml-1">
+                                <i class="fas fa-question-circle text-gray-400 cursor-help"></i>
+                                <span class="tooltip-text">Your unique agency identifier</span>
+                            </div>
+                        </label>
+                        <input type="text" id="agencyId" name="agencyId" required
+                               class="input-focus mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               placeholder="e.g., PHS001, ABC123">
+                    </div>
+
+                    <!-- API Key -->
+                    <div>
+                        <label for="apiKey" class="block text-sm font-medium text-gray-700 mb-2">
+                            Convoso API Key <span class="text-red-500">*</span>
+                            <div class="tooltip inline-block ml-1">
+                                <i class="fas fa-question-circle text-gray-400 cursor-help"></i>
+                                <span class="tooltip-text">Your Convoso API authentication key</span>
+                            </div>
+                        </label>
+                        <div class="relative">
+                            <input type="password" id="apiKey" name="apiKey" required
+                                   class="input-focus mt-1 block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                   placeholder="Enter your Convoso API key">
+                            <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" onclick="togglePassword('apiKey')">
+                                <i id="apiKey-icon" class="fas fa-eye text-gray-400"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Account ID -->
+                    <div>
+                        <label for="accountId" class="block text-sm font-medium text-gray-700 mb-2">
+                            Account ID
+                            <div class="tooltip inline-block ml-1">
+                                <i class="fas fa-question-circle text-gray-400 cursor-help"></i>
+                                <span class="tooltip-text">Your Convoso account identifier (optional)</span>
+                            </div>
+                        </label>
+                        <input type="text" id="accountId" name="accountId"
+                               class="input-focus mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                               placeholder="e.g., ACC_1234567890">
+                    </div>
+
+                    <!-- Webhook Secret -->
+                    <div>
+                        <label for="webhookSecret" class="block text-sm font-medium text-gray-700 mb-2">
+                            Webhook Secret
+                            <div class="tooltip inline-block ml-1">
+                                <i class="fas fa-question-circle text-gray-400 cursor-help"></i>
+                                <span class="tooltip-text">Secret for webhook signature validation (recommended)</span>
+                            </div>
+                        </label>
+                        <div class="relative">
+                            <input type="password" id="webhookSecret" name="webhookSecret"
+                                   class="input-focus mt-1 block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                   placeholder="Enter webhook secret (optional)">
+                            <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" onclick="togglePassword('webhookSecret')">
+                                <i id="webhookSecret-icon" class="fas fa-eye text-gray-400"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Test Mode Checkbox -->
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input id="testMode" name="testMode" type="checkbox"
+                                   class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="testMode" class="font-medium text-gray-700">Test Mode</label>
+                            <p class="text-gray-500">Validate credentials without storing them (for testing)</p>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex space-x-4">
+                        <button type="submit" id="validate-btn"
+                                class="flex-1 gradient-bg hover:from-blue-600 hover:to-purple-600 text-white font-bold py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center">
+                            <span id="validate-btn-text">Validate Credentials</span>
+                            <div id="validate-spinner" class="spinner ml-3 hidden"></div>
+                        </button>
+                        
+                        <button type="button" onclick="generateTestCredentials()"
+                                class="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition duration-200">
+                            <i class="fas fa-flask mr-2"></i>Generate Test Data
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Validation Results -->
+                <div id="validation-results" class="mt-6 hidden">
+                    <!-- Results will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Step 2: Validation Results -->
+            <div id="validation-step" class="step-content hidden">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                    <i class="fas fa-check-circle text-green-500 mr-3"></i>
+                    Credential Validation
+                </h2>
+                
+                <div id="validation-details">
+                    <!-- Populated by JavaScript -->
+                </div>
+
+                <div class="flex space-x-4 mt-6">
+                    <button onclick="nextStep()" class="flex-1 gradient-bg text-white font-bold py-3 px-6 rounded-lg">
+                        Continue Setup
+                    </button>
+                    <button onclick="previousStep()" class="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50">
+                        Back
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Configuration -->
+            <div id="configuration-step" class="step-content hidden">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                    <i class="fas fa-cog text-blue-500 mr-3"></i>
+                    Integration Configuration
+                </h2>
+
+                <div class="space-y-6">
+                    <!-- Webhook Configuration -->
+                    <div class="bg-gray-50 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Webhook Configuration</h3>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Webhook URL</label>
+                                <div class="mt-1 flex">
+                                    <input type="text" id="webhook-url" readonly
+                                           class="flex-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-l-md text-sm">
+                                    <button onclick="copyToClipboard('webhook-url')" 
+                                            class="px-3 py-2 bg-blue-600 text-white border border-blue-600 rounded-r-md hover:bg-blue-700">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-1">Configure this URL in your Convoso webhook settings</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Supported Events</label>
+                                <div class="mt-2 space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" checked disabled class="mr-2">
+                                        <span class="text-sm text-gray-600">Lead Created</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" checked disabled class="mr-2">
+                                        <span class="text-sm text-gray-600">Lead Updated</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campaign Sync -->
+                    <div class="bg-gray-50 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Campaign Synchronization</h3>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="auto-sync" checked class="mr-2">
+                                    <span class="font-medium">Enable automatic campaign synchronization</span>
+                                </label>
+                                <p class="text-sm text-gray-500 ml-6">Automatically sync campaign data and performance metrics</p>
+                            </div>
+
+                            <div>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="historical-sync" class="mr-2">
+                                    <span class="font-medium">Import historical leads</span>
+                                </label>
+                                <p class="text-sm text-gray-500 ml-6">Import existing leads from the last 30 days</p>
+                            </div>
+                        </div>
+
+                        <button onclick="testConnection()" id="test-connection-btn"
+                                class="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                            <i class="fas fa-plug mr-2"></i>Test Connection
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex space-x-4 mt-6">
+                    <button onclick="completeSetup()" id="complete-btn"
+                            class="flex-1 gradient-bg text-white font-bold py-3 px-6 rounded-lg">
+                        Complete Integration
+                    </button>
+                    <button onclick="previousStep()" class="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50">
+                        Back
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 4: Completion -->
+            <div id="completion-step" class="step-content hidden">
+                <div class="text-center">
+                    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
+                        <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                    </div>
+                    
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">
+                        Convoso Integration Complete!
+                    </h2>
+                    
+                    <p class="text-gray-600 mb-6">
+                        Your Convoso integration has been successfully configured. Leads will now be automatically 
+                        delivered to your system in real-time.
+                    </p>
+
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                        <h3 class="font-semibold text-green-800 mb-2">What's Next?</h3>
+                        <ul class="text-sm text-green-700 space-y-1">
+                            <li>✓ Configure webhook URL in your Convoso dashboard</li>
+                            <li>✓ Test webhook delivery with a sample lead</li>
+                            <li>✓ Monitor lead flow in your dashboard</li>
+                            <li>✓ Set up agent assignment rules if needed</li>
+                        </ul>
+                    </div>
+
+                    <div class="flex space-x-4 justify-center">
+                        <a href="/admin/" class="px-6 py-3 gradient-bg text-white font-bold rounded-lg hover:opacity-90">
+                            Return to Dashboard
+                        </a>
+                        <a href="/admin/leads.html" class="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50">
+                            View Leads
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let validationData = null;
+        let integrationConfig = null;
+
+        // Authentication check
+        const token = localStorage.getItem('authToken');
+        const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+        
+        if (!token || !['admin', 'super-admin'].includes(user.role)) {
+            window.location.href = '/login.html';
+        }
+
+        // Form submission handler
+        document.getElementById('credentials-form-element').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await validateCredentials();
+        });
+
+        // Toggle password visibility
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = document.getElementById(fieldId + '-icon');
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                field.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        // Generate test credentials
+        function generateTestCredentials() {
+            document.getElementById('agencyId').value = 'TEST001';
+            document.getElementById('apiKey').value = 'test_api_key_' + Math.random().toString(36).substr(2, 16);
+            document.getElementById('accountId').value = 'ACC_TEST_' + Math.random().toString(36).substr(2, 8).toUpperCase();
+            document.getElementById('webhookSecret').value = 'test_webhook_secret_' + Math.random().toString(36).substr(2, 12);
+            document.getElementById('testMode').checked = true;
+        }
+
+        // Validate credentials
+        async function validateCredentials() {
+            const validateBtn = document.getElementById('validate-btn');
+            const validateBtnText = document.getElementById('validate-btn-text');
+            const validateSpinner = document.getElementById('validate-spinner');
+            
+            // Show loading state
+            validateBtn.disabled = true;
+            validateBtnText.textContent = 'Validating...';
+            validateSpinner.classList.remove('hidden');
+
+            const formData = new FormData(document.getElementById('credentials-form-element'));
+            const credentials = {
+                agencyId: formData.get('agencyId'),
+                credentials: {
+                    apiKey: formData.get('apiKey'),
+                    accountId: formData.get('accountId'),
+                    webhookSecret: formData.get('webhookSecret')
+                },
+                testMode: formData.get('testMode') === 'on'
+            };
+
+            try {
+                const response = await fetch('/api/integrations/convoso/validate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(credentials)
+                });
+
+                const result = await response.json();
+                validationData = result;
+
+                displayValidationResults(result);
+
+                if (result.success) {
+                    setTimeout(() => {
+                        nextStep();
+                    }, 2000);
+                }
+
+            } catch (error) {
+                displayValidationResults({
+                    success: false,
+                    error: 'Connection failed: ' + error.message
+                });
+            } finally {
+                // Reset button state
+                validateBtn.disabled = false;
+                validateBtnText.textContent = 'Validate Credentials';
+                validateSpinner.classList.add('hidden');
+            }
+        }
+
+        // Display validation results
+        function displayValidationResults(result) {
+            const resultsDiv = document.getElementById('validation-results');
+            resultsDiv.classList.remove('hidden');
+
+            let html = '';
+
+            if (result.success) {
+                html = `
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-green-800">Validation Successful!</h3>
+                                <div class="mt-2 text-sm text-green-700">
+                                    <p>Your Convoso credentials have been validated successfully.</p>
+                                    ${result.integration ? `<p class="mt-1">Webhook URL: <code class="bg-green-100 px-1 rounded">${result.integration.webhookUrl}</code></p>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Show validation tests if available
+                if (result.validation && result.validation.tests) {
+                    html += `
+                        <div class="mt-4 bg-white border border-gray-200 rounded-lg p-4">
+                            <h4 class="font-medium text-gray-900 mb-3">Validation Tests</h4>
+                            <div class="space-y-2">
+                    `;
+
+                    for (const [test, passed] of Object.entries(result.validation.tests)) {
+                        const icon = passed ? 'fa-check text-green-500' : 'fa-times text-red-500';
+                        const testName = test.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                        html += `
+                            <div class="flex items-center">
+                                <i class="fas ${icon} mr-2"></i>
+                                <span class="text-sm">${testName}</span>
+                            </div>
+                        `;
+                    }
+
+                    html += `</div></div>`;
+                }
+
+            } else {
+                html = `
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-exclamation-triangle text-red-400 text-xl"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800">Validation Failed</h3>
+                                <div class="mt-2 text-sm text-red-700">
+                                    <p>${result.error || 'Please check your credentials and try again.'}</p>
+                                    ${result.validation?.errors?.length > 0 ? 
+                                        '<ul class="list-disc ml-5 mt-1">' + 
+                                        result.validation.errors.map(error => `<li>${error}</li>`).join('') + 
+                                        '</ul>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            resultsDiv.innerHTML = html;
+        }
+
+        // Step navigation
+        function nextStep() {
+            if (currentStep < 4) {
+                // Hide current step
+                document.querySelectorAll('.step-content').forEach(step => step.classList.add('hidden'));
+                
+                // Update step indicator
+                document.getElementById(`step${currentStep}`).classList.remove('step-active');
+                document.getElementById(`step${currentStep}`).classList.add('step-completed');
+                document.getElementById(`step${currentStep}`).innerHTML = '<i class="fas fa-check text-white"></i>';
+                
+                // Move to next step
+                currentStep++;
+                document.getElementById(`step${currentStep}`).classList.remove('step-inactive');
+                document.getElementById(`step${currentStep}`).classList.add('step-active');
+                
+                // Show next step content
+                if (currentStep === 2) {
+                    showValidationStep();
+                } else if (currentStep === 3) {
+                    showConfigurationStep();
+                } else if (currentStep === 4) {
+                    showCompletionStep();
+                }
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                // Hide current step
+                document.querySelectorAll('.step-content').forEach(step => step.classList.add('hidden'));
+                
+                // Update step indicator
+                document.getElementById(`step${currentStep}`).classList.remove('step-active');
+                document.getElementById(`step${currentStep}`).classList.add('step-inactive');
+                
+                // Move to previous step
+                currentStep--;
+                document.getElementById(`step${currentStep}`).classList.remove('step-completed', 'step-inactive');
+                document.getElementById(`step${currentStep}`).classList.add('step-active');
+                document.getElementById(`step${currentStep}`).textContent = currentStep;
+                
+                // Show previous step content
+                if (currentStep === 1) {
+                    document.getElementById('credentials-form').classList.remove('hidden');
+                } else if (currentStep === 2) {
+                    showValidationStep();
+                } else if (currentStep === 3) {
+                    showConfigurationStep();
+                }
+            }
+        }
+
+        // Show validation step
+        function showValidationStep() {
+            document.getElementById('validation-step').classList.remove('hidden');
+            
+            if (validationData) {
+                let html = '';
+                
+                if (validationData.success && validationData.apiInfo) {
+                    html = `
+                        <div class="space-y-4">
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+                                <h3 class="font-semibold text-green-800 mb-3">✓ Connection Established</h3>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <span class="font-medium text-green-700">Account:</span>
+                                        <span class="text-green-600">${validationData.apiInfo.accountName}</span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium text-green-700">Webhook Support:</span>
+                                        <span class="text-green-600">${validationData.apiInfo.webhookSupport ? 'Yes' : 'No'}</span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium text-green-700">Rate Limit:</span>
+                                        <span class="text-green-600">${validationData.apiInfo.rateLimit.requests} req/${validationData.apiInfo.rateLimit.period}</span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium text-green-700">Permissions:</span>
+                                        <span class="text-green-600">${validationData.apiInfo.permissions.length} granted</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <h4 class="font-medium text-blue-800 mb-2">Integration Details</h4>
+                                <ul class="text-sm text-blue-700 space-y-1">
+                                    <li>• Agency ID: <code class="bg-blue-100 px-1 rounded">${validationData.agencyId}</code></li>
+                                    <li>• Webhook URL: <code class="bg-blue-100 px-1 rounded text-xs">${validationData.integration?.webhookUrl || 'Will be generated'}</code></li>
+                                    <li>• Status: <span class="font-medium">${validationData.testMode ? 'Test Mode' : 'Production Ready'}</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('validation-details').innerHTML = html;
+            }
+        }
+
+        // Show configuration step
+        function showConfigurationStep() {
+            document.getElementById('configuration-step').classList.remove('hidden');
+            
+            if (validationData && validationData.integration) {
+                document.getElementById('webhook-url').value = validationData.integration.webhookUrl;
+            }
+        }
+
+        // Show completion step
+        function showCompletionStep() {
+            document.getElementById('completion-step').classList.remove('hidden');
+        }
+
+        // Test connection
+        async function testConnection() {
+            const btn = document.getElementById('test-connection-btn');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<div class="spinner mr-2"></div>Testing...';
+            btn.disabled = true;
+            
+            try {
+                // Test campaigns endpoint
+                const response = await fetch(`/api/integrations/convoso/campaigns?agencyId=${validationData.agencyId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    btn.innerHTML = '<i class="fas fa-check mr-2"></i>Connection Successful';
+                    btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    btn.classList.add('bg-green-500');
+                } else {
+                    btn.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Connection Failed';
+                    btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    btn.classList.add('bg-red-500');
+                }
+                
+            } catch (error) {
+                btn.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Test Failed';
+                btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                btn.classList.add('bg-red-500');
+            } finally {
+                btn.disabled = false;
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.className = 'mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700';
+                }, 3000);
+            }
+        }
+
+        // Complete setup
+        async function completeSetup() {
+            const btn = document.getElementById('complete-btn');
+            btn.innerHTML = '<div class="spinner mr-2"></div>Finalizing Setup...';
+            btn.disabled = true;
+            
+            // Simulate final setup steps
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            nextStep();
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            element.select();
+            element.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            
+            // Show feedback
+            const btn = element.nextElementSibling;
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i>';
+            btn.classList.add('bg-green-600');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalContent;
+                btn.classList.remove('bg-green-600');
+            }, 2000);
+        }
+    </script>
+    <script src="/assets/session-prod.js"></script>
+</body>
+</html>

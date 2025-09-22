@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Sales Leaderboard - SyncedUp Insurance</title>
+    <link rel="stylesheet" href="leaderboard-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- Auth Guard Script -->
+    <script src="/auth-check.js" defer></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Global Sales Leaderboard</h1>
+        <div class="header-info">
+            <span>🌍 All Offices Worldwide</span>
+            <span>📅 Updated: <span id="lastUpdated">Loading...</span></span>
+            <button id="classicModeToggle" class="btn btn-secondary classic-toggle" onclick="toggleClassicMode()">
+                <i data-lucide="gamepad-2" class="icon"></i>
+                Classic Mode
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="index.html" class="nav-link active">
+            <i data-lucide="trophy" class="icon"></i>
+            Overall Rankings
+        </a>
+        <a href="monthly.html" class="nav-link">
+            <i data-lucide="calendar" class="icon"></i>
+            Monthly Leaders
+        </a>
+        <a href="teams.html" class="nav-link">
+            <i data-lucide="users" class="icon"></i>
+            Team Rankings
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- Global Stats -->
+        <div class="grid grid-4">
+            <div class="card">
+                <div class="stat-value" id="totalAgents">0</div>
+                <div class="stat-label">Active Agents</div>
+            </div>
+            <div class="card">
+                <div class="stat-value" id="totalSales">$0</div>
+                <div class="stat-label">Total Sales</div>
+            </div>
+            <div class="card">
+                <div class="stat-value" id="totalCommissions">$0</div>
+                <div class="stat-label">Commissions Paid</div>
+            </div>
+            <div class="card">
+                <div class="stat-value" id="totalOffices">0</div>
+                <div class="stat-label">Offices Competing</div>
+            </div>
+        </div>
+
+        <!-- Top Performers Showcase -->
+        <div class="card">
+            <h2><i data-lucide="crown" class="card-icon"></i>Hall of Champions</h2>
+            <div class="grid">
+                <div id="champion1" class="card" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1));">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 0.5rem;">🥇</div>
+                        <h3 style="color: var(--lb-accent); margin-bottom: 0.5rem;" id="champ1Name">Loading...</h3>
+                        <div class="stat-value" style="font-size: 2rem;" id="champ1Sales">$0</div>
+                        <div class="stat-label" id="champ1Office">Office</div>
+                    </div>
+                </div>
+                <div id="champion2" class="card" style="background: linear-gradient(135deg, rgba(192, 192, 192, 0.2), rgba(192, 192, 192, 0.1));">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 0.5rem;">🥈</div>
+                        <h3 style="color: var(--lb-silver); margin-bottom: 0.5rem;" id="champ2Name">Loading...</h3>
+                        <div class="stat-value" style="font-size: 2rem; color: var(--lb-silver);" id="champ2Sales">$0</div>
+                        <div class="stat-label" id="champ2Office">Office</div>
+                    </div>
+                </div>
+                <div id="champion3" class="card" style="background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(205, 127, 50, 0.1));">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 0.5rem;">🥉</div>
+                        <h3 style="color: var(--lb-bronze); margin-bottom: 0.5rem;" id="champ3Name">Loading...</h3>
+                        <div class="stat-value" style="font-size: 2rem; color: var(--lb-bronze);" id="champ3Sales">$0</div>
+                        <div class="stat-label" id="champ3Office">Office</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card">
+            <h3><i data-lucide="filter" class="card-icon"></i>Filter Rankings</h3>
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="timeframe">Time Period</label>
+                    <select id="timeframe" class="filter-select" onchange="applyFilters()">
+                        <option value="all-time">All Time</option>
+                        <option value="year" selected>This Year</option>
+                        <option value="quarter">This Quarter</option>
+                        <option value="month">This Month</option>
+                        <option value="week">This Week</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="category">Category</label>
+                    <select id="category" class="filter-select" onchange="applyFilters()">
+                        <option value="total-sales" selected>Total Sales</option>
+                        <option value="commissions">Total Commissions</option>
+                        <option value="policies">Policies Sold</option>
+                        <option value="conversion">Conversion Rate</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="office">Office Filter</label>
+                    <select id="office" class="filter-select" onchange="applyFilters()">
+                        <option value="all">All Offices</option>
+                        <option value="headquarters">Headquarters</option>
+                        <option value="west-coast">West Coast</option>
+                        <option value="east-coast">East Coast</option>
+                        <option value="midwest">Midwest</option>
+                        <option value="south">South Region</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="experience">Experience</label>
+                    <select id="experience" class="filter-select" onchange="applyFilters()">
+                        <option value="all">All Levels</option>
+                        <option value="rookie">Rookie (0-1 years)</option>
+                        <option value="experienced">Experienced (2-5 years)</option>
+                        <option value="veteran">Veteran (5+ years)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Leaderboard -->
+        <div class="card">
+            <h3><i data-lucide="list" class="card-icon"></i>Global Rankings <span id="rankingCount">(Loading...)</span></h3>
+            <div class="leaderboard-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="text-align: center;">Rank</th>
+                            <th>Agent</th>
+                            <th>Office</th>
+                            <th style="text-align: right;">Sales</th>
+                            <th style="text-align: right;">Commissions</th>
+                            <th style="text-align: right;">Policies</th>
+                            <th style="text-align: center;">Streak</th>
+                            <th style="text-align: center;">Achievements</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody">
+                        <tr>
+                            <td colspan="8" style="text-align: center; color: var(--lb-text-muted); padding: 3rem;">
+                                <div class="loading"></div>
+                                Loading global leaderboard data...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Performance Insights -->
+        <div class="grid">
+            <div class="card">
+                <h3><i data-lucide="trending-up" class="card-icon"></i>Top Movers</h3>
+                <div id="topMovers">
+                    <div style="text-align: center; color: var(--lb-text-muted); padding: 2rem;">
+                        <div class="loading"></div>
+                        Loading top movers...
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3><i data-lucide="target" class="card-icon"></i>Goal Crushers</h3>
+                <div id="goalCrushers">
+                    <div style="text-align: center; color: var(--lb-text-muted); padding: 2rem;">
+                        <div class="loading"></div>
+                        Loading goal achievements...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Competition Updates -->
+        <div class="card">
+            <h3><i data-lucide="zap" class="card-icon"></i>Live Competition Feed</h3>
+            <div id="competitionFeed">
+                <div style="text-align: center; color: var(--lb-text-muted); padding: 2rem;">
+                    <div class="loading"></div>
+                    Loading live updates...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global data storage
+        let leaderboardData = [];
+        let filteredData = [];
+        let currentFilters = {
+            timeframe: 'year',
+            category: 'total-sales',
+            office: 'all',
+            experience: 'all'
+        };
+
+        // Authentication check - simplified since auth-check.js handles the main auth flow
+        function checkAuth() {
+            const token = localStorage.getItem('syncedup_token') || localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+            
+            // auth-check.js already verified the user, so just check basics
+            if (!token || !user.email) {
+                return false;
+            }
+
+            return true;
+        }
+
+        // Initialize page
+        async function initializePage() {
+            // Check authentication first
+            if (!checkAuth()) return;
+            
+            // Load leaderboard data
+            await loadLeaderboardData();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+            
+            // Set up auto-refresh
+            setInterval(loadLeaderboardData, 60000); // Refresh every minute
+        }
+
+        // Load leaderboard data
+        async function loadLeaderboardData() {
+            try {
+                const token = localStorage.getItem('syncedup_token') || localStorage.getItem('token');
+                if (!token) {
+                    throw new Error('No authentication token found');
+                }
+
+                const response = await fetch('/api/leaderboard/global', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    throw new Error('Authentication failed - please refresh the page');
+                }
+
+                if (!response.ok) {
+                    throw new Error(`API responded with status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to load leaderboard data');
+                }
+
+                const { globalStats, rankings, topPerformers, competitionFeed, lastUpdated } = result.data;
+                
+                // Update timestamp
+                document.getElementById('lastUpdated').textContent = new Date(lastUpdated).toLocaleString();
+                
+                // Load all data sections
+                loadGlobalStatsData(globalStats);
+                loadRankingsData(rankings);
+                loadTopChampionsData(topPerformers);
+                loadCompetitionFeedData(competitionFeed);
+                
+            } catch (error) {
+                console.error('Error loading leaderboard data:', error);
+                loadFallbackData();
+            }
+        }
+
+        // Load global statistics data
+        function loadGlobalStatsData(stats) {
+            document.getElementById('totalAgents').textContent = (stats.totalAgents || 0).toLocaleString();
+            document.getElementById('totalSales').textContent = stats.totalSales > 1000000 
+                ? '$' + (stats.totalSales / 1000000).toFixed(1) + 'M' 
+                : '$' + (stats.totalSales || 0).toLocaleString();
+            document.getElementById('totalCommissions').textContent = stats.totalCommissions > 1000000 
+                ? '$' + (stats.totalCommissions / 1000000).toFixed(1) + 'M' 
+                : '$' + (stats.totalCommissions || 0).toLocaleString();
+            document.getElementById('totalOffices').textContent = (stats.totalOffices || 0).toString();
+        }
+
+        // Load leaderboard rankings data
+        function loadRankingsData(rankings) {
+            leaderboardData = rankings.map(agent => ({
+                rank: agent.rank,
+                name: agent.name || 'Unknown Agent',
+                office: agent.office || 'Unknown Office',
+                totalSales: agent.totalSales || 0,
+                commissions: agent.totalCommissions || 0,
+                policies: agent.totalPolicies || 0,
+                streak: agent.currentStreak || 0,
+                experience: agent.totalSales > 1000000 ? 'veteran' : 
+                          agent.totalSales > 500000 ? 'experienced' : 'rookie',
+                achievements: agent.achievements || []
+            }));
+
+            // Apply filters and display
+            applyFilters();
+        }
+
+        // Apply filters to leaderboard data
+        function applyFilters() {
+            // Get current filter values
+            currentFilters.timeframe = document.getElementById('timeframe').value;
+            currentFilters.category = document.getElementById('category').value;
+            currentFilters.office = document.getElementById('office').value;
+            currentFilters.experience = document.getElementById('experience').value;
+
+            // Filter data (mock filtering - replace with actual API filtering)
+            filteredData = leaderboardData.filter(agent => {
+                if (currentFilters.office !== 'all' && !agent.office.toLowerCase().includes(currentFilters.office.replace('-', ' '))) {
+                    return false;
+                }
+                if (currentFilters.experience !== 'all' && agent.experience !== currentFilters.experience) {
+                    return false;
+                }
+                return true;
+            });
+
+            // Sort by selected category
+            filteredData.sort((a, b) => {
+                switch (currentFilters.category) {
+                    case 'commissions':
+                        return b.commissions - a.commissions;
+                    case 'policies':
+                        return b.policies - a.policies;
+                    case 'conversion':
+                        return (b.policies / (b.totalSales / 10000)) - (a.policies / (a.totalSales / 10000));
+                    default:
+                        return b.totalSales - a.totalSales;
+                }
+            });
+
+            // Update rankings
+            displayLeaderboard();
+        }
+
+        // Display leaderboard table
+        function displayLeaderboard() {
+            const tableBody = document.getElementById('leaderboardBody');
+            const count = document.getElementById('rankingCount');
+            
+            count.textContent = `(${filteredData.length} agents)`;
+
+            if (filteredData.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: var(--lb-text-muted); padding: 3rem;">
+                            <i data-lucide="search-x"></i>
+                            <p>No agents found matching current filters.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const tableHTML = filteredData.map((agent, index) => {
+                const rank = index + 1;
+                const rankClass = rank <= 3 ? `rank-${rank}` : '';
+                const rankBadgeClass = rank <= 3 ? `rank-badge rank-badge-${rank}` : 'rank-badge';
+                
+                const achievements = agent.achievements.map(achievement => 
+                    `<span class="achievement achievement-${rank <= 3 ? ['gold', 'silver', 'bronze'][rank-1] : 'bronze'}">${achievement}</span>`
+                ).join('');
+
+                return `
+                    <tr onclick="viewAgentProfile('${agent.name}')">
+                        <td class="rank ${rankClass}">
+                            ${rank <= 3 ? `<span class="${rankBadgeClass}">#${rank}</span>` : rank}
+                        </td>
+                        <td>
+                            <div class="agent-profile">
+                                <div class="agent-avatar">
+                                    ${agent.name.split(' ').map(n => n[0]).join('')}
+                                </div>
+                                <div class="agent-info">
+                                    <h4>${agent.name}</h4>
+                                    <p>${agent.experience} • ${agent.streak} month streak</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${agent.office}</td>
+                        <td style="text-align: right; font-weight: 600;">$${agent.totalSales.toLocaleString()}</td>
+                        <td style="text-align: right; color: var(--lb-accent);">$${agent.commissions.toLocaleString()}</td>
+                        <td style="text-align: right;">${agent.policies}</td>
+                        <td style="text-align: center;">
+                            <span style="color: ${agent.streak >= 6 ? 'var(--lb-accent)' : 'var(--lb-text-secondary)'};">
+                                ${agent.streak} ${agent.streak >= 6 ? '🔥' : '📈'}
+                            </span>
+                        </td>
+                        <td style="text-align: center;">
+                            <div style="max-width: 200px;">${achievements}</div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            tableBody.innerHTML = tableHTML;
+            lucide.createIcons();
+        }
+
+        // Load top champions data
+        function loadTopChampionsData(topPerformers) {
+            if (topPerformers.length >= 1) {
+                const champ1 = topPerformers[0];
+                document.getElementById('champ1Name').textContent = champ1.name || 'No Data';
+                document.getElementById('champ1Sales').textContent = champ1.totalSales > 1000 ? 
+                    '$' + (champ1.totalSales / 1000).toFixed(0) + 'K' : '$' + (champ1.totalSales || 0);
+                document.getElementById('champ1Office').textContent = champ1.office || 'Unknown';
+            }
+            
+            if (topPerformers.length >= 2) {
+                const champ2 = topPerformers[1];
+                document.getElementById('champ2Name').textContent = champ2.name || 'No Data';
+                document.getElementById('champ2Sales').textContent = champ2.totalSales > 1000 ? 
+                    '$' + (champ2.totalSales / 1000).toFixed(0) + 'K' : '$' + (champ2.totalSales || 0);
+                document.getElementById('champ2Office').textContent = champ2.office || 'Unknown';
+            }
+            
+            if (topPerformers.length >= 3) {
+                const champ3 = topPerformers[2];
+                document.getElementById('champ3Name').textContent = champ3.name || 'No Data';
+                document.getElementById('champ3Sales').textContent = champ3.totalSales > 1000 ? 
+                    '$' + (champ3.totalSales / 1000).toFixed(0) + 'K' : '$' + (champ3.totalSales || 0);
+                document.getElementById('champ3Office').textContent = champ3.office || 'Unknown';
+            }
+        }
+
+        // Load top movers
+        async function loadTopMovers() {
+            const movers = [
+                { name: 'Alex Thompson', change: '+15 positions', trend: 'up' },
+                { name: 'Maria Gonzalez', change: '+12 positions', trend: 'up' },
+                { name: 'Robert Lee', change: '+8 positions', trend: 'up' }
+            ];
+
+            const moversHTML = movers.map(mover => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px; margin-bottom: 0.5rem;">
+                    <div>
+                        <div style="font-weight: 600; color: var(--lb-text-primary);">${mover.name}</div>
+                        <div style="font-size: 0.85rem; color: var(--lb-text-muted);">${mover.change}</div>
+                    </div>
+                    <div style="color: var(--lb-accent); font-size: 1.5rem;">📈</div>
+                </div>
+            `).join('');
+
+            document.getElementById('topMovers').innerHTML = moversHTML;
+        }
+
+        // Load goal crushers
+        async function loadGoalCrushers() {
+            const goalCrushers = [
+                { name: 'Sarah Chen', percentage: 245 },
+                { name: 'Emily Watson', percentage: 198 },
+                { name: 'Michael Rodriguez', percentage: 187 }
+            ];
+
+            const crushersHTML = goalCrushers.map(crusher => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(255, 215, 0, 0.1); border-radius: 8px; margin-bottom: 0.5rem;">
+                    <div>
+                        <div style="font-weight: 600; color: var(--lb-text-primary);">${crusher.name}</div>
+                        <div style="font-size: 0.85rem; color: var(--lb-accent);">${crusher.percentage}% of goal</div>
+                    </div>
+                    <div style="color: var(--lb-accent); font-size: 1.5rem;">🎯</div>
+                </div>
+            `).join('');
+
+            document.getElementById('goalCrushers').innerHTML = crushersHTML;
+        }
+
+        // Load competition feed data
+        function loadCompetitionFeedData(competitionFeed) {
+            if (!competitionFeed || competitionFeed.length === 0) {
+                document.getElementById('competitionFeed').innerHTML = `
+                    <div style="text-align: center; color: var(--lb-text-muted); padding: 2rem;">
+                        No recent activity to display
+                    </div>
+                `;
+                return;
+            }
+
+            const feedHTML = competitionFeed.map(item => {
+                const timeAgo = item.timestamp ? getTimeAgo(new Date(item.timestamp)) : 'Unknown time';
+                return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px; margin-bottom: 0.75rem; border-left: 3px solid var(--lb-accent);">
+                        <div style="color: var(--lb-text-primary);">${item.message || 'Activity update'}</div>
+                        <div style="color: var(--lb-text-muted); font-size: 0.85rem;">${timeAgo}</div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('competitionFeed').innerHTML = feedHTML;
+        }
+
+        // Helper function to format time ago
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins} min ago`;
+            if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+            return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+        }
+
+        // View agent profile
+        function viewAgentProfile(agentName) {
+            alert(`View profile for ${agentName} - This would show detailed agent statistics and achievements`);
+        }
+
+        // Fallback data
+        function loadFallbackData() {
+            document.getElementById('totalAgents').textContent = '200+';
+            document.getElementById('totalSales').textContent = '$10M+';
+            document.getElementById('totalCommissions').textContent = '$3M+';
+            document.getElementById('totalOffices').textContent = '12';
+        }
+
+        // Classic Mode Toggle Functions
+        function toggleClassicMode() {
+            const body = document.body;
+            const toggle = document.getElementById('classicModeToggle');
+            const icon = toggle.querySelector('.icon');
+            
+            if (body.classList.contains('classic-mode')) {
+                // Exit classic mode
+                body.classList.remove('classic-mode');
+                toggle.innerHTML = '<i data-lucide="gamepad-2" class="icon"></i>Classic Mode';
+                localStorage.setItem('leaderboard-classic-mode', 'false');
+                playPacmanSound('exit');
+            } else {
+                // Enter classic mode
+                body.classList.add('classic-mode');
+                toggle.innerHTML = '<i data-lucide="zap" class="icon"></i>Modern Mode';
+                localStorage.setItem('leaderboard-classic-mode', 'true');
+                playPacmanSound('enter');
+            }
+            
+            // Reinitialize lucide icons
+            lucide.createIcons();
+        }
+
+        function initializeClassicMode() {
+            const isClassicMode = localStorage.getItem('leaderboard-classic-mode') === 'true';
+            if (isClassicMode) {
+                document.body.classList.add('classic-mode');
+                const toggle = document.getElementById('classicModeToggle');
+                toggle.innerHTML = '<i data-lucide="zap" class="icon"></i>Modern Mode';
+            }
+        }
+
+        function playPacmanSound(type) {
+            // Create audio context for retro sound effects
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                
+                oscillator.connect(gain);
+                gain.connect(audioContext.destination);
+                
+                if (type === 'enter') {
+                    // Pac-Man startup sound sequence
+                    oscillator.frequency.setValueAtTime(264, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(297, audioContext.currentTime + 0.1);
+                    oscillator.frequency.setValueAtTime(330, audioContext.currentTime + 0.2);
+                    oscillator.frequency.setValueAtTime(352, audioContext.currentTime + 0.3);
+                } else {
+                    // Exit sound
+                    oscillator.frequency.setValueAtTime(352, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(264, audioContext.currentTime + 0.1);
+                }
+                
+                oscillator.type = 'square';
+                gain.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+                
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 0.4);
+            } catch (e) {
+                console.log('Audio context not available');
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+            initializeClassicMode();
+        });
+    </script>
+
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
+</body>
+</html>

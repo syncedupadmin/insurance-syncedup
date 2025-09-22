@@ -87,28 +87,13 @@ function navigateTo(view) {
 async function testEdgeFunction() {
     console.log('Testing Edge Function...');
 
-    // Get token from localStorage or cookie
-    let token = localStorage.getItem('auth_token');
-    if (!token) {
-        const cookies = document.cookie.split(';').reduce((acc, cookie) => {
-            const [key, value] = cookie.trim().split('=');
-            acc[key] = value;
-            return acc;
-        }, {});
-        token = cookies.auth_token;
-    }
-
-    if (!token) {
-        alert('No auth token found. Please log in again.');
-        return;
-    }
+    // Use cookie-based authentication
+    // Cookies are automatically sent with credentials: 'include'
 
     try {
         // Test stats endpoint
         const response = await fetch('/api/super-admin/edge-proxy?endpoint=stats', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+            credentials: 'include'
         });
 
         const data = await response.json();
@@ -356,9 +341,9 @@ async function loadAuditTrail() {
 async function loadSecurity() {
     const content = document.getElementById('main-content');
     const [events, stats, settings] = await Promise.all([
-        fetch('/api/super-admin/security', {headers: {'X-Action': 'events'}}).then(r => r.json()).catch(() => null),
-        fetch('/api/super-admin/security', {headers: {'X-Action': 'stats'}}).then(r => r.json()).catch(() => null),
-        fetch('/api/super-admin/security', {headers: {'X-Action': 'settings'}}).then(r => r.json()).catch(() => null)
+        fetch('/api/super-admin/security', {headers: {'X-Action': 'events'}, credentials: 'include'}).then(r => r.json()).catch(() => null),
+        fetch('/api/super-admin/security', {headers: {'X-Action': 'stats'}, credentials: 'include'}).then(r => r.json()).catch(() => null),
+        fetch('/api/super-admin/security', {headers: {'X-Action': 'settings'}, credentials: 'include'}).then(r => r.json()).catch(() => null)
     ]);
     
     content.innerHTML = `
@@ -993,12 +978,10 @@ async function loadDatabaseTables() {
     tablesList.innerHTML = '<div class="loading">Loading tables...</div>';
 
     try {
-        const token = localStorage.getItem('auth_token');
+        // Use cookie-based authentication
         const response = await fetch('/api/super-admin/database-tables', {
             method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+            credentials: 'include'
         });
 
         if (!response.ok) {
@@ -1081,15 +1064,15 @@ async function loadDatabaseTables() {
 
 // Show table information
 async function showTableInfo(tableName) {
-    const token = localStorage.getItem('auth_token');
+    // Use cookie-based authentication
 
     try {
         const response = await fetch('/api/super-admin/edge-proxy?endpoint=table-info', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
+            credentials: 'include',
             body: JSON.stringify({ table: tableName })
         });
 
@@ -1151,15 +1134,15 @@ async function showTableInfo(tableName) {
 
 // Copy table structure as CREATE TABLE statement
 async function copyTableStructure(tableName) {
-    const token = localStorage.getItem('auth_token');
+    // Use cookie-based authentication
 
     try {
         const response = await fetch('/api/super-admin/edge-proxy?endpoint=table-ddl', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
+            credentials: 'include',
             body: JSON.stringify({ table: tableName })
         });
 
@@ -1617,14 +1600,14 @@ async function handleCreateAgency(e) {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating agency...';
 
         // Get auth token
-        const token = localStorage.getItem('auth_token') || '';
+        // Use cookie-based authentication
 
         // Make API call
         const response = await fetch('/api/super-admin/create-agency', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                // Cookie-based authentication
             },
             body: JSON.stringify(formData)
         });
@@ -1979,18 +1962,75 @@ function toggleUserView() {
     }
 }
 
+// Global variables for password reset modal
+let currentResetUserId = null;
+let currentResetEmail = null;
+
+// Show password reset modal
+function showPasswordResetModal(userId, email) {
+    currentResetUserId = userId;
+    currentResetEmail = email;
+
+    // Set email in modal
+    document.getElementById('reset-email').textContent = email;
+
+    // Show confirmation view
+    document.getElementById('password-reset-confirm').style.display = 'block';
+    document.getElementById('password-reset-result').style.display = 'none';
+    document.getElementById('password-reset-loading').style.display = 'none';
+
+    // Show modal
+    document.getElementById('password-reset-modal').style.display = 'flex';
+}
+
+// Close password reset modal
+function closePasswordResetModal() {
+    document.getElementById('password-reset-modal').style.display = 'none';
+    currentResetUserId = null;
+    currentResetEmail = null;
+}
+
+// Copy password to clipboard
+function copyPassword() {
+    const passwordInput = document.getElementById('new-password-display');
+    passwordInput.select();
+    document.execCommand('copy');
+
+    // Show feedback
+    const copyBtn = event.target.closest('button');
+    const originalHtml = copyBtn.innerHTML;
+    copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+    copyBtn.style.background = '#4caf50';
+
+    setTimeout(() => {
+        copyBtn.innerHTML = originalHtml;
+        copyBtn.style.background = '';
+    }, 2000);
+}
+
+// Confirm password reset
+async function confirmPasswordReset() {
+    if (!currentResetUserId || !currentResetEmail) return;
+
+    // Show loading
+    document.getElementById('password-reset-confirm').style.display = 'none';
+    document.getElementById('password-reset-loading').style.display = 'block';
+
+    await performPasswordReset(currentResetUserId, currentResetEmail);
+}
+
 async function inviteUser() {
     const email = prompt('Enter email address to invite:');
     if (!email) return;
 
     try {
-        const token = localStorage.getItem('auth_token');
+        // Use cookie-based authentication
         const response = await fetch('/api/super-admin/edge-proxy?endpoint=users', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
+            credentials: 'include',
             body: JSON.stringify({
                 action: 'invite',
                 email: email
@@ -2019,19 +2059,24 @@ async function inviteUser() {
     }
 }
 
+// Modified resetUserPassword to use modal
 async function resetUserPassword(userId, email) {
-    if (!confirm(`Reset password for ${email}?\n\nThis will generate a new password and invalidate all existing sessions.`)) return;
+    showPasswordResetModal(userId, email);
+}
+
+// Actual password reset logic
+async function performPasswordReset(userId, email) {
 
     try {
-        const token = localStorage.getItem('auth_token');
+        // Use cookie-based authentication
 
         // Use direct API endpoint
         const response = await fetch('/api/super-admin/reset-password', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
+            credentials: 'include',
             body: JSON.stringify({
                 user_id: userId  // Edge Function expects user_id
             })
@@ -2060,24 +2105,40 @@ async function resetUserPassword(userId, email) {
             document.execCommand('copy');
             document.body.removeChild(textarea);
 
-            alert(message + '\n\n(Password has been copied to clipboard)');
+            // Show success in modal
+            document.getElementById('password-reset-loading').style.display = 'none';
+            document.getElementById('password-reset-result').style.display = 'block';
+
+            // Display the new password
+            document.getElementById('result-email').textContent = email;
+            document.getElementById('new-password-display').value = result.new_password;
+
+            logAudit('PASSWORD_RESET', `Reset password for user: ${email}`);
+
+            // Refresh user list if in user management view
+            if (currentView === 'users') {
+                loadUserManagement();
+            }
         } else {
             throw new Error(result.error || result.message || 'Failed to reset password');
         }
     } catch (error) {
+        // Show error in modal
+        document.getElementById('password-reset-loading').style.display = 'none';
+        document.getElementById('password-reset-confirm').style.display = 'block';
         alert('Error resetting password: ' + error.message);
     }
 }
 
 async function changeUserRole(userId, newRole) {
     try {
-        const token = localStorage.getItem('auth_token');
+        // Use cookie-based authentication
         const response = await fetch('/api/super-admin/edge-proxy?endpoint=users', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
+            credentials: 'include',
             body: JSON.stringify({
                 action: 'set_role',
                 user_id: userId,
@@ -2137,13 +2198,13 @@ async function assignToAgency(userId) {
         const selectedAgency = prompt(`Select agency ID to assign:\n\n${agencyOptions}\n\nEnter agency ID:`);
         if (!selectedAgency) return;
 
-        const token = localStorage.getItem('auth_token');
+        // Use cookie-based authentication
         const assignResponse = await fetch('/api/super-admin/edge-proxy?endpoint=users', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
+            credentials: 'include',
             body: JSON.stringify({
                 action: 'set_agency',
                 user_id: userId,
@@ -2225,13 +2286,13 @@ async function handleCreateUser(e) {
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating user...';
 
-        const token = localStorage.getItem('auth_token');
+        // Use cookie-based authentication
         const response = await fetch('/api/super-admin/create-user', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
+            credentials: 'include',
             body: JSON.stringify({
                 action: 'create',
                 email: formData.email,
@@ -2346,14 +2407,14 @@ async function handleEditUser(e) {
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
-        const token = localStorage.getItem('auth_token');
+        // Use cookie-based authentication
 
         // Update role
         if (formData.role) {
             await fetch('/api/super-admin/edge-proxy?endpoint=users', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    // Cookie-based authentication,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
@@ -2369,7 +2430,7 @@ async function handleEditUser(e) {
             await fetch('/api/super-admin/edge-proxy?endpoint=users', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    // Cookie-based authentication,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
@@ -2397,22 +2458,20 @@ async function resetUserPasswordModal() {
     const userId = document.getElementById('edit-user-id').value;
     const email = document.getElementById('edit-user-email').value;
 
-    if (confirm(`Reset password for ${email}?\n\nA new password will be generated and sent to the user.`)) {
-        await resetUserPassword(userId, email);
-    }
+    showPasswordResetModal(userId, email);
 }
 
 async function sendPasswordResetEmail() {
     const email = document.getElementById('edit-user-email').value;
 
     try {
-        const token = localStorage.getItem('auth_token');
+        // Use cookie-based authentication
         const response = await fetch('/api/super-admin/edge-proxy?endpoint=users', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
+            credentials: 'include',
             body: JSON.stringify({
                 action: 'invite',
                 email: email
@@ -2444,13 +2503,13 @@ async function deleteUser() {
     }
 
     try {
-        const token = localStorage.getItem('auth_token');
+        // Use cookie-based authentication
         const response = await fetch('/api/super-admin/edge-proxy?endpoint=users', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
+            credentials: 'include',
             body: JSON.stringify({
                 action: 'delete',
                 user_id: userId
@@ -2552,13 +2611,13 @@ async function executeSQL() {
     resultDiv.innerHTML = '<div class="loading">Executing SQL...</div>';
 
     try {
-        const token = localStorage.getItem('auth_token');
+        // Use cookie-based authentication
         const response = await fetch('/api/super-admin/edge-proxy?endpoint=sql', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
+            credentials: 'include',
             body: JSON.stringify({ sql: sqlQuery })
         });
 

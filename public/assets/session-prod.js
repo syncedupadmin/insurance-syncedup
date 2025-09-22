@@ -1,12 +1,10 @@
 (async function(){
   const SUPABASE_URL = 'https://zgkszwkxibpnxhvlenct.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpna3N6d2t4aWJwbnhodmxlbmN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMTk3OTMsImV4cCI6MjA3MTg5NTc5M30.1n7a1TYOM2zWiCUfGFhQnfPb8fjvDkDa_ba3CKZEB98';
-  
-  // Check for session - look in the correct storage location
-  const userSession = localStorage.getItem('syncedup_user') || 
-                     sessionStorage.getItem('syncedup:user') ||
-                     sessionStorage.getItem('syncedup_user');
-  if (!userSession) return;
+
+  // Skip localStorage check - we use cookie-based auth now
+  // Just return early since we don't need localStorage
+  return;
   
   const user = JSON.parse(userSession);
   

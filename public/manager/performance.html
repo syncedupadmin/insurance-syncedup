@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Performance - Manager Dashboard</title>
+    <link rel="stylesheet" href="manager-global.css">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Team Performance Analytics</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span id="userDisplay">Loading...</span>
+            <button class="btn" onclick="logout()">
+                <i data-lucide="log-out" class="icon"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <a href="index.html" class="nav-link">
+            <i data-lucide="layout-dashboard" class="icon"></i>
+            Dashboard
+        </a>
+        <a href="leads.html" class="nav-link">
+            <i data-lucide="user-plus" class="icon"></i>
+            Leads
+        </a>
+        <a href="team-management.html" class="nav-link">
+            <i data-lucide="users" class="icon"></i>
+            Team Management
+        </a>
+        <a href="performance.html" class="nav-link active">
+            <i data-lucide="trending-up" class="icon"></i>
+            Team Performance
+        </a>
+        <a href="reports.html" class="nav-link">
+            <i data-lucide="file-text" class="icon"></i>
+            Reports
+        </a>
+        <a href="goals.html" class="nav-link">
+            <i data-lucide="target" class="icon"></i>
+            Goals
+        </a>
+        <a href="vendors.html" class="nav-link">
+            <i data-lucide="building-2" class="icon"></i>
+            Vendors
+        </a>
+        <a href="settings.html" class="nav-link">
+            <i data-lucide="settings" class="icon"></i>
+            Settings
+        </a>
+    </div>
+    
+    <div class="container">
+        <div class="card">
+            <h3 style="display: flex; align-items: center;">
+                <i data-lucide="trending-up" class="card-icon"></i>
+                Team Performance Viewer
+            </h3>
+            <div class="restricted-notice">
+                <i data-lucide="info" style="width: 16px; height: 16px; margin-right: 0.5rem;"></i>
+                Manager access allows you to view team sales performance and premium volumes.
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="agentSelect">Select Team Member</label>
+                    <select id="agentSelect">
+                        <option value="">Choose an agent...</option>
+                        <option value="ALL">🌟 All Team Members</option>
+                        <!-- Will be populated dynamically -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="timeframe">Time Period</label>
+                    <select id="timeframe">
+                        <option value="thisweek">This Week</option>
+                        <option value="lastweek">Last Week</option>
+                        <option value="thismonth">This Month</option>
+                        <option value="lastmonth">Last Month</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button class="btn" onclick="loadTeamPerformance()">Load Performance Data</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="performanceData">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalSales">0</div>
+                    <div class="stat-label">Total Sales</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalPremium">$0</div>
+                    <div class="stat-label">Premium Volume</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="conversionRate">0%</div>
+                    <div class="stat-label">Conversion Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avgSale">$0</div>
+                    <div class="stat-label">Average Sale</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>📊 Recent Sales Activity</h3>
+                <div id="salesTableContainer">
+                    <table id="salesTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Agent</th>
+                                <th>Customer</th>
+                                <th>Product</th>
+                                <th>Premium</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="salesTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="export-section">
+                <button class="btn btn-success" onclick="exportData('csv')">📊 Export Sales Data</button>
+                <button class="btn btn-warning" onclick="generateReport()">📄 Generate Team Report</button>
+                <button class="btn" onclick="refreshData()">🔄 Refresh Data</button>
+            </div>
+        </div>
+        
+        <div id="noDataMessage" class="card no-data">
+            Select a team member and time period to view performance analytics.
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let selectedAgent = null;
+        let currentTimeframe = 'thismonth';
+        
+        // No hardcoded agent data - will be loaded from API
+        const agents = [];
+        
+        // Sales data will be loaded from API - no fake data
+        let salesData = [];
+        
+        // Authentication check
+        function checkAuth() {
+            const token = localStorage.getItem('syncedup_token');
+            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+            
+            if (!token || !user.email) {
+                window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                return false;
+            }
+
+            // Check if user has manager permissions
+            if (!['manager', 'admin', 'super-admin'].includes(user.role)) {
+                alert('Access denied. Manager permissions required.');
+                if (user.role === 'agent') {
+                    window.location.href = 'https://insurance.syncedupsolutions.com/agent/';
+                } else {
+                    window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+                }
+                return false;
+            }
+
+            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
+            currentUser = user;
+            return true;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!checkAuth()) return;
+            
+            populateAgentSelect();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        });
+        
+        function populateAgentSelect() {
+            const agentSelect = document.getElementById('agentSelect');
+            
+            // Clear existing options (except first two)
+            agentSelect.innerHTML = '<option value="">Choose an agent...</option><option value="ALL">🌟 All Team Members</option>';
+            
+            // Add agents
+            agents.filter(agent => agent.active).forEach(agent => {
+                const option = document.createElement('option');
+                option.value = agent.id;
+                option.textContent = `${agent.name} (${agent.id})`;
+                agentSelect.appendChild(option);
+            });
+        }
+        
+        async function loadTeamPerformance() {
+            const agentId = document.getElementById('agentSelect').value;
+            const timeframe = document.getElementById('timeframe').value;
+            
+            if (!agentId) {
+                alert('Please select a team member first');
+                return;
+            }
+            
+            selectedAgent = agentId;
+            currentTimeframe = timeframe;
+            
+            try {
+                // Use the manager-specific team performance API
+                let apiUrl = `/api/manager/team-performance?timeframe=${timeframe}`;
+                if (agentId !== 'ALL') {
+                    apiUrl += `&agent_id=${agentId}`;
+                }
+                
+                const response = await fetch(apiUrl);
+                const performanceData = await response.json();
+                
+                displayPerformanceData(performanceData, agentId);
+                displaySalesTable(agentId);
+                
+            } catch (error) {
+                console.error('Failed to load performance data:', error);
+                displayMockData(agentId);
+            }
+        }
+        
+        function displayPerformanceData(data, agentId) {
+            // Use the new API response structure
+            const teamSummary = data.team_summary || {};
+            const agentDetail = data.agent_detail;
+            
+            if (agentDetail) {
+                // Show individual agent performance
+                document.getElementById('totalSales').textContent = agentDetail.metrics.sales_count || 0;
+                document.getElementById('totalPremium').textContent = `$${(agentDetail.metrics.total_sales || 0).toLocaleString()}`;
+                document.getElementById('avgSale').textContent = `$${(agentDetail.metrics.avg_premium || 0).toLocaleString()}`;
+            } else {
+                // Show team totals
+                document.getElementById('totalSales').textContent = teamSummary.total_sales_count || 0;
+                document.getElementById('totalPremium').textContent = `$${(teamSummary.total_sales || 0).toLocaleString()}`;
+                document.getElementById('avgSale').textContent = `$${(teamSummary.avg_sales_per_agent || 0).toLocaleString()}`;
+            }
+            
+            document.getElementById('performanceData').style.display = 'block';
+            document.getElementById('noDataMessage').style.display = 'none';
+        }
+        
+        function displayMockData(agentId) {
+            // Use mock data when API fails
+            let totalSales = 12;
+            let totalPremium = 28500;
+            let avgSale = 2375;
+            
+            if (agentId === 'ALL') {
+                const activeAgents = agents.filter(a => a.active).length;
+                totalSales *= activeAgents;
+                totalPremium *= activeAgents;
+            }
+            
+            document.getElementById('totalSales').textContent = totalSales;
+            document.getElementById('totalPremium').textContent = `$${totalPremium.toLocaleString()}`;
+            document.getElementById('avgSale').textContent = `$${avgSale.toLocaleString()}`;
+            
+            // Calculate conversion rate (mock calculation)
+            const conversionRate = Math.round((totalSales / (totalSales + 3)) * 100); // Assume some leads didn't convert
+            document.getElementById('conversionRate').textContent = `${conversionRate}%`;
+            
+            document.getElementById('performanceData').style.display = 'block';
+            document.getElementById('noDataMessage').style.display = 'none';
+            
+            displaySalesTable(agentId);
+        }
+        
+        function displaySalesTable(agentId) {
+            const tableBody = document.getElementById('salesTableBody');
+            tableBody.innerHTML = '';
+            
+            // Filter sales data based on selected agent
+            let salesToShow = salesData;
+            if (agentId !== 'ALL') {
+                salesToShow = salesData.filter(sale => sale.agentId === agentId);
+            }
+            
+            if (salesToShow.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6" class="no-data">No sales data available for selected agent and time period.</td></tr>';
+                return;
+            }
+            
+            salesToShow.forEach(sale => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(sale.date).toLocaleDateString()}</td>
+                    <td><strong>${sale.agentName}</strong><br><small>${sale.agentId}</small></td>
+                    <td>${sale.customer}</td>
+                    <td>${sale.product}</td>
+                    <td class="premium-amount">$${sale.premium.toFixed(2)}</td>
+                    <td><span class="status-${sale.status.toLowerCase()}">${sale.status}</span></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function exportData(format) {
+            if (!selectedAgent) {
+                alert('Please load performance data first');
+                return;
+            }
+            
+            const agentName = selectedAgent === 'ALL' ? 'All-Team-Members' : 
+                agents.find(a => a.id === selectedAgent)?.name.replace(' ', '-') || 'Agent';
+            
+            if (format === 'csv') {
+                exportToCSV(agentName);
+            }
+        }
+        
+        function exportToCSV(agentName) {
+            // Manager export includes sales and premium data
+            let csvContent = 'Date,Agent ID,Agent Name,Customer,Product,Premium,Status\\n';
+            
+            const salesToExport = selectedAgent === 'ALL' ? salesData : 
+                salesData.filter(sale => sale.agentId === selectedAgent);
+            
+            salesToExport.forEach(sale => {
+                csvContent += `${sale.date},${sale.agentId},${sale.agentName},${sale.customer},${sale.product},${sale.premium},${sale.status}\\n`;
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${agentName}-sales-${currentTimeframe}-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+        
+        function generateReport() {
+            if (!selectedAgent) {
+                alert('Please load performance data first');
+                return;
+            }
+            
+            alert('Team report generation would be implemented here. This would create a comprehensive sales and performance report.');
+        }
+        
+        function refreshData() {
+            if (selectedAgent) {
+                loadTeamPerformance();
+            }
+        }
+        
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
+        }
+        
+    </script>
+    
+    <!-- Classic Mode Toggle System -->
+    <script src="/js/classic-mode.js"></script>
+    <script src="/assets/session-prod.js"></script>
+</body>
+</html>

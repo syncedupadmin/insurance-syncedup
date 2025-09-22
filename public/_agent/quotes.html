@@ -44,7 +44,6 @@
         setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
     })();
     </script>
-    <script src="/js/auth-helper.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quote Products - SyncedUp Insurance Agent</title>
@@ -53,12 +52,12 @@
     <!-- Agent Portal Theme Override -->
     <link rel="stylesheet" href="/css/themes/agent-modern.css">
     
-    <!-- Load auth helper for user context -->
-    <script src="/js/auth-helper.js"></script>
+    <!-- Auth helper already loaded above -->
     <!-- Load navigation component -->
-    <script src="/agent/components/navigation.js"></script>
+    <script src="/_agent/components/navigation.js"></script>
     <!-- Load global header component -->
-    <script src="/agent/components/global-header.js"></script>
+    <script src="/_agent/components/global-header.js"></script>
+    <script src="/js/auth-check.js?v=3" defer></script>
 </head>
 <body class="portal-agent">
     <!-- Global Header Mount Point -->
@@ -66,7 +65,12 @@
     
     <!-- Initialize Global Header -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Require authentication
+            if (window.SyncedUpAuth) {
+                await window.SyncedUpAuth.requireAuth({ role: 'agent' });
+            }
+
             AgentHeader.init({
                 pageTitle: 'Quote Products',
                 showRoleSwitcher: false,
@@ -645,6 +649,5 @@
 
     <!-- Professional Theme System -->
     <script src="/js/theme-switcher.js"></script>
-    <script src="/assets/session-prod.js"></script>
 </body>
 </html>
