@@ -161,28 +161,6 @@
                                 Leaderboard
                             </span>
                         </button>
-
-                        <!-- Theme Switcher Buttons -->
-                        <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            <button class="btn btn-sm theme-btn" onclick="if(window.themeSystem) window.themeSystem.applyTheme('professional')"
-                                    title="Professional Theme"
-                                    style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background: linear-gradient(135deg, #059669, #10b981); color: white; border: none; cursor: pointer;">
-                                <i data-lucide="briefcase" style="width: 16px; height: 16px;"></i>
-                                <span style="margin-left: 4px;">Pro</span>
-                            </button>
-                            <button class="btn btn-sm theme-btn" onclick="if(window.themeSystem) window.themeSystem.applyTheme('classic')"
-                                    title="Classic Theme"
-                                    style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background: linear-gradient(135deg, #047857, #059669); color: white; border: none; cursor: pointer;">
-                                <i data-lucide="palette" style="width: 16px; height: 16px;"></i>
-                                <span style="margin-left: 4px;">Classic</span>
-                            </button>
-                            <button class="btn btn-sm theme-btn" onclick="if(window.themeSystem) window.themeSystem.applyTheme('modern')"
-                                    title="Modern Theme"
-                                    style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background: linear-gradient(135deg, #10b981, #34d399); color: white; border: none; cursor: pointer;">
-                                <i data-lucide="zap" style="width: 16px; height: 16px;"></i>
-                                <span style="margin-left: 4px;">Modern</span>
-                            </button>
-                        </div>
             `;
 
             // Add logout button
