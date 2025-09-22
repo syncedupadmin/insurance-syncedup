@@ -61,6 +61,12 @@ module.exports = async function handler(req, res) {
     const portalRoles = Array.isArray(portalUser?.roles) ? portalUser.roles : [portalRole].filter(Boolean);
     const supaRole = (supaUser?.role || '').toString();
 
+    // CRITICAL: Log RAW values before any processing
+    console.log('[LOGIN] RAW portalUser:', JSON.stringify(portalUser, null, 2));
+    console.log('[LOGIN] RAW supaUser.role:', supaUser?.role);
+    console.log('[LOGIN] RAW supaUser.id:', supaUser?.id);
+    console.log('[LOGIN] RAW supaUser.sub:', supaUser?.sub);
+
     // CRITICAL: Log both sources
     console.log('[LOGIN] Role sources:', {
       email: email,
@@ -75,7 +81,19 @@ module.exports = async function handler(req, res) {
 
     // Use portal_users role if found, otherwise fallback to Supabase metadata
     const actualRole = portalRole || supaRole || 'agent';
+
+    // EXACT values before normalization
+    console.log('[LOGIN] BEFORE NORMALIZATION:');
+    console.log('  portalRole:', portalRole);
+    console.log('  supaRole:', supaRole);
+    console.log('  actualRole:', actualRole);
+
     const redirectPath = getRolePortalPath(actualRole);
+
+    // AFTER normalization
+    console.log('[LOGIN] AFTER NORMALIZATION:');
+    console.log('  finalRole:', actualRole);
+    console.log('  redirectPath:', redirectPath);
 
     res.setHeader('Set-Cookie', [
       `auth_token=${token}; HttpOnly; Path=/; Max-Age=28800; Secure; SameSite=Lax`

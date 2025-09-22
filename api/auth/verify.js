@@ -65,16 +65,18 @@ module.exports = async (req, res) => {
       user.roles = ['super-admin'];
     }
 
-    // CRITICAL DEBUG LOG
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[VERIFY] Returning user payload:', {
-        email: user.email,
-        role: user.role,
-        roles: user.roles,
-        source: dbUser ? 'portal_users' : 'supabase_metadata',
-        raw_dbUser: dbUser
-      });
-    }
+    // CRITICAL DEBUG LOG - Log EVERYTHING
+    console.log('[VERIFY] RAW dbUser:', JSON.stringify(dbUser, null, 2));
+    console.log('[VERIFY] RAW payload (from token):', JSON.stringify(payload, null, 2));
+    console.log('[VERIFY] Building user object:', {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      roles: user.roles,
+      agency_id: user.agency_id
+    });
+    console.log('[VERIFY] FINAL user payload to return:', JSON.stringify(user, null, 2));
 
     return res.status(200).json({
       ok: true,
