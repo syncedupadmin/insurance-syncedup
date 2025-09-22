@@ -30,39 +30,44 @@ module.exports = async (req, res) => {
 
     const { data: dbUser, error } = await supabase
       .from('portal_users')
-      .select('id, email, full_name, role, agency_id, is_active')
+      .select('id, email, full_name, role, roles, agency_id, is_active')
       .eq('auth_user_id', payload.sub || payload.id)
       .single();
+
+    // CRITICAL: Apply same normalization as login
+    const ALLOWED = new Set(['super-admin','admin','manager','customer-service','agent']);
+    const norm = v => String(v||'').trim().toLowerCase().replace(/_/g,'-').replace(/\s+/g,'-');
 
     let user;
     if (!dbUser) {
       // Fallback for users not in portal_users
+      const fallbackRole = norm(payload.role || 'agent');
+      const validRole = ALLOWED.has(fallbackRole) ? fallbackRole : 'agent';
       user = {
         id: payload.id || payload.sub,
         email: payload.email,
         name: payload.email?.split('@')[0] || 'User',
-        role: payload.role || 'agent',
-        roles: [payload.role || 'agent'],
+        role: validRole,
+        roles: [validRole],
         agency_id: payload.agency_id || payload.agencyId
       };
     } else if (dbUser.is_active === false) {
       return res.status(401).json({ ok: false, error: 'Unauthorized' });
     } else {
-      // Use portal_users.id as the primary ID
+      // Use portal_users with normalization
+      const dbRoles = (Array.isArray(dbUser.roles) && dbUser.roles.length ? dbUser.roles : [dbUser.role])
+        .map(norm)
+        .filter(r => ALLOWED.has(r));
+      const dbRole = dbRoles[0] || 'agent';
+
       user = {
         id: dbUser.id,
         email: dbUser.email,
         name: dbUser.full_name || dbUser.email?.split('@')[0] || 'User',
-        role: dbUser.role,
-        roles: [dbUser.role],
+        role: dbRole,
+        roles: dbRoles.length > 0 ? dbRoles : [dbRole],
         agency_id: dbUser.agency_id
       };
-    }
-
-    // Normalize super_admin to super-admin
-    if (user.role === 'super_admin') {
-      user.role = 'super-admin';
-      user.roles = ['super-admin'];
     }
 
     // CRITICAL DEBUG LOG - Log EVERYTHING

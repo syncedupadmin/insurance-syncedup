@@ -41,77 +41,62 @@ module.exports = async function handler(req, res) {
     // Look up by auth_user_id (the Supabase auth ID)
     const { data: pu, error: puErr } = await supabase
       .from('portal_users')
-      .select('id, email, role, roles, agency_id, auth_user_id')
+      .select('id, email, role, roles, agency_id')
       .eq('auth_user_id', supaUser.id || supaUser.sub)
       .single();
 
-    // Also try by email if not found by auth_user_id
-    let portalUser = pu;
-    if (!portalUser && !puErr) {
-      const { data: puByEmail } = await supabase
-        .from('portal_users')
-        .select('id, email, role, roles, agency_id, auth_user_id')
-        .eq('email', email.toLowerCase())
-        .single();
-      portalUser = puByEmail;
-    }
+    // CRITICAL: Normalize roles properly
+    const ALLOWED = new Set(['super-admin','admin','manager','customer-service','agent']);
+    const norm = v => String(v||'').trim().toLowerCase().replace(/_/g,'-').replace(/\s+/g,'-');
 
-    // Extract roles from both sources
-    const portalRole = (portalUser?.role || '').toString();
-    const portalRoles = Array.isArray(portalUser?.roles) ? portalUser.roles : [portalRole].filter(Boolean);
-    const supaRole = (supaUser?.role || '').toString();
+    // Get portal roles - normalize and validate
+    const portalRoles = (Array.isArray(pu?.roles) && pu.roles.length ? pu.roles : [pu?.role])
+      .map(norm)
+      .filter(r => ALLOWED.has(r));
+    const portalRole = portalRoles[0] || '';
 
-    // CRITICAL: Log RAW values before any processing
-    console.log('[LOGIN] RAW portalUser:', JSON.stringify(portalUser, null, 2));
-    console.log('[LOGIN] RAW supaUser.role:', supaUser?.role);
-    console.log('[LOGIN] RAW supaUser.id:', supaUser?.id);
-    console.log('[LOGIN] RAW supaUser.sub:', supaUser?.sub);
+    // Get Supabase role - normalize
+    const supaRoleRaw = supaUser?.app_metadata?.role ?? supaUser?.user_metadata?.role ?? '';
+    const supaRole = norm(supaRoleRaw);
 
-    // CRITICAL: Log both sources
-    console.log('[LOGIN] Role sources:', {
-      email: email,
-      portalRole: portalRole,
-      portalRoles: portalRoles,
-      supaRole: supaRole,
-      supaUserId: supaUser.id || supaUser.sub,
-      foundPortalUser: !!portalUser,
-      portalUserAuthId: portalUser?.auth_user_id,
-      lookupMethod: pu ? 'by_auth_id' : (portalUser ? 'by_email' : 'not_found')
+    // CRITICAL LOG: Both sources with normalization
+    console.log('[LOGIN] Role sources after normalization:', {
+      email: pu?.email || supaUser?.email,
+      portalRole,
+      portalRoles,
+      supaRole,
+      supaRoleRaw,
+      foundPortalUser: !!pu,
+      authUserId: supaUser.id || supaUser.sub
     });
 
-    // Use portal_users role if found, otherwise fallback to Supabase metadata
-    const actualRole = portalRole || supaRole || 'agent';
+    // Decision: portal_users wins if found, else Supabase, else default
+    const finalRole = portalRole || (ALLOWED.has(supaRole) ? supaRole : 'agent');
 
-    // EXACT values before normalization
-    console.log('[LOGIN] BEFORE NORMALIZATION:');
-    console.log('  portalRole:', portalRole);
-    console.log('  supaRole:', supaRole);
-    console.log('  actualRole:', actualRole);
+    console.log('[LOGIN] Final role decision:', {
+      finalRole,
+      source: portalRole ? 'portal_users' : (ALLOWED.has(supaRole) ? 'supabase' : 'default')
+    });
 
-    const redirectPath = getRolePortalPath(actualRole);
+    const redirectPath = getRolePortalPath(finalRole);
 
-    // AFTER normalization
-    console.log('[LOGIN] AFTER NORMALIZATION:');
-    console.log('  finalRole:', actualRole);
-    console.log('  redirectPath:', redirectPath);
+    console.log('[LOGIN] Redirect path:', redirectPath);
 
     res.setHeader('Set-Cookie', [
       `auth_token=${token}; HttpOnly; Path=/; Max-Age=28800; Secure; SameSite=Lax`
     ])
-
-    // CRITICAL DEBUG LOG
-    console.log('[LOGIN] Final decision:', {
-      actualRole: actualRole,
-      redirectPath: redirectPath,
-      decision: portalRole ? 'using_portal_role' : (supaRole ? 'using_supa_role' : 'using_default')
-    });
 
     // Return format that matches client expectations
     res.status(200).json({
       ok: true,
       success: true,
       redirect: redirectPath,
-      user: { ...supaUser, role: actualRole, roles: portalRoles.length > 0 ? portalRoles : [actualRole] },
+      user: {
+        ...supaUser,
+        role: finalRole,
+        roles: portalRoles.length > 0 ? portalRoles : [finalRole],
+        agency_id: pu?.agency_id || supaUser?.agency_id
+      },
       token // Also return token so client can store it
     })
   } catch (e) {
