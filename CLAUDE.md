@@ -1,143 +1,76 @@
-# Insurance.SyncedUp Project Documentation
+# CLAUDE.md
 
-## Project Overview
-Multi-portal insurance management system with role-based access control and comprehensive database integration.
-
-## Technology Stack
-- **Frontend**: HTML, CSS, JavaScript (Vanilla)
-- **Backend**: Node.js with Express
-- **Database**: Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth with server-side session management
-- **Deployment**: Vercel
-- **Version Control**: Git
-
-## Project Structure
-```
-Insurance.SyncedUp/
-├── public/                    # Frontend files
-│   ├── admin/                # Admin portal
-│   ├── agent/                # Agent portal
-│   ├── customer-service/     # Customer service portal
-│   ├── leaderboard/          # Leaderboard portal
-│   ├── login/                # Login portal
-│   ├── manager/              # Manager portal
-│   ├── super-admin/          # Super admin portal
-│   └── assets/               # Shared assets
-├── server.js                  # Express server
-├── package.json              # Node dependencies
-├── vercel.json               # Vercel configuration
-└── .env                      # Environment variables
-
-```
-
-## Database Schema
-
-### Core Tables
-- **profiles**: User profiles with role-based access
-- **customers**: Customer information and policies
-- **quotes**: Insurance quotes with status tracking
-- **claims**: Insurance claims management
-- **payments**: Payment records and history
-- **commissions**: Agent commission tracking
-- **activities**: System-wide activity logging
-- **notifications**: User notifications
-- **messages**: Internal messaging system
-
-### Authentication & Security
-- Server-side session management (no localStorage)
-- Role-based access control (RBAC)
-- Supabase Row Level Security (RLS) policies
-- Secure API endpoints with authentication middleware
-
-## Portal Access Levels
-1. **Super Admin**: Full system access, user management, system configuration
-2. **Admin**: Administrative functions, reporting, user oversight
-3. **Manager**: Team management, performance tracking, approvals
-4. **Agent**: Quote creation, customer management, commission tracking
-5. **Customer Service**: Customer support, claim processing, inquiries
-6. **Customer**: Self-service portal, policy viewing, claim submission
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Development Commands
+
 ```bash
-# Install dependencies
-npm install
+# Build Tailwind CSS
+npm run build         # Production build
+npm run build:watch   # Watch mode for development
 
 # Run development server
-npm run dev
+npm run dev          # Starts http-server on port 3001
 
-# Build for production
-npm run build
+# Audit tools (Playwright-based crawler)
+npm run audit        # Run the portal crawler
+npm run audit:report # Generate audit report
+npm run audit:full   # Run crawler and generate report
 
-# Deploy to Vercel
-vercel --prod
+# Playwright tests
+npm run playwright:install  # Install Playwright browsers
+npm run playwright:test    # Run Playwright tests
 ```
 
-## Environment Variables
-Required in `.env`:
-```
-SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_anon_key
-SUPABASE_SERVICE_KEY=your_service_key
-SESSION_SECRET=your_session_secret
-PORT=3000
-```
+## High-Level Architecture
 
-## API Endpoints
-- `/api/auth/*` - Authentication endpoints
-- `/api/users/*` - User management
-- `/api/customers/*` - Customer operations
-- `/api/quotes/*` - Quote management
-- `/api/claims/*` - Claims processing
-- `/api/payments/*` - Payment handling
-- `/api/commissions/*` - Commission tracking
-- `/api/reports/*` - Reporting endpoints
+### Portal System
+Multi-portal insurance management system with role-based isolation:
+- Each portal is in `public/_[portal-name]/` (e.g., `_agent`, `_admin`, `_super-admin`)
+- Vercel rewrites map clean URLs (e.g., `/agent`) to portal directories
+- Portal isolation enforced through server-side authentication
+- No localStorage authentication - all auth is server-side session-based
 
-## Recent Updates
-- Eliminated localStorage authentication in favor of server-side sessions
-- Fixed critical JavaScript syntax errors across all portals
-- Corrected CSS path issues for all dashboards
-- Implemented comprehensive database schema with audit tables
-- Added RLS policies for secure data access
+### API Structure
+- **API Routes**: Located in `/api/` directory, organized by functionality
+- **Role-gated endpoints**: Each portal has dedicated API endpoints (e.g., `/api/super-admin/*`)
+- **Middleware**: Authentication checks in `/api/_middleware/authCheck.js`
+- **Utils**: Shared utilities in `/api/_utils/` and `/api/utils/`
 
-## Testing & Quality Assurance
-```bash
-# Run linting (if configured)
-npm run lint
+### Database Architecture
+- **Supabase PostgreSQL** with Row Level Security (RLS)
+- **Agency isolation**: Multi-tenant architecture with `agency_id` filtering
+- **Core tables**: profiles, customers, quotes, claims, payments, commissions
+- **Audit tables**: activities, notifications, messages for tracking
 
-# Run type checking (if TypeScript is configured)
-npm run typecheck
+### Authentication Flow
+1. Login via `/api/auth/login-secure.js` endpoint
+2. Server creates secure session cookie
+3. All API calls validate session server-side
+4. Role-based access control enforced at API level
+5. No client-side auth state storage
 
-# Run tests (if configured)
-npm test
-```
+## Portal Access Levels
+- **Super Admin**: System-wide control, agency management, platform monitoring
+- **Admin**: Agency administration, reporting, user management within agency
+- **Manager**: Team oversight, performance tracking, approvals
+- **Agent**: Quote creation, customer management, commission tracking
+- **Customer Service**: Support tickets, claim processing, customer inquiries
 
-## Deployment
-The application is deployed on Vercel with automatic deployments from the main branch.
+## Important Patterns
 
-Production URL: https://insurance.syncedupsolutions.com
+### Frontend JavaScript
+- Vanilla JavaScript (no framework)
+- API calls use fetch with credentials: 'include' for cookies
+- Error handling with user-friendly messages
+- Dynamic content loading without page refresh
 
-## Security Considerations
-- All sensitive operations require authentication
-- Role-based access control enforced at API level
-- Database RLS policies for additional security layer
-- No client-side storage of sensitive data
-- HTTPS enforced in production
-- Environment variables for all secrets
+### CSS Organization
+- Tailwind CSS for styling
+- Main CSS file: `/public/css/main.css` (generated from `/styles/tailwind.css`)
+- Portal-specific styles inline or in portal directories
 
-## Known Issues & TODOs
-- Monitor performance of complex queries
-- Consider implementing caching for frequently accessed data
-- Add comprehensive error logging
-- Implement rate limiting on API endpoints
-- Add automated testing suite
-
-## Support & Maintenance
-For issues or questions about this project:
-- Check the recent commit history for context
-- Review the database schema documentation
-- Ensure all environment variables are properly configured
-- Verify Supabase RLS policies are active
-
----
-*Last Updated: 2025-09-09*
-*Project maintained in: C:\Users\nicho\OneDrive\Desktop\Insurance.SyncedUp*
+### Security Headers
+- CSP configured in vercel.json
+- CORS handled at API level
+- Authentication cookies with httpOnly, secure, sameSite flags

@@ -50,21 +50,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agent Dashboard - SyncedUp Insurance</title>
+
+    <!-- Preconnect to external domains for faster loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Favicons - Green for Agent Portal -->
     <link rel="icon" type="image/png" sizes="50x50" href="/favicons/agent-50x50.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/favicons/agent-180x180.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/favicons/agent-512x512.png">
     
-    <link rel="stylesheet" href="/agent/agent-global.css">
+    <link rel="stylesheet" href="/_agent/agent-global.css">
     
-    <!-- Server-side portal-guard.js already verified agent access -->
+    <!-- Portal API Shim - Must load before dashboard scripts -->
+    <script src="/js/portal-api.js"></script>
     
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <!-- Agent Portal Theme Override -->
     <link rel="stylesheet" href="/css/themes/agent-modern.css">
     
     <!-- Load auth helper for user context -->
+    <!-- Load theme system first -->
+    <script src="/js/theme-switcher.js"></script>
     <!-- Load role switcher if available -->
     <script src="/js/role-switcher.js"></script>
     <!-- Load navigation component -->
@@ -117,11 +128,11 @@
         
         <!-- Quick Actions -->
         <div class="quick-actions">
-            <button class="btn btn-primary" onclick="location.href='/agent/quotes'">
+            <button class="btn btn-primary" onclick="location.href='/_agent/quotes.html'">
                 <i data-lucide="calculator"></i>
                 Generate Quote
             </button>
-            <button class="btn btn-warning" onclick="location.href='/agent/commissions'">
+            <button class="btn btn-warning" onclick="location.href='/_agent/commissions.html'">
                 <i data-lucide="download"></i>
                 Download Commissions
             </button>
@@ -358,14 +369,6 @@
         document.addEventListener('DOMContentLoaded', initializePage);
     </script>
 
-    <!-- Simple Theme Loading -->
-    <script>
-        // Theme initialization is now handled by theme-switcher.js
-        // No additional theme code needed here
-    </script>
-
-    <!-- Professional Theme System -->
-    <script src="/js/theme-switcher.js"></script>
-    <script src="/js/role-switcher.js"></script>
+    <!-- Theme system already loaded in head - no duplicate loading needed -->
 </body>
 </html>

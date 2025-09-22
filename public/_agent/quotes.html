@@ -47,12 +47,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quote Products - SyncedUp Insurance Agent</title>
-    <link rel="stylesheet" href="/agent/agent-global.css">
+
+    <!-- Preconnect to external domains for faster loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/_agent/agent-global.css">
+
+    <!-- Portal API Shim - Must load before dashboard scripts -->
+    <script src="/js/portal-api.js"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <!-- Agent Portal Theme Override -->
     <link rel="stylesheet" href="/css/themes/agent-modern.css">
     
-    <!-- Auth helper already loaded above -->
+    <!-- Load auth helper for user context -->
+    <!-- Load theme system first -->
+    <script src="/js/theme-switcher.js"></script>
+    <!-- Load role switcher if available -->
+    <script src="/js/role-switcher.js"></script>
     <!-- Load navigation component -->
     <script src="/_agent/components/navigation.js"></script>
     <!-- Load global header component -->
