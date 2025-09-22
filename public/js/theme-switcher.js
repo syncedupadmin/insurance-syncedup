@@ -47,11 +47,12 @@
         getThemeKey: function() {
             // Return portal-specific localStorage key
             const path = (window.location.pathname || '/').replace(/^\/_/, '/');
-            if (path.includes('/manager/')) return 'managerTheme';
-            else if (path.includes('/agent/')) return 'agentTheme';
-            else if (path.includes('/customer-service/')) return 'serviceTheme';
-            else if (path.includes('/admin/')) return 'adminTheme';
-            else if (path.includes('/super-admin/')) return 'superAdminTheme';
+            // Fixed: Check for /agent OR /agent/ to catch dashboard
+            if (path.includes('/manager')) return 'managerTheme';
+            else if (path.includes('/agent')) return 'agentTheme';  // Removed trailing slash requirement
+            else if (path.includes('/customer-service')) return 'serviceTheme';
+            else if (path.includes('/admin')) return 'adminTheme';
+            else if (path.includes('/super-admin')) return 'superAdminTheme';
             else if (path.includes('/leaderboard')) return 'leaderboardTheme';
             return 'selectedTheme'; // fallback for other pages
         },
