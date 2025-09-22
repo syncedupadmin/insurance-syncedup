@@ -45,7 +45,24 @@
     }
   }
 
+  // getCurrentUser function for compatibility
+  async function getCurrentUser() {
+    const ac = new AbortController();
+    try {
+      const r = await verifyOnce(ac);
+      if (r.ok && r.data?.user) {
+        console.log('[AUTH-CHECK] getCurrentUser returning:', r.data.user);
+        return r.data.user;
+      }
+      return null;
+    } catch (err) {
+      console.error('[AUTH-CHECK] getCurrentUser error:', err);
+      return null;
+    }
+  }
+
   window.SyncedUpAuth = window.SyncedUpAuth || {};
   window.SyncedUpAuth.requireAuth = requireAuth;
+  window.SyncedUpAuth.getCurrentUser = getCurrentUser;
   document.addEventListener('DOMContentLoaded', () => { requireAuth(); });
 })();

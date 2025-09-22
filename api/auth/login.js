@@ -47,22 +47,29 @@ module.exports = async function handler(req, res) {
 
     // Use portal_users role if found, otherwise fallback to Supabase metadata
     const actualRole = portalUser?.role || user.role || 'agent';
+    const redirectPath = getRolePortalPath(actualRole);
 
     res.setHeader('Set-Cookie', [
       `auth_token=${token}; HttpOnly; Path=/; Max-Age=28800; Secure; SameSite=Lax`
     ])
 
-    // DEV: Log cookie headers for audit
+    // CRITICAL DEBUG LOG
     if (process.env.NODE_ENV !== 'production') {
-      console.log('[AUTH] Set-Cookie:', 'Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=28800');
-      console.log('[AUTH] User role from portal_users:', actualRole);
+      console.log('[LOGIN] Role resolution:', {
+        email: email,
+        portalUserRole: portalUser?.role,
+        supabaseRole: user.role,
+        actualRole: actualRole,
+        redirectPath: redirectPath,
+        portalUser: portalUser
+      });
     }
 
     // Return format that matches client expectations
     res.status(200).json({
       ok: true,
       success: true,
-      redirect: getRolePortalPath(actualRole),
+      redirect: redirectPath,
       user: { ...user, role: actualRole },
       token // Also return token so client can store it
     })

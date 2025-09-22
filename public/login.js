@@ -54,6 +54,15 @@ document.addEventListener('DOMContentLoaded', () => {
       if (res.ok) {
         const data = await res.json().catch(() => ({}));
         if (data.success && data.redirect) {
+          // CRITICAL DEBUG LOG
+          console.log('[LOGIN CLIENT] Server response:', {
+            success: data.success,
+            redirect: data.redirect,
+            user_role: data.user?.role,
+            user_roles: data.user?.roles,
+            full_data: data
+          });
+
           // Server handles all authentication via cookies
           window.location.assign(data.redirect);           // ← do the page navigation
           return;

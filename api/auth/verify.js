@@ -65,6 +65,17 @@ module.exports = async (req, res) => {
       user.roles = ['super-admin'];
     }
 
+    // CRITICAL DEBUG LOG
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[VERIFY] Returning user payload:', {
+        email: user.email,
+        role: user.role,
+        roles: user.roles,
+        source: dbUser ? 'portal_users' : 'supabase_metadata',
+        raw_dbUser: dbUser
+      });
+    }
+
     return res.status(200).json({
       ok: true,
       user
