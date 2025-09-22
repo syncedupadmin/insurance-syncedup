@@ -8,7 +8,7 @@
     
     
     <!-- Auth Guard Script - Must be loaded in HEAD before content renders -->
-    <script src="/auth-check.js" defer></script>
+    <script src="/js/auth-check.js" defer></script>
     
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
@@ -158,7 +158,7 @@
         
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication
-            const userData = localStorage.getItem('syncedup_user');
+            const userData = await window.SyncedUpAuth?.getCurrentUser();
             if (userData) {
                 currentUser = JSON.parse(userData);
                 
@@ -401,6 +401,6 @@
     
     <!-- Classic Mode Toggle System -->
     <script src="/js/classic-mode.js"></script>
-    <script src="/assets/session-prod.js"></script>
+    
 </body>
 </html>

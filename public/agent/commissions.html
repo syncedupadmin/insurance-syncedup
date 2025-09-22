@@ -284,6 +284,7 @@
             }
         }
     </style>
+    <script src="/js/auth-check.js" defer></script>
 </head>
 <body>
     <!-- Header -->
@@ -468,9 +469,9 @@
         let commissionChart = null;
 
         // Authentication check
-        function checkAuth() {
+        async function checkAuth() {
             const token = localStorage.getItem('syncedup_token');
-            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+            const user = await window.SyncedUpAuth?.getCurrentUser() || {};
             
             if (!token || !user.email) {
                 window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
@@ -890,6 +891,6 @@
 
     <!-- Classic Mode Toggle System -->
     <script src="/js/classic-mode.js"></script>
-    <script src="/assets/session-prod.js"></script>
+    
 </body>
 </html>

@@ -1,5 +1,3 @@
-const cookie = require('cookie');
-
 module.exports = async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
@@ -16,31 +14,34 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    // Clear all authentication cookies with proper names
-    const cookiesToClear = ['auth_token', 'user_role', 'user_roles', 'assumed_role'];
-    const clearCookies = cookiesToClear.map(name => 
-      cookie.serialize(name, '', {
-        httpOnly: name === 'auth_token', // Only auth_token is httpOnly
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 0,
-        path: '/',
-        domain: process.env.NODE_ENV === 'production' ? '.syncedupsolutions.com' : undefined
-      })
-    );
-    
-    res.setHeader('Set-Cookie', clearCookies);
+    // Robust HTTPS check - same as login
+    const xfwd = String(req.headers['x-forwarded-proto'] || '');
+    const isHTTPS = xfwd.split(',')[0].trim() === 'https' || req.secure === true;
 
-    return res.status(200).json({ 
-      success: true, 
-      message: 'Logged out successfully' 
+    // Clear auth_token with EXACT same attributes as when setting
+    const clearCookie = [
+      'auth_token=',
+      'Path=/',
+      'HttpOnly',
+      'SameSite=Lax',
+      'Max-Age=0'
+    ];
+    if (isHTTPS) clearCookie.push('Secure');
+
+    res.setHeader('Set-Cookie', clearCookie.join('; '));
+
+    return res.status(200).json({
+      ok: true,
+      success: true,
+      message: 'Logged out successfully'
     });
 
   } catch (error) {
-    console.error('Logout error:', error);
-    return res.status(500).json({ 
-      success: false, 
-      error: 'Internal server error during logout' 
+    console.error('[LOGOUT] Error:', error);
+    return res.status(500).json({
+      ok: false,
+      success: false,
+      error: 'Internal server error during logout'
     });
   }
 }

@@ -7,12 +7,19 @@ function getCookie(req, name) {
 }
 
 module.exports = async (req, res) => {
-  // Set no-cache header
-  res.setHeader('Cache-Control', 'no-store');
+  // Set headers to prevent any caching
+  res.setHeader('Cache-Control', 'private, no-store');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Vary', 'Cookie');
   res.setHeader('Content-Type', 'application/json');
 
   try {
     const token = getCookie(req, "auth_token");
+
+    // Debug logging (remove before prod)
+    console.log('[VERIFY] Has cookie:', !!req.headers.cookie);
+    console.log('[VERIFY] Auth token found:', !!token);
+
     if (!token) {
       return res.status(401).json({ ok: false, error: 'Unauthorized' });
     }
@@ -22,7 +29,7 @@ module.exports = async (req, res) => {
       return res.status(401).json({ ok: false, error: 'Unauthorized' });
     }
 
-    // Get user from portal_users
+    // Get user from portal_users (ONLY source of truth)
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -34,54 +41,40 @@ module.exports = async (req, res) => {
       .eq('auth_user_id', payload.sub || payload.id)
       .single();
 
-    // CRITICAL: Apply same normalization as login
+    if (!dbUser || dbUser.is_active === false) {
+      console.log('[VERIFY] No active portal user for auth_user_id:', payload.sub || payload.id);
+      return res.status(401).json({ ok: false, error: 'Unauthorized' });
+    }
+
+    // Normalize roles exactly as login does
     const ALLOWED = new Set(['super-admin','admin','manager','customer-service','agent']);
     const norm = v => String(v||'').trim().toLowerCase().replace(/_/g,'-').replace(/\s+/g,'-');
 
-    let user;
-    if (!dbUser) {
-      // NO FALLBACK - portal_users is the ONLY source of truth
-      console.error('[VERIFY] No portal_users record for auth_user_id:', payload.sub || payload.id);
-      return res.status(403).json({ ok: false, error: 'No portal user' });
-    } else if (dbUser.is_active === false) {
-      return res.status(401).json({ ok: false, error: 'Unauthorized' });
-    } else {
-      // Use portal_users with normalization
-      const roles = (Array.isArray(dbUser.roles) && dbUser.roles.length ? dbUser.roles : [dbUser.role])
-        .map(norm)
-        .filter(r => ALLOWED.has(r));
+    const roles = (Array.isArray(dbUser.roles) && dbUser.roles.length ? dbUser.roles : [dbUser.role])
+      .map(norm)
+      .filter(r => ALLOWED.has(r));
 
-      if (roles.length === 0) {
-        roles.push('agent'); // Default if no valid roles
-      }
-
-      const primary = roles[0];
-
-      user = {
-        id: dbUser.id,
-        email: dbUser.email,
-        name: dbUser.full_name || dbUser.email?.split('@')[0] || 'User',
-        role: primary,
-        roles: roles,
-        agency_id: dbUser.agency_id
-      };
+    if (roles.length === 0) {
+      roles.push('agent');
     }
 
-    // Enhanced logging as required
-    console.log('[VERIFY] FINAL user payload to return:', {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-      roles: user.roles,
-      agency_id: user.agency_id
-    });
+    const user = {
+      id: dbUser.id,
+      email: dbUser.email,
+      name: dbUser.full_name || dbUser.email?.split('@')[0] || 'User',
+      role: roles[0],
+      roles: roles,
+      agency_id: dbUser.agency_id
+    };
 
-    return res.status(200).json({
-      ok: true,
-      user
-    });
+    // Debug logging (remove before prod)
+    console.log('[VERIFY] User role from portal_users:', user.role, 'roles:', user.roles);
+
+    // ONLY 200 or 401, nothing else
+    return res.status(200).json({ ok: true, user });
+
   } catch (err) {
-    console.error('[AUTH] Verify error:', err);
+    console.error('[VERIFY] Error:', err.message);
     return res.status(401).json({ ok: false, error: 'Unauthorized' });
   }
 };

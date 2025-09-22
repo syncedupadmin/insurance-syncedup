@@ -6,6 +6,7 @@
     <title>Reports - Manager Portal</title>
     <link rel="stylesheet" href="/manager/manager-global.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/js/auth-check.js" defer></script>
 </head>
 <body>
     <!-- Header -->
@@ -331,7 +332,7 @@
         
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication
-            const userData = localStorage.getItem('syncedup_user');
+            const userData = await window.SyncedUpAuth?.getCurrentUser();
             if (userData) {
                 currentUser = JSON.parse(userData);
                 
@@ -670,6 +671,6 @@
     
     <!-- Classic Mode Toggle System -->
     <script src="/js/classic-mode.js"></script>
-    <script src="/assets/session-prod.js"></script>
+    
 </body>
 </html>

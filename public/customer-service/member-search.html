@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Member Search - SyncedUp Insurance</title>
     <link rel="stylesheet" href="customer-service-global.css">
-    <script src="/auth-check.js" defer></script>
+    <script src="/js/auth-check.js" defer></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
@@ -164,9 +164,9 @@
         let searchHistory = JSON.parse(localStorage.getItem('memberSearchHistory') || '[]');
 
         // Authentication check
-        function checkAuth() {
+        async function checkAuth() {
             const token = localStorage.getItem('syncedup_token');
-            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+            const user = await window.SyncedUpAuth?.getCurrentUser() || {};
             
             if (!token || !user.email) {
                 window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
@@ -449,6 +449,6 @@
 
     <!-- Classic Mode Toggle System -->
     <script src="/js/classic-mode.js"></script>
-    <script src="/assets/session-prod.js"></script>
+    
 </body>
 </html>

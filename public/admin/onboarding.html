@@ -19,6 +19,7 @@
         .spinner { border: 2px solid #f3f4f6; border-top: 2px solid #667eea; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
+    <script src="/js/auth-check.js" defer></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- Navigation Header -->
@@ -355,7 +356,7 @@
 
         // Authentication check
         const token = localStorage.getItem('authToken');
-        const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+        const user = await window.SyncedUpAuth?.getCurrentUser() || {};
         
         if (!token || !['admin', 'super-admin'].includes(user.role)) {
             window.location.href = '/login.html';
@@ -705,6 +706,6 @@
             }, 2000);
         }
     </script>
-    <script src="/assets/session-prod.js"></script>
+    
 </body>
 </html>

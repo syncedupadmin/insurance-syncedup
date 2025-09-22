@@ -1,5 +1,9 @@
 // public/js/auth-check.js
 (function () {
+  // Debounce guard to prevent duplicate runs
+  if (window.__authGuardRan) return;
+  window.__authGuardRan = true;
+
   const VERIFY_URL = '/api/auth/verify';
   const LOGIN_URL  = '/login?next=' + encodeURIComponent(location.pathname + location.search);
   let unloading = false;
@@ -9,13 +13,14 @@
     const res = await fetch(VERIFY_URL, {
       method: 'GET',
       credentials: 'include',
+      cache: 'no-store',
       headers: { 'Accept': 'application/json' },
       signal: controller?.signal
     });
     if (res.status === 401) return { ok: false, status: 401 };
     if (!res.ok) return { ok: false, status: res.status, transient: true };
     const data = await res.json().catch(() => null);
-    return { ok: !!(data && (data.ok || data.authenticated)), status: 200, data };
+    return { ok: !!(data && data.ok), status: 200, data };
   }
 
   async function requireAuth(opts = {}) {
@@ -37,7 +42,11 @@
         }
         return true;
       }
-      if (r.status === 401) { location.href = LOGIN_URL; return false; }
+      // ONLY redirect on 401 from verify
+      if (r.status === 401) {
+        location.href = LOGIN_URL;
+        return false;
+      }
       return true;
     } catch (err) {
       if (unloading || (err && err.name === 'AbortError')) return true;
@@ -51,7 +60,6 @@
     try {
       const r = await verifyOnce(ac);
       if (r.ok && r.data?.user) {
-        console.log('[AUTH-CHECK] getCurrentUser returning:', r.data.user);
         return r.data.user;
       }
       return null;
@@ -64,5 +72,10 @@
   window.SyncedUpAuth = window.SyncedUpAuth || {};
   window.SyncedUpAuth.requireAuth = requireAuth;
   window.SyncedUpAuth.getCurrentUser = getCurrentUser;
-  document.addEventListener('DOMContentLoaded', () => { requireAuth(); });
+
+  // Script uses defer, so DOM is ready when this runs
+  // Only run requireAuth if not on login page
+  if (!window.location.pathname.includes('/login')) {
+    requireAuth();
+  }
 })();

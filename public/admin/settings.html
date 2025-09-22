@@ -6,6 +6,7 @@
     <title>Settings - SyncedUp Insurance Admin</title>
     <link rel="stylesheet" href="admin-global.css">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="/js/auth-check.js" defer></script>
 </head>
 <body>
     <!-- Floating Particles -->
@@ -461,9 +462,9 @@ Business City, ST 12345</textarea>
         let editingApiKeyId = null;
 
         // Authentication check
-        function checkAuth() {
+        async function checkAuth() {
             const token = localStorage.getItem('syncedup_token');
-            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
+            const user = await window.SyncedUpAuth?.getCurrentUser() || {};
             
             if (!token || !user.email) {
                 window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
@@ -483,8 +484,8 @@ Business City, ST 12345</textarea>
 
         // Logout function
         function logout() {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('user');
+            // Clear cookies instead of localStorage
+            await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
             window.location.href = 'https://insurance.syncedupsolutions.com/login.html';
         }
 
@@ -662,7 +663,7 @@ Business City, ST 12345</textarea>
         }
 
         // Setup form handlers
-        function setupFormHandlers() {
+        async function setupFormHandlers() {
             // System config form
             document.getElementById('systemConfigForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -1060,6 +1061,6 @@ Business City, ST 12345</textarea>
 
     <!-- Classic Mode Toggle System -->
     <script src="/js/classic-mode.js"></script>
-    <script src="/assets/session-prod.js"></script>
+    
 </body>
 </html>

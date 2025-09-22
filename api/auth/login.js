@@ -10,6 +10,10 @@ module.exports = async function handler(req, res) {
   const { email, password } = req.body || {}
   if (!email || !password) return res.status(400).json({ success:false, error:'Missing credentials' })
 
+  // Robust HTTPS check
+  const xfwd = String(req.headers['x-forwarded-proto'] || '');
+  const isHTTPS = xfwd.split(',')[0].trim() === 'https' || req.secure === true;
+
   const requestedEmail = String(email || '').trim().toLowerCase();
 
   // Step A: Check current session from cookie
@@ -26,7 +30,15 @@ module.exports = async function handler(req, res) {
   // If there's a session but for a DIFFERENT email, nuke it immediately
   if (currentUser?.email && currentUser.email.toLowerCase() !== requestedEmail) {
     console.log('[LOGIN] Session mismatch - clearing cookie for', currentUser.email, 'to login as', requestedEmail);
-    res.setHeader('Set-Cookie', 'auth_token=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0');
+    const clearCookie = [
+      'auth_token=',
+      'Path=/',
+      'HttpOnly',
+      'SameSite=Lax',
+      'Max-Age=0'
+    ];
+    if (isHTTPS) clearCookie.push('Secure');
+    res.setHeader('Set-Cookie', clearCookie.join('; '));
     currentUser = null; // Clear to force new login
   }
 
@@ -36,9 +48,15 @@ module.exports = async function handler(req, res) {
     const { token, user: supaUser } = await login(email, password)
 
     // Step C: Set NEW cookie from this sign-in
-    res.setHeader('Set-Cookie', [
-      `auth_token=${token}; HttpOnly; Path=/; Max-Age=28800; Secure; SameSite=Lax`
-    ])
+    const setCookie = [
+      `auth_token=${token}`,
+      'Path=/',
+      'HttpOnly',
+      'SameSite=Lax',
+      'Max-Age=28800'
+    ];
+    if (isHTTPS) setCookie.push('Secure');
+    res.setHeader('Set-Cookie', setCookie.join('; '))
 
     // Step D: Source role ONLY from portal_users (NEVER from Supabase metadata)
     const { createClient } = require('@supabase/supabase-js');
@@ -87,7 +105,8 @@ module.exports = async function handler(req, res) {
       portalEmail: pu.email,
       portalRoles,
       primary,
-      redirectPath
+      redirectPath,
+      secure: isHTTPS
     });
 
     // Return format that matches client expectations

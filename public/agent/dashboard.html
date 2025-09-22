@@ -402,6 +402,7 @@
             }
         }
     </style>
+    <script src="/js/auth-check.js" defer></script>
 </head>
 <body>
     <div class="container">
@@ -612,7 +613,7 @@
         // Check for logged in user on page load
         document.addEventListener('DOMContentLoaded', function() {
             // Get agent data from localStorage (set during login)
-            const userData = localStorage.getItem('syncedup_user');
+            const userData = await window.SyncedUpAuth?.getCurrentUser();
             if (userData) {
                 currentAgent = JSON.parse(userData);
                 console.log('Logged in as:', currentAgent.name, '- ID:', currentAgent.id);
@@ -858,6 +859,6 @@
             }
         }
     </script>
-    <script src="/assets/session-prod.js"></script>
+    
 </body>
 </html>

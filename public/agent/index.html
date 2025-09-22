@@ -8,7 +8,7 @@
     
     
     <!-- Auth Guard Script - Must be loaded in HEAD before content renders -->
-    <script src="/auth-check.js" defer></script>
+    <script src="/js/auth-check.js" defer></script>
     
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
@@ -167,24 +167,19 @@
     <script>
         let currentUser = null;
 
-        // Authentication check
-        function checkAuth() {
-            const token = localStorage.getItem('syncedup_token');
-            const user = JSON.parse(localStorage.getItem('syncedup_user') || '{}');
-            
-            if (!token || !user.email) {
-                window.location.href = '/login.html';
-                return false;
-            }
+        // Authentication handled by auth-check.js
+        async function checkAuth() {
+            const user = await window.SyncedUpAuth?.getCurrentUser();
+            if (!user) return false;
 
             // Check if user has agent permissions
-            if (!['agent', 'manager', 'admin', 'super-admin'].includes(user.role)) {
-                alert('Access denied. Agent permissions required.');
-                window.location.href = '/login.html';
+            const roles = user.roles || [user.role];
+            if (!roles.some(r => ['agent', 'manager', 'admin', 'super-admin'].includes(r))) {
+                window.location.href = '/login?unauthorized=1';
                 return false;
             }
 
-            document.getElementById('userDisplay').textContent = `${user.firstName} ${user.lastName} (${user.role})`;
+            document.getElementById('userDisplay').textContent = `${user.name || user.email} (${user.role})`;
             currentUser = user;
             return true;
         }
@@ -341,6 +336,5 @@
 
     <!-- Classic Mode Toggle System -->
     <script src="/js/classic-mode.js"></script>
-    <script src="/assets/session-prod.js"></script>
 </body>
 </html>
