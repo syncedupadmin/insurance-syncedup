@@ -84,17 +84,44 @@
     <script src="/js/auth-check.js?v=3" defer></script>
 </head>
 <body class="portal-agent">
+    <!-- Emergency Theme Switcher - Shows immediately while header loads -->
+    <div id="emergency-theme-switcher" style="position: fixed; top: 10px; right: 250px; z-index: 10000; display: flex; gap: 8px;">
+        <button onclick="localStorage.setItem('agentTheme', 'professional'); location.reload();"
+                style="padding: 8px 16px; background: #059669; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Pro</button>
+        <button onclick="localStorage.setItem('agentTheme', 'classic'); location.reload();"
+                style="padding: 8px 16px; background: #047857; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Classic</button>
+        <button onclick="localStorage.setItem('agentTheme', 'modern'); location.reload();"
+                style="padding: 8px 16px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Modern</button>
+    </div>
+
     <!-- Global Header Mount Point -->
     <div id="global-header-mount"></div>
     
     <!-- Initialize Global Header -->
     <script>
+        // Mark that we're initializing to prevent auth-check from running too early
+        window._headerInitializing = true;
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize header FIRST
             AgentHeader.init({
                 pageTitle: 'Agent Dashboard',
                 showRoleSwitcher: true,
                 showUserDisplay: true
             });
+
+            // Hide emergency switcher after header loads (with delay to ensure it's rendered)
+            setTimeout(function() {
+                const emergencySwitcher = document.getElementById('emergency-theme-switcher');
+                const realSwitcher = document.querySelector('.theme-btn');
+                if (emergencySwitcher && realSwitcher) {
+                    emergencySwitcher.style.display = 'none';
+                }
+
+                // Mark header as ready
+                window._headerReady = true;
+                window._headerInitializing = false;
+            }, 1000);
         });
     </script>
 

@@ -76,6 +76,37 @@
   // Script uses defer, so DOM is ready when this runs
   // Only run requireAuth if not on login page
   if (!window.location.pathname.includes('/login')) {
-    requireAuth();
+    // Check if we just came from login (don't re-check auth immediately)
+    const cameFromLogin = document.referrer && document.referrer.includes('/login');
+    const isAgentDashboard = window.location.pathname === '/agent' || window.location.pathname === '/agent/';
+
+    if (cameFromLogin && isAgentDashboard) {
+      console.log('[AUTH-CHECK] Skipping - just logged in to agent dashboard');
+      return; // Skip auth check on fresh login
+    }
+
+    // Check if header is still initializing
+    if (window._headerInitializing) {
+      console.log('[AUTH-CHECK] Waiting for header to initialize...');
+      // Wait for header to be ready before checking auth
+      const waitForHeader = setInterval(() => {
+        if (!window._headerInitializing || window._headerReady) {
+          clearInterval(waitForHeader);
+          console.log('[AUTH-CHECK] Header ready, checking auth now');
+          requireAuth();
+        }
+      }, 100);
+
+      // Timeout after 3 seconds
+      setTimeout(() => {
+        clearInterval(waitForHeader);
+        requireAuth();
+      }, 3000);
+    } else {
+      // Normal auth check with small delay to prevent race conditions
+      setTimeout(() => {
+        requireAuth();
+      }, 100);
+    }
   }
 })();

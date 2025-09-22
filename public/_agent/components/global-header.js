@@ -46,13 +46,17 @@
             
             // Initialize components
             this.initializeComponents(userData);
-            
+
             // Re-initialize Lucide icons multiple times to ensure they render
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons(); // Immediate
                 setTimeout(() => lucide.createIcons(), 100);
                 setTimeout(() => lucide.createIcons(), 500);
             }
+
+            // Mark header as fully rendered
+            window._headerRendered = true;
+            console.log('[AgentHeader] Header fully rendered and ready');
         },
 
         // Get current user data
