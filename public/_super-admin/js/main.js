@@ -32,14 +32,37 @@ document.addEventListener('DOMContentLoaded', () => {
     addRefreshControls();
 });
 
-// Check authentication
+// Check authentication - role-gated
 async function checkAuth() {
     try {
+        // First verify the user via the standard auth endpoint
+        const verifyRes = await fetch('/api/auth/verify', {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        if (!verifyRes.ok) {
+            console.log('[SUPER-ADMIN] User not authenticated');
+            return;
+        }
+
+        const { user } = await verifyRes.json();
+
+        // Check if user has super-admin role
+        const roles = Array.isArray(user.roles) ? user.roles : [user.role];
+        const hasRole = roles.map(r => String(r || '').toLowerCase()).includes('super-admin');
+
+        if (!hasRole) {
+            console.log('[SUPER-ADMIN] User lacks super-admin role');
+            return;
+        }
+
+        // Only call super-admin endpoint if user has the role
         const response = await fetch('/api/super-admin/test-users');
         const data = await response.json();
         if (data.success && data.data) {
             currentUser = data.data.find(u => u.role === 'super_admin');
-            document.getElementById('session-user').textContent = `Admin: ${currentUser?.email || 'admin@syncedupsolutions.com'}`;
+            document.getElementById('session-user').textContent = `Admin: ${currentUser?.email || user.email}`;
         }
     } catch (error) {
         console.error('Auth check failed:', error);
