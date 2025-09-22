@@ -35,14 +35,14 @@
       });
     }
 
-    // Explicit precedence order with EXACT matching
-    if (has('super-admin'))      return '/_super-admin';
-    if (has('admin'))            return '/_admin';
-    if (has('manager'))          return '/_manager';
-    if (has('customer-service')) return '/_customer-service';
+    // Explicit precedence order with EXACT matching (no underscore prefix)
+    if (has('super-admin'))      return '/super-admin';
+    if (has('admin'))            return '/admin';
+    if (has('manager'))          return '/manager';
+    if (has('customer-service')) return '/customer-service';
 
     // Default to agent portal
-    return '/_agent';
+    return '/agent';
   }
 
   // Export for use
