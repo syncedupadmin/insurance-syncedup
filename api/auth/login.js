@@ -7,95 +7,96 @@ module.exports = async function handler(req, res) {
   loginRateLimiter(req, res, async () => {
   if (req.method !== 'POST') return res.status(405).end()
 
-  // If already authenticated with valid cookie, return success without re-login
-  try {
-    const authToken = req.cookies?.auth_token;
-    if (authToken) {
-      const existing = await verifyToken(authToken);
-      if (existing) {
-        return res.status(200).json({
-          ok: true,
-          success: true,
-          redirect: getRolePortalPath(existing.role),
-          user: existing,
-          alreadyAuthenticated: true
-        });
-      }
-    }
-  } catch {
-    // Ignore and continue to normal login
-  }
-
   const { email, password } = req.body || {}
   if (!email || !password) return res.status(400).json({ success:false, error:'Missing credentials' })
+
+  const requestedEmail = String(email || '').trim().toLowerCase();
+
+  // Step A: Check current session from cookie
+  const authToken = req.cookies?.auth_token;
+  let currentUser = null;
+  if (authToken) {
+    try {
+      currentUser = await verifyToken(authToken);
+    } catch {
+      // Invalid token, will be replaced
+    }
+  }
+
+  // If there's a session but for a DIFFERENT email, nuke it immediately
+  if (currentUser?.email && currentUser.email.toLowerCase() !== requestedEmail) {
+    console.log('[LOGIN] Session mismatch - clearing cookie for', currentUser.email, 'to login as', requestedEmail);
+    res.setHeader('Set-Cookie', 'auth_token=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0');
+    currentUser = null; // Clear to force new login
+  }
+
+  // REMOVED dangerous "already authenticated" shortcut - ALWAYS do real sign-in
   try {
+    // Step B: ALWAYS attempt real sign-in with provided credentials
     const { token, user: supaUser } = await login(email, password)
 
-    // Get the actual role from portal_users table
+    // Step C: Set NEW cookie from this sign-in
+    res.setHeader('Set-Cookie', [
+      `auth_token=${token}; HttpOnly; Path=/; Max-Age=28800; Secure; SameSite=Lax`
+    ])
+
+    // Step D: Source role ONLY from portal_users (NEVER from Supabase metadata)
     const { createClient } = require('@supabase/supabase-js');
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     );
 
-    // Look up by auth_user_id (the Supabase auth ID)
-    const { data: pu, error: puErr } = await supabase
+    const { data: pu } = await supabase
       .from('portal_users')
       .select('id, email, role, roles, agency_id')
       .eq('auth_user_id', supaUser.id || supaUser.sub)
       .single();
 
-    // CRITICAL: Normalize roles properly
+    if (!pu) {
+      console.error('[LOGIN] No portal_users record for auth_user_id:', supaUser.id);
+      return res.status(403).json({ ok: false, error: 'No portal user record found' });
+    }
+
+    // Normalize role strictly
     const ALLOWED = new Set(['super-admin','admin','manager','customer-service','agent']);
     const norm = v => String(v||'').trim().toLowerCase().replace(/_/g,'-').replace(/\s+/g,'-');
 
-    // Get portal roles - normalize and validate
-    const portalRoles = (Array.isArray(pu?.roles) && pu.roles.length ? pu.roles : [pu?.role])
+    const roles = (Array.isArray(pu.roles) && pu.roles.length ? pu.roles : [pu.role])
       .map(norm)
       .filter(r => ALLOWED.has(r));
-    const portalRole = portalRoles[0] || '';
 
-    // Get Supabase role - normalize
-    const supaRoleRaw = supaUser?.app_metadata?.role ?? supaUser?.user_metadata?.role ?? '';
-    const supaRole = norm(supaRoleRaw);
+    if (roles.length === 0) {
+      roles.push('agent'); // Fallback if no valid roles
+    }
 
-    // CRITICAL LOG: Both sources with normalization
-    console.log('[LOGIN] Role sources after normalization:', {
-      email: pu?.email || supaUser?.email,
-      portalRole,
-      portalRoles,
-      supaRole,
-      supaRoleRaw,
-      foundPortalUser: !!pu,
-      authUserId: supaUser.id || supaUser.sub
+    const has = r => roles.includes(r);
+
+    // Explicit precedence with exact matching
+    const redirectPath = has('super-admin') ? '/super-admin'
+                      : has('admin')        ? '/admin'
+                      : has('manager')      ? '/manager'
+                      : has('customer-service') ? '/customer-service'
+                      : '/agent';
+
+    console.log('[LOGIN] Portal user login:', {
+      email: pu.email,
+      portalRoles: roles,
+      primaryRole: roles[0],
+      redirectPath: redirectPath
     });
-
-    // Decision: portal_users wins if found, else Supabase, else default
-    const finalRole = portalRole || (ALLOWED.has(supaRole) ? supaRole : 'agent');
-
-    console.log('[LOGIN] Final role decision:', {
-      finalRole,
-      source: portalRole ? 'portal_users' : (ALLOWED.has(supaRole) ? 'supabase' : 'default')
-    });
-
-    const redirectPath = getRolePortalPath(finalRole);
-
-    console.log('[LOGIN] Redirect path:', redirectPath);
-
-    res.setHeader('Set-Cookie', [
-      `auth_token=${token}; HttpOnly; Path=/; Max-Age=28800; Secure; SameSite=Lax`
-    ])
 
     // Return format that matches client expectations
-    res.status(200).json({
+    return res.status(200).json({
       ok: true,
       success: true,
       redirect: redirectPath,
       user: {
-        ...supaUser,
-        role: finalRole,
-        roles: portalRoles.length > 0 ? portalRoles : [finalRole],
-        agency_id: pu?.agency_id || supaUser?.agency_id
+        id: pu.id, // Use portal_users.id as primary ID
+        email: pu.email,
+        role: roles[0],
+        roles: roles,
+        agency_id: pu.agency_id
       },
       token // Also return token so client can store it
     })
