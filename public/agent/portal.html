@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agent Portal - SyncedUp Insurance</title>
+
+    <!-- Preconnect to external domains for faster loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Critical CSS - Load immediately to prevent flash -->
+    <link rel="stylesheet" href="/agent/agent-global.css">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
     <style>
@@ -167,6 +178,9 @@
             border: 1px solid rgba(239, 68, 68, 0.2);
         }
     </style>
+    <!-- Portal API Shim - Must load before dashboard scripts -->
+    <script src="/js/portal-api.js"></script>
+
     <script src="/js/auth-check.js" defer></script>
 </head>
 <body>

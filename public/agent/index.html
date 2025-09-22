@@ -4,13 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agent Dashboard - SyncedUp Insurance</title>
+
+    <!-- Preconnect to external domains for faster loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Critical CSS - Load immediately to prevent flash -->
     <link rel="stylesheet" href="/agent/agent-global.css">
-    
-    
+
+    <!-- Portal API Shim - Must load before dashboard scripts -->
+    <script src="/js/portal-api.js"></script>
+
     <!-- Auth Guard Script - Must be loaded in HEAD before content renders -->
     <script src="/js/auth-check.js" defer></script>
-    
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- Icons Library -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
 </head>
 <body>
     <!-- Header -->
