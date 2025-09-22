@@ -320,7 +320,8 @@ tr:hover {
     margin-bottom: 1.5rem;
 }
 
-.form-group label {
+.form-group label,
+.form-label {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
@@ -329,7 +330,9 @@ tr:hover {
 
 .form-group input,
 .form-group select,
-.form-group textarea {
+.form-group textarea,
+.form-input,
+.form-select {
     width: 100%;
     padding: 0.75rem;
     background: rgba(255, 255, 255, 0.1);
@@ -343,7 +346,9 @@ tr:hover {
 
 .form-group input:focus,
 .form-group select:focus,
-.form-group textarea:focus {
+.form-group textarea:focus,
+.form-input:focus,
+.form-select:focus {
     outline: none;
     border-color: rgba(255, 255, 255, 0.6);
     background: rgba(255, 255, 255, 0.15);
@@ -351,8 +356,64 @@ tr:hover {
 }
 
 .form-group input::placeholder,
-.form-group textarea::placeholder {
+.form-group textarea::placeholder,
+.form-input::placeholder {
     color: rgba(255, 255, 255, 0.6);
+}
+
+/* Form Grid Layout */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+/* Sales Specific Styles */
+.success-message {
+    background: rgba(212, 237, 218, 0.9);
+    color: #155724;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    display: none;
+    backdrop-filter: blur(10px);
+}
+
+.error-message {
+    background: rgba(248, 215, 218, 0.9);
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    display: none;
+    backdrop-filter: blur(10px);
+}
+
+.calculation-display {
+    background: rgba(231, 243, 255, 0.9);
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+    backdrop-filter: blur(10px);
+}
+
+.calculation-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.calculation-total {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #10b981;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    padding-top: 0.5rem;
 }
 
 /* Enhanced Select Dropdown Styling */
