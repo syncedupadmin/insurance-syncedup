@@ -871,8 +871,8 @@
         }
 
         function logout() {
-            localStorage.clear();
-            window.location.href = '/login.html';
+            fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+                .then(() => window.location.href = '/login');
         }
 
         // Initialize on page load
