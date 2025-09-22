@@ -30,6 +30,24 @@ module.exports = async function handler(req, res) {
   if (!email || !password) return res.status(400).json({ success:false, error:'Missing credentials' })
   try {
     const { token, user } = await login(email, password)
+
+    // Get the actual role from portal_users table
+    const { createClient } = require('@supabase/supabase-js');
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    );
+
+    // Look up the user in portal_users table to get correct role
+    const { data: portalUser } = await supabase
+      .from('portal_users')
+      .select('id, role, agency_id')
+      .eq('email', email.toLowerCase())
+      .single();
+
+    // Use portal_users role if found, otherwise fallback to Supabase metadata
+    const actualRole = portalUser?.role || user.role || 'agent';
+
     res.setHeader('Set-Cookie', [
       `auth_token=${token}; HttpOnly; Path=/; Max-Age=28800; Secure; SameSite=Lax`
     ])
@@ -37,14 +55,15 @@ module.exports = async function handler(req, res) {
     // DEV: Log cookie headers for audit
     if (process.env.NODE_ENV !== 'production') {
       console.log('[AUTH] Set-Cookie:', 'Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=28800');
+      console.log('[AUTH] User role from portal_users:', actualRole);
     }
 
     // Return format that matches client expectations
     res.status(200).json({
       ok: true,
       success: true,
-      redirect: getRolePortalPath(user.role),
-      user,
+      redirect: getRolePortalPath(actualRole),
+      user: { ...user, role: actualRole },
       token // Also return token so client can store it
     })
   } catch (e) {
