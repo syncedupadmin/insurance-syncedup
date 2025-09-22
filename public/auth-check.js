@@ -6,7 +6,7 @@ async function checkAuth() {
   if (window.location.pathname.includes('/login')) return;
 
   try {
-    const response = await fetch('/api/auth/me', {
+    const response = await fetch('/api/auth/verify', {
       method: 'GET',
       credentials: 'include',
       headers: {
@@ -15,8 +15,8 @@ async function checkAuth() {
     });
     
     const data = await response.json();
-    
-    if (!data.authenticated || !data.user) {
+
+    if (!data.ok || !data.user) {
       window.authCompleted = true;
       window.location.replace('/login.html');
       return;

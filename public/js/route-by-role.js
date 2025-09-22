@@ -9,12 +9,10 @@
    * @returns {string} Portal path
    */
   function landingPathFor(user) {
-    if (!user) return '/_agent';
-
     // Get roles as normalized array
-    const list = (user?.roles && Array.isArray(user.roles) ? user.roles : [user?.role])
+    const list = (Array.isArray(user?.roles) ? user.roles : [user?.role])
                  .filter(Boolean)
-                 .map(x => String(x).toLowerCase().trim());
+                 .map(x => String(x || '').toLowerCase().trim());
 
     // Exact match helper
     const has = r => list.includes(r);
@@ -54,3 +52,16 @@
     module.exports = { landingPathFor };
   }
 })();
+
+// ES6 export
+export function landingPathFor(user) {
+  const list = (Array.isArray(user?.roles) ? user.roles : [user?.role])
+    .filter(Boolean)
+    .map(x => String(x || '').toLowerCase().trim());
+  const has = r => list.includes(r);
+  if (has('super-admin')) return '/super-admin';
+  if (has('admin')) return '/admin';
+  if (has('manager')) return '/manager';
+  if (has('customer-service')) return '/customer-service';
+  return '/agent';
+}

@@ -40,48 +40,41 @@ module.exports = async (req, res) => {
 
     let user;
     if (!dbUser) {
-      // Fallback for users not in portal_users
-      const fallbackRole = norm(payload.role || 'agent');
-      const validRole = ALLOWED.has(fallbackRole) ? fallbackRole : 'agent';
-      user = {
-        id: payload.id || payload.sub,
-        email: payload.email,
-        name: payload.email?.split('@')[0] || 'User',
-        role: validRole,
-        roles: [validRole],
-        agency_id: payload.agency_id || payload.agencyId
-      };
+      // NO FALLBACK - portal_users is the ONLY source of truth
+      console.error('[VERIFY] No portal_users record for auth_user_id:', payload.sub || payload.id);
+      return res.status(403).json({ ok: false, error: 'No portal user' });
     } else if (dbUser.is_active === false) {
       return res.status(401).json({ ok: false, error: 'Unauthorized' });
     } else {
       // Use portal_users with normalization
-      const dbRoles = (Array.isArray(dbUser.roles) && dbUser.roles.length ? dbUser.roles : [dbUser.role])
+      const roles = (Array.isArray(dbUser.roles) && dbUser.roles.length ? dbUser.roles : [dbUser.role])
         .map(norm)
         .filter(r => ALLOWED.has(r));
-      const dbRole = dbRoles[0] || 'agent';
+
+      if (roles.length === 0) {
+        roles.push('agent'); // Default if no valid roles
+      }
+
+      const primary = roles[0];
 
       user = {
         id: dbUser.id,
         email: dbUser.email,
         name: dbUser.full_name || dbUser.email?.split('@')[0] || 'User',
-        role: dbRole,
-        roles: dbRoles.length > 0 ? dbRoles : [dbRole],
+        role: primary,
+        roles: roles,
         agency_id: dbUser.agency_id
       };
     }
 
-    // CRITICAL DEBUG LOG - Log EVERYTHING
-    console.log('[VERIFY] RAW dbUser:', JSON.stringify(dbUser, null, 2));
-    console.log('[VERIFY] RAW payload (from token):', JSON.stringify(payload, null, 2));
-    console.log('[VERIFY] Building user object:', {
+    // Enhanced logging as required
+    console.log('[VERIFY] FINAL user payload to return:', {
       id: user.id,
       email: user.email,
-      name: user.name,
       role: user.role,
       roles: user.roles,
       agency_id: user.agency_id
     });
-    console.log('[VERIFY] FINAL user payload to return:', JSON.stringify(user, null, 2));
 
     return res.status(200).json({
       ok: true,

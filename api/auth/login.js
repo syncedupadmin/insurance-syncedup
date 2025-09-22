@@ -62,28 +62,32 @@ module.exports = async function handler(req, res) {
     const ALLOWED = new Set(['super-admin','admin','manager','customer-service','agent']);
     const norm = v => String(v||'').trim().toLowerCase().replace(/_/g,'-').replace(/\s+/g,'-');
 
-    const roles = (Array.isArray(pu.roles) && pu.roles.length ? pu.roles : [pu.role])
+    const portalRoles = (Array.isArray(pu.roles) && pu.roles.length ? pu.roles : [pu.role])
       .map(norm)
       .filter(r => ALLOWED.has(r));
 
-    if (roles.length === 0) {
-      roles.push('agent'); // Fallback if no valid roles
+    if (portalRoles.length === 0) {
+      portalRoles.push('agent'); // Fallback if no valid roles
     }
 
-    const has = r => roles.includes(r);
+    const primary = portalRoles[0];
+    const has = r => portalRoles.includes(r);
 
-    // Explicit precedence with exact matching
+    // Explicit precedence with exact matching (NO substrings, NO underscores)
     const redirectPath = has('super-admin') ? '/super-admin'
                       : has('admin')        ? '/admin'
                       : has('manager')      ? '/manager'
                       : has('customer-service') ? '/customer-service'
                       : '/agent';
 
-    console.log('[LOGIN] Portal user login:', {
-      email: pu.email,
-      portalRoles: roles,
-      primaryRole: roles[0],
-      redirectPath: redirectPath
+    // Enhanced logging to prove sources and decisions
+    console.log('[LOGIN] role sources', {
+      requestedEmail,
+      supaUserId: supaUser.id || supaUser.sub,
+      portalEmail: pu.email,
+      portalRoles,
+      primary,
+      redirectPath
     });
 
     // Return format that matches client expectations
@@ -94,8 +98,8 @@ module.exports = async function handler(req, res) {
       user: {
         id: pu.id, // Use portal_users.id as primary ID
         email: pu.email,
-        role: roles[0],
-        roles: roles,
+        role: primary,
+        roles: portalRoles,
         agency_id: pu.agency_id
       },
       token // Also return token so client can store it
