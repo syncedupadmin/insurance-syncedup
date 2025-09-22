@@ -1,0 +1,30 @@
+/* Global CSS to hide all theme switchers */
+#emergency-theme-switcher,
+.emergency-theme-switcher,
+.theme-switcher-container,
+.theme-btn,
+button[onclick*="themeSystem.applyTheme"],
+button[onclick*="localStorage.setItem('agentTheme"],
+button[onclick*="localStorage.setItem('managerTheme"],
+button[onclick*="localStorage.setItem('adminTheme"],
+button[onclick*="localStorage.setItem('serviceTheme"],
+div[style*="position: fixed"][style*="top: 10px"],
+div[style*="position: fixed"][style*="z-index: 10000"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    left: -9999px !important;
+}
+
+/* Only allow theme switchers in settings pages */
+body[class*="settings"] .theme-btn,
+.settings-page .theme-btn {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    position: static !important;
+    left: auto !important;
+}
