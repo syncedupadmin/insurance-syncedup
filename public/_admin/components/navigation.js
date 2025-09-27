@@ -8,15 +8,15 @@
         // Navigation items configuration
         navItems: [
             { href: '/admin/', icon: 'layout-dashboard', text: 'Dashboard' },
+            { href: '/admin/convoso-monitor', icon: 'monitor-speaker', text: 'Convoso' },
+            { href: '/admin/vendors', icon: 'building-2', text: 'Vendors' },
             { href: '/admin/agent-performance', icon: 'trending-up', text: 'Agent Performance' },
             { href: '/admin/users', icon: 'users', text: 'Users' },
             { href: '/admin/licenses', icon: 'shield-check', text: 'Licenses' },
             { href: '/admin/convoso-leads', icon: 'users', text: 'Leads' },
-            { href: '/admin/vendors', icon: 'building-2', text: 'Vendors' },
             { href: '/admin/commissions', icon: 'dollar-sign', text: 'Commissions' },
             { href: '/admin/reports', icon: 'file-text', text: 'Reports' },
-            { href: '/admin/settings', icon: 'settings', text: 'Settings' },
-            { href: '/admin/convoso-monitor', icon: 'monitor-speaker', text: 'Convoso' }
+            { href: '/admin/settings', icon: 'settings', text: 'Settings' }
         ],
 
         // Initialize navigation
