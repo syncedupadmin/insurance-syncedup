@@ -461,7 +461,7 @@
             document.getElementById('apiKeysTable').classList.add('hidden');
 
             try {
-                const response = await SyncedUpAuth.authenticatedFetch('/api/admin/api-keys');
+                const response = await fetch('/api/admin/api-keys', { credentials: 'include' });
 
                 if (response.ok) {
                     const data = await response.json();
@@ -517,7 +517,7 @@
         // Load agency settings
         async function loadAgencySettings() {
             try {
-                const response = await SyncedUpAuth.authenticatedFetch('/api/admin/settings/agency');
+                const response = await fetch('/api/admin/settings/agency', { credentials: 'include' });
 
                 if (response.ok) {
                     const result = await response.json();
@@ -541,7 +541,7 @@
         // Load system settings
         async function loadSystemSettings() {
             try {
-                const response = await SyncedUpAuth.authenticatedFetch('/api/admin/settings');
+                const response = await fetch('/api/admin/settings', { credentials: 'include' });
 
                 if (response.ok) {
                     const data = await response.json();
@@ -630,7 +630,7 @@
             };
 
             try {
-                const response = await SyncedUpAuth.authenticatedFetch('/api/admin/settings/system', {
+                const response = await fetch('/api/admin/settings/system', { credentials: 'include',
                     method: 'PUT',
                     body: JSON.stringify(formData)
                 });
@@ -659,7 +659,7 @@
             };
 
             try {
-                const response = await SyncedUpAuth.authenticatedFetch('/api/admin/settings/branding', {
+                const response = await fetch('/api/admin/settings/branding', { credentials: 'include',
                     method: 'PUT',
                     body: JSON.stringify(formData)
                 });
@@ -687,7 +687,7 @@
             };
 
             try {
-                const response = await SyncedUpAuth.authenticatedFetch('/api/admin/settings/agency', {
+                const response = await fetch('/api/admin/settings/agency', { credentials: 'include',
                     method: 'PUT',
                     body: JSON.stringify(formData)
                 });
@@ -748,8 +748,10 @@
                     `/api/admin/api-keys/${editingApiKeyId}` : 
                     '/api/admin/api-keys';
                 
-                const response = await SyncedUpAuth.authenticatedFetch(url, {
+                const response = await fetch(url, {
                     method: editingApiKeyId ? 'PUT' : 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
                 });
                 
@@ -789,7 +791,7 @@
             if (!confirm('Are you sure you want to revoke this API key? This action cannot be undone.')) return;
 
             try {
-                const response = await SyncedUpAuth.authenticatedFetch(`/api/admin/api-keys/${keyId}`, {
+                const response = await fetch(`/api/admin/api-keys/${keyId}`, { credentials: 'include',
                     method: 'DELETE'
                 });
                 
@@ -814,7 +816,7 @@
             if (!key) return;
 
             try {
-                const response = await SyncedUpAuth.authenticatedFetch(`/api/admin/api-keys/${keyId}/test`, {
+                const response = await fetch(`/api/admin/api-keys/${keyId}/test`, { credentials: 'include',
                     method: 'POST'
                 });
                 
