@@ -2059,15 +2059,17 @@ async function inviteUser() {
 
     try {
         // Use cookie-based authentication
-        const response = await fetch('/api/super-admin/edge-proxy?endpoint=users', {
+        const response = await fetch('/api/super-admin/users', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             credentials: 'include',
             body: JSON.stringify({
-                action: 'invite',
-                email: email
+                email: email,
+                full_name: email.split('@')[0],
+                role: 'agent',
+                is_active: true
             })
         });
 
@@ -2232,15 +2234,14 @@ async function assignToAgency(userId) {
         if (!selectedAgency) return;
 
         // Use cookie-based authentication
-        const assignResponse = await fetch('/api/super-admin/edge-proxy?endpoint=users', {
-            method: 'POST',
+        const assignResponse = await fetch('/api/super-admin/users', {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
             credentials: 'include',
             body: JSON.stringify({
-                action: 'set_agency',
-                user_id: userId,
+                id: userId,
                 agency_id: selectedAgency
             })
         });
@@ -2442,37 +2443,19 @@ async function handleEditUser(e) {
 
         // Use cookie-based authentication
 
-        // Update role
-        if (formData.role) {
-            await fetch('/api/super-admin/edge-proxy?endpoint=users', {
-                method: 'POST',
-                headers: {
-                    // Cookie-based authentication,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    action: 'set_role',
-                    user_id: userId,
-                    role: formData.role
-                })
-            });
-        }
+        // Update user with both role and agency in one call
+        const updates = { id: userId };
+        if (formData.role) updates.role = formData.role;
+        if (formData.agency_id !== undefined) updates.agency_id = formData.agency_id;
 
-        // Update agency
-        if (formData.agency_id !== undefined) {
-            await fetch('/api/super-admin/edge-proxy?endpoint=users', {
-                method: 'POST',
-                headers: {
-                    // Cookie-based authentication,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    action: 'set_agency',
-                    user_id: userId,
-                    agency_id: formData.agency_id
-                })
-            });
-        }
+        await fetch('/api/super-admin/users', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify(updates)
+        });
 
         alert('User updated successfully!');
         closeEditUserForm();
@@ -2499,15 +2482,16 @@ async function sendPasswordResetEmail() {
 
     try {
         // Use cookie-based authentication
-        const response = await fetch('/api/super-admin/edge-proxy?endpoint=users', {
+        const response = await fetch('/api/super-admin/users', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             credentials: 'include',
             body: JSON.stringify({
-                action: 'invite',
-                email: email
+                email: email,
+                full_name: email.split('@')[0],
+                role: 'agent'
             })
         });
 
@@ -2537,15 +2521,14 @@ async function deleteUser() {
 
     try {
         // Use cookie-based authentication
-        const response = await fetch('/api/super-admin/edge-proxy?endpoint=users', {
-            method: 'POST',
+        const response = await fetch('/api/super-admin/users', {
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'
             },
             credentials: 'include',
             body: JSON.stringify({
-                action: 'delete',
-                user_id: userId
+                id: userId
             })
         });
 
