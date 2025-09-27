@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '',
@@ -367,4 +367,4 @@ function calculateLeadPriority(lead) {
   return 'low';
 }
 
-export default requireAuth(['admin'])(leadsHandler);
+module.exports = requireAuth(['admin'])(leadsHandler);

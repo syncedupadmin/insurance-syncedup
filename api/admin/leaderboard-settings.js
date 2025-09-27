@@ -1,5 +1,5 @@
-import { requireAuth, logAction } from '../_middleware/authCheck.js';
-import { createClient } from '@supabase/supabase-js';
+const { requireAuth, logAction } = require('../_middleware/authCheck.js');
+const { createClient } = require('@supabase/supabase-js');
 
 async function leaderboardSettingsHandler(req, res) {
   const supabase = req.supabase || createClient(
@@ -252,4 +252,4 @@ async function syncAgencyToLeaderboard(supabase, agencyId) {
   }
 }
 
-export default requireAuth(['admin'])(leaderboardSettingsHandler);
+module.exports = requireAuth(['admin'])(leaderboardSettingsHandler);

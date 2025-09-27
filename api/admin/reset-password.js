@@ -2,6 +2,7 @@ const { createClient } = require('@supabase/supabase-js');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const { verifyCookieAuth } = require('../_utils/cookie-auth.js');
+const { requireAuth } = require('../_middleware/authCheck.js');
 
 async function resetPasswordHandler(req, res) {
   // Verify authentication using cookie-based auth
@@ -145,4 +146,4 @@ async function resetPasswordHandler(req, res) {
   }
 }
 
-export default requireAuth(['admin'])(resetPasswordHandler);
+module.exports = requireAuth(['admin'])(resetPasswordHandler);

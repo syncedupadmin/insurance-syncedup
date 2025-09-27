@@ -1,5 +1,5 @@
-import { requireAuth, logAction } from '../_middleware/authCheck.js';
-import bcrypt from 'bcryptjs';
+const { requireAuth, logAction } = require('../_middleware/authCheck.js');
+const bcrypt = require('bcryptjs');
 
 async function bulkUploadHandler(req, res) {
   if (req.method !== 'POST') {
@@ -123,4 +123,4 @@ async function bulkUploadHandler(req, res) {
   });
 }
 
-export default requireAuth(['admin', 'super-admin'])(bulkUploadHandler);
+module.exports = requireAuth(['admin', 'super-admin'])(bulkUploadHandler);

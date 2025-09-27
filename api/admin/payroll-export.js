@@ -1,5 +1,5 @@
-import { requireAuth } from '../_middleware/authCheck.js';
-import { createClient } from '@supabase/supabase-js';
+const { requireAuth } = require('../_middleware/authCheck.js');
+const { createClient } = require('@supabase/supabase-js');
 
 async function payrollExportHandler(req, res) {
   if (req.method !== 'GET') {
@@ -90,4 +90,4 @@ async function payrollExportHandler(req, res) {
   }
 }
 
-export default requireAuth(['admin'])(payrollExportHandler);
+module.exports = requireAuth(['admin'])(payrollExportHandler);

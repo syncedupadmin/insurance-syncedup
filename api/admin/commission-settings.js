@@ -1,5 +1,6 @@
 const { createClient } = require('@supabase/supabase-js');
 const { verifyCookieAuth } = require('../_utils/cookie-auth.js');
+const { requireAuth } = require('../_middleware/authCheck.js');
 
 // Default commission structures
 const defaultCommissionStructures = {
@@ -338,4 +339,4 @@ export function calculateCommission(amount, product, agentSales, structure) {
   }
 }
 
-export default requireAuth(['admin'])(commissionSettingsHandler);
+module.exports = requireAuth(['admin'])(commissionSettingsHandler);

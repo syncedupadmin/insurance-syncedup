@@ -1,6 +1,6 @@
-import { requireAuth, logAction } from '../_middleware/authCheck.js';
-import { createClient } from '@supabase/supabase-js';
-import bcrypt from 'bcryptjs';
+const { requireAuth, logAction } = require('../_middleware/authCheck.js');
+const { createClient } = require('@supabase/supabase-js');
+const bcrypt = require('bcryptjs');
 
 async function agentsHandler(req, res) {
   const supabase = req.supabase || createClient(
@@ -206,4 +206,4 @@ async function agentsHandler(req, res) {
   }
 }
 
-export default requireAuth(['admin'])(agentsHandler);
+module.exports = requireAuth(['admin'])(agentsHandler);

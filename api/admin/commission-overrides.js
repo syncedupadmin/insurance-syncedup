@@ -1,6 +1,6 @@
-import { createClient } from '@supabase/supabase-js';
-import { requireAuth } from '../_middleware/authCheck.js';
-import { getUserContext } from '../utils/auth-helper.js';
+const { createClient } = require('@supabase/supabase-js');
+const { requireAuth } = require('../_middleware/authCheck.js');
+const { getUserContext } = require('../utils/auth-helper.js');
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -355,4 +355,4 @@ async function generateDemoCommissionOverrides(agencyId) {
   ];
 }
 
-export default requireAuth(['admin'])(commissionOverridesHandler);
+module.exports = requireAuth(['admin'])(commissionOverridesHandler);

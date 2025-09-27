@@ -1,5 +1,5 @@
-import { requireAuth, logAction } from '../_middleware/authCheck.js';
-import bcrypt from 'bcryptjs';
+const { requireAuth, logAction } = require('../_middleware/authCheck.js');
+const bcrypt = require('bcryptjs');
 
 async function usersHandler(req, res) {
   const supabase = req.supabase;
@@ -55,4 +55,4 @@ async function usersHandler(req, res) {
   // ... rest of the handler
 }
 
-export default requireAuth(['admin'])(usersHandler);
+module.exports = requireAuth(['admin'])(usersHandler);
