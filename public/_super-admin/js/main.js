@@ -1715,7 +1715,16 @@ async function loadUserManagement() {
         users.forEach(user => {
             if (user.agency_id && usersByAgency[user.agency_id]) {
                 usersByAgency[user.agency_id].users.push(user);
-            } else if (!user.agency_id) {
+            } else if (user.agency_id && !usersByAgency[user.agency_id]) {
+                // Agency ID exists but not in agencies table - create placeholder
+                if (!usersByAgency[user.agency_id]) {
+                    usersByAgency[user.agency_id] = {
+                        name: `Unknown Agency (${user.agency_id.substring(0, 8)}...)`,
+                        users: []
+                    };
+                }
+                usersByAgency[user.agency_id].users.push(user);
+            } else {
                 usersWithoutAgency.push(user);
             }
         });
@@ -1783,24 +1792,24 @@ async function loadUserManagement() {
                                     (${usersByAgency[agencyId].users.length} users)
                                 </span>
                             </h3>
-                            <table class="data-table">
+                            <table class="data-table" style="width: 100%; table-layout: fixed;">
                                 <thead>
                                     <tr>
-                                        <th>EMAIL</th>
-                                        <th>NAME</th>
-                                        <th>ROLE</th>
-                                        <th>STATUS</th>
-                                        <th>LAST LOGIN</th>
-                                        <th>ACTIONS</th>
+                                        <th style="width: 20%;">EMAIL</th>
+                                        <th style="width: 15%;">NAME</th>
+                                        <th style="width: 12%; text-align: center;">ROLE</th>
+                                        <th style="width: 8%; text-align: center;">STATUS</th>
+                                        <th style="width: 10%; text-align: center;">LAST LOGIN</th>
+                                        <th style="width: 35%; text-align: center;">ACTIONS</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     ${usersByAgency[agencyId].users.map(user => `
                                         <tr data-email="${user.email.toLowerCase()}" data-name="${(user.full_name || user.name || '').toLowerCase()}">
-                                            <td>${user.email}</td>
-                                            <td>${user.full_name || user.name || 'N/A'}</td>
-                                            <td>
-                                                <select onchange="changeUserRole('${user.id}', this.value)" style="background: #1a1a1a; color: white; border: 1px solid #444; padding: 5px;">
+                                            <td style="word-wrap: break-word;">${user.email}</td>
+                                            <td style="word-wrap: break-word;">${user.full_name || user.name || 'N/A'}</td>
+                                            <td style="text-align: center;">
+                                                <select onchange="changeUserRole('${user.id}', this.value)" style="background: #1a1a1a; color: white; border: 1px solid #444; padding: 8px; width: 100%; border-radius: 4px;">
                                                     <option value="agent" ${user.role === 'agent' ? 'selected' : ''}>Agent</option>
                                                     <option value="manager" ${user.role === 'manager' ? 'selected' : ''}>Manager</option>
                                                     <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
@@ -1808,15 +1817,16 @@ async function loadUserManagement() {
                                                     <option value="super_admin" ${user.role === 'super_admin' ? 'selected' : ''}>Super Admin</option>
                                                 </select>
                                             </td>
-                                            <td class="${user.is_active ? 'status-active' : 'status-inactive'}">
-                                                ${user.is_active ? 'Active' : 'Inactive'}
+                                            <td style="text-align: center;">
+                                                <span class="${user.is_active ? 'status-active' : 'status-inactive'}" style="display: inline-block; padding: 4px 12px; border-radius: 12px;">
+                                                    ${user.is_active ? 'Active' : 'Inactive'}
+                                                </span>
                                             </td>
-                                            <td>${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-primary" onclick="editUser('${user.id}')">Edit</button>
-                                                <button class="btn btn-sm" onclick="resetUserPassword('${user.auth_user_id || user.id}', '${user.email}')">Reset Password</button>
-                                                <button class="btn btn-sm ${user.is_active ? 'btn-danger' : 'btn-success'}"
-                                                        onclick="toggleUserStatus('${user.id}', ${!user.is_active})">
+                                            <td style="text-align: center;">${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
+                                            <td style="text-align: center;">
+                                                <button class="btn btn-sm btn-primary" onclick="editUser('${user.id}')" style="margin: 2px;">Edit</button>
+                                                <button class="btn btn-sm" onclick="resetUserPassword('${user.auth_user_id || user.id}', '${user.email}')" style="margin: 2px;">Reset Pwd</button>
+                                                <button class="btn btn-sm ${user.is_active ? 'btn-danger' : 'btn-success'}" onclick="toggleUserStatus('${user.id}', ${!user.is_active})" style="margin: 2px;">
                                                     ${user.is_active ? 'Deactivate' : 'Activate'}
                                                 </button>
                                             </td>
@@ -1835,24 +1845,24 @@ async function loadUserManagement() {
                                     (${usersWithoutAgency.length} users)
                                 </span>
                             </h3>
-                            <table class="data-table">
+                            <table class="data-table" style="width: 100%; table-layout: fixed;">
                                 <thead>
                                     <tr>
-                                        <th>EMAIL</th>
-                                        <th>NAME</th>
-                                        <th>ROLE</th>
-                                        <th>STATUS</th>
-                                        <th>LAST LOGIN</th>
-                                        <th>ACTIONS</th>
+                                        <th style="width: 20%;">EMAIL</th>
+                                        <th style="width: 15%;">NAME</th>
+                                        <th style="width: 12%; text-align: center;">ROLE</th>
+                                        <th style="width: 8%; text-align: center;">STATUS</th>
+                                        <th style="width: 10%; text-align: center;">LAST LOGIN</th>
+                                        <th style="width: 35%; text-align: center;">ACTIONS</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     ${usersWithoutAgency.map(user => `
                                         <tr data-email="${user.email.toLowerCase()}" data-name="${(user.full_name || user.name || '').toLowerCase()}">
-                                            <td>${user.email}</td>
-                                            <td>${user.full_name || user.name || 'N/A'}</td>
-                                            <td>
-                                                <select onchange="changeUserRole('${user.id}', this.value)" style="background: #1a1a1a; color: white; border: 1px solid #444; padding: 5px;">
+                                            <td style="word-wrap: break-word;">${user.email}</td>
+                                            <td style="word-wrap: break-word;">${user.full_name || user.name || 'N/A'}</td>
+                                            <td style="text-align: center;">
+                                                <select onchange="changeUserRole('${user.id}', this.value)" style="background: #1a1a1a; color: white; border: 1px solid #444; padding: 8px; width: 100%; border-radius: 4px;">
                                                     <option value="agent" ${user.role === 'agent' ? 'selected' : ''}>Agent</option>
                                                     <option value="manager" ${user.role === 'manager' ? 'selected' : ''}>Manager</option>
                                                     <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
@@ -1860,15 +1870,16 @@ async function loadUserManagement() {
                                                     <option value="super_admin" ${user.role === 'super_admin' ? 'selected' : ''}>Super Admin</option>
                                                 </select>
                                             </td>
-                                            <td class="${user.is_active ? 'status-active' : 'status-inactive'}">
-                                                ${user.is_active ? 'Active' : 'Inactive'}
+                                            <td style="text-align: center;">
+                                                <span class="${user.is_active ? 'status-active' : 'status-inactive'}" style="display: inline-block; padding: 4px 12px; border-radius: 12px;">
+                                                    ${user.is_active ? 'Active' : 'Inactive'}
+                                                </span>
                                             </td>
-                                            <td>${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-primary" onclick="editUser('${user.id}')">Edit</button>
-                                                <button class="btn btn-sm" onclick="resetUserPassword('${user.auth_user_id || user.id}', '${user.email}')">Reset Password</button>
-                                                <button class="btn btn-sm ${user.is_active ? 'btn-danger' : 'btn-success'}"
-                                                        onclick="toggleUserStatus('${user.id}', ${!user.is_active})">
+                                            <td style="text-align: center;">${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
+                                            <td style="text-align: center;">
+                                                <button class="btn btn-sm btn-primary" onclick="editUser('${user.id}')" style="margin: 2px;">Edit</button>
+                                                <button class="btn btn-sm" onclick="resetUserPassword('${user.auth_user_id || user.id}', '${user.email}')" style="margin: 2px;">Reset Pwd</button>
+                                                <button class="btn btn-sm ${user.is_active ? 'btn-danger' : 'btn-success'}" onclick="toggleUserStatus('${user.id}', ${!user.is_active})" style="margin: 2px;">
                                                     ${user.is_active ? 'Deactivate' : 'Activate'}
                                                 </button>
                                             </td>
