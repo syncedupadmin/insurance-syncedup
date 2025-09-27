@@ -60,10 +60,11 @@ function requireAuth(allowedRoles = []) {
       
       return handler(req, res);
     } catch (error) {
+      console.error('[requireAuth] ERROR:', error.message, error.stack);
       if (error.name === 'TokenExpiredError') {
         return res.status(401).json({ error: 'Token expired' });
       }
-      return res.status(401).json({ error: 'Invalid token' });
+      return res.status(401).json({ error: 'Invalid token', details: error.message });
     }
   };
 }
