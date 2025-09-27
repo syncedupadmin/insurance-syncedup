@@ -202,7 +202,7 @@
                 </div>
             `;
             
-            // Add navigation placeholder with centered styling
+            // Add navigation placeholder with centered styling and overflow handling
             headerContent += `
                 <nav class="nav" id="adminNavigation" style="
                     display: flex;
@@ -210,6 +210,9 @@
                     align-items: center;
                     gap: 1rem;
                     padding: 1rem 0;
+                    overflow-x: auto;
+                    flex-wrap: nowrap;
+                    max-width: 100%;
                 ">
                     <!-- Navigation will be injected by navigation.js -->
                 </nav>
