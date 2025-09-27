@@ -4,4 +4,9 @@ public/node_modules/
 *.log
 .vercel
 .env*.local
+.env
+.env.production
+.env.local
+SUPABASE_SERVICE_KEY
+.audit/
 nul
