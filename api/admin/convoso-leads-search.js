@@ -1,4 +1,6 @@
-export default async function handler(req, res) {
+const { requireAuth } = require('../_middleware/authCheck.js');
+
+async function convosoLeadsSearchHandler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -153,10 +155,12 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Leads search API error:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       error: 'Failed to search leads',
-      details: error.message 
+      details: error.message
     });
   }
 }
+
+module.exports = requireAuth(['admin'])(convosoLeadsSearchHandler);
