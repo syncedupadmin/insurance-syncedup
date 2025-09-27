@@ -1,10 +1,10 @@
-import jwt from 'jsonwebtoken';
-import { createClient } from '@supabase/supabase-js';
-import cookie from 'cookie';
+const jwt = require('jsonwebtoken');
+const { createClient } = require('@supabase/supabase-js');
+const cookie = require('cookie');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-change-in-production';
 
-export function requireAuth(allowedRoles = []) {
+function requireAuth(allowedRoles = []) {
   return (handler) => async (req, res) => {
     try {
       // Try to get token from Authorization header (for API calls) or cookies (for authenticated requests)
@@ -61,7 +61,7 @@ export function requireAuth(allowedRoles = []) {
   };
 }
 
-export function logAction(supabase, userId, agencyId, action, resourceType, resourceId, changes = null) {
+function logAction(supabase, userId, agencyId, action, resourceType, resourceId, changes = null) {
   return supabase.from('audit_logs').insert({
     user_id: userId,
     agency_id: agencyId,
@@ -71,3 +71,5 @@ export function logAction(supabase, userId, agencyId, action, resourceType, reso
     changes
   });
 }
+
+module.exports = { requireAuth, logAction };

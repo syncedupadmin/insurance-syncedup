@@ -63,6 +63,7 @@ async function agentsHandler(req, res) {
           name,
           role: 'agent',
           agent_code: finalAgentCode,
+          agency_id: req.user.agency_id,
           is_active: true,
           must_change_password: true
         })
