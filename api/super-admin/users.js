@@ -43,7 +43,11 @@ export default async function handler(req, res) {
             .eq('auth_user_id', user.id)
             .single();
 
-        if (portalError || !portalUser || portalUser.role !== 'super_admin') {
+        // Normalize role (database has super_admin, but system normalizes to super-admin)
+        const normalizeRole = r => String(r||'').trim().toLowerCase().replace(/_/g,'-');
+        const userRole = normalizeRole(portalUser.role);
+
+        if (portalError || !portalUser || userRole !== 'super-admin') {
             return res.status(403).json({ error: 'Super-admin access required' });
         }
     } catch (error) {
