@@ -43,7 +43,7 @@ export default async function handler(req, res) {
             .eq('auth_user_id', user.id)
             .single();
 
-        if (portalError || !portalUser || portalUser.role !== 'super-admin') {
+        if (portalError || !portalUser || portalUser.role !== 'super_admin') {
             return res.status(403).json({ error: 'Super-admin access required' });
         }
     } catch (error) {
