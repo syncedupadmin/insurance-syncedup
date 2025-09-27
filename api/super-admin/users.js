@@ -13,10 +13,19 @@ export default async function handler(req, res) {
         return match ? decodeURIComponent(match[1]) : null;
     };
 
+    console.log('[SUPER-ADMIN-USERS] Headers:', {
+        cookie: req.headers.cookie ? 'present' : 'missing',
+        hasAuthToken: req.headers.cookie?.includes('auth_token') || false,
+        method: req.method
+    });
+
     const token = getCookie('auth_token');
     if (!token) {
+        console.log('[SUPER-ADMIN-USERS] No token found in cookies');
         return res.status(401).json({ error: 'Authentication required' });
     }
+
+    console.log('[SUPER-ADMIN-USERS] Token found, length:', token.length);
 
     // Initialize Supabase client with service role (bypasses RLS)
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
