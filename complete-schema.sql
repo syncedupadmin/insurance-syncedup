@@ -540,14 +540,21 @@ CREATE TABLE commission_settings (
 CREATE TABLE api_keys (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     agency_id UUID REFERENCES agencies(id),
-    key_name VARCHAR(255),
+    service VARCHAR(100) CHECK (service IN ('convoso', 'boberdoo', 'stripe', 'twilio', 'sendgrid', 'other')),
+    name VARCHAR(255),
     encrypted_key TEXT,
+    api_key_prefix VARCHAR(50),
+    status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'expired', 'revoked')),
     permissions JSONB,
-    is_active BOOLEAN DEFAULT true,
+    last_used_at TIMESTAMP WITH TIME ZONE,
     created_by UUID REFERENCES portal_users(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     expires_at TIMESTAMP WITH TIME ZONE
 );
+
+CREATE INDEX idx_api_keys_agency_service ON api_keys(agency_id, service);
+CREATE INDEX idx_api_keys_status ON api_keys(status);
 
 -- 27. DOCUMENTS (File storage)
 CREATE TABLE documents (
