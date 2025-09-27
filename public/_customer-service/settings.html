@@ -523,27 +523,19 @@ MEM003,Bob Wilson,bob.wilson@email.com,(555) 456-7890,Pending,2025-08-30`;
                 await new Promise(resolve => setTimeout(resolve, 3000));
 
                 // Create mock report HTML
-                const reportContent = `
-<!DOCTYPE html>
+                const reportContent = `<!DOCTYPE html>
 <html>
-    <!-- Customer Service Portal Theme Override -->
-    <link rel="stylesheet" href="/css/themes/service-modern.css">
-    <script src="/js/auth-check.js?v=3" defer></script>
-    <link rel="stylesheet" href="/css/hide-theme-switchers.css">
-<head><title>Customer Service Report</title></head>
-    <!-- Critical Theme Flash Prevention -->
-    <script>
-    (function(){
-        var t=localStorage.getItem("serviceTheme")||"professional";
-        var h=document.documentElement;
-        if(t==="classic"){h.classList.add("classic-mode");h.style.backgroundColor="#008080";}
-        else if(t==="modern"){h.classList.add("modern-mode");h.style.background="linear-gradient(135deg,#3b82f6 0%,#1e40af 100%)";}
-        else{h.style.background="linear-gradient(-45deg,#1e3a8a,#3b82f6,#60a5fa,#dbeafe)";}
-        h.style.visibility="hidden";
-        setTimeout(function(){h.style.visibility="visible";h.style.transition="opacity 0.2s";h.style.opacity="1";},50);
-    })();
-    </script>
-<body style="font-family: Arial, sans-serif; padding: 20px;">
+<head>
+    <title>Customer Service Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        h1 { color: #333; }
+        h2 { color: #666; margin-top: 20px; }
+        ul { list-style-type: none; padding: 0; }
+        li { padding: 5px 0; }
+    </style>
+</head>
+<body>
     <h1>Customer Service Performance Report</h1>
     <p><strong>Generated:</strong> ${new Date().toLocaleDateString()}</p>
     <h2>Summary</h2>
