@@ -648,7 +648,7 @@
         
         async function loadAgentData() {
             try {
-                const response = await fetch('/api/admin/convoso-agent-monitor', { credentials: 'include' });
+                const response = await fetch('/api/admin/convoso/monitor', { credentials: 'include' });
                 if (response.ok) {
                     const data = await response.json();
                     updateDashboard(data);
