@@ -185,70 +185,6 @@
             </form>
         </div>
 
-        <!-- Branding Controls -->
-        <div class="card">
-            <h3 style="display: flex; align-items: center;">
-                <i data-lucide="palette" class="card-icon"></i>
-                Branding & Appearance
-            </h3>
-
-            <form id="brandingForm">
-                <div class="grid" style="margin-bottom: 1.5rem;">
-                    <div>
-                        <label class="form-label">Company Logo URL</label>
-                        <input type="url" id="logoUrl" class="form-input" placeholder="Enter logo URL">
-                        <small style="color: rgba(255,255,255,0.7);">Recommended size: 200x60px</small>
-                    </div>
-                    <div>
-                        <label class="form-label">Favicon URL</label>
-                        <input type="url" id="faviconUrl" class="form-input" placeholder="Enter favicon URL">
-                    </div>
-                </div>
-
-                <div class="grid" style="margin-bottom: 1.5rem;">
-                    <div>
-                        <label class="form-label">Primary Color</label>
-                        <input type="color" id="primaryColor" class="form-input" value="#7c3aed" style="height: 50px;">
-                    </div>
-                    <div>
-                        <label class="form-label">Secondary Color</label>
-                        <input type="color" id="secondaryColor" class="form-input" value="#8b5cf6" style="height: 50px;">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Company Name</label>
-                    <input type="text" id="companyName" class="form-input" value="SyncedUp Solutions">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Footer Text</label>
-                    <input type="text" id="footerText" class="form-input" value="© 2025 SyncedUp Solutions. Empowering Insurance Excellence.">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Theme</label>
-                    <select id="theme" class="form-select">
-                        <option value="purple" selected>Purple Glassmorphism</option>
-                        <option value="blue">Blue Professional</option>
-                        <option value="green">Green Corporate</option>
-                        <option value="dark">Dark Mode</option>
-                    </select>
-                </div>
-
-                <div class="flex gap-2" style="margin-top: 2rem;">
-                    <button type="submit" class="btn btn-primary">
-                        <i data-lucide="save" class="icon"></i>
-                        Save Branding
-                    </button>
-                    <button type="button" class="btn" onclick="previewBranding()">
-                        <i data-lucide="eye" class="icon"></i>
-                        Preview Changes
-                    </button>
-                </div>
-            </form>
-        </div>
-
         <!-- Agency Settings -->
         <div class="card">
             <h3 style="display: flex; align-items: center;">
@@ -260,11 +196,11 @@
                 <div class="grid" style="margin-bottom: 1.5rem;">
                     <div>
                         <label class="form-label">Agency Name</label>
-                        <input type="text" id="agencyName" class="form-input" value="Premier Insurance Solutions">
+                        <input type="text" id="agencyName" class="form-input" placeholder="Loading...">
                     </div>
                     <div>
                         <label class="form-label">License Number</label>
-                        <input type="text" id="licenseNumber" class="form-input" value="INS-2024-789456">
+                        <input type="text" id="licenseNumber" class="form-input" placeholder="Loading...">
                     </div>
                 </div>
 
@@ -275,15 +211,13 @@
                     </div>
                     <div>
                         <label class="form-label">Email Address</label>
-                        <input type="email" id="agencyEmail" class="form-input" value="info@premierinsurance.com">
+                        <input type="email" id="agencyEmail" class="form-input" placeholder="Loading...">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Address</label>
-                    <textarea id="agencyAddress" class="form-textarea" rows="3">123 Insurance Way
-Suite 100
-Business City, ST 12345</textarea>
+                    <textarea id="agencyAddress" class="form-textarea" rows="3" placeholder="Loading..."></textarea>
                 </div>
 
                 <div class="grid" style="margin-bottom: 1.5rem;">
@@ -339,15 +273,15 @@ Business City, ST 12345</textarea>
                     <div style="margin-bottom: 1rem;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                             <span>Last Backup:</span>
-                            <span id="lastBackup">2025-01-03 02:00 AM</span>
+                            <span id="lastBackup">Loading...</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                             <span>Next Backup:</span>
-                            <span id="nextBackup">2025-01-04 02:00 AM</span>
+                            <span id="nextBackup">Loading...</span>
                         </div>
                         <div style="display: flex; justify-content: space-between;">
                             <span>Backup Size:</span>
-                            <span>2.4 GB</span>
+                            <span id="backupSize">Loading...</span>
                         </div>
                     </div>
                     <div class="flex gap-2">
@@ -370,15 +304,15 @@ Business City, ST 12345</textarea>
                     <div style="margin-bottom: 1rem;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                             <span>Two-Factor Auth:</span>
-                            <span class="status-active">Enabled</span>
+                            <span id="twoFactorStatus" class="status-active">Loading...</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                             <span>SSL Certificate:</span>
-                            <span class="status-active">Valid</span>
+                            <span id="sslStatus" class="status-active">Loading...</span>
                         </div>
                         <div style="display: flex; justify-content: space-between;">
                             <span>Firewall:</span>
-                            <span class="status-active">Active</span>
+                            <span id="firewallStatus" class="status-active">Loading...</span>
                         </div>
                     </div>
                     <div class="flex gap-2">
@@ -506,10 +440,11 @@ Business City, ST 12345</textarea>
         async function initializePage() {
             const authResult = await checkAuth();
             if (!authResult) return;
-            
+
             await loadApiKeys();
             await loadSystemSettings();
-            
+            await loadAgencySettings();
+
             // Set up form handlers
             setupFormHandlers();
             
@@ -531,16 +466,16 @@ Business City, ST 12345</textarea>
 
             try {
                 const response = await SyncedUpAuth.authenticatedFetch('/api/admin/api-keys');
-                
+
                 if (response.ok) {
                     const data = await response.json();
-                    currentApiKeys = data.keys || getFallbackApiKeys();
+                    currentApiKeys = data.keys || [];
                 } else {
-                    currentApiKeys = getFallbackApiKeys();
+                    currentApiKeys = [];
                 }
             } catch (error) {
                 console.error('Error loading API keys:', error);
-                currentApiKeys = getFallbackApiKeys();
+                currentApiKeys = [];
             }
 
             renderApiKeysTable();
@@ -548,47 +483,6 @@ Business City, ST 12345</textarea>
             document.getElementById('apiKeysTable').classList.remove('hidden');
         }
 
-        // Get fallback API keys data
-        function getFallbackApiKeys() {
-            return [
-                {
-                    id: 1,
-                    service: 'Boberdoo',
-                    name: 'Production API Key',
-                    maskedKey: 'bob_live_••••••••••••7a2f',
-                    status: 'active',
-                    lastUsed: '2025-01-03 14:23',
-                    created: '2024-12-15'
-                },
-                {
-                    id: 2,
-                    service: 'Stripe',
-                    name: 'Payment Processing',
-                    maskedKey: 'sk_live_••••••••••••9b4c',
-                    status: 'active',
-                    lastUsed: '2025-01-03 12:45',
-                    created: '2024-11-20'
-                },
-                {
-                    id: 3,
-                    service: 'Twilio',
-                    name: 'SMS Notifications',
-                    maskedKey: 'AC••••••••••••••••••••••••5e8f',
-                    status: 'inactive',
-                    lastUsed: '2024-12-28 09:15',
-                    created: '2024-10-05'
-                },
-                {
-                    id: 4,
-                    service: 'SendGrid',
-                    name: 'Email Service',
-                    maskedKey: 'SG.••••••••••••••••••••••••',
-                    status: 'active',
-                    lastUsed: '2025-01-03 16:30',
-                    created: '2024-09-12'
-                }
-            ];
-        }
 
         // Render API keys table
         function renderApiKeysTable() {
@@ -624,11 +518,35 @@ Business City, ST 12345</textarea>
             lucide.createIcons();
         }
 
+        // Load agency settings
+        async function loadAgencySettings() {
+            try {
+                const response = await SyncedUpAuth.authenticatedFetch('/api/admin/settings/agency');
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && result.data) {
+                        const data = result.data;
+                        document.getElementById('agencyName').value = data.agency_name || '';
+                        document.getElementById('licenseNumber').value = data.license_number || '';
+                        document.getElementById('agencyPhone').value = data.phone || '';
+                        document.getElementById('agencyEmail').value = data.email || '';
+                        document.getElementById('agencyAddress').value = data.address || '';
+                        document.getElementById('timeZone').value = data.timezone || 'America/New_York';
+                    }
+                } else {
+                    console.log('Could not load agency settings');
+                }
+            } catch (error) {
+                console.error('Error loading agency settings:', error);
+            }
+        }
+
         // Load system settings
         async function loadSystemSettings() {
             try {
                 const response = await SyncedUpAuth.authenticatedFetch('/api/admin/settings');
-                
+
                 if (response.ok) {
                     const data = await response.json();
                     populateSettings(data);
@@ -764,14 +682,12 @@ Business City, ST 12345</textarea>
         // Save agency settings
         async function saveAgencySettings() {
             const formData = {
-                name: document.getElementById('agencyName').value,
-                licenseNumber: document.getElementById('licenseNumber').value,
+                agency_name: document.getElementById('agencyName').value,
+                license_number: document.getElementById('licenseNumber').value,
                 phone: document.getElementById('agencyPhone').value,
                 email: document.getElementById('agencyEmail').value,
                 address: document.getElementById('agencyAddress').value,
-                timeZone: document.getElementById('timeZone').value,
-                businessHours: document.getElementById('businessHours').value,
-                allowSelfRegistration: document.getElementById('allowSelfRegistration').checked
+                timezone: document.getElementById('timeZone').value
             };
 
             try {
@@ -779,7 +695,7 @@ Business City, ST 12345</textarea>
                     method: 'PUT',
                     body: JSON.stringify(formData)
                 });
-                
+
                 if (response.ok) {
                     showSuccess('Agency settings saved successfully!');
                 } else {
@@ -787,7 +703,7 @@ Business City, ST 12345</textarea>
                 }
             } catch (error) {
                 console.error('Error saving agency settings:', error);
-                showSuccess('Agency settings saved successfully!');
+                showError('Failed to save agency settings');
             }
         }
 

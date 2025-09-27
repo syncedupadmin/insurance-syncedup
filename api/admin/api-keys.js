@@ -1,82 +1,196 @@
-// PRODUCTION READY - Admin API Keys Management - REAL DATA ONLY
-const { createClient } = require('@supabase/supabase-js');
+const { requireAuth } = require('../_middleware/authCheck.js');
+const crypto = require('crypto');
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-);
+const ENCRYPTION_KEY = process.env.API_KEY_ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
+const ALGORITHM = 'aes-256-cbc';
 
-async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+function encryptApiKey(apiKey) {
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(ENCRYPTION_KEY.slice(0, 64), 'hex'), iv);
+  let encrypted = cipher.update(apiKey, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  return iv.toString('hex') + ':' + encrypted;
+}
+
+function decryptApiKey(encryptedKey) {
+  const parts = encryptedKey.split(':');
+  const iv = Buffer.from(parts[0], 'hex');
+  const encryptedText = parts[1];
+  const decipher = crypto.createDecipheriv(ALGORITHM, Buffer.from(ENCRYPTION_KEY.slice(0, 64), 'hex'), iv);
+  let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
+  return decrypted;
+}
+
+function maskApiKey(apiKey) {
+  if (apiKey.length <= 8) {
+    return '••••••••';
   }
-  
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  const prefix = apiKey.slice(0, Math.min(8, apiKey.length - 4));
+  const suffix = apiKey.slice(-4);
+  return prefix + '••••••••••••' + suffix;
+}
+
+async function apiKeysHandler(req, res) {
+  const supabase = req.supabase;
+  const user = req.user;
 
   try {
-    // Authentication check
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Missing or invalid authorization header' });
+    if (req.method === 'GET') {
+      console.log('API Keys API - GET - User:', user.role, 'Agency:', user.agency_id);
+
+      const { data: keys, error } = await supabase
+        .from('api_keys')
+        .select('*')
+        .eq('agency_id', user.agency_id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        if (error.message?.includes('does not exist') || error.code === 'PGRST116') {
+          console.log('API Keys API - api_keys table does not exist yet');
+          return res.status(200).json({
+            success: true,
+            keys: []
+          });
+        }
+        throw error;
+      }
+
+      const maskedKeys = (keys || []).map(key => ({
+        id: key.id,
+        service: key.service,
+        name: key.name,
+        maskedKey: maskApiKey(key.api_key_prefix || ''),
+        status: key.status,
+        lastUsed: key.last_used_at,
+        created: key.created_at
+      }));
+
+      return res.status(200).json({
+        success: true,
+        keys: maskedKeys
+      });
     }
 
-    const token = authHeader.substring(7);
-    
-    // Verify admin access
-    try {
-      const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64'));
-      console.log('API Keys API - User role:', payload.role);
-      
-      if (!['admin', 'super_admin'].includes(payload.role)) {
-        return res.status(403).json({ error: 'Admin access required' });
+    if (req.method === 'POST') {
+      console.log('API Keys API - POST - User:', user.role, 'Agency:', user.agency_id);
+
+      const { service, name, apiKey } = req.body;
+
+      if (!service || !name || !apiKey) {
+        return res.status(400).json({ error: 'Service, name, and apiKey are required' });
       }
-    } catch (e) {
-      console.log('API Keys API - Token decode error:', e.message);
-      return res.status(401).json({ error: 'Invalid token' });
+
+      const encryptedKey = encryptApiKey(apiKey);
+      const apiKeyPrefix = apiKey.slice(0, Math.min(8, apiKey.length - 4));
+
+      const { data: key, error } = await supabase
+        .from('api_keys')
+        .insert({
+          agency_id: user.agency_id,
+          service,
+          name,
+          encrypted_key: encryptedKey,
+          api_key_prefix: apiKeyPrefix,
+          status: 'active',
+          created_by: user.id,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return res.status(201).json({
+        success: true,
+        data: {
+          id: key.id,
+          service: key.service,
+          name: key.name,
+          maskedKey: maskApiKey(apiKeyPrefix),
+          status: key.status
+        },
+        message: 'API key created successfully'
+      });
     }
 
-    // Mock API keys data for now - in production this would connect to a real API keys table
-    const mockApiKeys = [
-      {
-        id: '1',
-        name: 'Production API Key',
-        key_prefix: 'sk_prod_...',
-        created_at: '2024-01-01T00:00:00.000Z',
-        last_used: '2024-01-15T10:30:00.000Z',
-        status: 'active',
-        permissions: ['read', 'write']
-      },
-      {
-        id: '2', 
-        name: 'Development API Key',
-        key_prefix: 'sk_dev_...',
-        created_at: '2024-01-02T00:00:00.000Z',
-        last_used: null,
-        status: 'inactive',
-        permissions: ['read']
-      }
-    ];
+    if (req.method === 'PUT') {
+      console.log('API Keys API - PUT - User:', user.role, 'Agency:', user.agency_id);
 
-    return res.status(200).json({
-      success: true,
-      data: mockApiKeys,
-      source: 'mock_data',
-      message: 'API Keys management - placeholder data',
-      timestamp: new Date().toISOString()
-    });
+      const { id, service, name, apiKey, status } = req.body;
+
+      if (!id) {
+        return res.status(400).json({ error: 'ID is required' });
+      }
+
+      const updateData = {
+        updated_at: new Date().toISOString()
+      };
+
+      if (service) updateData.service = service;
+      if (name) updateData.name = name;
+      if (status) updateData.status = status;
+
+      if (apiKey) {
+        updateData.encrypted_key = encryptApiKey(apiKey);
+        updateData.api_key_prefix = apiKey.slice(0, Math.min(8, apiKey.length - 4));
+      }
+
+      const { data: key, error } = await supabase
+        .from('api_keys')
+        .update(updateData)
+        .eq('id', id)
+        .eq('agency_id', user.agency_id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          id: key.id,
+          service: key.service,
+          name: key.name,
+          status: key.status
+        },
+        message: 'API key updated successfully'
+      });
+    }
+
+    if (req.method === 'DELETE') {
+      console.log('API Keys API - DELETE - User:', user.role, 'Agency:', user.agency_id);
+
+      const { id } = req.query;
+
+      if (!id) {
+        return res.status(400).json({ error: 'ID is required' });
+      }
+
+      const { error } = await supabase
+        .from('api_keys')
+        .delete()
+        .eq('id', id)
+        .eq('agency_id', user.agency_id);
+
+      if (error) throw error;
+
+      return res.status(200).json({
+        success: true,
+        message: 'API key deleted successfully'
+      });
+    }
+
+    return res.status(405).json({ error: 'Method not allowed' });
 
   } catch (error) {
-    console.error('API Keys API - General error:', error);
-    return res.status(500).json({ 
+    console.error('API Keys API error:', error);
+    return res.status(500).json({
       error: 'Internal server error',
       message: error.message
     });
   }
 }
-module.exports = handler;
+
+module.exports = requireAuth(['admin', 'manager'])(apiKeysHandler);
