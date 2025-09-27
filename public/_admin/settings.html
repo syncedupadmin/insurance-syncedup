@@ -754,30 +754,19 @@
                 });
                 
                 if (response.ok) {
+                    const result = await response.json();
+                    console.log('API key saved:', result);
                     showSuccess('API key saved successfully!');
                     closeApiKeyModal();
                     await loadApiKeys();
                 } else {
-                    showError('Failed to save API key');
+                    const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    console.error('Failed to save API key:', response.status, errorData);
+                    showError(`Failed to save API key: ${errorData.error || errorData.message || 'Unknown error'}`);
                 }
             } catch (error) {
                 console.error('Error saving API key:', error);
-                // For demo purposes, add locally
-                if (!editingApiKeyId) {
-                    const newKey = {
-                        id: Math.max(...currentApiKeys.map(k => k.id)) + 1,
-                        service: service,
-                        name: formData.name,
-                        maskedKey: `••••••••••••${formData.key.slice(-4)}`,
-                        status: 'active',
-                        lastUsed: 'Never',
-                        created: new Date().toISOString().split('T')[0]
-                    };
-                    currentApiKeys.push(newKey);
-                    renderApiKeysTable();
-                }
-                showSuccess('API key saved successfully!');
-                closeApiKeyModal();
+                showError(`Error saving API key: ${error.message}`);
             }
         }
 
