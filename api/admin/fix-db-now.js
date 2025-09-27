@@ -1,7 +1,7 @@
 // EMERGENCY DATABASE FIX - IMMEDIATE EXECUTION
 // Minimal dependencies, direct Supabase call
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   // Set CORS headers for production domains
   const origin = req.headers.origin;
   const allowedOrigins = [
@@ -193,3 +193,4 @@ export default async function handler(req, res) {
     });
   }
 }
+module.exports = handler;

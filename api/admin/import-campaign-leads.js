@@ -1,7 +1,7 @@
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 import multer from 'multer';
 import csvParser from 'csv-parser';
-import { Readable } from 'stream';
+const { Readable } = require('stream');
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -46,7 +46,7 @@ const PHS_AGENCY_CONFIG = {
   ]
 };
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -362,3 +362,4 @@ async function logImportActivity(agencyId, campaignId, summary) {
     console.error('Failed to log import activity:', error);
   }
 }
+module.exports = handler;

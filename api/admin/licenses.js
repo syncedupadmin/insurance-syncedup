@@ -1,12 +1,12 @@
 // PRODUCTION READY - Simple Licenses API - Graceful Error Handling
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '',
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 );
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -247,3 +247,4 @@ async function handlePutRequest(req, res, license_id) {
 async function handleDeleteRequest(req, res, license_id) {
   return res.status(501).json({ error: 'License deletion not yet implemented' });
 }
+module.exports = handler;

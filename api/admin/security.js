@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -64,7 +64,7 @@ async function logSecurityEvent(userId, eventType, details, ipAddress, userAgent
   }
 }
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   const token = req.headers.authorization?.replace('Bearer ', '');
   if (!token) {
     return res.status(401).json({ error: 'No authorization token' });
@@ -394,3 +394,4 @@ export default async function handler(req, res) {
 
   return res.status(405).json({ error: 'Method not allowed' });
 }
+module.exports = handler;

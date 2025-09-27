@@ -5,7 +5,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 )
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   const { method } = req
 
   // Verify admin authentication
@@ -252,3 +252,4 @@ async function handleDelete(req, res) {
     return res.status(500).json({ error: 'Failed to delete license' })
   }
 }
+module.exports = handler;

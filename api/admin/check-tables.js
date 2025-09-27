@@ -1,11 +1,11 @@
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-export default async function handler(req, res) {
+async function handler(req, res) {
     try {
         // Try to get table information
         const { data, error } = await supabase
@@ -47,3 +47,4 @@ export default async function handler(req, res) {
         });
     }
 }
+module.exports = handler;

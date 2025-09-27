@@ -1,16 +1,16 @@
 // Commission Sync API - Creates commission records from sales
 // PRODUCTION CRITICAL: Ensures all sales have corresponding commission tracking
 
-import { createClient } from '@supabase/supabase-js';
-import { setCORSHeaders, handleCORSPreflight } from '../_utils/cors.js';
-import { validateUserContext, logSecurityViolation } from '../_utils/agency-isolation.js';
+const { createClient } = require('@supabase/supabase-js');
+const { setCORSHeaders, handleCORSPreflight } = require('../_utils/cors.js');
+const { validateUserContext, logSecurityViolation } = require('../_utils/agency-isolation.js');
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   // Handle CORS preflight  
   if (handleCORSPreflight(req, res)) return;
   
@@ -135,3 +135,4 @@ export default async function handler(req, res) {
     });
   }
 }
+module.exports = handler;

@@ -1,6 +1,6 @@
-import { createClient } from '@supabase/supabase-js';
-// DISABLED: import { requireAuth } from '../_middleware/authCheck.js';
-import { getUserContext } from '../utils/auth-helper.js';
+const { createClient } = require('@supabase/supabase-js');
+// DISABLED: const { requireAuth } = require('../_middleware/authCheck.js');
+const { getUserContext } = require('../utils/auth-helper.js');
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,

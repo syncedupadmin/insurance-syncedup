@@ -1,4 +1,4 @@
-import { requireAuth } from '../_middleware/authCheck.js';
+const { requireAuth } = require('../_middleware/authCheck.js');
 
 async function adminDashboardHandler(req, res) {
   const supabase = req.supabase;

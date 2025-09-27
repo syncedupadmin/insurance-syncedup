@@ -2,15 +2,15 @@
 // PRODUCTION CRITICAL: Fixes orphaned records immediately
 // WARNING: This bypasses auth for emergency use only
 
-import { createClient } from '@supabase/supabase-js';
-import { setCORSHeaders, handleCORSPreflight } from '../_utils/cors.js';
+const { createClient } = require('@supabase/supabase-js');
+const { setCORSHeaders, handleCORSPreflight } = require('../_utils/cors.js');
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   // Handle CORS preflight  
   if (handleCORSPreflight(req, res)) return;
   
@@ -255,3 +255,4 @@ export default async function handler(req, res) {
     });
   }
 }
+module.exports = handler;

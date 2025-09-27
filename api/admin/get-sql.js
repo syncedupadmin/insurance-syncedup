@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-export default function handler(req, res) {
+function handler(req, res) {
     try {
         const sqlPath = path.join(process.cwd(), 'database', 'create-essential-tables.sql');
         const sql = fs.readFileSync(sqlPath, 'utf8');
@@ -13,3 +13,4 @@ export default function handler(req, res) {
         res.status(500).json({ error: 'Could not read SQL file' });
     }
 }
+module.exports = handler;

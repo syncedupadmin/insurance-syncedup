@@ -1,12 +1,12 @@
 // PRODUCTION READY - Admin User Management API - REAL DATA ONLY
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '',
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 );
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -424,3 +424,4 @@ async function sendWelcomeEmail(email, fullName, tempPassword) {
   console.log(`Welcome email sent to ${email} (${fullName}) with temp password: ${tempPassword}`);
   return true;
 }
+module.exports = handler;

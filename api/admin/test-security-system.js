@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -21,7 +21,7 @@ const TEST_CONFIG = {
 let testResults = [];
 let authToken = null;
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -399,3 +399,4 @@ async function hashPassword(password) {
   // In production, use bcrypt
   return `hashed_${password}`;
 }
+module.exports = handler;
