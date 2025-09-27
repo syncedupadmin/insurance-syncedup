@@ -12,7 +12,7 @@ export function requireAuth(allowedRoles = []) {
       
       if (!token && req.headers.cookie) {
         const cookies = cookie.parse(req.headers.cookie);
-        token = cookies['auth-token'];
+        token = cookies['auth_token'] || cookies['auth-token'];
       }
       
       if (!token) {

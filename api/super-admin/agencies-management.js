@@ -1,28 +1,35 @@
-const { requireAuth } = require('../_middleware/authCheck.js');
+import { createClient } from '@supabase/supabase-js';
 
-async function agenciesManagementHandler(req, res) {
-    const supabase = req.supabase;
-    const user = req.user;
+const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+export default async function handler(req, res) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') return res.status(200).end();
+
+    const getCookie = (name) => {
+        const match = (req.headers.cookie || '').match(new RegExp(`(?:^|; )${name}=([^;]+)`));
+        return match ? decodeURIComponent(match[1]) : null;
+    };
+
+    const token = getCookie('auth_token');
+    if (!token) {
+        return res.status(401).json({ error: 'Authentication required' });
+    }
 
     try {
         if (req.method === 'GET') {
-            console.log('Agencies Management API - GET - User:', user.role);
-
             const { data: agencies, error } = await supabase
                 .from('agencies')
                 .select('*')
-                .order('created_at', { ascending: false });
+                .order('created_at', { ascending: false});
 
-            if (error) {
-                if (error.message?.includes('does not exist') || error.code === 'PGRST116') {
-                    console.log('Agencies table does not exist yet');
-                    return res.status(200).json({
-                        success: true,
-                        agencies: []
-                    });
-                }
-                throw error;
-            }
+            if (error) throw error;
 
             const agenciesWithMetrics = await Promise.all(
                 (agencies || []).map(async (agency) => {
@@ -54,8 +61,6 @@ async function agenciesManagementHandler(req, res) {
                 });
             }
 
-            console.log('Agencies Management API - PUT - Updating agency:', agency_id);
-
             const cleanAgencyId = agency_id.replace(/['"]/g, '');
 
             const { data, error } = await supabase
@@ -86,8 +91,6 @@ async function agenciesManagementHandler(req, res) {
                     error: 'id is required'
                 });
             }
-
-            console.log('Agencies Management API - DELETE - Deleting agency:', id);
 
             const { count: userCount } = await supabase
                 .from('portal_users')
@@ -128,5 +131,3 @@ async function agenciesManagementHandler(req, res) {
         });
     }
 }
-
-module.exports = requireAuth(['super-admin', 'super_admin'])(agenciesManagementHandler);
