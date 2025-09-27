@@ -8,5 +8,6 @@ public/node_modules/
 .env.production
 .env.local
 SUPABASE_SERVICE_KEY
+SUPABASE_SERVICE_ROLE_KEY
 .audit/
 nul
