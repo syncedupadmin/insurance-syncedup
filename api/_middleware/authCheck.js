@@ -1,25 +1,27 @@
-const jwt = require('jsonwebtoken');
 const { createClient } = require('@supabase/supabase-js');
+const { verifyToken } = require('../../lib/auth-bridge.js');
 const cookie = require('cookie');
-
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-change-in-production';
 
 function requireAuth(allowedRoles = []) {
   return (handler) => async (req, res) => {
     try {
       // Try to get token from Authorization header (for API calls) or cookies (for authenticated requests)
       let token = req.headers.authorization?.replace('Bearer ', '');
-      
+
       if (!token && req.headers.cookie) {
         const cookies = cookie.parse(req.headers.cookie);
         token = cookies['auth_token'] || cookies['auth-token'];
       }
-      
+
       if (!token) {
         return res.status(401).json({ error: 'Authentication required' });
       }
-      
-      const decoded = jwt.verify(token, JWT_SECRET);
+
+      const decoded = await verifyToken(token);
+
+      if (!decoded) {
+        return res.status(401).json({ error: 'Invalid or expired token' });
+      }
       
       // Validate role permissions (handle both 'super-admin' and 'super_admin' formats)
       if (allowedRoles.length > 0) {
