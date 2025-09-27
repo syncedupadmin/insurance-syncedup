@@ -18,15 +18,38 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: 'Authentication required' });
     }
 
-    // Initialize Supabase client
+    // Initialize Supabase client with service role (bypasses RLS)
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    
+
     if (!supabaseUrl || !supabaseKey) {
         return res.status(500).json({ error: 'Database configuration error' });
     }
-    
+
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Verify token and check if user is super-admin
+    try {
+        const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+        if (authError || !user) {
+            return res.status(401).json({ error: 'Invalid token' });
+        }
+
+        // Check if user is super-admin in portal_users
+        const { data: portalUser, error: portalError } = await supabase
+            .from('portal_users')
+            .select('role')
+            .eq('auth_user_id', user.id)
+            .single();
+
+        if (portalError || !portalUser || portalUser.role !== 'super-admin') {
+            return res.status(403).json({ error: 'Super-admin access required' });
+        }
+    } catch (error) {
+        console.error('Auth verification error:', error);
+        return res.status(401).json({ error: 'Authorization failed' });
+    }
     
     if (req.method === 'GET') {
         try {
