@@ -2155,30 +2155,29 @@ async function performPasswordReset(userId, email) {
 
 async function changeUserRole(userId, newRole) {
     try {
-        // Use cookie-based authentication
-        const response = await fetch('/api/super-admin/edge-proxy?endpoint=users', {
-            method: 'POST',
+        const response = await fetch('/api/super-admin/users', {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
             credentials: 'include',
             body: JSON.stringify({
-                action: 'set_role',
-                user_id: userId,
+                id: userId,
                 role: newRole
             })
         });
 
         const result = await response.json();
 
-        if (response.ok && result.ok) {
+        if (response.ok && result.success) {
             alert('Role updated successfully');
+            loadUserManagement();
         } else {
             throw new Error(result.error || 'Failed to update role');
         }
     } catch (error) {
         alert('Error updating role: ' + error.message);
-        loadUserManagement(); // Reload to reset the dropdown
+        loadUserManagement();
     }
 }
 

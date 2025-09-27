@@ -30,8 +30,6 @@ export default async function handler(req, res) {
     
     if (req.method === 'GET') {
         try {
-            // Get ONLY users that exist in BOTH portal_users AND auth.users
-            // This ensures we only show real, authenticated users
             const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers({
                 page: 1,
                 perPage: 1000
@@ -42,39 +40,22 @@ export default async function handler(req, res) {
                 return res.status(500).json({ error: 'Failed to fetch auth users' });
             }
 
-            // Get portal users
-            const { data: portalUsers, error: portalError } = await supabase
-                .from('portal_users')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            if (portalError) {
-                console.error('Error fetching portal users:', portalError);
-                return res.status(500).json({ error: 'Failed to fetch portal users' });
-            }
-
-            // Create a map of auth users by email for quick lookup
-            const authUserMap = new Map();
-            authUsers.users.forEach(user => {
-                authUserMap.set(user.email.toLowerCase(), user);
-            });
-
-            // Filter portal users to only include those that exist in auth.users
-            // and merge auth metadata
-            const users = (portalUsers || []).filter(portalUser => {
-                const authUser = authUserMap.get(portalUser.email.toLowerCase());
-                if (authUser) {
-                    // Merge auth user ID and metadata
-                    portalUser.auth_user_id = authUser.id;
-                    portalUser.auth_role = authUser.app_metadata?.role || authUser.user_metadata?.role;
-                    portalUser.email_confirmed = !!authUser.email_confirmed_at;
-                    return true;
-                }
-                return false; // Exclude users not in auth.users
-            });
+            const users = authUsers.users.map(user => ({
+                id: user.id,
+                auth_user_id: user.id,
+                email: user.email,
+                full_name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
+                name: user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0],
+                role: user.app_metadata?.role || user.user_metadata?.role || null,
+                agency_id: user.app_metadata?.agency_id || user.user_metadata?.agency_id || null,
+                is_active: !user.banned_until && user.email_confirmed_at,
+                email_confirmed: !!user.email_confirmed_at,
+                last_login: user.last_sign_in_at,
+                created_at: user.created_at
+            }));
 
             const count = users.length;
-            
+
             return res.status(200).json({
                 users: users || [],
                 pagination: {
@@ -93,63 +74,71 @@ export default async function handler(req, res) {
     
     if (req.method === 'POST') {
         try {
-            const { email, full_name, role, agency_id } = req.body;
-            
-            const { data, error } = await supabase
-                .from('portal_users')
-                .insert([{
-                    email,
-                    full_name,
-                    role,
-                    agency_id,
-                    is_active: true,
-                    created_at: new Date().toISOString()
-                }])
-                .select();
-                
+            const { email, full_name, role, agency_id, password } = req.body;
+
+            const { data, error } = await supabase.auth.admin.createUser({
+                email,
+                password: password || Math.random().toString(36).slice(-12),
+                email_confirm: true,
+                app_metadata: { role, agency_id },
+                user_metadata: { full_name, role, agency_id, email_verified: true }
+            });
+
             if (error) {
                 return res.status(400).json({ error: error.message });
             }
-            
-            return res.status(201).json({ success: true, user: data[0] });
+
+            return res.status(201).json({ success: true, user: data.user });
         } catch (error) {
             return res.status(500).json({ error: 'Failed to create user' });
         }
     }
-    
+
     if (req.method === 'PUT') {
         try {
-            const { id, ...updates } = req.body;
-            
-            const { data, error } = await supabase
-                .from('portal_users')
-                .update(updates)
-                .eq('id', id)
-                .select();
-                
+            const { id, role, agency_id, full_name } = req.body;
+
+            const { data: user, error: getUserError } = await supabase.auth.admin.getUserById(id);
+            if (getUserError) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+            const updates = {
+                app_metadata: {
+                    ...user.user.app_metadata,
+                    role: role || user.user.app_metadata?.role,
+                    agency_id: agency_id !== undefined ? agency_id : user.user.app_metadata?.agency_id
+                },
+                user_metadata: {
+                    ...user.user.user_metadata,
+                    role: role || user.user.user_metadata?.role,
+                    agency_id: agency_id !== undefined ? agency_id : user.user.user_metadata?.agency_id,
+                    full_name: full_name || user.user.user_metadata?.full_name
+                }
+            };
+
+            const { data, error } = await supabase.auth.admin.updateUserById(id, updates);
+
             if (error) {
                 return res.status(400).json({ error: error.message });
             }
-            
-            return res.status(200).json({ success: true, user: data[0] });
+
+            return res.status(200).json({ success: true, user: data.user });
         } catch (error) {
             return res.status(500).json({ error: 'Failed to update user' });
         }
     }
-    
+
     if (req.method === 'DELETE') {
         try {
             const { id } = req.body;
-            
-            const { error } = await supabase
-                .from('portal_users')
-                .delete()
-                .eq('id', id);
-                
+
+            const { error } = await supabase.auth.admin.deleteUser(id);
+
             if (error) {
                 return res.status(400).json({ error: error.message });
             }
-            
+
             return res.status(200).json({ success: true });
         } catch (error) {
             return res.status(500).json({ error: 'Failed to delete user' });
