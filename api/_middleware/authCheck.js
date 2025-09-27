@@ -14,14 +14,19 @@ function requireAuth(allowedRoles = []) {
       }
 
       if (!token) {
+        console.log('[requireAuth] No token found');
         return res.status(401).json({ error: 'Authentication required' });
       }
 
+      console.log('[requireAuth] Token found, verifying...');
       const decoded = await verifyToken(token);
 
       if (!decoded) {
+        console.log('[requireAuth] Token verification failed');
         return res.status(401).json({ error: 'Invalid or expired token' });
       }
+
+      console.log('[requireAuth] Token verified, user:', decoded.email, 'role:', decoded.role);
       
       // Validate role permissions (handle both 'super-admin' and 'super_admin' formats)
       if (allowedRoles.length > 0) {
