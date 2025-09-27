@@ -7,16 +7,16 @@
     const ManagerNavigation = {
         // Navigation items configuration
         navItems: [
-            { href: '/manager/', icon: 'home', text: 'Dashboard' },
-            { href: '/manager/team-management.html', icon: 'users', text: 'Team' },
-            { href: '/manager/performance.html', icon: 'trending-up', text: 'Performance' },
-            { href: '/manager/reports.html', icon: 'file-text', text: 'Reports' },
-            { href: '/manager/leads.html', icon: 'users-2', text: 'Leads' },
-            { href: '/manager/vendors.html', icon: 'building-2', text: 'Vendors' },
-            { href: '/manager/convoso.html', icon: 'phone-call', text: 'Convoso' },
-            { href: '/manager/convoso-monitor.html', icon: 'monitor', text: 'Call Monitor' },
-            { href: '/manager/convoso-leads.html', icon: 'phone-incoming', text: 'Call Leads' },
-            { href: '/manager/settings.html', icon: 'settings', text: 'Settings' }
+            { href: '/manager', icon: 'home', text: 'Dashboard' },
+            { href: '/manager/team-management', icon: 'users', text: 'Team' },
+            { href: '/manager/performance', icon: 'trending-up', text: 'Performance' },
+            { href: '/manager/reports', icon: 'file-text', text: 'Reports' },
+            { href: '/manager/leads', icon: 'users-2', text: 'Leads' },
+            { href: '/manager/vendors', icon: 'building-2', text: 'Vendors' },
+            { href: '/manager/convoso', icon: 'phone-call', text: 'Convoso' },
+            { href: '/manager/convoso-monitor', icon: 'monitor', text: 'Call Monitor' },
+            { href: '/manager/convoso-leads', icon: 'phone-incoming', text: 'Call Leads' },
+            { href: '/manager/settings', icon: 'settings', text: 'Settings' }
         ],
 
         // Initialize navigation
