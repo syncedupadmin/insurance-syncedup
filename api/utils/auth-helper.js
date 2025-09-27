@@ -11,7 +11,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
  * Extract user context from request
  * Returns user info with proper data isolation scope
  */
-export function getUserContext(req) {
+async function getUserContext(req) {
   try {
     // Get token from various sources
     let token = req.headers.authorization?.replace('Bearer ', '');
@@ -30,7 +30,7 @@ export function getUserContext(req) {
     }
 
     // Verify JWT token
-    const payload = await verifyToken(, ["auth_token","auth-token","user_role","user_roles","assumed_role"]);
+    const payload = await verifyToken(token);
     
     // Extract user context
     const userId = payload.sub || payload.id;
@@ -75,7 +75,7 @@ function getDataScope(role) {
  * Apply data isolation filters to Supabase query
  * CRITICAL: This enforces agency/user level data isolation
  */
-export function applyDataIsolation(query, userContext, options = {}) {
+function applyDataIsolation(query, userContext, options = {}) {
   const { role, agencyId, userId, dataScope } = userContext;
   
   console.log(`🔒 Applying data isolation: ${dataScope} for ${role} (${userId})`);
@@ -140,7 +140,7 @@ export function applyDataIsolation(query, userContext, options = {}) {
 /**
  * Check if user has access to specific portal
  */
-export function checkPortalAccess(userRole, portalPath) {
+function checkPortalAccess(userRole, portalPath) {
   const ACCESS_MATRIX = {
     'super_admin': ['/super-admin', '/admin', '/manager', '/agent', '/customer-service', '/leaderboard'],
     'admin': ['/admin', '/manager', '/agent', '/customer-service', '/leaderboard'],
@@ -152,3 +152,10 @@ export function checkPortalAccess(userRole, portalPath) {
   const allowedPortals = ACCESS_MATRIX[userRole] || [];
   return allowedPortals.includes(portalPath);
 }
+
+module.exports = {
+  getUserContext,
+  applyDataIsolation,
+  checkPortalAccess,
+  getDataScope
+};
