@@ -41,7 +41,7 @@ function requireAuth(allowedRoles = []) {
       // Set user context for RLS
       const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.SUPABASE_SERVICE_KEY
+        process.env.SUPABASE_SERVICE_ROLE_KEY
       );
       
       // Set the user context for RLS policies
