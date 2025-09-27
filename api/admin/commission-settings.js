@@ -70,9 +70,16 @@ async function commissionSettingsHandler(req, res) {
   try {
     if (req.method === 'GET') {
       // Get commission settings from database or return defaults
-      const { data: settings, error } = await supabase
+      let query = supabase
         .from('commission_settings')
-        .select('*')
+        .select('*');
+
+      // Filter by agency (super admins see all)
+      if (req.user.role !== 'super-admin' && req.user.role !== 'super_admin') {
+        query = query.eq('agency_id', req.user.agency_id);
+      }
+
+      const { data: settings, error } = await query
         .order('updated_at', { ascending: false })
         .limit(1)
         .single();
@@ -84,11 +91,18 @@ async function commissionSettingsHandler(req, res) {
       }
 
       // Also get active agents for commission calculation preview
-      const { data: agents, error: agentsError } = await supabase
+      let agentsQuery = supabase
         .from('portal_users')
         .select('id, name, email')
         .eq('role', 'agent')
         .eq('is_active', true);
+
+      // Filter agents by agency
+      if (req.user.role !== 'super-admin' && req.user.role !== 'super_admin') {
+        agentsQuery = agentsQuery.eq('agency_id', req.user.agency_id);
+      }
+
+      const { data: agents, error: agentsError } = await agentsQuery;
 
       return res.json({
         success: true,
@@ -116,14 +130,21 @@ async function commissionSettingsHandler(req, res) {
       const settingsData = {
         structures: commission_structures,
         active_structure: active_structure || 'flat_percentage',
+        agency_id: req.user.agency_id,
         updated_by: req.user.id,
         updated_at: new Date().toISOString()
       };
 
-      // Check if settings exist
-      const { data: existingSettings } = await supabase
+      // Check if settings exist for this agency
+      let existingQuery = supabase
         .from('commission_settings')
-        .select('id')
+        .select('id');
+
+      if (req.user.role !== 'super-admin' && req.user.role !== 'super_admin') {
+        existingQuery = existingQuery.eq('agency_id', req.user.agency_id);
+      }
+
+      const { data: existingSettings } = await existingQuery
         .limit(1)
         .single();
 
@@ -317,5 +338,4 @@ export function calculateCommission(amount, product, agentSales, structure) {
   }
 }
 
-// DISABLED: export default requireAuth(['admin'])(commissionSettingsHandler);
-module.exports = commissionSettingsHandler;
+export default requireAuth(['admin'])(commissionSettingsHandler);

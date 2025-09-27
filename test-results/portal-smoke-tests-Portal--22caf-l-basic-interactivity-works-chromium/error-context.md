@@ -1,0 +1,54 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - heading "Manager Portal" [level=3] [ref=e4]: Manager Portal
+    - paragraph [ref=e5]: You have access to agent data and performance metrics for your team.
+  - generic [ref=e6]:
+    - generic [ref=e7]:
+      - generic [ref=e8]: "0"
+      - generic [ref=e9]: Active Agents
+    - generic [ref=e10]:
+      - generic [ref=e11]: $0
+      - generic [ref=e12]: MTD Premium Volume
+    - generic [ref=e13]:
+      - generic [ref=e14]: "0"
+      - generic [ref=e15]: Policies Sold
+    - generic [ref=e16]:
+      - generic [ref=e17]: $0
+      - generic [ref=e18]: Average Sale Size
+  - generic [ref=e19]:
+    - button "Manage Team" [ref=e20] [cursor=pointer]: Manage Team
+    - button "Team Performance" [ref=e21] [cursor=pointer]: Team Performance
+    - button "Generate Reports" [ref=e22] [cursor=pointer]: Generate Reports
+    - button "View as Agent" [ref=e23] [cursor=pointer]: View as Agent
+  - generic [ref=e24]:
+    - heading "Team Overview (This Month)" [level=3] [ref=e25]: Team Overview (This Month)
+    - table [ref=e26]:
+      - rowgroup [ref=e27]:
+        - row "Agent Sales Count Premium Volume Status Last Activity Actions" [ref=e28]:
+          - cell "Agent" [ref=e29]
+          - cell "Sales Count" [ref=e30]
+          - cell "Premium Volume" [ref=e31]
+          - cell "Status" [ref=e32]
+          - cell "Last Activity" [ref=e33]
+          - cell "Actions" [ref=e34]
+      - rowgroup [ref=e35]:
+        - row "No agents found" [ref=e36]:
+          - cell "No agents found" [ref=e37]
+  - generic [ref=e38]:
+    - heading "Recent Team Activity" [level=3] [ref=e39]: Recent Team Activity
+    - table [ref=e40]:
+      - rowgroup [ref=e41]:
+        - row "Time Agent Action Customer Product Premium" [ref=e42]:
+          - cell "Time" [ref=e43]
+          - cell "Agent" [ref=e44]
+          - cell "Action" [ref=e45]
+          - cell "Customer" [ref=e46]
+          - cell "Product" [ref=e47]
+          - cell "Premium" [ref=e48]
+      - rowgroup [ref=e49]:
+        - row "No recent activity found" [ref=e50]:
+          - cell "No recent activity found" [ref=e51]
+```

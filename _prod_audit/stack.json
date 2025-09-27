@@ -1,0 +1,29 @@
+{
+  "runtime": "Node.js v22.18.0",
+  "package_manager": "npm v10.9.3",
+  "framework": "Vanilla JavaScript (no framework)",
+  "css_framework": "Tailwind CSS v3.4.17",
+  "deployment_platform": "Vercel",
+  "database_primary": "Supabase (PostgreSQL)",
+  "authentication": "Server-side sessions (JWT + cookies)",
+  "storage": "AWS S3",
+  "email_provider": "Resend",
+  "payment_gateway": "Stripe",
+  "testing_framework": "Playwright",
+  "http_server_dev": "http-server",
+  "websocket": "ws v8.18.3",
+  "key_dependencies": {
+    "@supabase/supabase-js": "^2.57.4",
+    "express": "^5.1.0",
+    "bcrypt": "^6.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "puppeteer": "^24.19.0",
+    "aws-sdk": "^2.1692.0",
+    "@aws-sdk/client-s3": "^3.882.0"
+  },
+  "container_runtime": "None (serverless)",
+  "iac": "None detected",
+  "ci": "None detected",
+  "cd": "Vercel automatic deployment",
+  "environments_assumed": ["development", "production"]
+}

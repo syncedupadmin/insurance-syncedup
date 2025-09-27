@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-// DISABLED: // DISABLED: import { requireAuth } from '../_middleware/authCheck.js';
+// DISABLED: import { requireAuth } from '../_middleware/authCheck.js';
 import { getUserContext } from '../utils/auth-helper.js';
 
 const supabase = createClient(
@@ -621,4 +621,3 @@ function generateTrendData(startDate, endDate) {
   };
 }
 
-// DISABLED: export default requireAuth(['manager', 'admin', 'super_admin'])(reportsHandler);export default reportsHandler;

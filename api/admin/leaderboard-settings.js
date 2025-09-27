@@ -1,4 +1,4 @@
-// DISABLED: // DISABLED: // DISABLED: // DISABLED: import { requireAuth, logAction } from '../_middleware/authCheck.js';
+import { requireAuth, logAction } from '../_middleware/authCheck.js';
 import { createClient } from '@supabase/supabase-js';
 
 async function leaderboardSettingsHandler(req, res) {
@@ -252,5 +252,4 @@ async function syncAgencyToLeaderboard(supabase, agencyId) {
   }
 }
 
-// DISABLED: export default requireAuth.*Handler);
-export default leaderboardSettingsHandler;
+export default requireAuth(['admin'])(leaderboardSettingsHandler);

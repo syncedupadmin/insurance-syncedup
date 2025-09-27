@@ -1,4 +1,4 @@
-// DISABLED: // DISABLED: import { requireAuth } from '../_middleware/authCheck.js';
+import { requireAuth } from '../_middleware/authCheck.js';
 import { createClient } from '@supabase/supabase-js';
 
 async function payrollExportHandler(req, res) {
@@ -90,5 +90,4 @@ async function payrollExportHandler(req, res) {
   }
 }
 
-// DISABLED: export default requireAuth.*Handler);
-export default payrollExportHandler;
+export default requireAuth(['admin'])(payrollExportHandler);

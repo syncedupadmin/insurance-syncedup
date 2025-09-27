@@ -145,5 +145,4 @@ async function resetPasswordHandler(req, res) {
   }
 }
 
-// DISABLED: export default requireAuth.*Handler);
-module.exports = resetPasswordHandler;
+export default requireAuth(['admin'])(resetPasswordHandler);

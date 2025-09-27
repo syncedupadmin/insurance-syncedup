@@ -152,24 +152,33 @@
         async function loadDashboardData() {
             try {
                 showLoadingStates();
-                
-                // Load dashboard data with safe fetches
-                const [analyticsData, userStats, commissionData, recentLeads] = await Promise.all([
-                    safeFetch('/api/admin/analytics?analytics_type=overview'),
-                    safeFetch('/api/admin/user-management'),
-                    safeFetch('/api/admin/commission-summary'),
-                    safeFetch('/api/admin/leads?recent=true&limit=10')
-                ]);
-                
-                // Update dashboard with fetched data or fallbacks
-                updateDashboardMetrics(analyticsData, userStats, commissionData);
-                updateAgentPerformanceTable(analyticsData);
-                updateRecentLeads(recentLeads);
-                updateCommissionSummary(commissionData);
+
+                // Load dashboard data - try new dashboard API first
+                const dashboardData = await safeFetch('/api/admin/dashboard');
+
+                if (dashboardData && dashboardData.totalRevenue !== undefined) {
+                    // Use new dashboard API data
+                    updateDashboardMetrics(dashboardData, null, { thisMonth: dashboardData.totalCommissions });
+                    updateAgentPerformanceTable({ topAgents: dashboardData.topAgents || [] });
+                } else {
+                    // Fallback to individual API calls
+                    const [analyticsData, userStats, commissionData, recentLeads] = await Promise.all([
+                        safeFetch('/api/admin/analytics?analytics_type=overview'),
+                        safeFetch('/api/admin/user-management'),
+                        safeFetch('/api/admin/commission-summary'),
+                        safeFetch('/api/admin/leads?recent=true&limit=10')
+                    ]);
+
+                    // Update dashboard with fetched data or fallbacks
+                    updateDashboardMetrics(analyticsData, userStats, commissionData);
+                    updateAgentPerformanceTable(analyticsData);
+                    updateRecentLeads(recentLeads);
+                    updateCommissionSummary(commissionData);
+                }
+
                 updateRecentActivity();
-                
                 hideLoadingStates();
-                
+
             } catch (error) {
                 console.error('Failed to load dashboard data:', error);
                 loadFallbackData();
@@ -178,11 +187,16 @@
         
         function updateDashboardMetrics(analytics, userStats, commissionData) {
             // Update metrics with safe fallbacks
-            safeUpdateElement('activeAgents', userStats?.summary?.agents || analytics?.totalAgents);
-            safeUpdateElement('mtdRevenue', `$${(analytics?.mtdRevenue || 0).toLocaleString()}`, '$0');
-            safeUpdateElement('activeLeads', analytics?.activeLeads);
+            // Support both old analytics API and new dashboard API format
+            const agentCount = userStats?.summary?.agents || analytics?.agentCount || analytics?.totalAgents;
+            const revenue = analytics?.totalRevenue || analytics?.mtdRevenue || 0;
+            const commissions = commissionData?.thisMonth || analytics?.totalCommissions || 0;
+
+            safeUpdateElement('activeAgents', agentCount);
+            safeUpdateElement('mtdRevenue', `$${revenue.toLocaleString()}`, '$0');
+            safeUpdateElement('activeLeads', analytics?.activeLeads || 0);
             safeUpdateElement('conversionRate', `${(analytics?.conversionRate || 0).toFixed(1)}%`, '0%');
-            safeUpdateElement('totalCommissions', `$${(commissionData?.thisMonth || 0).toLocaleString()}`, '$0');
+            safeUpdateElement('totalCommissions', `$${commissions.toLocaleString()}`, '$0');
             safeUpdateElement('systemStatus', '100%');
         }
         

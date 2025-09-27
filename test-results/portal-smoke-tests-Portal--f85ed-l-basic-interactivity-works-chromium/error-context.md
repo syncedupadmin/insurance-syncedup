@@ -1,0 +1,142 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Agency Admin Dashboard" [level=1] [ref=e4]
+      - generic [ref=e5]:
+        - generic [ref=e6]: Admin (admin)
+        - button "Leaderboard" [ref=e7] [cursor=pointer]:
+          - img [ref=e8] [cursor=pointer]
+          - generic [ref=e14] [cursor=pointer]: Leaderboard
+        - button "Logout" [ref=e15] [cursor=pointer]:
+          - img [ref=e16] [cursor=pointer]
+          - text: Logout
+    - navigation [ref=e19]:
+      - navigation [ref=e20]:
+        - link "Dashboard" [ref=e21] [cursor=pointer]:
+          - /url: /admin/
+          - img [ref=e22] [cursor=pointer]
+          - text: Dashboard
+        - link "Agent Performance" [ref=e27] [cursor=pointer]:
+          - /url: /admin/agent-performance
+          - img [ref=e28] [cursor=pointer]
+          - text: Agent Performance
+        - link "Users" [ref=e31] [cursor=pointer]:
+          - /url: /_admin/users.html
+          - img [ref=e32] [cursor=pointer]
+          - text: Users
+        - link "Licenses" [ref=e37] [cursor=pointer]:
+          - /url: /admin/licenses
+          - img [ref=e38] [cursor=pointer]
+          - text: Licenses
+        - link "Leads" [ref=e41] [cursor=pointer]:
+          - /url: /admin/convoso-leads
+          - img [ref=e42] [cursor=pointer]
+          - text: Leads
+        - link "Vendors" [ref=e47] [cursor=pointer]:
+          - /url: /admin/vendors
+          - img [ref=e48] [cursor=pointer]
+          - text: Vendors
+        - link "Commissions" [ref=e52] [cursor=pointer]:
+          - /url: /admin/commissions
+          - img [ref=e53] [cursor=pointer]
+          - text: Commissions
+        - link "Reports" [ref=e55] [cursor=pointer]:
+          - /url: /admin/reports
+          - img [ref=e56] [cursor=pointer]
+          - text: Reports
+        - link "Settings" [ref=e59] [cursor=pointer]:
+          - /url: /admin/settings
+          - img [ref=e60] [cursor=pointer]
+          - text: Settings
+        - link "Convoso" [ref=e63] [cursor=pointer]:
+          - /url: /admin/convoso-monitor
+          - img [ref=e64] [cursor=pointer]
+          - text: Convoso
+  - generic [ref=e68]:
+    - generic [ref=e69]:
+      - generic [ref=e70]:
+        - generic [ref=e71]: "0"
+        - generic [ref=e72]: Active Agents
+      - generic [ref=e73]:
+        - generic [ref=e74]: $0
+        - generic [ref=e75]: MTD Revenue
+      - generic [ref=e76]:
+        - generic [ref=e77]: "0"
+        - generic [ref=e78]: Active Leads
+      - generic [ref=e79]:
+        - generic [ref=e80]: 0.0%
+        - generic [ref=e81]: Conversion Rate
+      - generic [ref=e82]:
+        - generic [ref=e83]: $0
+        - generic [ref=e84]: Total Commissions
+      - generic [ref=e85]:
+        - generic [ref=e86]: 98%
+        - generic [ref=e87]: System Health
+    - generic [ref=e88]:
+      - button "Agent Performance" [ref=e89] [cursor=pointer]:
+        - img [ref=e90] [cursor=pointer]
+        - text: Agent Performance
+      - button "Manage Users" [ref=e93] [cursor=pointer]:
+        - img [ref=e94] [cursor=pointer]
+        - text: Manage Users
+      - button "Lead Management" [ref=e99] [cursor=pointer]:
+        - img [ref=e100] [cursor=pointer]
+        - text: Lead Management
+      - button "Commissions" [ref=e105] [cursor=pointer]:
+        - img [ref=e106] [cursor=pointer]
+        - text: Commissions
+      - button "Settings" [ref=e108] [cursor=pointer]:
+        - img [ref=e109] [cursor=pointer]
+        - text: Settings
+    - generic [ref=e112]:
+      - heading "Top Performing Agents" [level=3] [ref=e113]:
+        - img [ref=e114]
+        - text: Top Performing Agents
+      - table [ref=e117]:
+        - rowgroup [ref=e118]:
+          - row "Agent Sales Revenue Conversion Rate Actions" [ref=e119]:
+            - cell "Agent" [ref=e120]
+            - cell "Sales" [ref=e121]
+            - cell "Revenue" [ref=e122]
+            - cell "Conversion Rate" [ref=e123]
+            - cell "Actions" [ref=e124]
+        - rowgroup [ref=e125]:
+          - row "No agent data available" [ref=e126]:
+            - cell "No agent data available" [ref=e127]
+    - generic [ref=e128]:
+      - heading "Recent Leads" [level=3] [ref=e129]:
+        - img [ref=e130]
+        - text: Recent Leads
+      - paragraph [ref=e136]: Error loading recent leads
+    - generic [ref=e137]:
+      - heading "Commission Summary" [level=3] [ref=e138]:
+        - img [ref=e139]
+        - text: Commission Summary
+      - generic [ref=e142]:
+        - generic [ref=e143]:
+          - generic [ref=e144]: $0
+          - generic [ref=e145]: This Month
+        - generic [ref=e146]:
+          - generic [ref=e147]: 0.0%
+          - generic [ref=e148]: Avg Rate
+        - generic [ref=e149]:
+          - generic [ref=e150]: "0"
+          - generic [ref=e151]: Pending
+    - generic [ref=e152]:
+      - heading "Recent Activity" [level=3] [ref=e153]:
+        - img [ref=e154]
+        - text: Recent Activity
+      - table [ref=e156]:
+        - rowgroup [ref=e157]:
+          - row "Time Agent Action Details" [ref=e158]:
+            - cell "Time" [ref=e159]
+            - cell "Agent" [ref=e160]
+            - cell "Action" [ref=e161]
+            - cell "Details" [ref=e162]
+        - rowgroup [ref=e163]:
+          - row "No recent activity" [ref=e164]:
+            - cell "No recent activity" [ref=e165]
+```

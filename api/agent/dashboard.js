@@ -1,4 +1,4 @@
-// DISABLED: // DISABLED: // DISABLED: import { requireAuth } from '../_middleware/authCheck.js';
+import { requireAuth } from '../_middleware/authCheck.js';
 import { getUserContext } from '../utils/auth-helper.js';
 
 async function dashboardHandler(req, res) {
@@ -23,14 +23,14 @@ async function dashboardHandler(req, res) {
     }
     
     // Calculate metrics from actual sales data
-    const monthlySales = sales?.reduce((sum, s) => sum + (parseFloat(s.premium) || 0), 0) || 0;
-    const commissions = sales?.reduce((sum, s) => sum + (parseFloat(s.commission_amount) || 0), 0) || 0;
+    const monthlySales = sales?.reduce((sum, s) => sum + (parseFloat(s.total_premium) || 0), 0) || 0;
+    const commissions = sales?.reduce((sum, s) => sum + (parseFloat(s.total_commission) || 0), 0) || 0;
     const policiesCount = sales?.length || 0;
     
     // Get all agents' sales for ranking (simplified)
     const { data: allAgentsSales } = await supabase
       .from('portal_sales')
-      .select('agent_id, commission_amount')
+      .select('agent_id, total_commission')
       .eq('agency_id', agencyId)
       .gte('sale_date', currentMonthStart);
     
@@ -41,7 +41,7 @@ async function dashboardHandler(req, res) {
       if (!agentCommissions[agentId]) {
         agentCommissions[agentId] = 0;
       }
-      agentCommissions[agentId] += parseFloat(sale.commission_amount) || 0;
+      agentCommissions[agentId] += parseFloat(sale.total_commission) || 0;
     });
     
     // Find current agent's rank
@@ -88,8 +88,8 @@ async function dashboardHandler(req, res) {
         id: sale.id,
         type: 'sale',
         client_name: sale.client_name,
-        premium: parseFloat(sale.premium) || 0,
-        commission: parseFloat(sale.commission_amount) || 0,
+        premium: parseFloat(sale.total_premium) || 0,
+        commission: parseFloat(sale.total_commission) || 0,
         date: sale.sale_date
       })),
       leaderboard: sortedAgents.slice(0, 5).map((agentIdStr, index) => ({
@@ -129,4 +129,4 @@ async function dashboardHandler(req, res) {
   }
 }
 
-// DISABLED: export default requireAuth()(dashboardHandler);export default dashboardHandler;
+export default requireAuth(['agent', 'manager', 'admin'])(dashboardHandler);

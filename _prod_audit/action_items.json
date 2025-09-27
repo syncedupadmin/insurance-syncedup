@@ -1,0 +1,184 @@
+[
+  {
+    "id": "SEC-001",
+    "title": "BLOCKER: Remove .env from git and rotate all secrets",
+    "severity": "critical",
+    "effort": "M",
+    "owner": "platform",
+    "tags": ["security", "secrets", "blocker"],
+    "evidence": ["secrets_findings.json", "logs/step-05-secrets.log"],
+    "commands": [
+      "echo '.env' >> .gitignore",
+      "git rm --cached .env",
+      "git commit -m 'Remove .env from version control'",
+      "# MANUAL: Rotate JWT_SECRET in Vercel env vars",
+      "# MANUAL: Rotate SUPABASE_SERVICE_KEY",
+      "# MANUAL: Rotate AWS credentials",
+      "# MANUAL: Rotate all API keys exposed in .env"
+    ],
+    "files_to_change": [".gitignore", ".env (remove from git)"],
+    "links": ["https://vercel.com/docs/projects/environment-variables"]
+  },
+  {
+    "id": "SEC-002",
+    "title": "BLOCKER: Remove hardcoded fallback JWT secret",
+    "severity": "critical",
+    "effort": "S",
+    "owner": "backend",
+    "tags": ["security", "secrets", "blocker"],
+    "evidence": ["api/_middleware/authCheck.js:5"],
+    "commands": [],
+    "files_to_change": ["api/_middleware/authCheck.js", "All files with fallback secrets"],
+    "links": []
+  },
+  {
+    "id": "OBS-001",
+    "title": "Remove 764 console.log statements from production code",
+    "severity": "high",
+    "effort": "L",
+    "owner": "backend",
+    "tags": ["observability", "code-quality"],
+    "evidence": ["logs/step-05-secrets.log"],
+    "commands": [
+      "# Use proper logging library instead of console.log",
+      "npm install winston --save"
+    ],
+    "files_to_change": ["169 API files with console.log"],
+    "links": []
+  },
+  {
+    "id": "DEP-001",
+    "title": "Fix npm audit vulnerabilities (2 low)",
+    "severity": "low",
+    "effort": "S",
+    "owner": "platform",
+    "tags": ["dependencies", "security"],
+    "evidence": ["logs/step-03-npm-audit.json"],
+    "commands": [
+      "npm audit fix"
+    ],
+    "files_to_change": ["package-lock.json"],
+    "links": ["https://github.com/advisories/GHSA-pxg6-pf52-xh8x"]
+  },
+  {
+    "id": "QA-001",
+    "title": "Add comprehensive test coverage",
+    "severity": "high",
+    "effort": "L",
+    "owner": "backend",
+    "tags": ["testing", "quality"],
+    "evidence": ["Only 1 Playwright smoke test found"],
+    "commands": [
+      "npm install jest @types/jest --save-dev",
+      "# Create test files for critical API endpoints"
+    ],
+    "files_to_change": ["Add tests/ directory with unit tests"],
+    "links": []
+  },
+  {
+    "id": "QA-002",
+    "title": "Add ESLint and code quality tools",
+    "severity": "medium",
+    "effort": "M",
+    "owner": "platform",
+    "tags": ["code-quality", "linting"],
+    "evidence": ["logs/step-04-static-analysis.log"],
+    "commands": [
+      "npm install eslint @eslint/js --save-dev",
+      "npx eslint --init"
+    ],
+    "files_to_change": ["Add .eslintrc.js", "Add lint script to package.json"],
+    "links": []
+  },
+  {
+    "id": "OPS-001",
+    "title": "Add health check endpoints",
+    "severity": "high",
+    "effort": "S",
+    "owner": "backend",
+    "tags": ["reliability", "monitoring"],
+    "evidence": ["No /health or /readiness endpoints found"],
+    "commands": [],
+    "files_to_change": ["Create api/health.js", "Create api/ready.js"],
+    "links": []
+  },
+  {
+    "id": "OPS-002",
+    "title": "Implement structured logging",
+    "severity": "high",
+    "effort": "M",
+    "owner": "backend",
+    "tags": ["observability", "logging"],
+    "evidence": ["Using console.log everywhere"],
+    "commands": [
+      "npm install winston --save"
+    ],
+    "files_to_change": ["Create lib/logger.js", "Replace all console.log with structured logging"],
+    "links": []
+  },
+  {
+    "id": "OPS-003",
+    "title": "Add error tracking (Sentry/Rollbar)",
+    "severity": "medium",
+    "effort": "S",
+    "owner": "platform",
+    "tags": ["monitoring", "errors"],
+    "evidence": ["No error tracking detected"],
+    "commands": [
+      "npm install @sentry/node --save"
+    ],
+    "files_to_change": ["Add api/_utils/sentry.js"],
+    "links": ["https://docs.sentry.io/platforms/javascript/"]
+  },
+  {
+    "id": "OPS-004",
+    "title": "Configure staging environment",
+    "severity": "high",
+    "effort": "M",
+    "owner": "platform",
+    "tags": ["infrastructure", "dev-prod-parity"],
+    "evidence": ["No staging environment detected"],
+    "commands": [
+      "# Create staging environment in Vercel",
+      "# Configure staging branch and auto-deploy"
+    ],
+    "files_to_change": [],
+    "links": ["https://vercel.com/docs/concepts/git/branches"]
+  },
+  {
+    "id": "DB-001",
+    "title": "Document database migration strategy",
+    "severity": "medium",
+    "effort": "S",
+    "owner": "backend",
+    "tags": ["database", "documentation"],
+    "evidence": ["SQL files in database/ but no migration tool"],
+    "commands": [],
+    "files_to_change": ["Create database/README.md"],
+    "links": []
+  },
+  {
+    "id": "SEC-003",
+    "title": "Add rate limiting to all API endpoints",
+    "severity": "high",
+    "effort": "M",
+    "owner": "backend",
+    "tags": ["security", "reliability"],
+    "evidence": ["express-rate-limit installed but not universally applied"],
+    "commands": [],
+    "files_to_change": ["Apply rate limiting middleware globally"],
+    "links": []
+  },
+  {
+    "id": "COMP-001",
+    "title": "Audit PII/PHI data handling for GDPR/HIPAA",
+    "severity": "high",
+    "effort": "L",
+    "owner": "backend",
+    "tags": ["compliance", "data-privacy"],
+    "evidence": ["Insurance data likely contains PHI"],
+    "commands": [],
+    "files_to_change": ["Add data retention policies", "Document PHI handling"],
+    "links": []
+  }
+]

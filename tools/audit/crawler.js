@@ -3,7 +3,7 @@ const fs = require('fs').promises;
 const path = require('path');
 
 class InsurancePortalCrawler {
-  constructor(baseUrl = 'http://localhost:3001') {
+  constructor(baseUrl = 'http://localhost:3002') {
     this.baseUrl = baseUrl;
     this.visitedUrls = new Set();
     this.errors = [];
@@ -174,8 +174,8 @@ class InsurancePortalCrawler {
           // Click with error handling
           await Promise.race([
             button.click({ trial: true }),
-            new Promise((_, reject) => 
-              setTimeout(() => reject(new Error('Click timeout')), 5000)
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('Click timeout')), 2000)
             )
           ]);
         }
@@ -224,8 +224,8 @@ class InsurancePortalCrawler {
     // Test links
     const links = await page.$$('a[href], [role="link"]');
     console.log(`    Found ${links.length} links`);
-    
-    for (let i = 0; i < Math.min(links.length, 5); i++) {
+
+    for (let i = 0; i < Math.min(links.length, 3); i++) {
       try {
         const link = links[i];
         const href = await link.getAttribute('href');

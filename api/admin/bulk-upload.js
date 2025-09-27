@@ -1,4 +1,4 @@
-// DISABLED: // DISABLED: // DISABLED: // DISABLED: import { requireAuth, logAction } from '../_middleware/authCheck.js';
+import { requireAuth, logAction } from '../_middleware/authCheck.js';
 import bcrypt from 'bcryptjs';
 
 async function bulkUploadHandler(req, res) {
@@ -123,5 +123,4 @@ async function bulkUploadHandler(req, res) {
   });
 }
 
-// DISABLED: export default requireAuth(['super_admin', 'admin', 'manager'])(bulkUploadHandler);
-export default bulkUploadHandler;
+export default requireAuth(['admin', 'super-admin'])(bulkUploadHandler);

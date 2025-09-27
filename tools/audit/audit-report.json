@@ -1,580 +1,864 @@
 {
   "summary": {
-    "timestamp": "2025-09-10T17:49:58.878Z",
-    "baseUrl": "http://localhost:3001",
+    "timestamp": "2025-09-23T02:39:29.501Z",
+    "baseUrl": "http://localhost:3002",
     "portalsChecked": 7,
     "urlsVisited": 7,
-    "totalErrors": 107
+    "totalErrors": 161
   },
   "errors": {
-    "pageErrors": [],
+    "pageErrors": [
+      {
+        "message": "updateRefreshInterval is not defined",
+        "stack": "ReferenceError: updateRefreshInterval is not defined\n    at http://localhost:3002/_admin/js/dashboard.js:336:5",
+        "file": "http://localhost:3002/_admin/js/dashboard.js",
+        "line": 336,
+        "column": 5,
+        "timestamp": "2025-09-23T02:38:33.442Z"
+      },
+      {
+        "message": "CSHeader is not defined",
+        "stack": "ReferenceError: CSHeader is not defined\n    at HTMLDocument.<anonymous> (http://localhost:3002/_customer-service/:47:13)",
+        "file": "HTMLDocument.<anonymous> (http://localhost:3002/_customer-service/",
+        "line": 47,
+        "column": 13,
+        "timestamp": "2025-09-23T02:38:41.488Z"
+      },
+      {
+        "message": "updateRefreshInterval is not defined",
+        "stack": "ReferenceError: updateRefreshInterval is not defined\n    at http://localhost:3002/_manager/js/dashboard.js:313:5",
+        "file": "http://localhost:3002/_manager/js/dashboard.js",
+        "line": 313,
+        "column": 5,
+        "timestamp": "2025-09-23T02:38:48.390Z"
+      },
+      {
+        "message": "ManagerHeader is not defined",
+        "stack": "ReferenceError: ManagerHeader is not defined\n    at HTMLDocument.<anonymous> (http://localhost:3002/_manager/:400:13)",
+        "file": "HTMLDocument.<anonymous> (http://localhost:3002/_manager/",
+        "line": 400,
+        "column": 13,
+        "timestamp": "2025-09-23T02:38:48.391Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "url": "http://localhost:3002/_super-admin/",
+        "message": "page.$$: Target page, context or browser has been closed",
+        "stack": "page.$$: Target page, context or browser has been closed\n    at InsurancePortalCrawler.testInteractiveElements (C:\\Users\\nicho\\OneDrive\\Desktop\\Insurance.SyncedUp\\tools\\audit\\crawler.js:225:30)\n    at async InsurancePortalCrawler.crawlPortal (C:\\Users\\nicho\\OneDrive\\Desktop\\Insurance.SyncedUp\\tools\\audit\\crawler.js:141:7)\n    at async InsurancePortalCrawler.start (C:\\Users\\nicho\\OneDrive\\Desktop\\Insurance.SyncedUp\\tools\\audit\\crawler.js:44:7)",
+        "timestamp": "2025-09-23T02:39:29.501Z"
+      }
+    ],
     "consoleErrors": [
       {
         "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/auth/verify",
+        "url": "http://localhost:3002/api/auth/verify",
         "lineNumber": 0,
         "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:36.243Z"
+        "timestamp": "2025-09-23T02:38:33.448Z"
       },
       {
         "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/manager/dashboard",
+        "url": "http://localhost:3002/api/manager/dashboard",
         "lineNumber": 0,
         "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:36.243Z"
+        "timestamp": "2025-09-23T02:38:33.448Z"
       },
       {
         "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/admin/analytics?analytics_type=overview",
+        "url": "http://localhost:3002/api/auth/verify",
         "lineNumber": 0,
         "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:36.244Z"
+        "timestamp": "2025-09-23T02:38:33.458Z"
       },
       {
         "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/admin/user-management",
+        "url": "http://localhost:3002/api/manager/dashboard",
         "lineNumber": 0,
         "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:36.244Z"
+        "timestamp": "2025-09-23T02:38:33.459Z"
       },
       {
         "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/admin/commission-settings",
+        "url": "http://localhost:3002/api/admin/leads?recent=true&limit=10",
         "lineNumber": 0,
         "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:36.244Z"
+        "timestamp": "2025-09-23T02:38:33.460Z"
       },
       {
-        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/admin/api-keys",
-        "lineNumber": 0,
-        "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:36.244Z"
-      },
-      {
-        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/manager/dashboard",
-        "lineNumber": 0,
-        "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:36.259Z"
-      },
-      {
-        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/admin/analytics?analytics_type=overview",
-        "lineNumber": 0,
-        "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:36.259Z"
-      },
-      {
-        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/admin/user-management",
-        "lineNumber": 0,
-        "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:36.259Z"
-      },
-      {
-        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/admin/commission-settings",
-        "lineNumber": 0,
-        "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:36.259Z"
-      },
-      {
-        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/admin/api-keys",
-        "lineNumber": 0,
-        "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:36.259Z"
-      },
-      {
-        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/admin/leads?recent=true&limit=10",
-        "lineNumber": 0,
-        "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:36.259Z"
-      },
-      {
-        "text": "Error loading recent leads: Error: Failed to fetch recent leads\n    at loadRecentLeads (http://localhost:3001/_admin/:618:27)",
-        "url": "http://localhost:3001/_admin/",
-        "lineNumber": 655,
+        "text": "Error loading recent leads: Error: Failed to fetch recent leads\n    at loadRecentLeads (http://localhost:3002/_admin/:564:27)",
+        "url": "http://localhost:3002/_admin/",
+        "lineNumber": 601,
         "columnNumber": 24,
-        "timestamp": "2025-09-10T17:49:36.259Z"
+        "timestamp": "2025-09-23T02:38:33.460Z"
       },
       {
         "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/admin/commission-summary",
+        "url": "http://localhost:3002/api/admin/commission-summary",
         "lineNumber": 0,
         "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:36.260Z"
+        "timestamp": "2025-09-23T02:38:33.460Z"
       },
       {
         "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/admin/leads?recent=true&limit=10",
+        "url": "http://localhost:3002/api/auth/verify",
         "lineNumber": 0,
         "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:36.261Z"
+        "timestamp": "2025-09-23T02:38:33.460Z"
       },
       {
-        "text": "Error loading recent leads: Error: Failed to fetch recent leads\n    at loadRecentLeads (http://localhost:3001/_admin/:618:27)",
-        "url": "http://localhost:3001/_admin/",
-        "lineNumber": 655,
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/api/admin/leads?recent=true&limit=10",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:33.461Z"
+      },
+      {
+        "text": "Error loading recent leads: Error: Failed to fetch recent leads\n    at loadRecentLeads (http://localhost:3002/_admin/:564:27)",
+        "url": "http://localhost:3002/_admin/",
+        "lineNumber": 601,
         "columnNumber": 24,
-        "timestamp": "2025-09-10T17:49:36.261Z"
+        "timestamp": "2025-09-23T02:38:33.461Z"
       },
       {
         "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/admin/commission-summary",
+        "url": "http://localhost:3002/api/admin/commission-summary",
         "lineNumber": 0,
         "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:36.262Z"
+        "timestamp": "2025-09-23T02:38:33.461Z"
       },
       {
         "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/auth/verify",
+        "url": "http://localhost:3002/api/auth/verify",
         "lineNumber": 0,
         "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:40.612Z"
+        "timestamp": "2025-09-23T02:38:33.557Z"
       },
       {
         "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/auth/verify",
+        "url": "http://localhost:3002/api/auth/verify",
         "lineNumber": 0,
         "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:44.408Z"
+        "timestamp": "2025-09-23T02:38:33.711Z"
       },
       {
         "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/leaderboard/css/leaderboard-base.css",
+        "url": "http://localhost:3002/api/auth/verify",
         "lineNumber": 0,
         "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:49.058Z"
+        "timestamp": "2025-09-23T02:38:37.340Z"
       },
       {
         "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/leaderboard/js/leaderboard-theme.js",
+        "url": "http://localhost:3002/api/auth/verify",
         "lineNumber": 0,
         "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:49.067Z"
+        "timestamp": "2025-09-23T02:38:37.340Z"
       },
       {
         "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/manager/dashboard?timeframe=month",
+        "url": "http://localhost:3002/api/auth/verify",
         "lineNumber": 0,
         "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:52.182Z"
+        "timestamp": "2025-09-23T02:38:37.341Z"
+      },
+      {
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/api/auth/verify",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:37.500Z"
+      },
+      {
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/api/auth/verify",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:37.501Z"
+      },
+      {
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/api/auth/verify",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:37.502Z"
+      },
+      {
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/api/auth/verify",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:37.503Z"
+      },
+      {
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/api/auth/verify",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:37.946Z"
+      },
+      {
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/api/auth/verify",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:38.099Z"
+      },
+      {
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/api/auth/verify",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:40.337Z"
+      },
+      {
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/api/auth/verify",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:40.492Z"
+      },
+      {
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/customer-service/components/global-header.js",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:41.486Z"
+      },
+      {
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/customer-service/components/navigation.js",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:41.486Z"
+      },
+      {
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/api/auth/verify",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:41.497Z"
+      },
+      {
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/api/auth/verify",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:41.591Z"
+      },
+      {
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/api/auth/verify",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:41.748Z"
+      },
+      {
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/leaderboard/css/leaderboard-base.css",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:45.253Z"
+      },
+      {
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/leaderboard/js/leaderboard-theme.js",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:45.253Z"
+      },
+      {
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/api/leaderboard/global",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:45.274Z"
+      },
+      {
+        "text": "Error loading leaderboard: Error: HTTP 404: Failed to load leaderboard data\n    at loadLeaderboardData (http://localhost:3002/_leaderboard/:184:27)",
+        "url": "http://localhost:3002/_leaderboard/",
+        "lineNumber": 186,
+        "columnNumber": 24,
+        "timestamp": "2025-09-23T02:38:45.275Z"
+      },
+      {
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/leaderboard/css/themes/competition.css",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:46.274Z"
+      },
+      {
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/manager/components/navigation.js",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:48.209Z"
+      },
+      {
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/manager/components/global-header.js",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:48.209Z"
+      },
+      {
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/api/manager/dashboard?timeframe=month",
+        "lineNumber": 0,
+        "columnNumber": 0,
+        "timestamp": "2025-09-23T02:38:48.394Z"
       },
       {
         "text": "Dashboard API: non-JSON",
-        "url": "http://localhost:3001/_manager/",
-        "lineNumber": 223,
+        "url": "http://localhost:3002/_manager/",
+        "lineNumber": 187,
         "columnNumber": 32,
-        "timestamp": "2025-09-10T17:49:52.182Z"
+        "timestamp": "2025-09-23T02:38:48.394Z"
       },
       {
         "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/auth/verify",
+        "url": "http://localhost:3002/api/auth/verify",
         "lineNumber": 0,
         "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:56.100Z"
-      },
-      {
-        "text": "Failed to load resource: the server responded with a status of 405 (Method Not Allowed)",
-        "url": "http://localhost:3001/api/super-admin/audit",
-        "lineNumber": 0,
-        "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:56.102Z"
-      },
-      {
-        "text": "CRITICAL: Audit logging failed: Error: Audit logging failed: 405\n    at logAdminAction (http://localhost:3001/_super-admin/:947:27)\n    at async HTMLDocument.initializeAdminConsole (http://localhost:3001/_super-admin/:889:17)",
-        "url": "http://localhost:3001/_super-admin/",
-        "lineNumber": 949,
-        "columnNumber": 24,
-        "timestamp": "2025-09-10T17:49:56.102Z"
-      },
-      {
-        "text": "Failed to load resource: the server responded with a status of 405 (Method Not Allowed)",
-        "url": "http://localhost:3001/api/super-admin/audit",
-        "lineNumber": 0,
-        "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:56.104Z"
-      },
-      {
-        "text": "CRITICAL: Audit logging failed: Error: Audit logging failed: 405\n    at logAdminAction (http://localhost:3001/_super-admin/:947:27)\n    at async loadSystemMetrics (http://localhost:3001/_super-admin/:1078:13)\n    at async Promise.all (index 0)\n    at async HTMLDocument.initializeAdminConsole (http://localhost:3001/_super-admin/:895:17)",
-        "url": "http://localhost:3001/_super-admin/",
-        "lineNumber": 949,
-        "columnNumber": 24,
-        "timestamp": "2025-09-10T17:49:56.104Z"
+        "timestamp": "2025-09-23T02:38:48.496Z"
       },
       {
         "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/super-admin/health",
+        "url": "http://localhost:3002/api/auth/verify",
         "lineNumber": 0,
         "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:56.104Z"
+        "timestamp": "2025-09-23T02:38:48.651Z"
       },
       {
         "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/super-admin/performance",
+        "url": "http://localhost:3002/api/auth/verify",
         "lineNumber": 0,
         "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:56.105Z"
+        "timestamp": "2025-09-23T02:38:51.373Z"
       },
       {
         "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/super-admin/audit?limit=10",
+        "url": "http://localhost:3002/api/super-admin/revenue-metrics",
         "lineNumber": 0,
         "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:56.105Z"
-      },
-      {
-        "text": "Failed to load resource: the server responded with a status of 405 (Method Not Allowed)",
-        "url": "http://localhost:3001/api/super-admin/audit",
-        "lineNumber": 0,
-        "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:56.106Z"
-      },
-      {
-        "text": "CRITICAL: Audit logging failed: Error: Audit logging failed: 405\n    at logAdminAction (http://localhost:3001/_super-admin/:947:27)\n    at async loadPerformanceMetrics (http://localhost:3001/_super-admin/:1186:17)\n    at async Promise.all (index 2)\n    at async HTMLDocument.initializeAdminConsole (http://localhost:3001/_super-admin/:895:17)",
-        "url": "http://localhost:3001/_super-admin/",
-        "lineNumber": 949,
-        "columnNumber": 24,
-        "timestamp": "2025-09-10T17:49:56.106Z"
+        "timestamp": "2025-09-23T02:38:51.373Z"
       },
       {
         "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
-        "url": "http://localhost:3001/api/super-admin/metrics",
+        "url": "http://localhost:3002/api/auth/verify",
         "lineNumber": 0,
         "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:56.106Z"
+        "timestamp": "2025-09-23T02:38:51.462Z"
       },
       {
-        "text": "Failed to load resource: the server responded with a status of 405 (Method Not Allowed)",
-        "url": "http://localhost:3001/api/super-admin/audit",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/api/auth/verify",
         "lineNumber": 0,
         "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:56.107Z"
+        "timestamp": "2025-09-23T02:38:51.616Z"
       },
       {
-        "text": "CRITICAL: Audit logging failed: Error: Audit logging failed: 405\n    at logAdminAction (http://localhost:3001/_super-admin/:947:27)\n    at async loadRecentAuditLogs (http://localhost:3001/_super-admin/:1232:17)\n    at async Promise.all (index 3)\n    at async HTMLDocument.initializeAdminConsole (http://localhost:3001/_super-admin/:895:17)",
-        "url": "http://localhost:3001/_super-admin/",
-        "lineNumber": 949,
-        "columnNumber": 24,
-        "timestamp": "2025-09-10T17:49:56.107Z"
-      },
-      {
-        "text": "Failed to load resource: the server responded with a status of 405 (Method Not Allowed)",
-        "url": "http://localhost:3001/api/super-admin/audit",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3002/api/super-admin/revenue-metrics",
         "lineNumber": 0,
         "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:56.107Z"
+        "timestamp": "2025-09-23T02:39:21.365Z"
       },
       {
-        "text": "CRITICAL: Audit logging failed: Error: Audit logging failed: 405\n    at logAdminAction (http://localhost:3001/_super-admin/:947:27)\n    at async loadSystemMetrics (http://localhost:3001/_super-admin/:1100:17)\n    at async Promise.all (index 0)\n    at async HTMLDocument.initializeAdminConsole (http://localhost:3001/_super-admin/:895:17)",
-        "url": "http://localhost:3001/_super-admin/",
-        "lineNumber": 949,
-        "columnNumber": 24,
-        "timestamp": "2025-09-10T17:49:56.107Z"
-      },
-      {
-        "text": "Failed to load resource: the server responded with a status of 405 (Method Not Allowed)",
-        "url": "http://localhost:3001/api/super-admin/audit",
-        "lineNumber": 0,
-        "columnNumber": 0,
-        "timestamp": "2025-09-10T17:49:56.108Z"
-      },
-      {
-        "text": "CRITICAL: Audit logging failed: Error: Audit logging failed: 405\n    at logAdminAction (http://localhost:3001/_super-admin/:947:27)",
-        "url": "http://localhost:3001/_super-admin/",
-        "lineNumber": 949,
-        "columnNumber": 24,
-        "timestamp": "2025-09-10T17:49:56.109Z"
+        "text": "Silent fetch error: Error: HTTP error! status: 404\n    at silentFetch (http://localhost:3002/_super-admin/js/main.js:2841:33)\n    at async silentRefreshDashboard (http://localhost:3002/_super-admin/js/main.js:3015:18)\n    at async silentRefreshCurrentView (http://localhost:3002/_super-admin/js/main.js:2916:13)",
+        "url": "http://localhost:3002/_super-admin/js/main.js",
+        "lineNumber": 2843,
+        "columnNumber": 16,
+        "timestamp": "2025-09-23T02:39:21.365Z"
       }
     ],
     "networkFailures": [
       {
-        "url": "http://localhost:3001/api/auth/verify",
+        "url": "http://localhost:3002/api/auth/verify",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:36.241Z"
+        "timestamp": "2025-09-23T02:38:33.448Z"
       },
       {
-        "url": "http://localhost:3001/api/manager/dashboard",
+        "url": "http://localhost:3002/api/manager/dashboard",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:36.243Z"
+        "timestamp": "2025-09-23T02:38:33.448Z"
       },
       {
-        "url": "http://localhost:3001/api/admin/analytics?analytics_type=overview",
+        "url": "http://localhost:3002/api/auth/verify",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:36.244Z"
+        "timestamp": "2025-09-23T02:38:33.458Z"
       },
       {
-        "url": "http://localhost:3001/api/admin/user-management",
-        "status": 404,
-        "statusText": "Not Found",
-        "method": "GET",
-        "timestamp": "2025-09-10T17:49:36.244Z"
-      },
-      {
-        "url": "http://localhost:3001/api/admin/commission-settings",
-        "status": 404,
-        "statusText": "Not Found",
-        "method": "GET",
-        "timestamp": "2025-09-10T17:49:36.244Z"
-      },
-      {
-        "url": "http://localhost:3001/api/admin/api-keys",
-        "status": 404,
-        "statusText": "Not Found",
-        "method": "GET",
-        "timestamp": "2025-09-10T17:49:36.244Z"
-      },
-      {
-        "url": "http://localhost:3001/api/auth/verify",
+        "url": "http://localhost:3002/api/auth/verify",
         "method": "GET",
         "failure": {
           "errorText": "net::ERR_ABORTED"
         },
-        "timestamp": "2025-09-10T17:49:36.258Z"
+        "timestamp": "2025-09-23T02:38:33.458Z"
       },
       {
-        "url": "http://localhost:3001/api/manager/dashboard",
+        "url": "http://localhost:3002/api/manager/dashboard",
         "method": "GET",
         "failure": {
           "errorText": "net::ERR_ABORTED"
         },
-        "timestamp": "2025-09-10T17:49:36.259Z"
+        "timestamp": "2025-09-23T02:38:33.459Z"
       },
       {
-        "url": "http://localhost:3001/api/manager/dashboard",
+        "url": "http://localhost:3002/api/manager/dashboard",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:36.259Z"
+        "timestamp": "2025-09-23T02:38:33.459Z"
       },
       {
-        "url": "http://localhost:3001/api/admin/analytics?analytics_type=overview",
+        "url": "http://localhost:3002/api/admin/leads?recent=true&limit=10",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:36.259Z"
+        "timestamp": "2025-09-23T02:38:33.460Z"
       },
       {
-        "url": "http://localhost:3001/api/admin/user-management",
+        "url": "http://localhost:3002/api/admin/commission-summary",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:36.259Z"
+        "timestamp": "2025-09-23T02:38:33.460Z"
       },
       {
-        "url": "http://localhost:3001/api/admin/commission-settings",
+        "url": "http://localhost:3002/api/auth/verify",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:33.460Z"
+      },
+      {
+        "url": "http://localhost:3002/api/manager/dashboard",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:33.460Z"
+      },
+      {
+        "url": "http://localhost:3002/api/admin/leads?recent=true&limit=10",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:33.460Z"
+      },
+      {
+        "url": "http://localhost:3002/api/admin/commission-summary",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:33.460Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:36.259Z"
+        "timestamp": "2025-09-23T02:38:33.460Z"
       },
       {
-        "url": "http://localhost:3001/api/admin/api-keys",
+        "url": "http://localhost:3002/api/auth/verify",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:33.460Z"
+      },
+      {
+        "url": "http://localhost:3002/api/admin/leads?recent=true&limit=10",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:36.259Z"
+        "timestamp": "2025-09-23T02:38:33.461Z"
       },
       {
-        "url": "http://localhost:3001/api/admin/analytics?analytics_type=overview",
-        "method": "GET",
-        "failure": {
-          "errorText": "net::ERR_ABORTED"
-        },
-        "timestamp": "2025-09-10T17:49:36.259Z"
-      },
-      {
-        "url": "http://localhost:3001/api/admin/user-management",
-        "method": "GET",
-        "failure": {
-          "errorText": "net::ERR_ABORTED"
-        },
-        "timestamp": "2025-09-10T17:49:36.259Z"
-      },
-      {
-        "url": "http://localhost:3001/api/admin/commission-settings",
-        "method": "GET",
-        "failure": {
-          "errorText": "net::ERR_ABORTED"
-        },
-        "timestamp": "2025-09-10T17:49:36.259Z"
-      },
-      {
-        "url": "http://localhost:3001/api/admin/api-keys",
-        "method": "GET",
-        "failure": {
-          "errorText": "net::ERR_ABORTED"
-        },
-        "timestamp": "2025-09-10T17:49:36.259Z"
-      },
-      {
-        "url": "http://localhost:3001/api/manager/dashboard",
-        "method": "GET",
-        "failure": {
-          "errorText": "net::ERR_ABORTED"
-        },
-        "timestamp": "2025-09-10T17:49:36.259Z"
-      },
-      {
-        "url": "http://localhost:3001/api/admin/analytics?analytics_type=overview",
-        "method": "GET",
-        "failure": {
-          "errorText": "net::ERR_ABORTED"
-        },
-        "timestamp": "2025-09-10T17:49:36.259Z"
-      },
-      {
-        "url": "http://localhost:3001/api/admin/user-management",
-        "method": "GET",
-        "failure": {
-          "errorText": "net::ERR_ABORTED"
-        },
-        "timestamp": "2025-09-10T17:49:36.259Z"
-      },
-      {
-        "url": "http://localhost:3001/api/admin/commission-settings",
-        "method": "GET",
-        "failure": {
-          "errorText": "net::ERR_ABORTED"
-        },
-        "timestamp": "2025-09-10T17:49:36.259Z"
-      },
-      {
-        "url": "http://localhost:3001/api/admin/api-keys",
-        "method": "GET",
-        "failure": {
-          "errorText": "net::ERR_ABORTED"
-        },
-        "timestamp": "2025-09-10T17:49:36.259Z"
-      },
-      {
-        "url": "http://localhost:3001/api/admin/leads?recent=true&limit=10",
+        "url": "http://localhost:3002/api/admin/commission-summary",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:36.259Z"
+        "timestamp": "2025-09-23T02:38:33.461Z"
       },
       {
-        "url": "http://localhost:3001/api/admin/leads?recent=true&limit=10",
+        "url": "http://localhost:3002/api/admin/leads?recent=true&limit=10",
         "method": "GET",
         "failure": {
           "errorText": "net::ERR_ABORTED"
         },
-        "timestamp": "2025-09-10T17:49:36.260Z"
+        "timestamp": "2025-09-23T02:38:33.461Z"
       },
       {
-        "url": "http://localhost:3001/api/admin/commission-summary",
+        "url": "http://localhost:3002/api/admin/commission-summary",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:33.461Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:36.260Z"
+        "timestamp": "2025-09-23T02:38:33.557Z"
       },
       {
-        "url": "http://localhost:3001/api/admin/commission-summary",
+        "url": "http://localhost:3002/api/auth/verify",
         "method": "GET",
         "failure": {
           "errorText": "net::ERR_ABORTED"
         },
-        "timestamp": "2025-09-10T17:49:36.260Z"
+        "timestamp": "2025-09-23T02:38:33.557Z"
       },
       {
-        "url": "http://localhost:3001/api/admin/leads?recent=true&limit=10",
+        "url": "http://localhost:3002/api/auth/verify",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:36.261Z"
+        "timestamp": "2025-09-23T02:38:33.711Z"
       },
       {
-        "url": "http://localhost:3001/api/admin/leads?recent=true&limit=10",
+        "url": "http://localhost:3002/api/auth/verify",
         "method": "GET",
         "failure": {
           "errorText": "net::ERR_ABORTED"
         },
-        "timestamp": "2025-09-10T17:49:36.261Z"
+        "timestamp": "2025-09-23T02:38:33.711Z"
       },
       {
-        "url": "http://localhost:3001/api/admin/commission-summary",
+        "url": "http://localhost:3002/api/auth/verify",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:36.262Z"
+        "timestamp": "2025-09-23T02:38:37.340Z"
       },
       {
-        "url": "http://localhost:3001/api/admin/commission-summary",
-        "method": "GET",
-        "failure": {
-          "errorText": "net::ERR_ABORTED"
-        },
-        "timestamp": "2025-09-10T17:49:36.262Z"
-      },
-      {
-        "url": "http://localhost:3001/api/auth/verify",
+        "url": "http://localhost:3002/api/auth/verify",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:40.612Z"
+        "timestamp": "2025-09-23T02:38:37.340Z"
       },
       {
-        "url": "http://localhost:3001/api/auth/verify",
+        "url": "http://localhost:3002/api/auth/verify",
         "method": "GET",
         "failure": {
           "errorText": "net::ERR_ABORTED"
         },
-        "timestamp": "2025-09-10T17:49:40.612Z"
+        "timestamp": "2025-09-23T02:38:37.340Z"
       },
       {
-        "url": "http://localhost:3001/api/auth/verify",
+        "url": "http://localhost:3002/api/auth/verify",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:37.340Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:44.408Z"
+        "timestamp": "2025-09-23T02:38:37.341Z"
       },
       {
-        "url": "http://localhost:3001/api/auth/verify",
+        "url": "http://localhost:3002/api/auth/verify",
         "method": "GET",
         "failure": {
           "errorText": "net::ERR_ABORTED"
         },
-        "timestamp": "2025-09-10T17:49:44.408Z"
+        "timestamp": "2025-09-23T02:38:37.344Z"
       },
       {
-        "url": "http://localhost:3001/leaderboard/css/leaderboard-base.css",
+        "url": "http://localhost:3002/api/auth/verify",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:49.058Z"
+        "timestamp": "2025-09-23T02:38:37.500Z"
       },
       {
-        "url": "http://localhost:3001/leaderboard/css/leaderboard-base.css",
+        "url": "http://localhost:3002/api/auth/verify",
         "method": "GET",
         "failure": {
           "errorText": "net::ERR_ABORTED"
         },
-        "timestamp": "2025-09-10T17:49:49.067Z"
+        "timestamp": "2025-09-23T02:38:37.500Z"
       },
       {
-        "url": "http://localhost:3001/leaderboard/js/leaderboard-theme.js",
+        "url": "http://localhost:3002/api/auth/verify",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:49.067Z"
+        "timestamp": "2025-09-23T02:38:37.501Z"
       },
       {
-        "url": "http://localhost:3001/leaderboard/js/leaderboard-theme.js",
+        "url": "http://localhost:3002/api/auth/verify",
         "method": "GET",
         "failure": {
           "errorText": "net::ERR_ABORTED"
         },
-        "timestamp": "2025-09-10T17:49:49.067Z"
+        "timestamp": "2025-09-23T02:38:37.501Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
+        "status": 404,
+        "statusText": "Not Found",
+        "method": "GET",
+        "timestamp": "2025-09-23T02:38:37.502Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:37.502Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
+        "status": 404,
+        "statusText": "Not Found",
+        "method": "GET",
+        "timestamp": "2025-09-23T02:38:37.503Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:37.504Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
+        "status": 404,
+        "statusText": "Not Found",
+        "method": "GET",
+        "timestamp": "2025-09-23T02:38:37.946Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:37.946Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
+        "status": 404,
+        "statusText": "Not Found",
+        "method": "GET",
+        "timestamp": "2025-09-23T02:38:38.099Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:38.099Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
+        "status": 404,
+        "statusText": "Not Found",
+        "method": "GET",
+        "timestamp": "2025-09-23T02:38:40.337Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:40.337Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
+        "status": 404,
+        "statusText": "Not Found",
+        "method": "GET",
+        "timestamp": "2025-09-23T02:38:40.492Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:40.492Z"
+      },
+      {
+        "url": "http://localhost:3002/customer-service/components/global-header.js",
+        "status": 404,
+        "statusText": "Not Found",
+        "method": "GET",
+        "timestamp": "2025-09-23T02:38:41.486Z"
+      },
+      {
+        "url": "http://localhost:3002/customer-service/components/global-header.js",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:41.486Z"
+      },
+      {
+        "url": "http://localhost:3002/customer-service/components/navigation.js",
+        "status": 404,
+        "statusText": "Not Found",
+        "method": "GET",
+        "timestamp": "2025-09-23T02:38:41.486Z"
+      },
+      {
+        "url": "http://localhost:3002/customer-service/components/navigation.js",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:41.486Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
+        "status": 404,
+        "statusText": "Not Found",
+        "method": "GET",
+        "timestamp": "2025-09-23T02:38:41.497Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:41.499Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
+        "status": 404,
+        "statusText": "Not Found",
+        "method": "GET",
+        "timestamp": "2025-09-23T02:38:41.591Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:41.591Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
+        "status": 404,
+        "statusText": "Not Found",
+        "method": "GET",
+        "timestamp": "2025-09-23T02:38:41.748Z"
+      },
+      {
+        "url": "http://localhost:3002/api/auth/verify",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:41.749Z"
+      },
+      {
+        "url": "http://localhost:3002/leaderboard/css/leaderboard-base.css",
+        "status": 404,
+        "statusText": "Not Found",
+        "method": "GET",
+        "timestamp": "2025-09-23T02:38:45.253Z"
+      },
+      {
+        "url": "http://localhost:3002/leaderboard/css/leaderboard-base.css",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:45.253Z"
+      },
+      {
+        "url": "http://localhost:3002/leaderboard/js/leaderboard-theme.js",
+        "status": 404,
+        "statusText": "Not Found",
+        "method": "GET",
+        "timestamp": "2025-09-23T02:38:45.253Z"
+      },
+      {
+        "url": "http://localhost:3002/leaderboard/js/leaderboard-theme.js",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:45.253Z"
+      },
+      {
+        "url": "http://localhost:3002/api/leaderboard/global",
+        "status": 404,
+        "statusText": "Not Found",
+        "method": "GET",
+        "timestamp": "2025-09-23T02:38:45.274Z"
+      },
+      {
+        "url": "http://localhost:3002/leaderboard/css/themes/competition.css",
+        "status": 404,
+        "statusText": "Not Found",
+        "method": "GET",
+        "timestamp": "2025-09-23T02:38:46.274Z"
+      },
+      {
+        "url": "http://localhost:3002/leaderboard/css/themes/competition.css",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:46.274Z"
+      },
+      {
+        "url": "http://localhost:3002/manager/components/navigation.js",
+        "status": 404,
+        "statusText": "Not Found",
+        "method": "GET",
+        "timestamp": "2025-09-23T02:38:48.209Z"
+      },
+      {
+        "url": "http://localhost:3002/manager/components/navigation.js",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:48.209Z"
+      },
+      {
+        "url": "http://localhost:3002/manager/components/global-header.js",
+        "status": 404,
+        "statusText": "Not Found",
+        "method": "GET",
+        "timestamp": "2025-09-23T02:38:48.209Z"
+      },
+      {
+        "url": "http://localhost:3002/manager/components/global-header.js",
+        "method": "GET",
+        "failure": {
+          "errorText": "net::ERR_ABORTED"
+        },
+        "timestamp": "2025-09-23T02:38:48.209Z"
       },
       {
         "url": "https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.css",
@@ -582,216 +866,323 @@
         "failure": {
           "errorText": "net::ERR_BLOCKED_BY_ORB"
         },
-        "timestamp": "2025-09-10T17:49:52.168Z"
+        "timestamp": "2025-09-23T02:38:48.378Z"
       },
       {
-        "url": "http://localhost:3001/api/manager/dashboard?timeframe=month",
+        "url": "http://localhost:3002/api/manager/dashboard?timeframe=month",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:52.182Z"
+        "timestamp": "2025-09-23T02:38:48.394Z"
       },
       {
-        "url": "http://localhost:3001/api/auth/verify",
+        "url": "http://localhost:3002/api/auth/verify",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:56.100Z"
+        "timestamp": "2025-09-23T02:38:48.496Z"
       },
       {
-        "url": "http://localhost:3001/api/auth/verify",
+        "url": "http://localhost:3002/api/auth/verify",
         "method": "GET",
         "failure": {
           "errorText": "net::ERR_ABORTED"
         },
-        "timestamp": "2025-09-10T17:49:56.101Z"
+        "timestamp": "2025-09-23T02:38:48.496Z"
       },
       {
-        "url": "http://localhost:3001/api/super-admin/audit",
-        "status": 405,
-        "statusText": "Method Not Allowed",
-        "method": "POST",
-        "timestamp": "2025-09-10T17:49:56.102Z"
-      },
-      {
-        "url": "http://localhost:3001/api/super-admin/audit",
-        "method": "POST",
-        "failure": {
-          "errorText": "net::ERR_ABORTED"
-        },
-        "timestamp": "2025-09-10T17:49:56.103Z"
-      },
-      {
-        "url": "http://localhost:3001/api/super-admin/audit",
-        "status": 405,
-        "statusText": "Method Not Allowed",
-        "method": "POST",
-        "timestamp": "2025-09-10T17:49:56.104Z"
-      },
-      {
-        "url": "http://localhost:3001/api/super-admin/audit",
-        "method": "POST",
-        "failure": {
-          "errorText": "net::ERR_ABORTED"
-        },
-        "timestamp": "2025-09-10T17:49:56.104Z"
-      },
-      {
-        "url": "http://localhost:3001/api/super-admin/health",
+        "url": "http://localhost:3002/api/auth/verify",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:56.104Z"
+        "timestamp": "2025-09-23T02:38:48.651Z"
       },
       {
-        "url": "http://localhost:3001/api/super-admin/health",
+        "url": "http://localhost:3002/api/auth/verify",
         "method": "GET",
         "failure": {
           "errorText": "net::ERR_ABORTED"
         },
-        "timestamp": "2025-09-10T17:49:56.105Z"
+        "timestamp": "2025-09-23T02:38:48.651Z"
       },
       {
-        "url": "http://localhost:3001/api/super-admin/performance",
+        "url": "http://localhost:3002/api/auth/verify",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:56.105Z"
+        "timestamp": "2025-09-23T02:38:51.373Z"
       },
       {
-        "url": "http://localhost:3001/api/super-admin/audit?limit=10",
+        "url": "http://localhost:3002/api/super-admin/revenue-metrics",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:56.105Z"
+        "timestamp": "2025-09-23T02:38:51.373Z"
       },
       {
-        "url": "http://localhost:3001/api/super-admin/performance",
+        "url": "http://localhost:3002/api/auth/verify",
         "method": "GET",
         "failure": {
           "errorText": "net::ERR_ABORTED"
         },
-        "timestamp": "2025-09-10T17:49:56.105Z"
+        "timestamp": "2025-09-23T02:38:51.374Z"
       },
       {
-        "url": "http://localhost:3001/api/super-admin/audit?limit=10",
-        "method": "GET",
-        "failure": {
-          "errorText": "net::ERR_ABORTED"
-        },
-        "timestamp": "2025-09-10T17:49:56.105Z"
-      },
-      {
-        "url": "http://localhost:3001/api/super-admin/audit",
-        "status": 405,
-        "statusText": "Method Not Allowed",
-        "method": "POST",
-        "timestamp": "2025-09-10T17:49:56.106Z"
-      },
-      {
-        "url": "http://localhost:3001/api/super-admin/metrics",
+        "url": "http://localhost:3002/api/auth/verify",
         "status": 404,
         "statusText": "Not Found",
         "method": "GET",
-        "timestamp": "2025-09-10T17:49:56.106Z"
+        "timestamp": "2025-09-23T02:38:51.462Z"
       },
       {
-        "url": "http://localhost:3001/api/super-admin/audit",
-        "method": "POST",
-        "failure": {
-          "errorText": "net::ERR_ABORTED"
-        },
-        "timestamp": "2025-09-10T17:49:56.106Z"
-      },
-      {
-        "url": "http://localhost:3001/api/super-admin/metrics",
+        "url": "http://localhost:3002/api/auth/verify",
         "method": "GET",
         "failure": {
           "errorText": "net::ERR_ABORTED"
         },
-        "timestamp": "2025-09-10T17:49:56.106Z"
+        "timestamp": "2025-09-23T02:38:51.462Z"
       },
       {
-        "url": "http://localhost:3001/api/super-admin/audit",
-        "status": 405,
-        "statusText": "Method Not Allowed",
-        "method": "POST",
-        "timestamp": "2025-09-10T17:49:56.107Z"
+        "url": "http://localhost:3002/api/auth/verify",
+        "status": 404,
+        "statusText": "Not Found",
+        "method": "GET",
+        "timestamp": "2025-09-23T02:38:51.616Z"
       },
       {
-        "url": "http://localhost:3001/api/super-admin/audit",
-        "method": "POST",
+        "url": "http://localhost:3002/api/auth/verify",
+        "method": "GET",
         "failure": {
           "errorText": "net::ERR_ABORTED"
         },
-        "timestamp": "2025-09-10T17:49:56.107Z"
+        "timestamp": "2025-09-23T02:38:51.616Z"
       },
       {
-        "url": "http://localhost:3001/api/super-admin/audit",
-        "status": 405,
-        "statusText": "Method Not Allowed",
-        "method": "POST",
-        "timestamp": "2025-09-10T17:49:56.107Z"
+        "url": "http://localhost:3002/api/super-admin/revenue-metrics",
+        "status": 404,
+        "statusText": "Not Found",
+        "method": "GET",
+        "timestamp": "2025-09-23T02:39:21.365Z"
       },
       {
-        "url": "http://localhost:3001/api/super-admin/audit",
-        "method": "POST",
+        "url": "http://localhost:3002/api/super-admin/revenue-metrics",
+        "method": "GET",
         "failure": {
           "errorText": "net::ERR_ABORTED"
         },
-        "timestamp": "2025-09-10T17:49:56.107Z"
-      },
-      {
-        "url": "http://localhost:3001/api/super-admin/audit",
-        "status": 405,
-        "statusText": "Method Not Allowed",
-        "method": "POST",
-        "timestamp": "2025-09-10T17:49:56.108Z"
-      },
-      {
-        "url": "http://localhost:3001/api/super-admin/audit",
-        "method": "POST",
-        "failure": {
-          "errorText": "net::ERR_ABORTED"
-        },
-        "timestamp": "2025-09-10T17:49:56.109Z"
+        "timestamp": "2025-09-23T02:39:21.365Z"
       }
     ],
     "actionErrors": [
       {
-        "portal": "Admin Portal",
-        "element": "input",
-        "index": 0,
-        "error": "elementHandle.fill: Error: Element is not an <input>, <textarea> or [contenteditable] element\nCall log:\n\u001b[2m    - fill(\"\")\u001b[22m\n\u001b[2m  - attempting fill action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and editable\u001b[22m\n",
-        "timestamp": "2025-09-10T17:49:39.453Z"
-      },
-      {
         "portal": "Customer Service Portal",
         "element": "input",
-        "index": 0,
+        "index": 1,
         "error": "elementHandle.fill: Error: Element is not an <input>, <textarea> or [contenteditable] element\nCall log:\n\u001b[2m    - fill(\"\")\u001b[22m\n\u001b[2m  - attempting fill action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and editable\u001b[22m\n",
-        "timestamp": "2025-09-10T17:49:47.966Z"
+        "timestamp": "2025-09-23T02:38:45.078Z"
       },
       {
-        "portal": "Customer Service Portal",
-        "element": "input",
-        "index": 2,
-        "error": "elementHandle.fill: Error: Element is not an <input>, <textarea> or [contenteditable] element\nCall log:\n\u001b[2m    - fill(\"\")\u001b[22m\n\u001b[2m  - attempting fill action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and editable\u001b[22m\n",
-        "timestamp": "2025-09-10T17:49:48.124Z"
-      },
-      {
-        "portal": "Manager Portal",
+        "portal": "Leaderboard Portal",
         "element": "input",
         "index": 0,
         "error": "elementHandle.fill: Error: Element is not an <input>, <textarea> or [contenteditable] element\nCall log:\n\u001b[2m    - fill(\"\")\u001b[22m\n\u001b[2m  - attempting fill action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and editable\u001b[22m\n",
-        "timestamp": "2025-09-10T17:49:55.167Z"
+        "timestamp": "2025-09-23T02:38:47.968Z"
+      },
+      {
+        "portal": "Leaderboard Portal",
+        "element": "input",
+        "index": 1,
+        "error": "elementHandle.fill: Error: Element is not an <input>, <textarea> or [contenteditable] element\nCall log:\n\u001b[2m    - fill(\"\")\u001b[22m\n\u001b[2m  - attempting fill action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and editable\u001b[22m\n",
+        "timestamp": "2025-09-23T02:38:48.046Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "button",
+        "index": 0,
+        "error": "Click timeout",
+        "timestamp": "2025-09-23T02:38:56.165Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "button",
+        "index": 1,
+        "error": "Click timeout",
+        "timestamp": "2025-09-23T02:38:58.183Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "button",
+        "index": 3,
+        "error": "Click timeout",
+        "timestamp": "2025-09-23T02:39:00.191Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "button",
+        "index": 4,
+        "error": "Click timeout",
+        "timestamp": "2025-09-23T02:39:02.195Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "button",
+        "index": 5,
+        "error": "Click timeout",
+        "timestamp": "2025-09-23T02:39:04.211Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "button",
+        "index": 6,
+        "error": "Click timeout",
+        "timestamp": "2025-09-23T02:39:06.229Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "button",
+        "index": 7,
+        "error": "Click timeout",
+        "timestamp": "2025-09-23T02:39:08.244Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "button",
+        "index": 8,
+        "error": "Click timeout",
+        "timestamp": "2025-09-23T02:39:10.263Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "button",
+        "index": 9,
+        "error": "Click timeout",
+        "timestamp": "2025-09-23T02:39:12.272Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "button",
+        "index": 10,
+        "error": "Click timeout",
+        "timestamp": "2025-09-23T02:39:14.276Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "button",
+        "index": 11,
+        "error": "Click timeout",
+        "timestamp": "2025-09-23T02:39:16.294Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "button",
+        "index": 12,
+        "error": "Click timeout",
+        "timestamp": "2025-09-23T02:39:18.299Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "button",
+        "index": 13,
+        "error": "Click timeout",
+        "timestamp": "2025-09-23T02:39:20.303Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "button",
+        "index": 14,
+        "error": "Click timeout",
+        "timestamp": "2025-09-23T02:39:22.308Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "button",
+        "index": 15,
+        "error": "Click timeout",
+        "timestamp": "2025-09-23T02:39:24.312Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "button",
+        "index": 16,
+        "error": "Click timeout",
+        "timestamp": "2025-09-23T02:39:26.317Z"
       },
       {
         "portal": "Super Admin Portal",
         "element": "input",
-        "index": 0,
+        "index": 3,
         "error": "elementHandle.fill: Error: Element is not an <input>, <textarea> or [contenteditable] element\nCall log:\n\u001b[2m    - fill(\"\")\u001b[22m\n\u001b[2m  - attempting fill action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and editable\u001b[22m\n",
-        "timestamp": "2025-09-10T17:49:58.814Z"
+        "timestamp": "2025-09-23T02:39:26.645Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "input",
+        "index": 6,
+        "error": "elementHandle.fill: Error: Element is not an <input>, <textarea> or [contenteditable] element\nCall log:\n\u001b[2m    - fill(\"\")\u001b[22m\n\u001b[2m  - attempting fill action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and editable\u001b[22m\n",
+        "timestamp": "2025-09-23T02:39:26.723Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "input",
+        "index": 14,
+        "error": "elementHandle.fill: Error: Element is not an <input>, <textarea> or [contenteditable] element\nCall log:\n\u001b[2m    - fill(\"\")\u001b[22m\n\u001b[2m  - attempting fill action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and editable\u001b[22m\n",
+        "timestamp": "2025-09-23T02:39:27.043Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "input",
+        "index": 18,
+        "error": "elementHandle.fill: Error: Element is not an <input>, <textarea> or [contenteditable] element\nCall log:\n\u001b[2m    - fill(\"\")\u001b[22m\n\u001b[2m  - attempting fill action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and editable\u001b[22m\n",
+        "timestamp": "2025-09-23T02:39:27.355Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "input",
+        "index": 19,
+        "error": "elementHandle.fill: Error: Element is not an <input>, <textarea> or [contenteditable] element\nCall log:\n\u001b[2m    - fill(\"\")\u001b[22m\n\u001b[2m  - attempting fill action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and editable\u001b[22m\n",
+        "timestamp": "2025-09-23T02:39:27.436Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "input",
+        "index": 22,
+        "error": "elementHandle.fill: Target page, context or browser has been closed\nCall log:\n\u001b[2m    - fill(\"\")\u001b[22m\n\u001b[2m  - attempting fill action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and editable\u001b[22m\n\u001b[2m      - element is not editable\u001b[22m\n\u001b[2m    - retrying fill action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and editable\u001b[22m\n\u001b[2m      - element is not editable\u001b[22m\n\u001b[2m    - retrying fill action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    4 × waiting for element to be visible, enabled and editable\u001b[22m\n\u001b[2m      - element is not editable\u001b[22m\n\u001b[2m    - retrying fill action\u001b[22m\n\u001b[2m      - waiting 500ms\u001b[22m\n",
+        "timestamp": "2025-09-23T02:39:29.500Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "input",
+        "index": 23,
+        "error": "elementHandle.getAttribute: Target page, context or browser has been closed",
+        "timestamp": "2025-09-23T02:39:29.500Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "input",
+        "index": 24,
+        "error": "elementHandle.getAttribute: Target page, context or browser has been closed",
+        "timestamp": "2025-09-23T02:39:29.501Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "input",
+        "index": 25,
+        "error": "elementHandle.getAttribute: Target page, context or browser has been closed",
+        "timestamp": "2025-09-23T02:39:29.501Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "input",
+        "index": 26,
+        "error": "elementHandle.getAttribute: Target page, context or browser has been closed",
+        "timestamp": "2025-09-23T02:39:29.501Z"
+      },
+      {
+        "portal": "Super Admin Portal",
+        "element": "input",
+        "index": 27,
+        "error": "elementHandle.getAttribute: Target page, context or browser has been closed",
+        "timestamp": "2025-09-23T02:39:29.501Z"
       }
     ]
   },
@@ -833,64 +1224,24 @@
     }
   ],
   "visitedUrls": [
-    "http://localhost:3001/login.html",
-    "http://localhost:3001/_admin/",
-    "http://localhost:3001/_agent/",
-    "http://localhost:3001/_customer-service/",
-    "http://localhost:3001/_leaderboard/",
-    "http://localhost:3001/_manager/",
-    "http://localhost:3001/_super-admin/"
+    "http://localhost:3002/login.html",
+    "http://localhost:3002/_admin/",
+    "http://localhost:3002/_agent/",
+    "http://localhost:3002/_customer-service/",
+    "http://localhost:3002/_leaderboard/",
+    "http://localhost:3002/_manager/",
+    "http://localhost:3002/_super-admin/"
   ],
   "suspectFiles": [
     {
-      "file": "api/super-admin/audit",
-      "errorCount": 7,
-      "lines": [],
-      "fileLineRefs": []
-    },
-    {
-      "file": "_super-admin/",
-      "errorCount": 6,
-      "lines": [
-        949
-      ],
-      "fileLineRefs": [
-        "_super-admin/:949"
-      ]
-    },
-    {
       "file": "api/auth/verify",
-      "errorCount": 4,
+      "errorCount": 24,
       "lines": [],
       "fileLineRefs": []
     },
     {
       "file": "api/manager/dashboard",
       "errorCount": 3,
-      "lines": [],
-      "fileLineRefs": []
-    },
-    {
-      "file": "api/admin/analytics",
-      "errorCount": 2,
-      "lines": [],
-      "fileLineRefs": []
-    },
-    {
-      "file": "api/admin/user-management",
-      "errorCount": 2,
-      "lines": [],
-      "fileLineRefs": []
-    },
-    {
-      "file": "api/admin/commission-settings",
-      "errorCount": 2,
-      "lines": [],
-      "fileLineRefs": []
-    },
-    {
-      "file": "api/admin/api-keys",
-      "errorCount": 2,
       "lines": [],
       "fileLineRefs": []
     },
@@ -904,15 +1255,33 @@
       "file": "_admin/",
       "errorCount": 2,
       "lines": [
-        655
+        601
       ],
       "fileLineRefs": [
-        "_admin/:655"
+        "_admin/:601"
       ]
     },
     {
       "file": "api/admin/commission-summary",
       "errorCount": 2,
+      "lines": [],
+      "fileLineRefs": []
+    },
+    {
+      "file": "api/super-admin/revenue-metrics",
+      "errorCount": 2,
+      "lines": [],
+      "fileLineRefs": []
+    },
+    {
+      "file": "customer-service/components/global-header.js",
+      "errorCount": 1,
+      "lines": [],
+      "fileLineRefs": []
+    },
+    {
+      "file": "customer-service/components/navigation.js",
+      "errorCount": 1,
       "lines": [],
       "fileLineRefs": []
     },
@@ -929,32 +1298,98 @@
       "fileLineRefs": []
     },
     {
-      "file": "_manager/",
+      "file": "api/leaderboard/global",
+      "errorCount": 1,
+      "lines": [],
+      "fileLineRefs": []
+    },
+    {
+      "file": "_leaderboard/",
       "errorCount": 1,
       "lines": [
-        223
+        186
       ],
       "fileLineRefs": [
-        "_manager/:223"
+        "_leaderboard/:186"
       ]
     },
     {
-      "file": "api/super-admin/health",
+      "file": "leaderboard/css/themes/competition.css",
       "errorCount": 1,
       "lines": [],
       "fileLineRefs": []
     },
     {
-      "file": "api/super-admin/performance",
+      "file": "manager/components/navigation.js",
       "errorCount": 1,
       "lines": [],
       "fileLineRefs": []
     },
     {
-      "file": "api/super-admin/metrics",
+      "file": "manager/components/global-header.js",
       "errorCount": 1,
       "lines": [],
       "fileLineRefs": []
+    },
+    {
+      "file": "_manager/",
+      "errorCount": 1,
+      "lines": [
+        187
+      ],
+      "fileLineRefs": [
+        "_manager/:187"
+      ]
+    },
+    {
+      "file": "_super-admin/js/main.js",
+      "errorCount": 1,
+      "lines": [
+        2843
+      ],
+      "fileLineRefs": [
+        "_super-admin/js/main.js:2843"
+      ]
+    },
+    {
+      "file": "_admin/js/dashboard.js",
+      "errorCount": 1,
+      "lines": [
+        336
+      ],
+      "fileLineRefs": [
+        "_admin/js/dashboard.js:336"
+      ]
+    },
+    {
+      "file": "HTMLDocument.<anonymous> (http://localhost:3002/_customer-service/",
+      "errorCount": 1,
+      "lines": [
+        47
+      ],
+      "fileLineRefs": [
+        "HTMLDocument.<anonymous> (http://localhost:3002/_customer-service/:47"
+      ]
+    },
+    {
+      "file": "_manager/js/dashboard.js",
+      "errorCount": 1,
+      "lines": [
+        313
+      ],
+      "fileLineRefs": [
+        "_manager/js/dashboard.js:313"
+      ]
+    },
+    {
+      "file": "HTMLDocument.<anonymous> (http://localhost:3002/_manager/",
+      "errorCount": 1,
+      "lines": [
+        400
+      ],
+      "fileLineRefs": [
+        "HTMLDocument.<anonymous> (http://localhost:3002/_manager/:400"
+      ]
     }
   ]
 }

@@ -272,15 +272,37 @@
         // Load performance stats
         async function loadStats() {
             try {
-                // API endpoints not configured - show clean zero state
-                console.log('API endpoints not configured, showing empty state...');
-                
-                document.getElementById('monthlyCommissions').textContent = '$0';
-                document.getElementById('monthlySales').textContent = '0';
-                document.getElementById('totalCustomers').textContent = '0';
-                document.getElementById('conversionRate').textContent = '0%';
+                const response = await fetch('/api/agent/dashboard', {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Update dashboard with real data
+                document.getElementById('monthlyCommissions').textContent = `$${data.commissions?.toLocaleString() || 0}`;
+                document.getElementById('monthlySales').textContent = data.policiesCount || 0;
+                document.getElementById('totalCustomers').textContent = data.totalCustomers || 0;
+                document.getElementById('conversionRate').textContent = `${data.conversionRate || 0}%`;
+
+                // Update goal progress if available
+                if (data.salesGoal) {
+                    const goalText = `$${(data.commissions || 0).toLocaleString()} / $${data.salesGoal.toLocaleString()}`;
+                    const goalEl = document.getElementById('commissionGoalText');
+                    if (goalEl) goalEl.textContent = goalText;
+                }
+
+                console.log('Dashboard stats loaded successfully', data);
             } catch (error) {
                 console.error('Failed to load stats:', error);
+                // Show zeros on error
                 document.getElementById('monthlyCommissions').textContent = '$0';
                 document.getElementById('monthlySales').textContent = '0';
                 document.getElementById('totalCustomers').textContent = '0';

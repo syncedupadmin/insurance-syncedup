@@ -1,0 +1,160 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - heading "Customer Service Portal" [level=3] [ref=e4]:
+      - img [ref=e5]
+      - text: Customer Service Portal
+    - paragraph [ref=e7]: Comprehensive member support dashboard. Search members, manage cases, and track interaction history.
+  - generic [ref=e8]:
+    - generic [ref=e9]:
+      - generic [ref=e10]: "0"
+      - generic [ref=e11]: Daily Cases
+    - generic [ref=e12]:
+      - generic [ref=e13]: "0"
+      - generic [ref=e14]: Active Cases
+    - generic [ref=e15]:
+      - generic [ref=e16]: "0"
+      - generic [ref=e17]: Total Members
+    - generic [ref=e18]:
+      - generic [ref=e19]: 0m
+      - generic [ref=e20]: Avg Response Time
+  - generic [ref=e21]:
+    - button "Search Member" [ref=e22] [cursor=pointer]:
+      - img [ref=e23] [cursor=pointer]
+      - text: Search Member
+    - button "New Case" [ref=e26] [cursor=pointer]:
+      - img [ref=e27] [cursor=pointer]
+      - text: New Case
+    - button "View Active Cases" [ref=e29] [cursor=pointer]:
+      - img [ref=e30] [cursor=pointer]
+      - text: View Active Cases
+    - button "Generate Report" [ref=e33] [cursor=pointer]:
+      - img [ref=e34] [cursor=pointer]
+      - text: Generate Report
+  - generic [ref=e37]:
+    - generic [ref=e38]:
+      - heading "FirstEnroll Management" [level=3] [ref=e39]:
+        - img [ref=e40]
+        - text: FirstEnroll Management
+      - generic [ref=e43]:
+        - button "Open FirstEnroll Portal" [ref=e44] [cursor=pointer]:
+          - img [ref=e45] [cursor=pointer]
+          - text: Open FirstEnroll Portal
+        - button "Search Members" [ref=e49] [cursor=pointer]:
+          - img [ref=e50] [cursor=pointer]
+          - text: Search Members
+    - generic [ref=e53]:
+      - heading "Health Sherpa" [level=3] [ref=e54]:
+        - img [ref=e55]
+        - text: Health Sherpa
+      - generic [ref=e57]:
+        - button "Open Health Sherpa" [ref=e58] [cursor=pointer]:
+          - img [ref=e59] [cursor=pointer]
+          - text: Open Health Sherpa
+        - button "Check Enrollments" [ref=e63] [cursor=pointer]:
+          - img [ref=e64] [cursor=pointer]
+          - text: Check Enrollments
+    - generic [ref=e67]:
+      - heading "Blue Enrollments" [level=3] [ref=e68]:
+        - img [ref=e69]
+        - text: Blue Enrollments
+      - generic [ref=e72]:
+        - button "Open Blue Portal" [ref=e73] [cursor=pointer]:
+          - img [ref=e74] [cursor=pointer]
+          - text: Open Blue Portal
+        - button "Verify Enrollment" [ref=e78] [cursor=pointer]:
+          - img [ref=e79] [cursor=pointer]
+          - text: Verify Enrollment
+  - generic [ref=e83]:
+    - heading "Provider Search Tools" [level=3] [ref=e84]:
+      - img [ref=e85]
+      - text: Provider Search Tools
+    - generic [ref=e88]:
+      - generic [ref=e89]:
+        - heading "Find Providers" [level=4] [ref=e90]:
+          - img [ref=e91]
+          - text: Find Providers
+        - generic [ref=e95]:
+          - textbox "ZIP Code" [ref=e96]
+          - combobox [ref=e97]:
+            - option "Select Provider Type" [selected]
+            - option "Primary Care"
+            - option "Specialist"
+            - option "Hospital"
+            - option "Pharmacy"
+          - button "Search" [ref=e98] [cursor=pointer]:
+            - img [ref=e99] [cursor=pointer]
+            - text: Search
+      - generic [ref=e102]:
+        - heading "Member Verification" [level=4] [ref=e103]:
+          - img [ref=e104]
+          - text: Member Verification
+        - generic [ref=e108]:
+          - textbox "Member ID" [ref=e109]
+          - textbox "Date of Birth (MM/DD/YYYY)" [ref=e110]
+          - button "Verify Member" [ref=e111] [cursor=pointer]:
+            - img [ref=e112] [cursor=pointer]
+            - text: Verify Member
+  - generic [ref=e115]:
+    - generic [ref=e116]:
+      - heading "Recent Activity" [level=3] [ref=e117]:
+        - img [ref=e118]
+        - text: Recent Activity
+      - paragraph [ref=e122]: No recent activity data available
+    - generic [ref=e123]:
+      - heading "Case Statistics" [level=3] [ref=e124]:
+        - img [ref=e125]
+        - text: Case Statistics
+      - generic [ref=e129]:
+        - generic [ref=e130]:
+          - generic [ref=e131]: "Total Cases Today:"
+          - generic [ref=e132]: "0"
+        - generic [ref=e133]:
+          - generic [ref=e134]: "Resolved Cases:"
+          - generic [ref=e135]: "0"
+        - generic [ref=e136]:
+          - generic [ref=e137]: "Pending Cases:"
+          - generic [ref=e138]: "0"
+        - generic [ref=e139]:
+          - generic [ref=e140]: "Escalated Cases:"
+          - generic [ref=e141]: "0"
+        - generic [ref=e142]:
+          - generic [ref=e143]: "Resolution Rate:"
+          - generic [ref=e144]: 0%
+  - generic [ref=e145]:
+    - heading "Priority Cases" [level=3] [ref=e146]:
+      - img [ref=e147]
+      - text: Priority Cases
+    - table [ref=e150]:
+      - rowgroup [ref=e151]:
+        - row "Case ID Member Name Issue Type Priority Created Status Actions" [ref=e152]:
+          - cell "Case ID" [ref=e153]
+          - cell "Member Name" [ref=e154]
+          - cell "Issue Type" [ref=e155]
+          - cell "Priority" [ref=e156]
+          - cell "Created" [ref=e157]
+          - cell "Status" [ref=e158]
+          - cell "Actions" [ref=e159]
+      - rowgroup [ref=e160]:
+        - row "No priority cases" [ref=e161]:
+          - cell "No priority cases" [ref=e162]
+  - generic [ref=e163]:
+    - heading "Today's Assigned Cases" [level=3] [ref=e164]:
+      - img [ref=e165]
+      - text: Today's Assigned Cases
+    - table [ref=e170]:
+      - rowgroup [ref=e171]:
+        - row "Case ID Member Contact Info Issue Last Update Status Actions" [ref=e172]:
+          - cell "Case ID" [ref=e173]
+          - cell "Member" [ref=e174]
+          - cell "Contact Info" [ref=e175]
+          - cell "Issue" [ref=e176]
+          - cell "Last Update" [ref=e177]
+          - cell "Status" [ref=e178]
+          - cell "Actions" [ref=e179]
+      - rowgroup [ref=e180]:
+        - row "No assigned cases today" [ref=e181]:
+          - cell "No assigned cases today" [ref=e182]
+```

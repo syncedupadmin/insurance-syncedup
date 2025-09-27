@@ -1,6 +1,6 @@
 # 🔍 Insurance Portal Audit Report
 
-Generated: 9/10/2025, 1:49:58 PM
+Generated: 9/22/2025, 10:39:29 PM
 
 ## 📊 Summary
 
@@ -8,11 +8,11 @@ Generated: 9/10/2025, 1:49:58 PM
 |--------|-------|
 | Portals Checked | 7 |
 | URLs Visited | 7 |
-| **Total Errors** | **107** |
-| Page Errors | 0 |
-| Console Errors | 40 |
-| Network Failures | 62 |
-| Action Errors | 5 |
+| **Total Errors** | **161** |
+| Page Errors | 5 |
+| Console Errors | 46 |
+| Network Failures | 80 |
+| Action Errors | 30 |
 
 ## 📍 Portal Status
 
@@ -30,23 +30,27 @@ Generated: 9/10/2025, 1:49:58 PM
 
 | File | Errors | File:Line References |
 |------|--------|---------------------|
-| `api/super-admin/audit` | 7 |  |
-| `_super-admin/` | 6 | `_super-admin/:949` |
-| `api/auth/verify` | 4 |  |
+| `api/auth/verify` | 24 |  |
 | `api/manager/dashboard` | 3 |  |
-| `api/admin/analytics` | 2 |  |
-| `api/admin/user-management` | 2 |  |
-| `api/admin/commission-settings` | 2 |  |
-| `api/admin/api-keys` | 2 |  |
 | `api/admin/leads` | 2 |  |
-| `_admin/` | 2 | `_admin/:655` |
+| `_admin/` | 2 | `_admin/:601` |
 | `api/admin/commission-summary` | 2 |  |
+| `api/super-admin/revenue-metrics` | 2 |  |
+| `customer-service/components/global-header.js` | 1 |  |
+| `customer-service/components/navigation.js` | 1 |  |
 | `leaderboard/css/leaderboard-base.css` | 1 |  |
 | `leaderboard/js/leaderboard-theme.js` | 1 |  |
-| `_manager/` | 1 | `_manager/:223` |
-| `api/super-admin/health` | 1 |  |
-| `api/super-admin/performance` | 1 |  |
-| `api/super-admin/metrics` | 1 |  |
+| `api/leaderboard/global` | 1 |  |
+| `_leaderboard/` | 1 | `_leaderboard/:186` |
+| `leaderboard/css/themes/competition.css` | 1 |  |
+| `manager/components/navigation.js` | 1 |  |
+| `manager/components/global-header.js` | 1 |  |
+| `_manager/` | 1 | `_manager/:187` |
+| `_super-admin/js/main.js` | 1 | `_super-admin/js/main.js:2843` |
+| `_admin/js/dashboard.js` | 1 | `_admin/js/dashboard.js:336` |
+| `HTMLDocument.<anonymous> (http://localhost:3002/_customer-service/` | 1 | `HTMLDocument.<anonymous> (http://localhost:3002/_customer-service/:47` |
+| `_manager/js/dashboard.js` | 1 | `_manager/js/dashboard.js:313` |
+| `HTMLDocument.<anonymous> (http://localhost:3002/_manager/` | 1 | `HTMLDocument.<anonymous> (http://localhost:3002/_manager/:400` |
 
 ## ❌ Console Errors
 
@@ -54,119 +58,149 @@ Generated: 9/10/2025, 1:49:58 PM
 |-----------|--------------|
 | api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
 | api/manager/dashboard | Failed to load resource: the server responded with a status of 404 (Not Found)... |
-| api/admin/analytics | Failed to load resource: the server responded with a status of 404 (Not Found)... |
-| api/admin/user-management | Failed to load resource: the server responded with a status of 404 (Not Found)... |
-| api/admin/commission-settings | Failed to load resource: the server responded with a status of 404 (Not Found)... |
-| api/admin/api-keys | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
 | api/manager/dashboard | Failed to load resource: the server responded with a status of 404 (Not Found)... |
-| api/admin/analytics | Failed to load resource: the server responded with a status of 404 (Not Found)... |
-| api/admin/user-management | Failed to load resource: the server responded with a status of 404 (Not Found)... |
-| api/admin/commission-settings | Failed to load resource: the server responded with a status of 404 (Not Found)... |
-| api/admin/api-keys | Failed to load resource: the server responded with a status of 404 (Not Found)... |
 | api/admin/leads | Failed to load resource: the server responded with a status of 404 (Not Found)... |
-| `_admin/:655` | Error loading recent leads: Error: Failed to fetch recent leads
+| `_admin/:601` | Error loading recent leads: Error: Failed to fetch recent leads
     at loadRecentLeads (http://local... |
 | api/admin/commission-summary | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
 | api/admin/leads | Failed to load resource: the server responded with a status of 404 (Not Found)... |
-| `_admin/:655` | Error loading recent leads: Error: Failed to fetch recent leads
+| `_admin/:601` | Error loading recent leads: Error: Failed to fetch recent leads
     at loadRecentLeads (http://local... |
 | api/admin/commission-summary | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| customer-service/components/global-header.js | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| customer-service/components/navigation.js | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
 | api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
 | api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
 | leaderboard/css/leaderboard-base.css | Failed to load resource: the server responded with a status of 404 (Not Found)... |
 | leaderboard/js/leaderboard-theme.js | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/leaderboard/global | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| `_leaderboard/:186` | Error loading leaderboard: Error: HTTP 404: Failed to load leaderboard data
+    at loadLeaderboardDa... |
+| leaderboard/css/themes/competition.css | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| manager/components/navigation.js | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| manager/components/global-header.js | Failed to load resource: the server responded with a status of 404 (Not Found)... |
 | api/manager/dashboard | Failed to load resource: the server responded with a status of 404 (Not Found)... |
-| `_manager/:223` | Dashboard API: non-JSON... |
+| `_manager/:187` | Dashboard API: non-JSON... |
 | api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
-| api/super-admin/audit | Failed to load resource: the server responded with a status of 405 (Method Not Allowed)... |
-| `_super-admin/:949` | CRITICAL: Audit logging failed: Error: Audit logging failed: 405
-    at logAdminAction (http://local... |
-| api/super-admin/audit | Failed to load resource: the server responded with a status of 405 (Method Not Allowed)... |
-| `_super-admin/:949` | CRITICAL: Audit logging failed: Error: Audit logging failed: 405
-    at logAdminAction (http://local... |
-| api/super-admin/health | Failed to load resource: the server responded with a status of 404 (Not Found)... |
-| api/super-admin/performance | Failed to load resource: the server responded with a status of 404 (Not Found)... |
-| api/super-admin/audit | Failed to load resource: the server responded with a status of 404 (Not Found)... |
-| api/super-admin/audit | Failed to load resource: the server responded with a status of 405 (Method Not Allowed)... |
-| `_super-admin/:949` | CRITICAL: Audit logging failed: Error: Audit logging failed: 405
-    at logAdminAction (http://local... |
-| api/super-admin/metrics | Failed to load resource: the server responded with a status of 404 (Not Found)... |
-| api/super-admin/audit | Failed to load resource: the server responded with a status of 405 (Method Not Allowed)... |
-| `_super-admin/:949` | CRITICAL: Audit logging failed: Error: Audit logging failed: 405
-    at logAdminAction (http://local... |
-| api/super-admin/audit | Failed to load resource: the server responded with a status of 405 (Method Not Allowed)... |
-| `_super-admin/:949` | CRITICAL: Audit logging failed: Error: Audit logging failed: 405
-    at logAdminAction (http://local... |
-| api/super-admin/audit | Failed to load resource: the server responded with a status of 405 (Method Not Allowed)... |
-| `_super-admin/:949` | CRITICAL: Audit logging failed: Error: Audit logging failed: 405
-    at logAdminAction (http://local... |
+| api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/super-admin/revenue-metrics | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/auth/verify | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| api/super-admin/revenue-metrics | Failed to load resource: the server responded with a status of 404 (Not Found)... |
+| `_super-admin/js/main.js:2843` | Silent fetch error: Error: HTTP error! status: 404
+    at silentFetch (http://localhost:3002/_super-... |
 
 ## 🌐 Network Failures
 
 | URL | Method | Status | Error |
 |-----|--------|--------|-------|
-| `http://localhost:3001/api/auth/verify` | GET | 404 | Not Found |
-| `http://localhost:3001/api/manager/dashboard` | GET | 404 | Not Found |
-| `http://localhost:3001/api/admin/analytics?analytics_type=overview` | GET | 404 | Not Found |
-| `http://localhost:3001/api/admin/user-management` | GET | 404 | Not Found |
-| `http://localhost:3001/api/admin/commission-settings` | GET | 404 | Not Found |
-| `http://localhost:3001/api/admin/api-keys` | GET | 404 | Not Found |
-| `http://localhost:3001/api/auth/verify` | GET | - | - |
-| `http://localhost:3001/api/manager/dashboard` | GET | - | - |
-| `http://localhost:3001/api/manager/dashboard` | GET | 404 | Not Found |
-| `http://localhost:3001/api/admin/analytics?analytics_type=overview` | GET | 404 | Not Found |
-| `http://localhost:3001/api/admin/user-management` | GET | 404 | Not Found |
-| `http://localhost:3001/api/admin/commission-settings` | GET | 404 | Not Found |
-| `http://localhost:3001/api/admin/api-keys` | GET | 404 | Not Found |
-| `http://localhost:3001/api/admin/analytics?analytics_type=overview` | GET | - | - |
-| `http://localhost:3001/api/admin/user-management` | GET | - | - |
-| `http://localhost:3001/api/admin/commission-settings` | GET | - | - |
-| `http://localhost:3001/api/admin/api-keys` | GET | - | - |
-| `http://localhost:3001/api/manager/dashboard` | GET | - | - |
-| `http://localhost:3001/api/admin/analytics?analytics_type=overview` | GET | - | - |
-| `http://localhost:3001/api/admin/user-management` | GET | - | - |
-| `http://localhost:3001/api/admin/commission-settings` | GET | - | - |
-| `http://localhost:3001/api/admin/api-keys` | GET | - | - |
-| `http://localhost:3001/api/admin/leads?recent=true&limit=10` | GET | 404 | Not Found |
-| `http://localhost:3001/api/admin/leads?recent=true&limit=10` | GET | - | - |
-| `http://localhost:3001/api/admin/commission-summary` | GET | 404 | Not Found |
-| `http://localhost:3001/api/admin/commission-summary` | GET | - | - |
-| `http://localhost:3001/api/admin/leads?recent=true&limit=10` | GET | 404 | Not Found |
-| `http://localhost:3001/api/admin/leads?recent=true&limit=10` | GET | - | - |
-| `http://localhost:3001/api/admin/commission-summary` | GET | 404 | Not Found |
-| `http://localhost:3001/api/admin/commission-summary` | GET | - | - |
-| `http://localhost:3001/api/auth/verify` | GET | 404 | Not Found |
-| `http://localhost:3001/api/auth/verify` | GET | - | - |
-| `http://localhost:3001/api/auth/verify` | GET | 404 | Not Found |
-| `http://localhost:3001/api/auth/verify` | GET | - | - |
-| `http://localhost:3001/leaderboard/css/leaderboard-base.css` | GET | 404 | Not Found |
-| `http://localhost:3001/leaderboard/css/leaderboard-base.css` | GET | - | - |
-| `http://localhost:3001/leaderboard/js/leaderboard-theme.js` | GET | 404 | Not Found |
-| `http://localhost:3001/leaderboard/js/leaderboard-theme.js` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/manager/dashboard` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/manager/dashboard` | GET | - | - |
+| `http://localhost:3002/api/manager/dashboard` | GET | 404 | Not Found |
+| `http://localhost:3002/api/admin/leads?recent=true&limit=10` | GET | 404 | Not Found |
+| `http://localhost:3002/api/admin/commission-summary` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/manager/dashboard` | GET | - | - |
+| `http://localhost:3002/api/admin/leads?recent=true&limit=10` | GET | - | - |
+| `http://localhost:3002/api/admin/commission-summary` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/admin/leads?recent=true&limit=10` | GET | 404 | Not Found |
+| `http://localhost:3002/api/admin/commission-summary` | GET | 404 | Not Found |
+| `http://localhost:3002/api/admin/leads?recent=true&limit=10` | GET | - | - |
+| `http://localhost:3002/api/admin/commission-summary` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/customer-service/components/global-header.js` | GET | 404 | Not Found |
+| `http://localhost:3002/customer-service/components/global-header.js` | GET | - | - |
+| `http://localhost:3002/customer-service/components/navigation.js` | GET | 404 | Not Found |
+| `http://localhost:3002/customer-service/components/navigation.js` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/leaderboard/css/leaderboard-base.css` | GET | 404 | Not Found |
+| `http://localhost:3002/leaderboard/css/leaderboard-base.css` | GET | - | - |
+| `http://localhost:3002/leaderboard/js/leaderboard-theme.js` | GET | 404 | Not Found |
+| `http://localhost:3002/leaderboard/js/leaderboard-theme.js` | GET | - | - |
+| `http://localhost:3002/api/leaderboard/global` | GET | 404 | Not Found |
+| `http://localhost:3002/leaderboard/css/themes/competition.css` | GET | 404 | Not Found |
+| `http://localhost:3002/leaderboard/css/themes/competition.css` | GET | - | - |
+| `http://localhost:3002/manager/components/navigation.js` | GET | 404 | Not Found |
+| `http://localhost:3002/manager/components/navigation.js` | GET | - | - |
+| `http://localhost:3002/manager/components/global-header.js` | GET | 404 | Not Found |
+| `http://localhost:3002/manager/components/global-header.js` | GET | - | - |
 | `https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.css` | GET | - | - |
-| `http://localhost:3001/api/manager/dashboard?timeframe=month` | GET | 404 | Not Found |
-| `http://localhost:3001/api/auth/verify` | GET | 404 | Not Found |
-| `http://localhost:3001/api/auth/verify` | GET | - | - |
-| `http://localhost:3001/api/super-admin/audit` | POST | 405 | Method Not Allowed |
-| `http://localhost:3001/api/super-admin/audit` | POST | - | - |
-| `http://localhost:3001/api/super-admin/audit` | POST | 405 | Method Not Allowed |
-| `http://localhost:3001/api/super-admin/audit` | POST | - | - |
-| `http://localhost:3001/api/super-admin/health` | GET | 404 | Not Found |
-| `http://localhost:3001/api/super-admin/health` | GET | - | - |
-| `http://localhost:3001/api/super-admin/performance` | GET | 404 | Not Found |
-| `http://localhost:3001/api/super-admin/audit?limit=10` | GET | 404 | Not Found |
-| `http://localhost:3001/api/super-admin/performance` | GET | - | - |
-| `http://localhost:3001/api/super-admin/audit?limit=10` | GET | - | - |
-| `http://localhost:3001/api/super-admin/audit` | POST | 405 | Method Not Allowed |
-| `http://localhost:3001/api/super-admin/metrics` | GET | 404 | Not Found |
-| `http://localhost:3001/api/super-admin/audit` | POST | - | - |
-| `http://localhost:3001/api/super-admin/metrics` | GET | - | - |
-| `http://localhost:3001/api/super-admin/audit` | POST | 405 | Method Not Allowed |
-| `http://localhost:3001/api/super-admin/audit` | POST | - | - |
-| `http://localhost:3001/api/super-admin/audit` | POST | 405 | Method Not Allowed |
-| `http://localhost:3001/api/super-admin/audit` | POST | - | - |
-| `http://localhost:3001/api/super-admin/audit` | POST | 405 | Method Not Allowed |
-| `http://localhost:3001/api/super-admin/audit` | POST | - | - |
+| `http://localhost:3002/api/manager/dashboard?timeframe=month` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/super-admin/revenue-metrics` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/auth/verify` | GET | 404 | Not Found |
+| `http://localhost:3002/api/auth/verify` | GET | - | - |
+| `http://localhost:3002/api/super-admin/revenue-metrics` | GET | 404 | Not Found |
+| `http://localhost:3002/api/super-admin/revenue-metrics` | GET | - | - |
+
+## ⚠️ Page Errors
+
+| Portal | File:Line | Error |
+|--------|-----------|-------|
+| - | `http://localhost:3002/_admin/js/dashboard.js:336` | updateRefreshInterval is not defined... |
+| - | `HTMLDocument.<anonymous> (http://localhost:3002/_customer-service/:47` | CSHeader is not defined... |
+| - | `http://localhost:3002/_manager/js/dashboard.js:313` | updateRefreshInterval is not defined... |
+| - | `HTMLDocument.<anonymous> (http://localhost:3002/_manager/:400` | ManagerHeader is not defined... |
+| Super Admin Portal | - | page.$$: Target page, context or browser has been closed... |
 
 ## 🔧 Reproduction Commands
 

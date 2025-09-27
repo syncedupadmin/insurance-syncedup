@@ -1,0 +1,764 @@
+{
+  "noAuth": [
+    {
+      "path": "api/admin/agents.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": false,
+      "queriesData": true
+    },
+    {
+      "path": "api/admin/bulk-upload.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/commission-overrides.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/commission-settings.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": true
+    },
+    {
+      "path": "api/admin/leaderboard-settings.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": false,
+      "queriesData": true
+    },
+    {
+      "path": "api/admin/leads-backup.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": true
+    },
+    {
+      "path": "api/admin/payroll-export.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/reset-password.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/users-with-email.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/agent/dashboard.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/ai/churn-predictor.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/ai/commission-audit.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/ai/score-lead.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/carriers/sync.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": true
+    },
+    {
+      "path": "api/manager/dashboard-v2.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/manager/goals.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/manager/reports.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/manager/team-performance.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/manager/vendors.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/quote.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/sales.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": true
+    },
+    {
+      "path": "api/support/tickets.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": false,
+      "queriesData": true
+    }
+  ],
+  "noAgencyFilter": [
+    {
+      "path": "api/super-admin/users.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": false,
+      "queriesData": true
+    }
+  ],
+  "hasAgencyFilter": [
+    {
+      "path": "api/admin/convoso-leads.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/import-campaign-leads.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/payroll.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/commissions.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/convoso-webhook/[slug].js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/customer-service/frequent-members.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/customer-service/member-search.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/dashboard/cs-stats.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/dashboard.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/integrations/convoso/campaigns.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/integrations/convoso/sync.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/integrations/convoso/validate.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/leads/convoso-webhook/[agency].js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/stripe-webhook.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/super-admin/agencies-management.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": false,
+      "queriesData": true
+    },
+    {
+      "path": "api/super-admin/compliance-monitoring.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": false,
+      "queriesData": true
+    },
+    {
+      "path": "api/super-admin/platform-analytics.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/super-admin/usage-metrics.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    },
+    {
+      "path": "api/utils/data-isolation-helper.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": false,
+      "queriesData": false
+    }
+  ],
+  "superAdminOnly": [
+    {
+      "path": "api/add-super-admin-role.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/analytics-clean.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/analytics.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/api-keys.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/commission-summary.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/commission-sync.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/dashboard-licenses.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/dashboard-metrics.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/database-health.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/fix-database.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/leads.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": true
+    },
+    {
+      "path": "api/admin/license-types.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/licenses-backup.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/licenses.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/licensing.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/security.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": true
+    },
+    {
+      "path": "api/admin/seed-test-data.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/settings.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/test-security-system.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/user-management.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/admin/users.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": true
+    },
+    {
+      "path": "api/auth/login.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/auth/verify.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/database/add-customer-service-role.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/leaderboard/global.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/manager/dashboard-metrics.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/manager/dashboard.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/manager/dashboard.old.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/setup-customer-service-database.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/super-admin/agency-management.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/super-admin/analytics.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/super-admin/audit.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": true
+    },
+    {
+      "path": "api/super-admin/create-user.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/super-admin/database-tables.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/super-admin/edge-proxy.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/super-admin/enhanced-dashboard.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": true
+    },
+    {
+      "path": "api/super-admin/global-leaderboard.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/super-admin/production-cleanup.js",
+      "hasAuth": true,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/super-admin/reset-password.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/super-admin/revenue-management.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/super-admin/setup-demo-data.js",
+      "hasAuth": true,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/super-admin/system-events.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/super-admin/system-settings.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/super-admin/system-stats.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": true,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/super-admin/test-users.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/super-admin/user-administration.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/super-admin/verify-production.js",
+      "hasAuth": true,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/test/agencies-simple.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/utils/auth-helper.js",
+      "hasAuth": false,
+      "hasAgencyFilter": true,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    },
+    {
+      "path": "api/websocket/realtime-server.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": true,
+      "queriesData": false
+    }
+  ],
+  "needsWork": [
+    {
+      "path": "api/sales-test.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": false,
+      "queriesData": true
+    },
+    {
+      "path": "api/super-admin/billing-management.js",
+      "hasAuth": false,
+      "hasAgencyFilter": false,
+      "hasPortalUsers": false,
+      "hasSuperAdminCheck": false,
+      "queriesData": true
+    }
+  ]
+}

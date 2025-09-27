@@ -1,0 +1,75 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - heading "Global Sales Leaderboard" [level=1] [ref=e4]
+    - generic [ref=e5]:
+      - button "🏆 Competition" [ref=e6]:
+        - generic [ref=e7]: 🏆
+        - generic [ref=e8]: Competition
+      - button "📊 Analytics" [ref=e9]:
+        - generic [ref=e10]: 📊
+        - generic [ref=e11]: Analytics
+      - button "🎮 Gaming" [ref=e12]:
+        - generic [ref=e13]: 🎮
+        - generic [ref=e14]: Gaming
+    - generic [ref=e16]: Live Updates Active
+  - generic [ref=e17]:
+    - link "Overall Rankings" [ref=e19] [cursor=pointer]:
+      - /url: /global-leaderboard
+      - img [ref=e20] [cursor=pointer]
+      - text: Overall Rankings
+    - generic [ref=e26]:
+      - combobox [ref=e27]:
+        - option "All Offices" [selected]
+        - option "My Office"
+      - combobox [ref=e28]:
+        - option "Current Period" [selected]
+        - option "Last Month"
+        - option "This Quarter"
+        - option "This Year"
+  - generic [ref=e29]:
+    - generic [ref=e30]:
+      - generic [ref=e31]: Active Agents
+      - generic [ref=e32]: "--"
+    - generic [ref=e33]:
+      - generic [ref=e34]: Total Sales
+      - generic [ref=e35]: "--"
+    - generic [ref=e36]:
+      - generic [ref=e37]: Commissions Paid
+      - generic [ref=e38]: "--"
+    - generic [ref=e39]:
+      - generic [ref=e40]: Offices Competing
+      - generic [ref=e41]: "--"
+  - generic [ref=e42]:
+    - generic [ref=e43]:
+      - generic [ref=e44]:
+        - generic [ref=e45]: "1"
+        - generic [ref=e46]: Loading...
+        - generic [ref=e47]: "--"
+        - generic [ref=e48]: $0
+      - generic [ref=e49]:
+        - generic [ref=e50]: "2"
+        - generic [ref=e51]: Loading...
+        - generic [ref=e52]: "--"
+        - generic [ref=e53]: $0
+      - generic [ref=e54]:
+        - generic [ref=e55]: "3"
+        - generic [ref=e56]: Loading...
+        - generic [ref=e57]: "--"
+        - generic [ref=e58]: $0
+    - table [ref=e59]:
+      - rowgroup [ref=e60]:
+        - row "Rank Agent Office Sales Policies Commission Trend" [ref=e61]:
+          - cell "Rank" [ref=e62]
+          - cell "Agent" [ref=e63]
+          - cell "Office" [ref=e64]
+          - cell "Sales" [ref=e65]
+          - cell "Policies" [ref=e66]
+          - cell "Commission" [ref=e67]
+          - cell "Trend" [ref=e68]
+      - rowgroup [ref=e69]:
+        - 'row "HTTP 404: Failed to load leaderboard data" [ref=e70]':
+          - 'cell "HTTP 404: Failed to load leaderboard data" [ref=e71]'
+```

@@ -1,0 +1,97 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Agent Dashboard" [level=1] [ref=e4]
+      - generic [ref=e5]:
+        - generic [ref=e6]: Agent User (agent)
+        - button "Leaderboard" [ref=e7] [cursor=pointer]:
+          - img [ref=e8] [cursor=pointer]
+          - generic [ref=e14] [cursor=pointer]: Leaderboard
+        - button "Logout" [ref=e15] [cursor=pointer]:
+          - img [ref=e16] [cursor=pointer]
+          - text: Logout
+    - generic [ref=e19]:
+      - link "Dashboard" [ref=e20] [cursor=pointer]:
+        - /url: /agent
+        - img [ref=e21] [cursor=pointer]
+        - text: Dashboard
+      - link "Quote Products" [ref=e26] [cursor=pointer]:
+        - /url: /agent/quotes
+        - img [ref=e27] [cursor=pointer]
+        - text: Quote Products
+      - link "My Commissions" [ref=e29] [cursor=pointer]:
+        - /url: /agent/commissions
+        - img [ref=e30] [cursor=pointer]
+        - text: My Commissions
+      - link "Settings" [ref=e32] [cursor=pointer]:
+        - /url: /agent/settings
+        - img [ref=e33] [cursor=pointer]
+        - text: Settings
+  - generic [ref=e36]:
+    - generic [ref=e37]:
+      - heading "Agent Portal" [level=3] [ref=e38]:
+        - img [ref=e39]
+        - text: Agent Portal
+      - paragraph [ref=e42]: Welcome to your agent dashboard. Generate quotes, track sales, and manage your commission earnings.
+    - generic [ref=e43]:
+      - generic [ref=e44]:
+        - generic [ref=e45]: $0
+        - generic [ref=e46]: Monthly Commissions
+      - generic [ref=e47]:
+        - generic [ref=e48]: "0"
+        - generic [ref=e49]: Monthly Sales
+      - generic [ref=e50]:
+        - generic [ref=e51]: "0"
+        - generic [ref=e52]: Total Customers
+      - generic [ref=e53]:
+        - generic [ref=e54]: 0%
+        - generic [ref=e55]: Conversion Rate
+    - generic [ref=e56]:
+      - button "Generate Quote" [ref=e57] [cursor=pointer]:
+        - img [ref=e58] [cursor=pointer]
+        - text: Generate Quote
+      - button "Download Commissions" [ref=e60] [cursor=pointer]:
+        - img [ref=e61] [cursor=pointer]
+        - text: Download Commissions
+    - generic [ref=e64]:
+      - generic [ref=e65]:
+        - heading "Recent Activity" [level=3] [ref=e66]:
+          - img [ref=e67]
+          - text: Recent Activity
+        - generic [ref=e71]: No recent activity found
+      - generic [ref=e72]:
+        - heading "This Month's Performance" [level=3] [ref=e73]:
+          - img [ref=e74]
+          - text: This Month's Performance
+        - generic [ref=e78]: Loading performance data...
+    - generic [ref=e80]:
+      - heading "Recent Quotes" [level=3] [ref=e81]:
+        - img [ref=e82]
+        - text: Recent Quotes
+      - table [ref=e86]:
+        - rowgroup [ref=e87]:
+          - row "Date Customer Product Premium Status Actions" [ref=e88]:
+            - cell "Date" [ref=e89]
+            - cell "Customer" [ref=e90]
+            - cell "Product" [ref=e91]
+            - cell "Premium" [ref=e92]
+            - cell "Status" [ref=e93]
+            - cell "Actions" [ref=e94]
+        - rowgroup [ref=e95]:
+          - row "No quotes data available" [ref=e96]:
+            - cell "No quotes data available" [ref=e97]
+    - generic [ref=e98]:
+      - heading "Monthly Goals" [level=3] [ref=e99]:
+        - img [ref=e100]
+        - text: Monthly Goals
+      - generic [ref=e104]:
+        - generic [ref=e106]:
+          - generic [ref=e107]: Sales Goal
+          - generic [ref=e108]: 0 / 30
+        - generic [ref=e111]:
+          - generic [ref=e112]: Commission Goal
+          - generic [ref=e113]: $0 / $5,000
+```

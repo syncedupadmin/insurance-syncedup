@@ -1,4 +1,4 @@
-// DISABLED: // DISABLED: // DISABLED: // DISABLED: import { requireAuth, logAction } from '../_middleware/authCheck.js';
+import { requireAuth, logAction } from '../_middleware/authCheck.js';
 import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcryptjs';
 
@@ -10,12 +10,18 @@ async function agentsHandler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      // Get all agent users
-      const { data: agents, error } = await supabase
+      // Get agent users for this admin's agency only
+      let query = supabase
         .from('portal_users')
         .select('*')
-        .eq('role', 'agent')
-        .order('created_at', { ascending: false });
+        .eq('role', 'agent');
+
+      // Super admins see all agents, admins see only their agency
+      if (req.user.role !== 'super-admin' && req.user.role !== 'super_admin') {
+        query = query.eq('agency_id', req.user.agency_id);
+      }
+
+      const { data: agents, error } = await query.order('created_at', { ascending: false });
 
       if (error) throw error;
 
@@ -200,5 +206,4 @@ async function agentsHandler(req, res) {
   }
 }
 
-// DISABLED: export default requireAuth(['admin'])(agentsHandler);
-export default agentsHandler;
+export default requireAuth(['admin'])(agentsHandler);

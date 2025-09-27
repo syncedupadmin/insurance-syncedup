@@ -367,5 +367,4 @@ function calculateLeadPriority(lead) {
   return 'low';
 }
 
-// DISABLED: export default requireAuth.*Handler);
-export default leadsHandler;
+export default requireAuth(['admin'])(leadsHandler);

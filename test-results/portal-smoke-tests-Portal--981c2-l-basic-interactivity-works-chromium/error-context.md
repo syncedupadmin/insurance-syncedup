@@ -1,0 +1,223 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - heading "SUPER ADMIN CONSOLE" [level=1] [ref=e4]
+      - generic [ref=e5]:
+        - generic [ref=e6]: "Admin: admin@syncedupsolutions.com"
+        - generic [ref=e7]: Mon, Sep 22, 10:39 PM
+    - navigation [ref=e8]:
+      - generic [ref=e9]:
+        - heading "MAIN" [level=3] [ref=e10]
+        - link "Revenue Dashboard" [ref=e11] [cursor=pointer]:
+          - /url: "#dashboard"
+        - link "Agency Management" [ref=e12] [cursor=pointer]:
+          - /url: "#agencies"
+        - link "User Management" [ref=e13] [cursor=pointer]:
+          - /url: "#users"
+        - link "Infrastructure" [ref=e14] [cursor=pointer]:
+          - /url: "#infrastructure"
+      - generic [ref=e15]:
+        - heading "REPORTS" [level=3] [ref=e16]
+        - link "Financial Reports" [ref=e17] [cursor=pointer]:
+          - /url: "#financial"
+        - link "Usage Reports" [ref=e18] [cursor=pointer]:
+          - /url: "#usage"
+        - link "Platform Analytics" [ref=e19] [cursor=pointer]:
+          - /url: "#analytics"
+      - generic [ref=e20]:
+        - heading "ADMIN" [level=3] [ref=e21]
+        - link "Compliance & Limits" [ref=e22] [cursor=pointer]:
+          - /url: "#compliance"
+        - link "Platform Settings" [ref=e23] [cursor=pointer]:
+          - /url: "#settings"
+        - link "Logout" [ref=e24] [cursor=pointer]:
+          - /url: "#logout"
+    - main [ref=e25]:
+      - generic [ref=e26]: "Error: Failed to execute 'json' on 'Response': Unexpected end of JSON input"
+  - generic [ref=e27]:
+    - generic [ref=e28]:
+      - heading "Edit Agency" [level=2] [ref=e29]
+      - button "×" [ref=e30] [cursor=pointer]
+    - generic [ref=e32]:
+      - generic [ref=e33]:
+        - heading "Basic Information" [level=3] [ref=e34]
+        - generic [ref=e35]:
+          - generic [ref=e36]: Agency Name
+          - textbox [ref=e37]
+        - generic [ref=e38]:
+          - generic [ref=e39]: Agency Code
+          - textbox [ref=e40]
+        - generic [ref=e41]:
+          - generic [ref=e42]: Admin Email
+          - textbox [ref=e43]
+      - generic [ref=e44]:
+        - heading "Subscription Details" [level=3] [ref=e45]
+        - generic [ref=e46]:
+          - generic [ref=e47]: Plan Type
+          - combobox [ref=e48] [cursor=pointer]:
+            - option "Free" [selected]
+            - option "Starter"
+            - option "Professional"
+            - option "Enterprise"
+        - generic [ref=e49]:
+          - generic [ref=e50]: Monthly Fee ($)
+          - spinbutton [ref=e51]
+        - generic [ref=e52]:
+          - generic [ref=e53]: Next Billing Date
+          - textbox [ref=e54]
+        - generic [ref=e55]:
+          - generic [ref=e56]: Status
+          - combobox [ref=e57] [cursor=pointer]:
+            - option "Active" [selected]
+            - option "Suspended"
+            - option "Trial"
+            - option "Cancelled"
+      - generic [ref=e58]:
+        - heading "Resource Limits" [level=3] [ref=e59]
+        - generic [ref=e60]:
+          - generic [ref=e61]: User Limit
+          - spinbutton [ref=e62]
+        - generic [ref=e63]:
+          - generic [ref=e64]: Storage Limit (GB)
+          - spinbutton [ref=e65]
+        - generic [ref=e66]:
+          - generic [ref=e67]: API Calls/Month
+          - spinbutton [ref=e68]
+      - generic [ref=e69]:
+        - button "Save Changes" [ref=e70] [cursor=pointer]
+        - button "Suspend Agency" [ref=e71] [cursor=pointer]
+        - button "Cancel" [ref=e72] [cursor=pointer]
+  - generic [ref=e73]:
+    - generic [ref=e74]:
+      - heading "Create New Agency" [level=2] [ref=e75]
+      - button "×" [ref=e76] [cursor=pointer]
+    - generic [ref=e78]:
+      - generic [ref=e79]:
+        - heading "Agency Information" [level=3] [ref=e80]
+        - generic [ref=e81]:
+          - generic [ref=e82]: Agency Name *
+          - textbox [ref=e83]
+          - generic [ref=e84]: This will be used to generate the agency code
+        - generic [ref=e85]:
+          - generic [ref=e86]: Contact Email *
+          - textbox [ref=e87]
+          - generic [ref=e88]: Primary contact email for the agency
+        - generic [ref=e89]:
+          - generic [ref=e90]: Phone Number
+          - textbox [ref=e91]
+        - generic [ref=e92]:
+          - generic [ref=e93]: Address
+          - textbox [ref=e94]
+      - generic [ref=e95]:
+        - heading "Subscription Plan" [level=3] [ref=e96]
+        - generic [ref=e97]:
+          - generic [ref=e98]: Plan Type *
+          - combobox [ref=e99] [cursor=pointer]:
+            - option "Select a plan..." [selected]
+            - option "Basic ($99/month - 10 users)"
+            - option "Professional ($199/month - 50 users)"
+            - option "Enterprise ($399/month - 200 users)"
+      - generic [ref=e100]:
+        - heading "Agency Setup Information" [level=3] [ref=e101]
+        - paragraph [ref=e102]: "After creating the agency:"
+        - list [ref=e103]:
+          - listitem [ref=e104]: Agency will be active immediately
+          - listitem [ref=e105]: You can add users through User Management
+          - listitem [ref=e106]: Agency code will be auto-generated
+          - listitem [ref=e107]: Billing will start based on selected plan
+        - paragraph [ref=e108]: Remember to add at least one admin user after creation
+      - generic [ref=e109]:
+        - button "Create Agency" [ref=e110] [cursor=pointer]: Create Agency
+        - button "Cancel" [ref=e111] [cursor=pointer]
+  - generic [ref=e112]:
+    - generic [ref=e113]:
+      - heading "Create New User" [level=2] [ref=e114]
+      - button "×" [ref=e115] [cursor=pointer]
+    - generic [ref=e117]:
+      - generic [ref=e118]:
+        - heading "User Information" [level=3] [ref=e119]
+        - generic [ref=e120]:
+          - generic [ref=e121]: Email Address *
+          - textbox [ref=e122]
+          - generic [ref=e123]: User will receive login credentials at this email
+        - generic [ref=e124]:
+          - generic [ref=e125]: Full Name
+          - textbox [ref=e126]
+        - generic [ref=e127]:
+          - generic [ref=e128]: Password
+          - textbox "Leave blank for auto-generated" [ref=e129]
+          - generic [ref=e130]: If blank, a secure password will be generated
+      - generic [ref=e131]:
+        - heading "Role & Access" [level=3] [ref=e132]
+        - generic [ref=e133]:
+          - generic [ref=e134]: User Role *
+          - combobox [ref=e135] [cursor=pointer]:
+            - option "Select a role..." [selected]
+            - option "Agent - Sales and customer management"
+            - option "Manager - Team oversight and reports"
+            - option "Admin - Full agency administration"
+            - option "Customer Service - Support and claims"
+            - option "Super Admin - System administration"
+        - generic [ref=e136]:
+          - generic [ref=e137]: Assign to Agency
+          - combobox [ref=e138] [cursor=pointer]:
+            - option "No agency (assign later)" [selected]
+          - generic [ref=e139]: You can assign to an agency later if needed
+      - generic [ref=e140]:
+        - heading "Additional Options" [level=3] [ref=e141]
+        - generic [ref=e143] [cursor=pointer]:
+          - checkbox "Send welcome email with credentials" [checked] [ref=e144]
+          - text: Send welcome email with credentials
+        - generic [ref=e146] [cursor=pointer]:
+          - checkbox "Activate account immediately" [checked] [ref=e147]
+          - text: Activate account immediately
+      - generic [ref=e148]:
+        - button "Create User" [ref=e149] [cursor=pointer]: Create User
+        - button "Cancel" [ref=e150] [cursor=pointer]
+  - generic [ref=e151]:
+    - generic [ref=e152]:
+      - heading "Edit User" [level=2] [ref=e153]
+      - button "×" [ref=e154] [cursor=pointer]
+    - generic [ref=e156]:
+      - generic [ref=e157]:
+        - heading "User Information" [level=3] [ref=e158]
+        - generic [ref=e159]:
+          - generic [ref=e160]: Email Address
+          - textbox [ref=e161]
+          - generic [ref=e162]: Email cannot be changed
+        - generic [ref=e163]:
+          - generic [ref=e164]: Full Name
+          - textbox [ref=e165]
+      - generic [ref=e166]:
+        - heading "Role & Access" [level=3] [ref=e167]
+        - generic [ref=e168]:
+          - generic [ref=e169]: User Role
+          - combobox [ref=e170] [cursor=pointer]:
+            - option "Agent" [selected]
+            - option "Manager"
+            - option "Admin"
+            - option "Customer Service"
+            - option "Super Admin"
+        - generic [ref=e171]:
+          - generic [ref=e172]: Agency
+          - combobox [ref=e173] [cursor=pointer]:
+            - option "No agency" [selected]
+        - generic [ref=e174]:
+          - generic [ref=e175]: Account Status
+          - combobox [ref=e176] [cursor=pointer]:
+            - option "Active" [selected]
+            - option "Inactive"
+            - option "Suspended"
+      - generic [ref=e177]:
+        - heading "Account Actions" [level=3] [ref=e178]
+        - generic [ref=e179]:
+          - button "Reset Password" [ref=e180] [cursor=pointer]: Reset Password
+          - button "Send Password Reset Email" [ref=e181] [cursor=pointer]: Send Password Reset Email
+      - generic [ref=e182]:
+        - button "Save Changes" [ref=e183] [cursor=pointer]: Save Changes
+        - button "Delete User" [ref=e184] [cursor=pointer]: Delete User
+        - button "Cancel" [ref=e185] [cursor=pointer]
+```
