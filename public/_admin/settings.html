@@ -1332,14 +1332,14 @@
                 statusBadge.style.color = '#4ade80';
 
                 // Show success message
-                alert('✅ Convoso credentials saved successfully!\\n\\nThey are securely stored and isolated to your agency only.');
+                alert('✅ Convoso credentials saved successfully!\n\nThey are securely stored and isolated to your agency only.');
 
                 // Reload to show masked values
                 await loadIntegrations();
 
             } catch (error) {
                 console.error('Error saving Convoso credentials:', error);
-                alert(`❌ Failed to save Convoso credentials:\\n\\n${error.message}`);
+                alert(`❌ Failed to save Convoso credentials:\n\n${error.message}`);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
@@ -1363,16 +1363,16 @@
                 };
 
                 if (!credentials.api_key || credentials.api_key.includes('*')) {
-                    alert('⚠️ Please enter your actual API key to test the connection.\\n\\n(Masked credentials cannot be tested)');
+                    alert('⚠️ Please enter your actual API key to test the connection.\n\n(Masked credentials cannot be tested)');
                     return;
                 }
 
                 // TODO: Add actual Convoso API test endpoint
-                alert('🔍 Connection test feature coming soon!\\n\\nFor now, save your credentials and check the Convoso monitor page.');
+                alert('🔍 Connection test feature coming soon!\n\nFor now, save your credentials and check the Convoso monitor page.');
 
             } catch (error) {
                 console.error('Error testing connection:', error);
-                alert(`❌ Connection test failed:\\n\\n${error.message}`);
+                alert(`❌ Connection test failed:\n\n${error.message}`);
             } finally {
                 testBtn.disabled = false;
                 testBtn.innerHTML = originalText;
