@@ -657,63 +657,86 @@
 
         // Populate settings forms with data
         function populateSettings(data) {
+            // Helper to safely set element value
+            const safeSetValue = (id, value, defaultValue = '') => {
+                const elem = document.getElementById(id);
+                if (elem) elem.value = value || defaultValue;
+            };
+
+            const safeSetChecked = (id, value) => {
+                const elem = document.getElementById(id);
+                if (elem) elem.checked = value;
+            };
+
             if (data.system) {
-                document.getElementById('systemName').value = data.system.name || 'SyncedUp Insurance';
-                document.getElementById('environment').value = data.system.environment || 'production';
-                document.getElementById('sessionTimeout').value = data.system.sessionTimeout || 60;
-                document.getElementById('maxLoginAttempts').value = data.system.maxLoginAttempts || 5;
-                document.getElementById('defaultRole').value = data.system.defaultRole || 'agent';
-                document.getElementById('dataRetention').value = data.system.dataRetention || 2555;
-                document.getElementById('maintenanceMode').checked = data.system.maintenanceMode || false;
+                safeSetValue('systemName', data.system.name, 'SyncedUp Insurance');
+                safeSetValue('environment', data.system.environment, 'production');
+                safeSetValue('sessionTimeout', data.system.sessionTimeout, 60);
+                safeSetValue('maxLoginAttempts', data.system.maxLoginAttempts, 5);
+                safeSetValue('defaultRole', data.system.defaultRole, 'agent');
+                safeSetValue('dataRetention', data.system.dataRetention, 2555);
+                safeSetChecked('maintenanceMode', data.system.maintenanceMode || false);
             }
-            
+
             if (data.branding) {
-                document.getElementById('logoUrl').value = data.branding.logoUrl || '';
-                document.getElementById('faviconUrl').value = data.branding.faviconUrl || '';
-                document.getElementById('primaryColor').value = data.branding.primaryColor || '#7c3aed';
-                document.getElementById('secondaryColor').value = data.branding.secondaryColor || '#8b5cf6';
-                document.getElementById('companyName').value = data.branding.companyName || 'SyncedUp Solutions';
-                document.getElementById('footerText').value = data.branding.footerText || '© 2025 SyncedUp Solutions. Empowering Insurance Excellence.';
-                document.getElementById('theme').value = data.branding.theme || 'purple';
+                safeSetValue('logoUrl', data.branding.logoUrl);
+                safeSetValue('faviconUrl', data.branding.faviconUrl);
+                safeSetValue('primaryColor', data.branding.primaryColor, '#7c3aed');
+                safeSetValue('secondaryColor', data.branding.secondaryColor, '#8b5cf6');
+                safeSetValue('companyName', data.branding.companyName, 'SyncedUp Solutions');
+                safeSetValue('footerText', data.branding.footerText, '© 2025 SyncedUp Solutions. Empowering Insurance Excellence.');
+                safeSetValue('theme', data.branding.theme, 'purple');
             }
-            
+
             if (data.agency) {
-                document.getElementById('agencyName').value = data.agency.name || 'Premier Insurance Solutions';
-                document.getElementById('licenseNumber').value = data.agency.licenseNumber || '';
-                document.getElementById('agencyPhone').value = data.agency.phone || '';
-                document.getElementById('agencyEmail').value = data.agency.email || '';
-                document.getElementById('agencyAddress').value = data.agency.address || '';
-                document.getElementById('timeZone').value = data.agency.timeZone || 'America/Los_Angeles';
-                document.getElementById('businessHours').value = data.agency.businessHours || '8-6';
-                document.getElementById('allowSelfRegistration').checked = data.agency.allowSelfRegistration !== false;
+                safeSetValue('agencyName', data.agency.name, 'Premier Insurance Solutions');
+                safeSetValue('licenseNumber', data.agency.licenseNumber);
+                safeSetValue('agencyPhone', data.agency.phone);
+                safeSetValue('agencyEmail', data.agency.email);
+                safeSetValue('agencyAddress', data.agency.address);
+                safeSetValue('timeZone', data.agency.timeZone, 'America/Los_Angeles');
+                safeSetValue('businessHours', data.agency.businessHours, '8-6');
+                safeSetChecked('allowSelfRegistration', data.agency.allowSelfRegistration !== false);
             }
         }
 
         // Setup form handlers
         function setupFormHandlers() {
             // System config form
-            document.getElementById('systemConfigForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                await saveSystemConfig();
-            });
+            const systemConfigForm = document.getElementById('systemConfigForm');
+            if (systemConfigForm) {
+                systemConfigForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await saveSystemConfig();
+                });
+            }
 
             // Branding form
-            document.getElementById('brandingForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                await saveBranding();
-            });
+            const brandingForm = document.getElementById('brandingForm');
+            if (brandingForm) {
+                brandingForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await saveBranding();
+                });
+            }
 
             // Agency form
-            document.getElementById('agencyForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                await saveAgencySettings();
-            });
+            const agencyForm = document.getElementById('agencyForm');
+            if (agencyForm) {
+                agencyForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await saveAgencySettings();
+                });
+            }
 
             // API key form
-            document.getElementById('apiKeyForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                await saveApiKey();
-            });
+            const apiKeyForm = document.getElementById('apiKeyForm');
+            if (apiKeyForm) {
+                apiKeyForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await saveApiKey();
+                });
+            }
         }
 
         // Save system configuration
