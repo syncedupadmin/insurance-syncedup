@@ -109,7 +109,7 @@
                                     <i data-lucide="key" style="width: 14px; height: 14px;"></i>
                                     API Key *
                                 </label>
-                                <input type="password" id="convoso_api_key" class="form-input" placeholder="Enter your Convoso API key" required>
+                                <input type="text" id="convoso_api_key" class="form-input" placeholder="Enter your Convoso API key">
                                 <small style="color: rgba(255,255,255,0.6);">Your Convoso authentication key</small>
                             </div>
 
@@ -1245,18 +1245,20 @@
                 if (data.integrations && data.integrations.convoso) {
                     const convoso = data.integrations.convoso;
 
-                    // Show masked credentials (already masked by backend)
-                    if (convoso.api_key) {
-                        document.getElementById('convoso_api_key').value = convoso.api_key;
-                        document.getElementById('convoso_api_key').placeholder = 'Already configured (masked for security)';
+                    // DON'T populate masked credentials - leave fields empty
+                    // Show placeholders indicating credentials are already configured
+                    if (convoso.api_key && convoso.api_key.includes('*')) {
+                        document.getElementById('convoso_api_key').placeholder = `Already configured: ${convoso.api_key} (enter new key to update)`;
+                        document.getElementById('convoso_api_key').value = ''; // Empty so it doesn't interfere
                     }
 
-                    if (convoso.api_secret) {
-                        document.getElementById('convoso_api_secret').value = convoso.api_secret;
-                        document.getElementById('convoso_api_secret').placeholder = 'Already configured (masked)';
+                    if (convoso.api_secret && convoso.api_secret.includes('*')) {
+                        document.getElementById('convoso_api_secret').placeholder = `Already configured: ${convoso.api_secret} (enter new to update)`;
+                        document.getElementById('convoso_api_secret').value = '';
                     }
 
-                    if (convoso.account_id) {
+                    // Non-sensitive fields can be populated
+                    if (convoso.account_id && !convoso.account_id.includes('*')) {
                         document.getElementById('convoso_account_id').value = convoso.account_id;
                     }
 
@@ -1267,9 +1269,32 @@
                     // Update status badge
                     const statusBadge = document.getElementById('convosoStatus');
                     if (convoso.enabled !== false) {
-                        statusBadge.textContent = 'Configured';
+                        statusBadge.textContent = '✓ Configured';
                         statusBadge.style.background = 'rgba(34, 197, 94, 0.2)';
                         statusBadge.style.color = '#4ade80';
+                    }
+
+                    // Show info message
+                    const convosoForm = document.getElementById('convosoForm');
+                    let infoMessage = convosoForm.querySelector('.credentials-info');
+                    if (!infoMessage && convoso.api_key) {
+                        infoMessage = document.createElement('div');
+                        infoMessage.className = 'credentials-info';
+                        infoMessage.style.cssText = 'padding: 1rem; background: rgba(59, 130, 246, 0.1); border-radius: 8px; margin-bottom: 1rem; color: rgba(255,255,255,0.9);';
+                        infoMessage.innerHTML = `
+                            <div style="display: flex; align-items: start; gap: 0.75rem;">
+                                <i data-lucide="info" style="width: 20px; height: 20px; color: #60a5fa; flex-shrink: 0; margin-top: 2px;"></i>
+                                <div>
+                                    <strong>Credentials Already Configured</strong>
+                                    <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; opacity: 0.8;">
+                                        Your Convoso API credentials are securely stored. Fields are empty for security.
+                                        Enter new values only if you want to update them.
+                                    </p>
+                                </div>
+                            </div>
+                        `;
+                        convosoForm.insertBefore(infoMessage, convosoForm.firstChild);
+                        lucide.createIcons();
                     }
                 }
 
@@ -1293,17 +1318,37 @@
                 submitBtn.innerHTML = '<i data-lucide="loader" class="icon animate-spin"></i> Saving...';
                 lucide.createIcons();
 
-                const credentials = {
-                    api_key: document.getElementById('convoso_api_key').value.trim(),
-                    api_secret: document.getElementById('convoso_api_secret').value.trim() || undefined,
-                    account_id: document.getElementById('convoso_account_id').value.trim() || undefined,
-                    base_url: document.getElementById('convoso_base_url').value.trim() || 'https://api.convoso.com'
-                };
+                const apiKey = document.getElementById('convoso_api_key').value.trim();
+                const apiSecret = document.getElementById('convoso_api_secret').value.trim();
+                const accountId = document.getElementById('convoso_account_id').value.trim();
+                const baseUrl = document.getElementById('convoso_base_url').value.trim();
 
-                // Remove undefined values
-                Object.keys(credentials).forEach(key =>
-                    credentials[key] === undefined && delete credentials[key]
-                );
+                // Build credentials object - only include fields that have values
+                const credentials = {};
+
+                if (apiKey) {
+                    credentials.api_key = apiKey;
+                }
+
+                if (apiSecret) {
+                    credentials.api_secret = apiSecret;
+                }
+
+                if (accountId) {
+                    credentials.account_id = accountId;
+                }
+
+                if (baseUrl) {
+                    credentials.base_url = baseUrl;
+                } else {
+                    credentials.base_url = 'https://api.convoso.com';
+                }
+
+                // Validate that at least api_key is provided (for new setup or full update)
+                if (!apiKey) {
+                    alert('⚠️ Please enter your Convoso API key.\n\nIf credentials are already configured and you just want to test, use the Test Connection button after entering your actual key.');
+                    return;
+                }
 
                 const response = await fetch('/api/admin/integrations', {
                     method: 'POST',
