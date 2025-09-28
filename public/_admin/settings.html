@@ -62,6 +62,105 @@
     <div id="global-header-mount"></div>
 
     <div class="container">
+        <!-- 🔐 SECURE INTEGRATIONS SECTION -->
+        <div class="card" style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="display: flex; align-items: center;">
+                    <i data-lucide="plug" class="card-icon"></i>
+                    Integrations
+                </h3>
+                <span class="badge" style="background: rgba(139, 92, 246, 0.2); color: #a78bfa;">
+                    <i data-lucide="shield-check" style="width: 14px; height: 14px; margin-right: 4px;"></i>
+                    Agency Isolated
+                </span>
+            </div>
+
+            <p style="color: rgba(255,255,255,0.7); margin-bottom: 1.5rem;">
+                Configure third-party integrations for your agency. These credentials are securely stored and <strong>isolated to your agency only</strong>.
+            </p>
+
+            <div id="integrationsLoading" class="loading">
+                <div class="spinner"></div>
+                Loading integrations...
+            </div>
+
+            <!-- Convoso Integration -->
+            <div id="integrationsContainer" class="hidden">
+                <div style="background: rgba(139, 92, 246, 0.1); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="phone-call" style="width: 24px; height: 24px; color: white;"></i>
+                            </div>
+                            <div>
+                                <h4 style="margin: 0; font-size: 1.1rem;">Convoso</h4>
+                                <p style="margin: 0; color: rgba(255,255,255,0.6); font-size: 0.9rem;">Lead management and dialer integration</p>
+                            </div>
+                        </div>
+                        <div>
+                            <span id="convosoStatus" class="badge" style="background: rgba(239, 68, 68, 0.2); color: #f87171;">Not Configured</span>
+                        </div>
+                    </div>
+
+                    <form id="convosoForm" onsubmit="saveConvosoCredentials(event)">
+                        <div class="grid" style="grid-template-columns: 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i data-lucide="key" style="width: 14px; height: 14px;"></i>
+                                    API Key *
+                                </label>
+                                <input type="password" id="convoso_api_key" class="form-input" placeholder="Enter your Convoso API key" required>
+                                <small style="color: rgba(255,255,255,0.6);">Your Convoso authentication key</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i data-lucide="lock" style="width: 14px; height: 14px;"></i>
+                                    API Secret (Optional)
+                                </label>
+                                <input type="password" id="convoso_api_secret" class="form-input" placeholder="Enter API secret if required">
+                            </div>
+
+                            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i data-lucide="hash" style="width: 14px; height: 14px;"></i>
+                                        Account ID (Optional)
+                                    </label>
+                                    <input type="text" id="convoso_account_id" class="form-input" placeholder="Your Convoso account ID">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i data-lucide="link" style="width: 14px; height: 14px;"></i>
+                                        Base URL
+                                    </label>
+                                    <input type="text" id="convoso_base_url" class="form-input" placeholder="https://api.convoso.com" value="https://api.convoso.com">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2" style="justify-content: flex-end; margin-top: 1.5rem;">
+                            <button type="button" class="btn" onclick="testConvosoConnection()">
+                                <i data-lucide="wifi" class="icon"></i>
+                                Test Connection
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i data-lucide="save" class="icon"></i>
+                                Save Convoso Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Future integrations can be added here -->
+                <div style="padding: 1rem; text-align: center; color: rgba(255,255,255,0.5); border: 2px dashed rgba(255,255,255,0.1); border-radius: 12px;">
+                    <i data-lucide="plus-circle" style="width: 32px; height: 32px; margin-bottom: 0.5rem;"></i>
+                    <p>More integrations coming soon (Stripe, Twilio, SendGrid)</p>
+                </div>
+            </div>
+        </div>
+
         <!-- API Key Management -->
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
@@ -1092,6 +1191,180 @@
                 editingApiKeyId = null;
             }
         });
+
+        // ============================================================================
+        // 🔐 SECURE INTEGRATIONS MANAGEMENT (Agency Isolated)
+        // ============================================================================
+
+        async function loadIntegrations() {
+            const loading = document.getElementById('integrationsLoading');
+            const container = document.getElementById('integrationsContainer');
+
+            try {
+                loading.classList.remove('hidden');
+                container.classList.add('hidden');
+
+                const response = await fetch('/api/admin/integrations', {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                // Populate Convoso fields if credentials exist
+                if (data.integrations && data.integrations.convoso) {
+                    const convoso = data.integrations.convoso;
+
+                    // Show masked credentials (already masked by backend)
+                    if (convoso.api_key) {
+                        document.getElementById('convoso_api_key').value = convoso.api_key;
+                        document.getElementById('convoso_api_key').placeholder = 'Already configured (masked for security)';
+                    }
+
+                    if (convoso.api_secret) {
+                        document.getElementById('convoso_api_secret').value = convoso.api_secret;
+                        document.getElementById('convoso_api_secret').placeholder = 'Already configured (masked)';
+                    }
+
+                    if (convoso.account_id) {
+                        document.getElementById('convoso_account_id').value = convoso.account_id;
+                    }
+
+                    if (convoso.base_url) {
+                        document.getElementById('convoso_base_url').value = convoso.base_url;
+                    }
+
+                    // Update status badge
+                    const statusBadge = document.getElementById('convosoStatus');
+                    if (convoso.enabled !== false) {
+                        statusBadge.textContent = 'Configured';
+                        statusBadge.style.background = 'rgba(34, 197, 94, 0.2)';
+                        statusBadge.style.color = '#4ade80';
+                    }
+                }
+
+                loading.classList.add('hidden');
+                container.classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error loading integrations:', error);
+                loading.innerHTML = `<div class="error">Failed to load integrations: ${error.message}</div>`;
+            }
+        }
+
+        async function saveConvosoCredentials(event) {
+            event.preventDefault();
+
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+
+            try {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i data-lucide="loader" class="icon animate-spin"></i> Saving...';
+                lucide.createIcons();
+
+                const credentials = {
+                    api_key: document.getElementById('convoso_api_key').value.trim(),
+                    api_secret: document.getElementById('convoso_api_secret').value.trim() || undefined,
+                    account_id: document.getElementById('convoso_account_id').value.trim() || undefined,
+                    base_url: document.getElementById('convoso_base_url').value.trim() || 'https://api.convoso.com'
+                };
+
+                // Remove undefined values
+                Object.keys(credentials).forEach(key =>
+                    credentials[key] === undefined && delete credentials[key]
+                );
+
+                const response = await fetch('/api/admin/integrations', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        integration_name: 'convoso',
+                        credentials: credentials,
+                        enabled: true
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || errorData.error || `HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Update status badge
+                const statusBadge = document.getElementById('convosoStatus');
+                statusBadge.textContent = 'Configured';
+                statusBadge.style.background = 'rgba(34, 197, 94, 0.2)';
+                statusBadge.style.color = '#4ade80';
+
+                // Show success message
+                alert('✅ Convoso credentials saved successfully!\\n\\nThey are securely stored and isolated to your agency only.');
+
+                // Reload to show masked values
+                await loadIntegrations();
+
+            } catch (error) {
+                console.error('Error saving Convoso credentials:', error);
+                alert(`❌ Failed to save Convoso credentials:\\n\\n${error.message}`);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+                lucide.createIcons();
+            }
+        }
+
+        async function testConvosoConnection() {
+            const testBtn = event.target;
+            const originalText = testBtn.innerHTML;
+
+            try {
+                testBtn.disabled = true;
+                testBtn.innerHTML = '<i data-lucide="loader" class="icon animate-spin"></i> Testing...';
+                lucide.createIcons();
+
+                // Get current credentials
+                const credentials = {
+                    api_key: document.getElementById('convoso_api_key').value.trim(),
+                    base_url: document.getElementById('convoso_base_url').value.trim() || 'https://api.convoso.com'
+                };
+
+                if (!credentials.api_key || credentials.api_key.includes('*')) {
+                    alert('⚠️ Please enter your actual API key to test the connection.\\n\\n(Masked credentials cannot be tested)');
+                    return;
+                }
+
+                // TODO: Add actual Convoso API test endpoint
+                alert('🔍 Connection test feature coming soon!\\n\\nFor now, save your credentials and check the Convoso monitor page.');
+
+            } catch (error) {
+                console.error('Error testing connection:', error);
+                alert(`❌ Connection test failed:\\n\\n${error.message}`);
+            } finally {
+                testBtn.disabled = false;
+                testBtn.innerHTML = originalText;
+                lucide.createIcons();
+            }
+        }
+
+        // Load integrations when page initializes
+        const originalInitializePage = window.initializePage;
+        window.initializePage = async function() {
+            if (typeof originalInitializePage === 'function') {
+                await originalInitializePage();
+            }
+            await loadIntegrations();
+        };
     </script>
 
     <!-- Professional Theme System -->
